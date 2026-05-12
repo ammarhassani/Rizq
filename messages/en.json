@@ -1,0 +1,106 @@
+{
+  "Meta": {
+    "title": "Rizq — The pricing benchmark for Saudi freelancers",
+    "description": "Price with confidence. Earn your rizq. — A real Saudi-market pricing benchmark, built on local data, so you know what to charge before you bid."
+  },
+  "Hero": {
+    "wordmark": "Rizq",
+    "eyebrow": "For Saudi freelancers",
+    "tagline": "Price with confidence. Earn your rizq.",
+    "subtitle": "The first Saudi-market pricing benchmark built on real local data. Know your fair rate before you send the next proposal.",
+    "ctaPrimary": "Try the tool free",
+    "ctaSecondary": "How Rizq works",
+    "trustBadge": "Made in Saudi",
+    "comingSoon": "Coming soon — join the waitlist"
+  },
+  "HowItWorks": {
+    "eyebrow": "How it works",
+    "heading": "Three steps to a fair price.",
+    "subheading": "No spreadsheets, no guesswork. Just real numbers from the Saudi freelance market.",
+    "step1Title": "Pick your specialty",
+    "step1Body": "From graphic design to web development, choose the specialty that matches your service.",
+    "step2Title": "Set your city and experience",
+    "step2Body": "Riyadh is not Jeddah. A beginner is not an expert. The details shape the number.",
+    "step3Title": "Get your fair rate",
+    "step3Body": "You'll receive a precise price range built on data from real Saudi freelancers like you."
+  },
+  "Pricing": {
+    "eyebrow": "Pricing",
+    "heading": "Start free. Upgrade when you're ready.",
+    "subheading": "No hidden fees. No annual commitments. Cancel anytime.",
+    "free": {
+      "name": "Free",
+      "price": "0",
+      "period": "SAR",
+      "tagline": "Start here",
+      "feature1": "3 queries per month",
+      "feature2": "Full price range result",
+      "feature3": "Sample size shown",
+      "feature4": "Share your result",
+      "cta": "Start free"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "49",
+      "period": "SAR / month",
+      "tagline": "For serious freelancers",
+      "feature1": "Unlimited queries",
+      "feature2": "Advanced filters (project size, client type)",
+      "feature3": "Save queries and history",
+      "feature4": "Clean PDF exports for proposals",
+      "feature5": "One-click cancel, no commitment",
+      "cta": "Start with Pro",
+      "badge": "Most popular"
+    },
+    "halalNote": "Halal. No riba. A service subscription only."
+  },
+  "Faq": {
+    "eyebrow": "Frequently asked",
+    "heading": "What freelancers ask before they sign up.",
+    "q1": "Where does Rizq's data come from?",
+    "a1": "A blend: completed projects on Saudi platforms (Mostaql, Khamsat, Bahr), contributions from freelancers themselves, and rates posted in LinkedIn and X job listings. Every record is reviewed before it enters the benchmark.",
+    "q2": "Is the benchmark really accurate?",
+    "a2": "We always show the sample size honestly. If it's based on 12 freelancers, we'll tell you. Transparency matters more than claimed precision.",
+    "q3": "Why monthly and not annual?",
+    "a3": "We want you to try us. If we don't earn it, you cancel. An annual plan with a discount is on the way for those who already trust the product.",
+    "q4": "Is my data safe?",
+    "a4": "Yes. All contributions are anonymized before they enter the public benchmark. We don't expose any freelancer's or client's identity. Compliant with the Saudi PDPL.",
+    "q5": "How is Rizq different from Mostaql or Khamsat?",
+    "a5": "Those platforms match freelancers with clients. Rizq tells you the fair price before you bid — on any platform, or for a direct client.",
+    "q6": "Will there be a proposal generator?",
+    "a6": "Yes — in v0.2. Right now we're focused on getting the benchmark right first. Join the waitlist to be among the first to know.",
+    "q7": "Does Rizq support Saudi payment methods?",
+    "a7": "Yes. Mada, Visa, Mastercard, and Apple Pay through a Sharia-compliant Saudi payment processor."
+  },
+  "Founder": {
+    "eyebrow": "Who built Rizq",
+    "heading": "Built by a Saudi who lived the problem.",
+    "body": "I'm Ammar — a data analyst in banking and a former freelancer. I lived the question of \"am I charging right?\" for years. Rizq is what I wish existed when I started — a real benchmark built on Saudi data, with full transparency on where every number comes from.",
+    "name": "Ammar Al-Hassani",
+    "role": "Founder, Rizq"
+  },
+  "Waitlist": {
+    "heading": "Be the first to try Rizq.",
+    "subheading": "Launching soon. Drop your email for early access.",
+    "emailPlaceholder": "Your email address",
+    "submit": "Join the waitlist",
+    "submitting": "Adding you…",
+    "successTitle": "You're on the list.",
+    "successBody": "We'll be in touch when the beta opens.",
+    "errorInvalidEmail": "Enter a valid email address.",
+    "errorRequired": "Email is required.",
+    "errorRateLimited": "Easy there — try again in a few minutes.",
+    "errorGeneric": "Something went wrong. Try again.",
+    "errorDuplicate": "This email is already on the list.",
+    "privacyNote": "We won't share your email with anyone."
+  },
+  "Footer": {
+    "tagline": "The pricing benchmark for Saudi freelancers",
+    "contactLabel": "Contact",
+    "contactEmail": "hello@rizq.sa",
+    "termsLabel": "Terms",
+    "privacyLabel": "Privacy",
+    "langToggleLabel": "عربي",
+    "copyright": "© 2026 Rizq. All rights reserved."
+  }
+}
