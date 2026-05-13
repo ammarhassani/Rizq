@@ -2,11 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 /**
- * Server-side Supabase client. Uses the publishable (anon) key.
- * For the waitlist insert flow, RLS grants the anon role INSERT on
- * `public.waitlist` (specific columns only). No SELECT/UPDATE/DELETE.
+ * Supabase client for use in Server Components, Server Actions, and Route
+ * Handlers. Reads + writes cookies via next/headers.
+ *
+ * Auth session refresh lives in proxy.ts (middleware) — Server Components
+ * cannot mutate cookies, so writes here are silently swallowed when called
+ * from a Server Component context.
  */
-export async function getSupabaseServerClient() {
+export async function createClient() {
   const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,17 +19,22 @@ export async function getSupabaseServerClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookies) {
-          for (const { name, value, options } of cookies) {
-            try {
+        setAll(cookiesToSet) {
+          try {
+            for (const { name, value, options } of cookiesToSet) {
               cookieStore.set(name, value, options);
-            } catch {
-              // setAll called from a Server Component — cookies cannot be set here;
-              // ignore. Middleware refreshes the session.
             }
+          } catch {
+            // Server Component context — cookies are read-only here.
+            // Session refresh happens in middleware (proxy.ts) instead.
           }
         },
       },
     }
   );
 }
+
+/**
+ * @deprecated Use {@link createClient} instead. Kept for Sprint 1 callers.
+ */
+export const getSupabaseServerClient = createClient;

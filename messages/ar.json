@@ -102,5 +102,123 @@
     "privacyLabel": "سياسة الخصوصية",
     "langToggleLabel": "English",
     "copyright": "© 2026 رِزق. جميع الحقوق محفوظة."
+  },
+  "Auth": {
+    "shared": {
+      "or": "أو",
+      "back": "رجوع",
+      "continueWithGoogle": "متابعة عبر جوجل",
+      "continueWithApple": "متابعة عبر آبل",
+      "continueWithLinkedIn": "متابعة عبر لينكدإن",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "passwordPlaceholder": "كلمة مرور قوية",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "اسمك",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "termsBlurb": "بإنشاء حساب، أنت توافق على الشروط وسياسة الخصوصية.",
+      "providerNotConfigured": "هذه الطريقة غير مفعّلة بعد. استخدم البريد الإلكتروني.",
+      "genericError": "حدث خطأ. حاول مرة أخرى."
+    },
+    "Signup": {
+      "title": "أنشئ حسابك",
+      "subtitle": "ابدأ مجانًا. ٣ استعلامات شهريًا، بلا بطاقة ائتمان.",
+      "submit": "إنشاء حساب",
+      "submitting": "جارٍ إنشاء الحساب...",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "loginLink": "سجّل الدخول",
+      "errors": {
+        "emailRequired": "أدخل بريدك الإلكتروني.",
+        "emailInvalid": "أدخل بريدًا إلكترونيًا صحيحًا.",
+        "passwordRequired": "أدخل كلمة مرور.",
+        "passwordTooShort": "كلمة المرور يجب أن تكون ٨ أحرف على الأقل.",
+        "emailTaken": "هذا البريد مسجل بالفعل. سجّل الدخول.",
+        "weakPassword": "كلمة مرور ضعيفة. جرّب أحرف وأرقام ورموز.",
+        "rateLimited": "هدّئ قليلًا — حاول بعد دقائق."
+      }
+    },
+    "Login": {
+      "title": "أهلًا بعودتك",
+      "subtitle": "سجّل دخولك للوصول إلى رِزق.",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ تسجيل الدخول...",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "noAccount": "ليس لديك حساب؟",
+      "signupLink": "أنشئ حساب",
+      "errors": {
+        "invalidCredentials": "البريد أو كلمة المرور غير صحيحة.",
+        "emailNotConfirmed": "تحقق من بريدك أولًا لتفعيل الحساب.",
+        "rateLimited": "محاولات كثيرة. حاول بعد دقائق."
+      }
+    },
+    "Forgot": {
+      "title": "أعد ضبط كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة الضبط.",
+      "submit": "إرسال الرابط",
+      "submitting": "جارٍ الإرسال...",
+      "successTitle": "تحقق من بريدك.",
+      "successBody": "إذا كان البريد مسجلًا لدينا، ستجد رسالة بإعادة ضبط كلمة المرور.",
+      "backToLogin": "العودة لتسجيل الدخول"
+    },
+    "Reset": {
+      "title": "اختر كلمة مرور جديدة",
+      "subtitle": "اختر كلمة مرور قوية لحسابك.",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "confirmLabel": "تأكيد كلمة المرور",
+      "submit": "حفظ كلمة المرور",
+      "submitting": "جارٍ الحفظ...",
+      "successTitle": "تم تحديث كلمة المرور.",
+      "successBody": "يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+      "goToLogin": "اذهب لتسجيل الدخول",
+      "errors": {
+        "mismatch": "كلمتا المرور غير متطابقتين.",
+        "tooShort": "كلمة المرور يجب أن تكون ٨ أحرف على الأقل.",
+        "linkExpired": "انتهت صلاحية الرابط. اطلب رابطًا جديدًا."
+      }
+    },
+    "Verify": {
+      "title": "تحقق من بريدك",
+      "subtitle": "أرسلنا رابط تفعيل إلى {email}. افتحه لتأكيد الحساب.",
+      "checkSpam": "لم يصلك؟ تحقق من مجلد البريد العشوائي.",
+      "resend": "إعادة إرسال رابط التفعيل",
+      "resending": "جارٍ الإرسال...",
+      "resentTitle": "تم إعادة الإرسال.",
+      "resentBody": "تحقق من بريدك خلال دقيقة.",
+      "logout": "تسجيل الخروج"
+    },
+    "Callback": {
+      "processing": "جارٍ تسجيل دخولك...",
+      "error": "تعذّر إتمام تسجيل الدخول.",
+      "tryAgain": "حاول مرة أخرى"
+    }
+  },
+  "Onboarding": {
+    "title": "خطوة أخيرة قبل أن نبدأ.",
+    "subtitle": "ساعدنا نجعل رِزق أكثر فائدة لك. كل هذه الحقول اختيارية.",
+    "languageLabel": "لغة الواجهة المفضّلة",
+    "languageAr": "العربية",
+    "languageEn": "English",
+    "cityLabel": "مدينتك",
+    "cityPlaceholder": "اختر مدينتك",
+    "citySkip": "تخطّي",
+    "specialtyLabel": "تخصصك",
+    "specialtyPlaceholder": "اختر تخصصك",
+    "submit": "ابدأ استخدام رِزق",
+    "submitting": "جارٍ الحفظ...",
+    "skip": "تخطّي الآن"
+  },
+  "Dashboard": {
+    "welcome": "أهلًا، {name}",
+    "welcomeGuest": "أهلًا بك في رِزق",
+    "comingSoon": "أداة التسعير ستكون متاحة في الإصدار القادم. تابعنا.",
+    "logout": "تسجيل الخروج",
+    "logoutLoading": "جارٍ تسجيل الخروج...",
+    "settings": "الإعدادات",
+    "verifyBannerTitle": "بريدك غير مفعّل",
+    "verifyBannerBody": "تحقق من بريدك لتفعيل حسابك واستخدام جميع الميزات.",
+    "verifyBannerCta": "أرسل رابط التفعيل مجددًا",
+    "verifyBannerSent": "تم الإرسال — تحقق من بريدك."
   }
 }

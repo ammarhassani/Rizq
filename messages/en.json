@@ -102,5 +102,123 @@
     "privacyLabel": "Privacy",
     "langToggleLabel": "عربي",
     "copyright": "© 2026 Rizq. All rights reserved."
+  },
+  "Auth": {
+    "shared": {
+      "or": "or",
+      "back": "Back",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithApple": "Continue with Apple",
+      "continueWithLinkedIn": "Continue with LinkedIn",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "A strong password",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "termsBlurb": "By creating an account, you agree to the Terms and Privacy Policy.",
+      "providerNotConfigured": "This sign-in method isn't enabled yet. Use email instead.",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "Signup": {
+      "title": "Create your account",
+      "subtitle": "Start free. 3 queries / month, no credit card.",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "errors": {
+        "emailRequired": "Enter your email.",
+        "emailInvalid": "Enter a valid email address.",
+        "passwordRequired": "Enter a password.",
+        "passwordTooShort": "Password must be at least 8 characters.",
+        "emailTaken": "This email is already registered. Sign in instead.",
+        "weakPassword": "Weak password — mix letters, numbers, and symbols.",
+        "rateLimited": "Easy there — try again in a few minutes."
+      }
+    },
+    "Login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to access Rizq.",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Create one",
+      "errors": {
+        "invalidCredentials": "Email or password is incorrect.",
+        "emailNotConfirmed": "Verify your email first to activate your account.",
+        "rateLimited": "Too many attempts. Try again in a few minutes."
+      }
+    },
+    "Forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link.",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "successTitle": "Check your inbox.",
+      "successBody": "If that email is registered, you'll find a reset message.",
+      "backToLogin": "Back to sign in"
+    },
+    "Reset": {
+      "title": "Pick a new password",
+      "subtitle": "Choose a strong password for your account.",
+      "newPasswordLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "submit": "Save password",
+      "submitting": "Saving…",
+      "successTitle": "Password updated.",
+      "successBody": "You can now sign in with your new password.",
+      "goToLogin": "Go to sign in",
+      "errors": {
+        "mismatch": "Passwords don't match.",
+        "tooShort": "Password must be at least 8 characters.",
+        "linkExpired": "This reset link has expired. Request a new one."
+      }
+    },
+    "Verify": {
+      "title": "Check your email",
+      "subtitle": "We sent a verification link to {email}. Open it to confirm your account.",
+      "checkSpam": "Didn't get it? Check your spam folder.",
+      "resend": "Resend verification link",
+      "resending": "Sending…",
+      "resentTitle": "Sent again.",
+      "resentBody": "Check your inbox in a minute.",
+      "logout": "Sign out"
+    },
+    "Callback": {
+      "processing": "Signing you in…",
+      "error": "Couldn't complete sign-in.",
+      "tryAgain": "Try again"
+    }
+  },
+  "Onboarding": {
+    "title": "One last step before we start.",
+    "subtitle": "Help us make Rizq more useful for you. All fields optional.",
+    "languageLabel": "Preferred interface language",
+    "languageAr": "Arabic",
+    "languageEn": "English",
+    "cityLabel": "Your city",
+    "cityPlaceholder": "Pick your city",
+    "citySkip": "Skip",
+    "specialtyLabel": "Your specialty",
+    "specialtyPlaceholder": "Pick your specialty",
+    "submit": "Start using Rizq",
+    "submitting": "Saving…",
+    "skip": "Skip for now"
+  },
+  "Dashboard": {
+    "welcome": "Welcome, {name}",
+    "welcomeGuest": "Welcome to Rizq",
+    "comingSoon": "The pricing tool ships in the next release. Stay tuned.",
+    "logout": "Sign out",
+    "logoutLoading": "Signing out…",
+    "settings": "Settings",
+    "verifyBannerTitle": "Email not verified yet",
+    "verifyBannerBody": "Verify your email to activate your account and unlock everything.",
+    "verifyBannerCta": "Resend verification link",
+    "verifyBannerSent": "Sent — check your inbox."
   }
 }
