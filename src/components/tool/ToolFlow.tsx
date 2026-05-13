@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { calculate, type ToolActionResult } from "@/app/actions/tool/calculate";
+import { track } from "@/lib/analytics/track";
 import { ResultCard } from "./ResultCard";
 import { ResultSkeleton } from "./ResultSkeleton";
 import { InsufficientCard } from "./InsufficientCard";
@@ -18,6 +20,16 @@ type Props = {
   tiers: Option[];
   canShare: boolean;
 };
+
+const VALID_SIZES = new Set(["small", "medium", "large", "enterprise"]);
+
+function safeParam(
+  raw: string | null,
+  validValues: Set<string>
+): string {
+  if (!raw) return "";
+  return validValues.has(raw) ? raw : "";
+}
 
 type View =
   | { kind: "form"; error?: string }
@@ -41,12 +53,28 @@ export function ToolFlow({
   canShare,
 }: Props) {
   const t = useTranslations("Tool");
+  const search = useSearchParams();
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
-  const [specialty, setSpecialty] = useState("");
-  const [city, setCity] = useState("");
-  const [tier, setTier] = useState("");
-  const [projectSize, setProjectSize] = useState<string>("");
+  // Prefill from URL params when arriving via "Run again" links in the
+  // dashboard. Each value is validated against the known option lists to
+  // prevent injecting arbitrary strings.
+  const specialtySlugs = new Set(specialties.map((s) => s.slug));
+  const citySlugs = new Set(cities.map((c) => c.slug));
+  const tierSlugs = new Set(tiers.map((t2) => t2.slug));
+
+  const [specialty, setSpecialty] = useState(() =>
+    safeParam(search?.get("specialty") ?? null, specialtySlugs)
+  );
+  const [city, setCity] = useState(() =>
+    safeParam(search?.get("city") ?? null, citySlugs)
+  );
+  const [tier, setTier] = useState(() =>
+    safeParam(search?.get("tier") ?? null, tierSlugs)
+  );
+  const [projectSize, setProjectSize] = useState<string>(() =>
+    safeParam(search?.get("size") ?? null, VALID_SIZES)
+  );
 
   const [view, setView] = useState<View>({ kind: "form" });
   const [isPending, startTransition] = useTransition();
@@ -74,6 +102,10 @@ export function ToolFlow({
 
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
+          track("quota_exhausted", {
+            locale,
+            mode: result.cta === "signup" ? "anon" : "free",
+          });
           setView({
             kind: "exhausted",
             mode: (result.cta === "signup" ? "anon" : "free") as "anon" | "free",
@@ -91,9 +123,28 @@ export function ToolFlow({
       }
 
       if (result.result.status === "insufficient_data") {
+        track("query_insufficient_data", {
+          locale,
+          specialty,
+          city,
+          tier,
+        });
         setView({ kind: "insufficient", data: result });
         return;
       }
+
+      track("query_calculated", {
+        locale,
+        specialty,
+        city,
+        tier,
+        project_size: projectSize || null,
+        median: result.result.status === "ok" ? result.result.median : null,
+        sample_size:
+          result.result.status === "ok" ? result.result.sample_size : null,
+        fallback_used:
+          result.result.status === "ok" ? result.result.fallback_used : null,
+      });
       setView({ kind: "result", data: result });
     });
   };

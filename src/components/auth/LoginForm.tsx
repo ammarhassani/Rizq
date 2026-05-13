@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { logIn } from "@/app/actions/auth/login";
+import { track } from "@/lib/analytics/track";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { email: string; password: string };
@@ -47,6 +48,7 @@ export function LoginForm({ locale }: Props) {
       });
 
       if (result.ok) {
+        track("login_completed", { locale, method: "email" });
         // Strip the locale prefix from returnTo since router.push re-adds it.
         const raw = search?.get("returnTo") ?? `/dashboard`;
         const stripped = raw.replace(/^\/(?:ar|en)/, "") || "/dashboard";

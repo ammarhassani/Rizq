@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "./LocaleToggle";
 
 type Props = { locale: "ar" | "en" };
@@ -34,18 +35,18 @@ export async function SiteFooter({ locale }: Props) {
           </div>
 
           <div className="flex flex-col gap-3">
-            <a
-              href="#"
+            <Link
+              href="/terms"
               className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
             >
               {t("termsLabel")}
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/privacy"
               className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
             >
               {t("privacyLabel")}
-            </a>
+            </Link>
             <div className="mt-2">
               <LocaleToggle />
             </div>

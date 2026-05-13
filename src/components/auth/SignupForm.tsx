@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { signUp } from "@/app/actions/auth/signup";
+import { track } from "@/lib/analytics/track";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { email: string; password: string };
@@ -52,6 +53,11 @@ export function SignupForm({ locale }: Props) {
       });
 
       if (result.ok) {
+        track("signup_completed", {
+          locale,
+          method: "email",
+          needs_verification: result.needsVerification,
+        });
         const path = `/verify-email?email=${encodeURIComponent(values.email)}`;
         router.push(path);
         return;

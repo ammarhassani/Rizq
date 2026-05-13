@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { PostHogProvider } from "@/lib/analytics/PostHogProvider";
 import "../globals.css";
 
 const tajawal = Tajawal({
@@ -64,7 +65,9 @@ export default async function LocaleLayout({
       <body
         className={`min-h-full bg-paper text-rizq-ink antialiased selection:bg-rizq-gold/30 selection:text-rizq-ink ${bodyFontClass}`}
       >
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <PostHogProvider>{children}</PostHogProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

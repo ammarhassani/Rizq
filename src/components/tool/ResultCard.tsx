@@ -70,6 +70,12 @@ export function ResultCard({
     }
   };
 
+  // Locale-aware number formatter for inline stats (sample size, %).
+  const numberFmt = new Intl.NumberFormat(
+    locale === "ar" ? "ar-SA" : "en-US",
+    { maximumFractionDigits: 0 }
+  );
+
   // Confidence band: visualises the spread between min/median/max as a bar
   const range = max - min;
   const medianPct = range > 0 ? ((median - min) / range) * 100 : 50;
@@ -124,14 +130,14 @@ export function ResultCard({
             aria-hidden
             className="inline-block h-1.5 w-1.5 rounded-full bg-rizq-green me-2 align-middle"
           />
-          {t("sampleSize", { n: sample_size })}
+          {t("sampleSize", { n: numberFmt.format(sample_size) })}
         </p>
         <p className={`text-sm text-rizq-ink ${font}`}>
           <span
             aria-hidden
             className="inline-block h-1.5 w-1.5 rounded-full bg-rizq-gold me-2 align-middle"
           />
-          {t("comparison", { percent: comparison_percent_below })}
+          {t("comparison", { percent: numberFmt.format(comparison_percent_below) })}
         </p>
         {fallback_used && (
           <p

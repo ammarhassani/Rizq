@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { percentile } from "./percentile";
 
 export type CalculateInput = {
   specialty_slug: string;
@@ -178,17 +179,6 @@ async function fetchPrices(
   return data.map((r) => Number(r.price_sar)).filter((n) => Number.isFinite(n));
 }
 
-function percentile(sorted: number[], p: number): number {
-  // p10 = 10th percentile, etc. Sorted ascending. Uses linear interpolation.
-  if (sorted.length === 0) return 0;
-  if (sorted.length === 1) return sorted[0]!;
-  const idx = (sorted.length - 1) * p;
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo]!;
-  const frac = idx - lo;
-  return sorted[lo]! + (sorted[hi]! - sorted[lo]!) * frac;
-}
 
 type ResolvedIds = {
   specialty_id: string;

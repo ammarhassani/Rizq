@@ -199,7 +199,7 @@ export default async function SharedResultPage({
               aria-hidden
               className="inline-block h-1.5 w-1.5 rounded-full bg-rizq-green me-2 align-middle"
             />
-            {t("sampleSize", { n: row.result_sample_size ?? 0 })}
+            {t("sampleSize", { n: fmt.format(row.result_sample_size ?? 0) })}
           </p>
         </article>
 

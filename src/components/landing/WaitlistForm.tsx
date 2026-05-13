@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { Check, Loader2 } from "lucide-react";
 import { joinWaitlist } from "@/app/actions/waitlist";
+import { track } from "@/lib/analytics/track";
 
 type Props = { locale: "ar" | "en" };
 
@@ -48,6 +49,7 @@ export function WaitlistForm({ locale }: Props) {
       });
 
       if (result.ok) {
+        track("waitlist_joined", { locale });
         setSuccess(true);
         reset();
         return;

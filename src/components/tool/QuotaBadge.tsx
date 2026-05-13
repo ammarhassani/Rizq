@@ -11,6 +11,7 @@ export async function QuotaBadge({ locale, mode, remaining, limit = 3 }: Props) 
   const t = await getTranslations({ locale, namespace: "Tool.quota" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
+  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US");
   let label: string;
   let tone: "neutral" | "warn" | "good" = "neutral";
   if (mode === "pro" || mode === "admin" || remaining === "unlimited") {
@@ -20,7 +21,10 @@ export async function QuotaBadge({ locale, mode, remaining, limit = 3 }: Props) 
     label = t("anonRemaining");
     tone = remaining === 0 ? "warn" : "neutral";
   } else {
-    label = t("freeRemaining", { remaining, limit });
+    label = t("freeRemaining", {
+      remaining: fmt.format(remaining),
+      limit: fmt.format(limit),
+    });
     tone = remaining === 0 ? "warn" : remaining === 1 ? "neutral" : "good";
   }
 

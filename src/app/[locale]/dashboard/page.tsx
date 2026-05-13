@@ -207,12 +207,23 @@ export default async function DashboardPage({
                     ? Math.round(Number(row.result_median))
                     : null;
 
+                  // Prefill URL: /tool?specialty=...&city=...&tier=...
+                  const rerunParams = new URLSearchParams();
+                  if (row.specialty) rerunParams.set("specialty", row.specialty.slug);
+                  if (row.city) rerunParams.set("city", row.city.slug);
+                  if (row.experience_tier)
+                    rerunParams.set("tier", row.experience_tier.slug);
+                  const rerunHref = `/tool?${rerunParams.toString()}`;
+
                   return (
                     <li
                       key={row.id}
-                      className="py-4 sm:py-5 flex items-center justify-between gap-4"
+                      className="group py-4 sm:py-5 flex items-center justify-between gap-4 hover:bg-rizq-gold/[0.04] -mx-2 px-2 rounded-lg transition-colors"
                     >
-                      <div className="min-w-0 flex-1">
+                      <Link
+                        href={rerunHref}
+                        className="min-w-0 flex-1 outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 rounded-md"
+                      >
                         <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
                           {sName}{" "}
                           <span className="text-rizq-ink-soft/70">·</span>{" "}
@@ -229,7 +240,7 @@ export default async function DashboardPage({
                             </span>
                           )}
                         </p>
-                      </div>
+                      </Link>
                       <div className="flex items-center gap-4 shrink-0">
                         {median !== null && (
                           <span className="hidden sm:flex flex-col items-end">
@@ -241,14 +252,12 @@ export default async function DashboardPage({
                             </span>
                           </span>
                         )}
-                        {row.public_share && (
-                          <Link
-                            href={`/r/${row.id}`}
-                            className={`text-xs text-rizq-green hover:text-rizq-green-dark transition-colors ${font}`}
-                          >
-                            {t("historyRerun")}
-                          </Link>
-                        )}
+                        <Link
+                          href={rerunHref}
+                          className={`text-xs text-rizq-green hover:text-rizq-green-dark transition-colors opacity-70 group-hover:opacity-100 ${font}`}
+                        >
+                          {t("historyRerun")}
+                        </Link>
                       </div>
                     </li>
                   );

@@ -103,6 +103,52 @@
     "langToggleLabel": "عربي",
     "copyright": "© 2026 Rizq. All rights reserved."
   },
+  "Legal": {
+    "lastUpdated": "Last updated: May 2026",
+    "backHome": "Back to home",
+    "Terms": {
+      "title": "Terms of Service",
+      "intro": "By accessing or using Rizq, you agree to these Terms. Read them carefully.",
+      "s1Title": "1. What Rizq provides",
+      "s1Body": "Rizq is a data platform that offers indicative price ranges for freelance services in the Saudi market, based on aggregated and reviewed data. The ranges are market information — they are not professional advice or a guarantee of any actual price.",
+      "s2Title": "2. Account and acceptable use",
+      "s2Body": "You're responsible for the accuracy of your account information and for any activity that happens through it. Do not share your credentials. Automated or abusive use of Rizq is prohibited and may lead to account suspension.",
+      "s3Title": "3. Subscriptions and payment",
+      "s3Body": "The free tier allows 3 queries per month. The Pro tier is a monthly subscription, cancellable at any time from your account settings. There is no interest (riba) in any payment flow. Payments are processed by a Saudi-compliant processor.",
+      "s4Title": "4. Cancellation and refunds",
+      "s4Body": "You can cancel your subscription at any time and retain access until the end of the paid period. Refunds are available within the first 7 days of a subscription, pro-rated to time used.",
+      "s5Title": "5. Intellectual property",
+      "s5Body": "The Rizq trademark, content, and code belong to its founder. The dataset shown is part of Rizq's database and may not be republished commercially without permission.",
+      "s6Title": "6. Limitation of liability",
+      "s6Body": "Rizq data is provided \"as is\". We're not responsible for business decisions based on it. Use your own professional judgment when pricing.",
+      "s7Title": "7. Changes to these terms",
+      "s7Body": "We may update these terms from time to time. Material changes will be announced to your registered email.",
+      "s8Title": "8. Governing law",
+      "s8Body": "These terms are governed by the laws of the Kingdom of Saudi Arabia. Disputes are resolved before the competent Saudi courts.",
+      "contact": "Questions: {email}"
+    },
+    "Privacy": {
+      "title": "Privacy Policy",
+      "intro": "We respect your privacy. This policy explains what we collect and why, in line with the Saudi Personal Data Protection Law (PDPL).",
+      "s1Title": "1. What we collect",
+      "s1Body": "Your email and an encrypted password, plus your name, preferred language, and city if you provide them. A log of your queries (specialty, city, returned range). Limited technical data (browser, timestamp) for security and analytics.",
+      "s2Title": "2. Why we collect it",
+      "s2Body": "To operate the service, improve benchmark accuracy, prevent abuse, and contact you about important updates. We do not sell your data to any third party.",
+      "s3Title": "3. Who we share with",
+      "s3Body": "Only infrastructure providers (hosting, database, error tracking, analytics, email). All are bound by confidentiality and data-processing agreements.",
+      "s4Title": "4. Your rights",
+      "s4Body": "You can ask what we store about you, correct it, delete it, or export a copy. Email us at the address below and we'll respond within 14 days.",
+      "s5Title": "5. Cookies",
+      "s5Body": "We use a session cookie to keep you logged in, and optional analytics cookies to understand how the product is used. We do not use ad-tracking cookies.",
+      "s6Title": "6. Where data is stored",
+      "s6Body": "Your data is stored in Supabase's Central-EU region. Passwords are stored encrypted; the Rizq team cannot read them.",
+      "s7Title": "7. Children",
+      "s7Body": "Rizq is not directed at users under 18, and we do not knowingly collect their data.",
+      "s8Title": "8. Privacy contact",
+      "s8Body": "For privacy questions or to exercise your rights, email us below.",
+      "contact": "Contact: {email}"
+    }
+  },
   "Auth": {
     "shared": {
       "or": "or",

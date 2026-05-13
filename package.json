@@ -6,11 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@hookform/resolvers": "^5.2.2",
+    "@sentry/nextjs": "^10.53.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "@vercel/analytics": "^2.0.1",
@@ -22,6 +25,7 @@
     "next": "16.2.6",
     "next-intl": "^4.11.2",
     "next-themes": "^0.4.6",
+    "posthog-js": "^1.373.3",
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -42,6 +46,21 @@
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.6"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@parcel/watcher",
+      "@swc/core",
+      "unrs-resolver",
+      "msw"
+    ],
+    "ignoredBuiltDependencies": [
+      "@sentry/cli",
+      "core-js",
+      "protobufjs"
+    ]
   }
 }
