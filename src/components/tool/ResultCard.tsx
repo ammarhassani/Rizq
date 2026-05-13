@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Copy, Globe, Lock, RotateCcw } from "lucide-react";
+import { Check, Copy, Globe, HandCoins, Lock, RotateCcw } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { toggleShare } from "@/app/actions/tool/calculate";
 
@@ -203,6 +204,23 @@ export function ResultCard({
         <p className={`mt-3 text-xs text-rizq-ink-soft/65 ${font}`}>
           {isShared ? t("shareNotePublic") : t("shareNotePrivate")}
         </p>
+      )}
+
+      {/* Contribute CTA — quiet, editorial. Only for authed users
+          (anons would hit a login-required wall on the submit page). */}
+      {canShare && (
+        <div className="mt-6 pt-5 border-t border-rizq-gold/15">
+          <Link
+            href="/submit"
+            className={`group inline-flex items-center gap-2 text-sm text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
+          >
+            <HandCoins size={14} strokeWidth={1.8} />
+            <span>{t("contributeYourPrice")}</span>
+            <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
+              →
+            </span>
+          </Link>
+        </div>
       )}
     </article>
   );
