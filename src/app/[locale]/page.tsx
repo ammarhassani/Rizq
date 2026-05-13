@@ -2,7 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
-import { SiteHeader } from "@/components/landing/SiteHeader";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Pricing } from "@/components/landing/Pricing";
@@ -22,7 +22,7 @@ export default async function LandingPage({
 
   return (
     <>
-      <SiteHeader />
+      <SiteNav locale={locale} />
       <main>
         <Hero locale={locale} />
         <HowItWorks locale={locale} />

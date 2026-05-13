@@ -2,8 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
-import { LocaleToggle } from "@/components/landing/LocaleToggle";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { createClient } from "@/lib/supabase/server";
 import {
   getSpecialties,
@@ -85,30 +84,7 @@ export default async function ToolPage({
         }}
       />
 
-      <header className="relative z-10 backdrop-blur-md bg-rizq-cream/70 border-b border-rizq-gold/15">
-        <div className="mx-auto w-full max-w-5xl px-6 sm:px-10 lg:px-16 h-16 flex items-center justify-between">
-          <Link href="/" className="group inline-flex items-baseline gap-2">
-            <span className="font-arabic text-2xl font-bold text-rizq-green tracking-tight transition-colors group-hover:text-rizq-green-dark">
-              رِزق
-            </span>
-            <span aria-hidden className="hidden sm:inline-block h-3 w-px bg-rizq-gold/50" />
-            <span className="hidden sm:inline-block text-[10px] tracking-[0.24em] uppercase text-rizq-ink-soft/70">
-              beta
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <LocaleToggle />
-            {isAuth && (
-              <Link
-                href="/dashboard"
-                className={`text-xs tracking-[0.18em] uppercase text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
-              >
-                {locale === "ar" ? "الحساب" : "Account"}
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <SiteNav locale={locale} />
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
         <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">

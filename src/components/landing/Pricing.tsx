@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
 
 type Props = { locale: "ar" | "en" };
@@ -93,13 +94,13 @@ export async function Pricing({ locale }: Props) {
               ))}
             </ul>
 
-            <a
-              href="#waitlist"
+            <Link
+              href="/tool"
               className={`inline-flex items-center gap-2 text-rizq-green border-b border-rizq-green/30 pb-1 hover:border-rizq-green transition-colors ${font}`}
             >
               <span>{t("free.cta")}</span>
               <span className="inline-block rtl:rotate-180">→</span>
-            </a>
+            </Link>
             </article>
           </Reveal>
 
@@ -144,15 +145,15 @@ export async function Pricing({ locale }: Props) {
               ))}
             </ul>
 
-            <a
-              href="#waitlist"
+            <Link
+              href="/signup"
               className={`group inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium shadow-[0_2px_0_0_var(--color-rizq-green-dark)] hover:bg-rizq-green-dark transition-all hover:shadow-[0_4px_16px_-4px_rgba(26,95,63,0.45)] hover:-translate-y-0.5 ${font}`}
             >
               <span>{t("pro.cta")}</span>
               <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
                 →
               </span>
-            </a>
+            </Link>
             </article>
           </Reveal>
         </div>

@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { LocaleToggle } from "@/components/landing/LocaleToggle";
+import { SiteNav } from "@/components/nav/SiteNav";
 
 type Section = { title: string; body: string };
 
@@ -18,7 +18,7 @@ type Props = {
  * site, narrow column for readability, gold rule between sections, and a
  * small "last updated" line.
  */
-export function LegalShell({
+export async function LegalShell({
   locale,
   title,
   intro,
@@ -45,16 +45,7 @@ export function LegalShell({
         }}
       />
 
-      <header className="relative z-10 backdrop-blur-md bg-rizq-cream/70 border-b border-rizq-gold/15">
-        <div className="mx-auto w-full max-w-3xl px-6 sm:px-10 h-16 flex items-center justify-between">
-          <Link href="/" className="group inline-flex items-baseline gap-2">
-            <span className="font-arabic text-2xl font-bold text-rizq-green tracking-tight transition-colors group-hover:text-rizq-green-dark">
-              رِزق
-            </span>
-          </Link>
-          <LocaleToggle />
-        </div>
-      </header>
+      <SiteNav locale={locale} />
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 py-12 sm:py-16 lg:py-20">
         <p className="eyebrow mb-4">{lastUpdated}</p>

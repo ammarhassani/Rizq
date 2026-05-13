@@ -36,6 +36,12 @@ export async function SiteFooter({ locale }: Props) {
 
           <div className="flex flex-col gap-3">
             <Link
+              href="/tool"
+              className={`text-sm text-rizq-green hover:text-rizq-green-dark font-medium transition-colors ${font}`}
+            >
+              {t("navTool")} →
+            </Link>
+            <Link
               href="/terms"
               className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
             >

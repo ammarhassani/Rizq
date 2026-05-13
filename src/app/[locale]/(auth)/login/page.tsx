@@ -8,6 +8,9 @@ import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { AuthDivider } from "@/components/auth/AuthDivider";
 import { LoginForm } from "@/components/auth/LoginForm";
 
+// LoginForm uses useSearchParams (returnTo); skip static prerender.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

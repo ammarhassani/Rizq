@@ -11,7 +11,7 @@
     "ctaPrimary": "Try the tool free",
     "ctaSecondary": "How Rizq works",
     "trustBadge": "Made in Saudi",
-    "comingSoon": "Coming soon — join the waitlist"
+    "comingSoon": "Beta — try the tool now"
   },
   "HowItWorks": {
     "eyebrow": "How it works",
@@ -101,7 +101,17 @@
     "termsLabel": "Terms",
     "privacyLabel": "Privacy",
     "langToggleLabel": "عربي",
-    "copyright": "© 2026 Rizq. All rights reserved."
+    "copyright": "© 2026 Rizq. All rights reserved.",
+    "navTool": "Pricing tool",
+    "navHome": "Home"
+  },
+  "Nav": {
+    "tool": "Pricing tool",
+    "dashboard": "Account",
+    "login": "Sign in",
+    "signup": "Sign up",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "Legal": {
     "lastUpdated": "Last updated: May 2026",

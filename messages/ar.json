@@ -11,7 +11,7 @@
     "ctaPrimary": "جرّب الأداة مجانًا",
     "ctaSecondary": "كيف يعمل رِزق",
     "trustBadge": "صنع في السعودية",
-    "comingSoon": "قريبًا — انضم لقائمة الانتظار"
+    "comingSoon": "بيتا — جرّب الأداة الآن"
   },
   "HowItWorks": {
     "eyebrow": "كيف يعمل",
@@ -101,7 +101,17 @@
     "termsLabel": "الشروط والأحكام",
     "privacyLabel": "سياسة الخصوصية",
     "langToggleLabel": "English",
-    "copyright": "© 2026 رِزق. جميع الحقوق محفوظة."
+    "copyright": "© 2026 رِزق. جميع الحقوق محفوظة.",
+    "navTool": "أداة التسعير",
+    "navHome": "الرئيسية"
+  },
+  "Nav": {
+    "tool": "أداة التسعير",
+    "dashboard": "حسابك",
+    "login": "تسجيل الدخول",
+    "signup": "أنشئ حساب",
+    "openMenu": "افتح القائمة",
+    "closeMenu": "أغلق القائمة"
   },
   "Legal": {
     "lastUpdated": "آخر تحديث: مايو 2026",

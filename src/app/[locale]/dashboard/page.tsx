@@ -4,8 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
-import { LocaleToggle } from "@/components/landing/LocaleToggle";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { SiteNav } from "@/components/nav/SiteNav";
 import { VerifyBanner } from "@/components/auth/VerifyBanner";
 import { QuotaBadge } from "@/components/tool/QuotaBadge";
 import { getQuotaState } from "@/lib/pricing/quota";
@@ -98,23 +97,7 @@ export default async function DashboardPage({
         }}
       />
 
-      <header className="relative z-10 backdrop-blur-md bg-rizq-cream/70 border-b border-rizq-gold/15">
-        <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16 h-16 flex items-center justify-between">
-          <Link href="/" className="group inline-flex items-baseline gap-2">
-            <span className="font-arabic text-2xl font-bold text-rizq-green tracking-tight transition-colors group-hover:text-rizq-green-dark">
-              رِزق
-            </span>
-            <span aria-hidden className="hidden sm:inline-block h-3 w-px bg-rizq-gold/50" />
-            <span className="hidden sm:inline-block text-[10px] tracking-[0.24em] uppercase text-rizq-ink-soft/70">
-              beta
-            </span>
-          </Link>
-          <div className="flex items-center gap-5">
-            <LocaleToggle />
-            <LogoutButton locale={locale} />
-          </div>
-        </div>
-      </header>
+      <SiteNav locale={locale} />
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
         <Reveal asMount>

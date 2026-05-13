@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowDown, BadgeCheck } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
 
 type Props = { locale: "ar" | "en" };
@@ -88,15 +89,15 @@ export async function Hero({ locale }: Props) {
 
             <Reveal asMount delay={0.58}>
               <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
-                <a
-                  href="#waitlist"
+                <Link
+                  href="/tool"
                   className={`group inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-sm sm:text-base font-medium tracking-wide shadow-[0_2px_0_0_var(--color-rizq-green-dark)] hover:bg-rizq-green-dark transition-all hover:shadow-[0_4px_16px_-4px_rgba(26,95,63,0.45)] hover:-translate-y-0.5 ${font}`}
                 >
                   <span>{t("ctaPrimary")}</span>
                   <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
                     →
                   </span>
-                </a>
+                </Link>
 
                 <a
                   href="#how-it-works"
