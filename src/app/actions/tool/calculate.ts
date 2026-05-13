@@ -69,35 +69,38 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
     return { ok: false, code: "invalid" };
   }
 
-  // Log the query (counts against quota by virtue of its existence)
+  // Log the query via security-definer RPC. The function reads auth.uid()
+  // server-side, so we don't have to trust (or fight) the caller-supplied
+  // user_id. Anon callers must supply a session_id.
   const supabase = await createClient();
-  const queryRow = {
-    user_id: quota.user_id,
-    session_id: quota.session_id,
-    specialty_id: result.ids.specialty_id,
-    city_id: result.ids.city_id,
-    experience_tier_id: result.ids.experience_tier_id,
-    project_size: parsed.data.project_size ?? null,
-    filters_json: {} as Record<string, unknown>,
-    result_min: result.status === "ok" ? result.min : null,
-    result_median: result.status === "ok" ? result.median : null,
-    result_max: result.status === "ok" ? result.max : null,
-    result_sample_size:
-      result.status === "ok" ? result.sample_size : result.sample_size,
-    result_fallback_used:
-      result.status === "ok" ? result.fallback_used : false,
-  };
+  const { data: insertedId, error: insertError } = await supabase.rpc(
+    "log_query",
+    {
+      p_specialty_id: result.ids.specialty_id,
+      p_city_id: result.ids.city_id,
+      p_experience_tier_id: result.ids.experience_tier_id,
+      p_session_id: quota.session_id,
+      p_project_size: parsed.data.project_size ?? null,
+      p_result_min: result.status === "ok" ? result.min : null,
+      p_result_median: result.status === "ok" ? result.median : null,
+      p_result_max: result.status === "ok" ? result.max : null,
+      p_result_sample_size:
+        result.status === "ok" ? result.sample_size : result.sample_size,
+      p_result_fallback_used:
+        result.status === "ok" ? result.fallback_used : false,
+    }
+  );
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("queries")
-    .insert(queryRow)
-    .select("id")
-    .single();
-
-  if (insertError || !inserted) {
-    console.error("[tool/calculate] insert failed", insertError);
+  if (insertError || !insertedId) {
+    console.error("[tool/calculate] log_query rpc failed", {
+      message: insertError?.message,
+      details: insertError?.details,
+      hint: insertError?.hint,
+      code: insertError?.code,
+    });
     return { ok: false, code: "error" };
   }
+  const inserted = { id: insertedId as string };
 
   // For free users, refresh the dashboard so the counter reflects the new query
   if (quota.mode === "free") revalidatePath(`/[locale]/dashboard`, "page");
