@@ -84,18 +84,7 @@ export async function calculateBenchmark(
   const experience_tier_id = tierRes.data.id;
   const ids = { specialty_id, city_id, experience_tier_id };
 
-  // Three progressively wider filters, evaluated in order.
-  const exactPrices = await fetchPrices(supabase, {
-    specialty_id,
-    city_id,
-    experience_tier_id,
-    project_size: input.project_size,
-  });
-  if (exactPrices.length >= MIN_SAMPLE) {
-    return finalize(supabase, exactPrices, "none", specialty_id, ids);
-  }
-
-  // Fallback 1: same region, same tier
+  // Resolve region cities once — used by both passes below.
   const regionCityIds = await supabase
     .from("cities")
     .select("id")
@@ -103,31 +92,54 @@ export async function calculateBenchmark(
     .eq("active", true);
   const regionIds = (regionCityIds.data ?? []).map((r) => r.id);
 
-  const regionPrices = await fetchPrices(supabase, {
-    specialty_id,
-    city_ids: regionIds,
-    experience_tier_id,
-    project_size: input.project_size,
-  });
-  if (regionPrices.length >= MIN_SAMPLE) {
-    return finalize(supabase, regionPrices, "region", specialty_id, ids);
+  // Soft project_size filter: try the narrow pass with project_size, then
+  // a wider pass without it. The narrow pass wins if it has ≥MIN_SAMPLE;
+  // otherwise we fall through transparently. This treats project_size as
+  // a "prefer" hint rather than a hard requirement.
+  const passes = input.project_size
+    ? [input.project_size, undefined]
+    : [undefined];
+
+  let bestSample = 0;
+  for (const ps of passes) {
+    const exactPrices = await fetchPrices(supabase, {
+      specialty_id,
+      city_id,
+      experience_tier_id,
+      project_size: ps ?? null,
+    });
+    if (exactPrices.length >= MIN_SAMPLE) {
+      return finalize(supabase, exactPrices, "none", specialty_id, ids);
+    }
+
+    const regionPrices = await fetchPrices(supabase, {
+      specialty_id,
+      city_ids: regionIds,
+      experience_tier_id,
+      project_size: ps ?? null,
+    });
+    if (regionPrices.length >= MIN_SAMPLE) {
+      return finalize(supabase, regionPrices, "region", specialty_id, ids);
+    }
+
+    const specPrices = await fetchPrices(supabase, {
+      specialty_id,
+      experience_tier_id,
+      project_size: ps ?? null,
+    });
+    if (specPrices.length >= MIN_SAMPLE) {
+      return finalize(supabase, specPrices, "specialty", specialty_id, ids);
+    }
+
+    bestSample = Math.max(
+      bestSample,
+      exactPrices.length,
+      regionPrices.length,
+      specPrices.length
+    );
   }
 
-  // Fallback 2: same specialty + tier, ignore city entirely
-  const specPrices = await fetchPrices(supabase, {
-    specialty_id,
-    experience_tier_id,
-    project_size: input.project_size,
-  });
-  if (specPrices.length >= MIN_SAMPLE) {
-    return finalize(supabase, specPrices, "specialty", specialty_id, ids);
-  }
-
-  return {
-    status: "insufficient_data",
-    sample_size: Math.max(exactPrices.length, regionPrices.length, specPrices.length),
-    ids,
-  };
+  return { status: "insufficient_data", sample_size: bestSample, ids };
 }
 
 // ─────────────────────────────────────────────────────────────────────────
