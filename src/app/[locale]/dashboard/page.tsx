@@ -7,7 +7,21 @@ import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "@/components/landing/LocaleToggle";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { VerifyBanner } from "@/components/auth/VerifyBanner";
+import { QuotaBadge } from "@/components/tool/QuotaBadge";
+import { getQuotaState } from "@/lib/pricing/quota";
 import { Reveal } from "@/components/motion/Reveal";
+import { ArrowRight, Globe, History } from "lucide-react";
+
+type HistoryRow = {
+  id: string;
+  result_median: number | null;
+  result_sample_size: number | null;
+  public_share: boolean;
+  created_at: string;
+  specialty: { name_ar: string; name_en: string; slug: string } | null;
+  city: { name_ar: string; name_en: string; slug: string } | null;
+  experience_tier: { name_ar: string; name_en: string; slug: string } | null;
+};
 
 export default async function DashboardPage({
   params,
@@ -22,19 +36,51 @@ export default async function DashboardPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: profile } = await supabase
-    .from("users")
-    .select("name, email, preferred_language")
-    .eq("id", user.id)
-    .single();
+  const [profileRes, quota, historyRes] = await Promise.all([
+    supabase
+      .from("users")
+      .select("name, email, preferred_language, role, bonus_quota")
+      .eq("id", user.id)
+      .single(),
+    getQuotaState(),
+    supabase
+      .from("queries")
+      .select(`
+        id, result_median, result_sample_size, public_share, created_at,
+        specialty:specialties (slug, name_ar, name_en),
+        city:cities (slug, name_ar, name_en),
+        experience_tier:experience_tiers (slug, name_ar, name_en)
+      `)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+  ]);
 
-  const displayName =
-    profile?.name || user.email?.split("@")[0] || "";
+  const profile = profileRes.data;
+  const history = (historyRes.data ?? []) as unknown as HistoryRow[];
+
+  const displayName = profile?.name || user.email?.split("@")[0] || "";
   const t = await getTranslations({ locale, namespace: "Dashboard" });
+  const tTool = await getTranslations({ locale, namespace: "Tool" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   const emailConfirmed =
     user.email_confirmed_at !== null && user.email_confirmed_at !== undefined;
+
+  const mode = (quota.ok ? quota.mode : "free") as
+    | "anon"
+    | "free"
+    | "pro"
+    | "admin";
+  const remaining = quota.ok ? quota.remaining : 0;
+  const limit = 3 + (profile?.bonus_quota ?? 0);
+  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    maximumFractionDigits: 0,
+  });
+  const dateFmt = new Intl.DateTimeFormat(
+    locale === "ar" ? "ar-SA" : "en-US",
+    { day: "numeric", month: "short" }
+  );
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -72,33 +118,144 @@ export default async function DashboardPage({
 
       <main className="relative z-10 flex-1 mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
         <Reveal asMount>
-          <p className="eyebrow mb-4">v0.1 · sprint 2 · placeholder</p>
-          <h1 className={`display-2 text-rizq-ink ${font}`}>
-            {displayName
-              ? t("welcome", { name: displayName })
-              : t("welcomeGuest")}
-          </h1>
-          <p className={`mt-4 text-lg text-rizq-ink-soft max-w-xl ${font}`}>
-            {t("comingSoon")}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+            <div>
+              <p className="eyebrow mb-4">
+                {locale === "ar" ? "حسابك" : "Your account"}
+              </p>
+              <h1 className={`display-2 text-rizq-ink ${font}`}>
+                {displayName
+                  ? t("welcome", { name: displayName })
+                  : t("welcomeGuest")}
+              </h1>
+            </div>
+            <div className="shrink-0 pt-2">
+              <QuotaBadge
+                locale={locale}
+                mode={mode}
+                remaining={remaining}
+                limit={limit}
+              />
+            </div>
+          </div>
         </Reveal>
 
         {!emailConfirmed && user.email && (
-          <Reveal asMount delay={0.15}>
-            <div className="mt-12 max-w-3xl">
+          <Reveal asMount delay={0.12}>
+            <div className="mt-10 max-w-3xl">
               <VerifyBanner locale={locale} email={user.email} />
             </div>
           </Reveal>
         )}
 
-        <Reveal delay={0.25} asMount>
-          <div className="mt-16 max-w-3xl border-t border-rizq-gold/15 pt-10">
-            <p className={`text-sm text-rizq-ink-soft/80 ${font}`}>
-              {locale === "ar"
-                ? "ستظهر هنا أداة معيار التسعير في الإصدار التالي. شكرًا لانضمامك مبكرًا."
-                : "The pricing benchmark tool will live here in the next release. Thanks for joining early."}
-            </p>
+        {/* Primary CTA — Open the tool */}
+        <Reveal asMount delay={0.2}>
+          <div className="mt-12 sm:mt-16">
+            <Link
+              href="/tool"
+              className="group block relative overflow-hidden rounded-3xl border border-rizq-green/25 bg-gradient-to-br from-rizq-green/8 via-rizq-cream to-rizq-gold/8 px-7 py-8 sm:px-10 sm:py-10 hover:border-rizq-green/45 hover:-translate-y-0.5 transition-all"
+            >
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex-1">
+                  <p className="eyebrow mb-3">{tTool("eyebrow")}</p>
+                  <h2 className={`text-2xl sm:text-3xl font-semibold text-rizq-ink leading-snug ${font}`}>
+                    {tTool("title")}
+                  </h2>
+                  <p className={`mt-2 text-sm sm:text-base text-rizq-ink-soft ${font}`}>
+                    {t("openTool")}
+                  </p>
+                </div>
+                <span className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-rizq-green text-rizq-cream shrink-0 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
+                  <ArrowRight
+                    size={22}
+                    strokeWidth={1.8}
+                    className="rtl:rotate-180"
+                  />
+                </span>
+              </div>
+            </Link>
           </div>
+        </Reveal>
+
+        {/* Query history */}
+        <Reveal asMount delay={0.32}>
+          <section className="mt-16 max-w-4xl">
+            <div className="flex items-center gap-3 mb-6">
+              <History size={16} className="text-rizq-gold-dark" strokeWidth={1.6} />
+              <h2 className={`text-lg font-semibold text-rizq-ink ${font}`}>
+                {t("historyHeading")}
+              </h2>
+            </div>
+
+            {history.length === 0 ? (
+              <p className={`text-sm text-rizq-ink-soft/70 ${font}`}>
+                {t("historyEmpty")}
+              </p>
+            ) : (
+              <ul className="divide-y divide-rizq-gold/15 border-y border-rizq-gold/15">
+                {history.map((row) => {
+                  const sName = row.specialty
+                    ? row.specialty[locale === "ar" ? "name_ar" : "name_en"]
+                    : "—";
+                  const cName = row.city
+                    ? row.city[locale === "ar" ? "name_ar" : "name_en"]
+                    : "—";
+                  const tName = row.experience_tier
+                    ? row.experience_tier[locale === "ar" ? "name_ar" : "name_en"]
+                    : "—";
+                  const median = row.result_median !== null
+                    ? Math.round(Number(row.result_median))
+                    : null;
+
+                  return (
+                    <li
+                      key={row.id}
+                      className="py-4 sm:py-5 flex items-center justify-between gap-4"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
+                          {sName}{" "}
+                          <span className="text-rizq-ink-soft/70">·</span>{" "}
+                          {cName}{" "}
+                          <span className="text-rizq-ink-soft/70">·</span>{" "}
+                          {tName}
+                        </p>
+                        <p className={`mt-1 text-xs text-rizq-ink-soft ${font}`}>
+                          {dateFmt.format(new Date(row.created_at))}
+                          {row.public_share && (
+                            <span className="ms-3 inline-flex items-center gap-1 text-rizq-green">
+                              <Globe size={11} strokeWidth={2} />
+                              {t("historyShare")}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 shrink-0">
+                        {median !== null && (
+                          <span className="hidden sm:flex flex-col items-end">
+                            <span className="font-sans tabular text-lg font-medium text-rizq-green leading-none">
+                              {fmt.format(median)}
+                            </span>
+                            <span className={`text-[10px] tracking-wider uppercase text-rizq-ink-soft/60 mt-0.5 ${font}`}>
+                              {tTool("result.currency")}
+                            </span>
+                          </span>
+                        )}
+                        {row.public_share && (
+                          <Link
+                            href={`/r/${row.id}`}
+                            className={`text-xs text-rizq-green hover:text-rizq-green-dark transition-colors ${font}`}
+                          >
+                            {t("historyRerun")}
+                          </Link>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
         </Reveal>
       </main>
     </div>

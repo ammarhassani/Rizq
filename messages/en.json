@@ -219,6 +219,81 @@
     "verifyBannerTitle": "Email not verified yet",
     "verifyBannerBody": "Verify your email to activate your account and unlock everything.",
     "verifyBannerCta": "Resend verification link",
-    "verifyBannerSent": "Sent — check your inbox."
+    "verifyBannerSent": "Sent — check your inbox.",
+    "openTool": "Open the pricing tool",
+    "quotaRemaining": "{remaining} of {limit} queries left this month",
+    "quotaUnlimited": "Unlimited queries",
+    "historyHeading": "Your recent queries",
+    "historyEmpty": "No queries yet. Run your first.",
+    "historyRerun": "Run again",
+    "historyShare": "Public result"
+  },
+  "Tool": {
+    "eyebrow": "Pricing tool",
+    "title": "Find your fair rate.",
+    "subtitle": "Pick the details — we'll give you a range built on real Saudi data.",
+    "specialtyLabel": "Specialty",
+    "specialtyPlaceholder": "Pick your specialty",
+    "cityLabel": "City",
+    "cityPlaceholder": "Pick your city",
+    "tierLabel": "Years of experience",
+    "tierPlaceholder": "Pick your level",
+    "projectSizeLabel": "Project size (optional)",
+    "projectSizeAny": "Any size",
+    "projectSizeSmall": "Small",
+    "projectSizeMedium": "Medium",
+    "projectSizeLarge": "Large",
+    "projectSizeEnterprise": "Enterprise",
+    "tierYearsExact": "{min} yr",
+    "tierYearsRange": "{min}–{max} yrs",
+    "tierYearsPlus": "{min}+ yrs",
+    "submit": "Calculate my price",
+    "submitting": "Calculating…",
+    "errors": {
+      "selectAll": "Pick specialty, city, and experience.",
+      "rate_limited": "Too many tries. Wait a minute.",
+      "error": "Something went wrong. Try again."
+    },
+    "result": {
+      "eyebrow": "Your fair-price range",
+      "currency": "SAR",
+      "min": "Low end",
+      "median": "Median",
+      "max": "High end",
+      "sampleSize": "Based on {n} Saudi freelancers",
+      "fallbackRegion": "We widened the search to your whole region.",
+      "fallbackSpecialty": "We widened the search across all cities.",
+      "comparison": "Higher than {percent}% of freelancers in your specialty.",
+      "shareTitle": "Share this result",
+      "shareCopy": "Copy link",
+      "shareCopied": "Copied",
+      "shareToggleOn": "Make public",
+      "shareToggleOff": "Make private",
+      "shareNotePublic": "Anyone with the link can see this result.",
+      "shareNotePrivate": "This result is private. Make it public to get a shareable link.",
+      "again": "Run another query"
+    },
+    "insufficient": {
+      "title": "Not enough data yet.",
+      "body": "We need 5 records to publish a benchmark. Try a different specialty or city — we add data weekly.",
+      "tryAgain": "Try a different combination"
+    },
+    "quota": {
+      "anonRemaining": "You have 1 free query.",
+      "freeRemaining": "{remaining} of {limit} queries left this month.",
+      "freeExhaustedTitle": "You've used your free queries.",
+      "freeExhaustedBody": "Upgrade to Pro for unlimited queries — 49 SAR / month.",
+      "freeExhaustedCta": "Upgrade now",
+      "anonExhaustedTitle": "Your free query is used.",
+      "anonExhaustedBody": "Create a free account for 3 queries per month.",
+      "anonExhaustedCta": "Create account",
+      "pro": "Unlimited"
+    }
+  },
+  "Share": {
+    "title": "Rizq result",
+    "byline": "From the Rizq pricing benchmark",
+    "viewMore": "Find your own rate",
+    "openTool": "Open the tool"
   }
 }

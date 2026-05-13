@@ -219,6 +219,81 @@
     "verifyBannerTitle": "بريدك غير مفعّل",
     "verifyBannerBody": "تحقق من بريدك لتفعيل حسابك واستخدام جميع الميزات.",
     "verifyBannerCta": "أرسل رابط التفعيل مجددًا",
-    "verifyBannerSent": "تم الإرسال — تحقق من بريدك."
+    "verifyBannerSent": "تم الإرسال — تحقق من بريدك.",
+    "openTool": "افتح أداة التسعير",
+    "quotaRemaining": "متبقي لديك {remaining} من {limit} هذا الشهر",
+    "quotaUnlimited": "استعلامات غير محدودة",
+    "historyHeading": "آخر استعلاماتك",
+    "historyEmpty": "لم تستعلم بعد. ابدأ بأول استعلام.",
+    "historyRerun": "إعادة الاستعلام",
+    "historyShare": "نتيجة عامة"
+  },
+  "Tool": {
+    "eyebrow": "أداة التسعير",
+    "title": "احسب سعرك العادل.",
+    "subtitle": "اختر التفاصيل، نعطيك نطاقًا مبنيًا على بيانات سعودية حقيقية.",
+    "specialtyLabel": "التخصص",
+    "specialtyPlaceholder": "اختر تخصصك",
+    "cityLabel": "المدينة",
+    "cityPlaceholder": "اختر مدينتك",
+    "tierLabel": "سنوات الخبرة",
+    "tierPlaceholder": "اختر مستوى الخبرة",
+    "projectSizeLabel": "حجم المشروع (اختياري)",
+    "projectSizeAny": "أي حجم",
+    "projectSizeSmall": "صغير",
+    "projectSizeMedium": "متوسط",
+    "projectSizeLarge": "كبير",
+    "projectSizeEnterprise": "مؤسسي",
+    "tierYearsExact": "{min} سنة",
+    "tierYearsRange": "{min}–{max} سنوات",
+    "tierYearsPlus": "{min}+ سنوات",
+    "submit": "احسب سعري",
+    "submitting": "نحسب...",
+    "errors": {
+      "selectAll": "اختر التخصص والمدينة ومستوى الخبرة.",
+      "rate_limited": "محاولات كثيرة. حاول بعد دقيقة.",
+      "error": "حدث خطأ. حاول مرة أخرى."
+    },
+    "result": {
+      "eyebrow": "نطاق سعرك العادل",
+      "currency": "ريال",
+      "min": "الحد الأدنى",
+      "median": "الوسيط",
+      "max": "الحد الأعلى",
+      "sampleSize": "بناءً على {n} مستقل سعودي",
+      "fallbackRegion": "وسّعنا البحث ليشمل المنطقة كاملة.",
+      "fallbackSpecialty": "وسّعنا البحث ليشمل جميع المدن.",
+      "comparison": "أعلى من {percent}% من المستقلين في تخصصك.",
+      "shareTitle": "شارك النتيجة",
+      "shareCopy": "نسخ الرابط",
+      "shareCopied": "تم النسخ",
+      "shareToggleOn": "تفعيل المشاركة",
+      "shareToggleOff": "إيقاف المشاركة",
+      "shareNotePublic": "أي شخص لديه الرابط يستطيع رؤية النتيجة.",
+      "shareNotePrivate": "هذه النتيجة خاصة. فعّل المشاركة لإنشاء رابط عام.",
+      "again": "احسب مرة أخرى"
+    },
+    "insufficient": {
+      "title": "بيانات غير كافية بعد.",
+      "body": "لم نصل لـ ٥ سجلات في هذه التركيبة. جرّب تخصصًا أو مدينة أخرى — نضيف بيانات أسبوعيًا.",
+      "tryAgain": "جرّب تركيبة أخرى"
+    },
+    "quota": {
+      "anonRemaining": "لديك استعلام واحد مجاني.",
+      "freeRemaining": "متبقي {remaining} من {limit} استعلامات هذا الشهر.",
+      "freeExhaustedTitle": "انتهت استعلاماتك المجانية.",
+      "freeExhaustedBody": "ترقَّ للاحترافي للحصول على استعلامات غير محدودة، ٤٩ ريال/شهر.",
+      "freeExhaustedCta": "ترقية الآن",
+      "anonExhaustedTitle": "انتهى استعلامك المجاني.",
+      "anonExhaustedBody": "أنشئ حسابًا مجانًا للحصول على ٣ استعلامات شهريًا.",
+      "anonExhaustedCta": "إنشاء حساب",
+      "pro": "غير محدود"
+    }
+  },
+  "Share": {
+    "title": "نتيجة رِزق",
+    "byline": "نتيجة من معيار التسعير لرِزق",
+    "viewMore": "احسب سعرك أنت",
+    "openTool": "افتح الأداة"
   }
 }
