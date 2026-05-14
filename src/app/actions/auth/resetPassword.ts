@@ -33,7 +33,7 @@ export async function setNewPassword(
     if (msg.includes("weak") || msg.includes("password should")) {
       return { ok: false, code: "weak_password" };
     }
-    console.error("[reset-password] error", error);
+    console.error("[reset-password] error", { code: error.code });
     return { ok: false, code: "error" };
   }
 

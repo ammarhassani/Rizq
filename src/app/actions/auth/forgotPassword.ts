@@ -44,7 +44,7 @@ export async function requestPasswordReset(
   if (error) {
     // Don't leak whether the email exists — return success to the client either way.
     // We log the underlying error for debugging.
-    console.error("[forgot-password] error", error);
+    console.error("[forgot-password] error", { code: error.code });
   }
 
   return { ok: true };

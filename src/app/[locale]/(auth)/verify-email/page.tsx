@@ -19,6 +19,7 @@ export default async function VerifyEmailPage({
 
   const { email } = await searchParams;
   const t = await getTranslations({ locale, namespace: "Auth.Verify" });
+  const tForgot = await getTranslations({ locale, namespace: "Auth.Forgot" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   return (
@@ -31,7 +32,7 @@ export default async function VerifyEmailPage({
           className={`inline-flex items-center gap-1 text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
         >
           <span className="inline-block rtl:rotate-180">←</span>
-          {t("logout")}
+          {tForgot("backToLogin")}
         </Link>
       }
     >

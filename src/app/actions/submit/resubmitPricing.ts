@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
 
 const InputSchema = z.object({
   submission_id: z.string().uuid(),
@@ -31,16 +32,24 @@ export type ResubmitResult =
         | "not_owner"
         | "wrong_state"
         | "not_found"
+        | "rate_limited"
         | "error";
     };
 
 export async function resubmitPricing(input: unknown): Promise<ResubmitResult> {
+  maybeSweep();
+
   const parsed = InputSchema.safeParse(input);
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return { ok: false, code: "login_required" };
+
+  // 10 resubmits per hour per user — generous for legitimate iteration on
+  // a needs_info request, tight enough to discourage hammering.
+  const rl = checkRateLimit(`resubmit:${userData.user.id}`, 10, 60 * 60 * 1000);
+  if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const [specRes, cityRes, tierRes] = await Promise.all([
     supabase

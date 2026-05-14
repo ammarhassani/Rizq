@@ -61,7 +61,7 @@ export async function joinWaitlist(
   if (error) {
     // 23505 = unique_violation (Postgres). Surface as a friendly duplicate.
     if (error.code === "23505") return { ok: false, code: "duplicate" };
-    console.error("[waitlist] insert failed", error);
+    console.error("[waitlist] insert failed", { code: error.code });
     return { ok: false, code: "error" };
   }
 

@@ -442,6 +442,10 @@
     "subtitle": "Share a price you were paid — earn +2 queries when approved.",
     "cta": "Contribute"
   },
+  "Common": {
+    "backToDashboard": "Back to account",
+    "back": "Back"
+  },
   "MySubmissions": {
     "heading": "Your contributions",
     "empty": "No contributions yet. Share your first price.",

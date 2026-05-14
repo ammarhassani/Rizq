@@ -114,7 +114,7 @@ export function WaitlistForm({ locale }: Props) {
           aria-label={t("emailPlaceholder")}
           aria-invalid={errors.email ? "true" : "false"}
           {...register("email")}
-          className={`flex-1 bg-transparent border rounded-full sm:rounded-none sm:border-0 px-5 py-4 text-base text-rizq-ink placeholder:text-rizq-ink-soft/60 focus:outline-none ${
+          className={`flex-1 bg-transparent border rounded-full sm:rounded-none sm:border-0 px-5 py-4 text-base text-rizq-ink placeholder:text-rizq-ink-soft/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
             errors.email ? "border-red-500/50" : "border-rizq-gold/30"
           } ${font}`}
         />

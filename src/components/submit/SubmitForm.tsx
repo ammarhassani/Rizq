@@ -68,6 +68,7 @@ export function SubmitForm({
 }: Props) {
   const t = useTranslations("Submit");
   const tResubmit = useTranslations("Resubmit");
+  const tCommon = useTranslations("Common");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const router = useRouter();
   const isResubmit = !!prefill;
@@ -153,10 +154,11 @@ export function SubmitForm({
   const onSubmit = (values: FormValues) => {
     setUploadError(null);
     startTransition(async () => {
+      const supabase = createBrowserClient();
       let proofUrl: string | null = null;
+
       if (proofFile) {
         // Upload to private bucket. Path: {user_id}/{random}.{ext}
-        const supabase = createBrowserClient();
         const ext = proofFile.name.split(".").pop() ?? "bin";
         const random = crypto.randomUUID();
         const path = `${userId}/${random}.${ext}`;
@@ -188,16 +190,15 @@ export function SubmitForm({
             : Number(values.project_duration_days),
         client_type: values.client_type || null,
         notes: values.notes || null,
-        proof_url: proofUrl ?? prefill?.specialty_slug ? null : null,
+        proof_url: proofUrl,
       };
 
       const result = isResubmit
         ? await resubmitPricing({
             submission_id: prefill!.submission_id,
             ...payload,
-            proof_url: proofUrl,
           })
-        : await submitPricing({ ...payload, proof_url: proofUrl });
+        : await submitPricing(payload);
 
       if (result.ok) {
         setSuccess(true);
@@ -207,6 +208,18 @@ export function SubmitForm({
         }
         router.refresh();
         return;
+      }
+
+      // Server action failed — if we uploaded a proof for this attempt,
+      // clean it up so we don't leave an orphan in storage.
+      if (proofUrl) {
+        try {
+          await supabase.storage
+            .from("submission-proofs")
+            .remove([proofUrl]);
+        } catch {
+          // Best-effort cleanup; the file becomes an orphan if this fails.
+        }
       }
 
       const messages: Record<string, string> = {
@@ -255,7 +268,7 @@ export function SubmitForm({
             href="/dashboard"
             className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
           >
-            {locale === "ar" ? "العودة للحساب" : "Back to account"}
+            {tCommon("backToDashboard")}
           </Link>
         </div>
       </div>
@@ -317,7 +330,7 @@ export function SubmitForm({
           min={0}
           {...register("price_sar", { valueAsNumber: true })}
           placeholder={t("pricePlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular ${font}`}
         />
       </FieldShell>
 
@@ -327,7 +340,7 @@ export function SubmitForm({
           type="text"
           {...register("project_type")}
           placeholder={t("projectTypePlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors ${font}`}
         />
       </FieldShell>
 
@@ -352,7 +365,7 @@ export function SubmitForm({
           inputMode="numeric"
           min={0}
           {...register("project_duration_days", { valueAsNumber: true })}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular ${font}`}
         />
       </FieldShell>
 
@@ -377,7 +390,7 @@ export function SubmitForm({
           rows={3}
           {...register("notes")}
           placeholder={t("notesPlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none ${font}`}
         />
       </FieldShell>
 
@@ -487,7 +500,7 @@ function SelectField({
       <select
         id={id}
         {...register}
-        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
+        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
       >
         <option value="">{placeholder}</option>
         {options.map((o) => (

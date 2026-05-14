@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
 
@@ -61,8 +61,19 @@ export async function signUp(input: unknown): Promise<SignupResult> {
     if (msg.includes("rate limit") || msg.includes("too many")) {
       return { ok: false, code: "rate_limited" };
     }
-    console.error("[signup] error", error);
+    console.error("[signup] error", { code: error.code });
     return { ok: false, code: "error" };
+  }
+
+  // Clear the anonymous session cookie — once the user has an account,
+  // the lifetime anon quota is meaningless and the cookie just clutters.
+  try {
+    const store = await cookies();
+    if (store.get("rizq_anon_session")) {
+      store.delete("rizq_anon_session");
+    }
+  } catch {
+    /* server-component read-only path; ignored */
   }
 
   // Supabase returns user with no session when email confirmation is required.

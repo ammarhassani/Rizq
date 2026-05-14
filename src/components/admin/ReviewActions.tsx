@@ -61,7 +61,7 @@ export function ReviewActions({ locale, submissionId }: Props) {
         rows={2}
         placeholder={t("moderatorNotesPlaceholder")}
         aria-label={t("moderatorNotesLabel")}
-        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/50 px-3 py-2 text-sm text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none ${font}`}
+        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/50 px-3 py-2 text-sm text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none ${font}`}
       />
       <div className="flex flex-wrap items-center gap-2">
         <button

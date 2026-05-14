@@ -8,36 +8,53 @@ import { createClient } from "@/lib/supabase/server";
  *   - Password recovery (link from forgot-password email)
  *
  * The PKCE flow ships a `code` param that we exchange for a session.
- * On success we redirect to `next` (defaults to /ar). On failure we drop
- * to /login with an error marker the page can read.
+ * On success we redirect to `next` (defaults to /ar). On any failure
+ * (including unexpected throws) we redirect to /login with an error
+ * marker the page can read — never a 500 page.
  */
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") ?? "/ar";
-  const errorParam = url.searchParams.get("error");
-  const errorDescription = url.searchParams.get("error_description");
+  try {
+    const url = new URL(request.url);
+    const code = url.searchParams.get("code");
+    const next = url.searchParams.get("next") ?? "/ar";
+    const errorParam = url.searchParams.get("error");
 
-  // Surface explicit provider errors (e.g. user cancelled OAuth) to the user
-  if (errorParam) {
-    console.error("[auth-callback] provider error", { errorParam, errorDescription });
     const locale = next.startsWith("/en") ? "en" : "ar";
-    return NextResponse.redirect(new URL(`/${locale}/login?error=callback`, url.origin));
+    const fallback = new URL(`/${locale}/login?error=callback`, url.origin);
+
+    // Surface explicit provider errors (e.g. user cancelled OAuth)
+    if (errorParam) {
+      console.error("[auth-callback] provider error", { errorParam });
+      return NextResponse.redirect(fallback);
+    }
+
+    if (!code) {
+      return NextResponse.redirect(fallback);
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      // Don't log the full error — it may contain email or other PII.
+      console.error("[auth-callback] exchange failed", { code: error.code });
+      return NextResponse.redirect(fallback);
+    }
+
+    return NextResponse.redirect(new URL(next, url.origin));
+  } catch (err) {
+    // Defense in depth: even if URL parsing or createClient throws, send
+    // the user somewhere they can recover from instead of a 500.
+    console.error("[auth-callback] uncaught", {
+      type: err instanceof Error ? err.name : typeof err,
+    });
+    const origin = (() => {
+      try {
+        return new URL(request.url).origin;
+      } catch {
+        return "";
+      }
+    })();
+    return NextResponse.redirect(`${origin}/ar/login?error=callback`);
   }
-
-  if (!code) {
-    const locale = next.startsWith("/en") ? "en" : "ar";
-    return NextResponse.redirect(new URL(`/${locale}/login?error=callback`, url.origin));
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-  if (error) {
-    console.error("[auth-callback] exchange failed", error);
-    const locale = next.startsWith("/en") ? "en" : "ar";
-    return NextResponse.redirect(new URL(`/${locale}/login?error=callback`, url.origin));
-  }
-
-  return NextResponse.redirect(new URL(next, url.origin));
 }

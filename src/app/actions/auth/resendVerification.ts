@@ -46,7 +46,7 @@ export async function resendVerificationEmail(
 
   if (error) {
     // Don't leak existence of email.
-    console.error("[resend] error", error);
+    console.error("[resend] error", { code: error.code });
   }
 
   return { ok: true };

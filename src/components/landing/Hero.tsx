@@ -64,7 +64,7 @@ export async function Hero({ locale }: Props) {
                 رِزق
               </p>
               {!isAr && (
-                <p className="font-sans text-2xl sm:text-3xl text-rizq-gold-dark font-medium tracking-tight pl-1 -mt-2">
+                <p className="font-sans text-2xl sm:text-3xl text-rizq-gold-dark font-medium tracking-tight ps-1 -mt-2">
                   Rizq
                 </p>
               )}

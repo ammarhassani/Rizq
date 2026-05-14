@@ -37,7 +37,7 @@ export async function startOAuth(
     if (msg.includes("provider is not enabled") || msg.includes("unsupported provider")) {
       return { ok: false, code: "provider_not_configured" };
     }
-    console.error("[oauth] error", error);
+    console.error("[oauth] error", { code: error.code });
     return { ok: false, code: "error" };
   }
 

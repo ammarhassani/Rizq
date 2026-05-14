@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
 
 const ReviewSchema = z.object({
   submission_id: z.string().uuid(),
@@ -12,9 +13,11 @@ const ReviewSchema = z.object({
 
 export type ReviewResult =
   | { ok: true }
-  | { ok: false; code: "invalid" | "not_admin" | "error" };
+  | { ok: false; code: "invalid" | "not_admin" | "rate_limited" | "error" };
 
 export async function reviewSubmission(input: unknown): Promise<ReviewResult> {
+  maybeSweep();
+
   const parsed = ReviewSchema.safeParse(input);
   if (!parsed.success) return { ok: false, code: "invalid" };
 
@@ -30,6 +33,15 @@ export async function reviewSubmission(input: unknown): Promise<ReviewResult> {
     .eq("id", userData.user.id)
     .single();
   if (profile?.role !== "admin") return { ok: false, code: "not_admin" };
+
+  // 120 reviews per hour per admin. High ceiling — admin shouldn't be
+  // throttled in normal use — but caps a compromised account.
+  const rl = checkRateLimit(
+    `review:${userData.user.id}`,
+    120,
+    60 * 60 * 1000
+  );
+  if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const status =
     parsed.data.action === "approve"

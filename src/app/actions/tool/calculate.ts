@@ -176,15 +176,28 @@ const ToggleShareSchema = z.object({
   share: z.boolean(),
 });
 
+/**
+ * Flips queries.public_share on the caller's own query row.
+ *
+ * The RLS UPDATE policy on queries already requires `auth.uid() = user_id`,
+ * so a non-owner can't actually mutate someone else's row. This action
+ * adds an explicit ownership guard so we can return a clean code instead
+ * of relying on the RLS denial alone — and the action stops at the
+ * earliest cheap check (auth) before any DB write attempt.
+ */
 export async function toggleShare(input: unknown): Promise<{ ok: boolean }> {
   const parsed = ToggleShareSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
 
   const supabase = await createClient();
+  const { data: userResult } = await supabase.auth.getUser();
+  if (!userResult.user) return { ok: false };
+
   const { error } = await supabase
     .from("queries")
     .update({ public_share: parsed.data.share })
-    .eq("id", parsed.data.query_id);
+    .eq("id", parsed.data.query_id)
+    .eq("user_id", userResult.user.id);
 
   return { ok: !error };
 }

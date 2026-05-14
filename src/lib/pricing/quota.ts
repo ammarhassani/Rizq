@@ -141,15 +141,27 @@ async function getOrSetAnonSession(): Promise<string> {
   return fresh;
 }
 
+// Saudi Arabia is UTC+3 year-round (no DST). Hardcoding the offset is
+// safe and avoids a date-fns-tz dependency just for this one call.
+const RIYADH_OFFSET_MS = 3 * 60 * 60 * 1000;
+
+/**
+ * Returns the start of the current month *in Riyadh time*, expressed as
+ * a UTC ISO string so it can be compared against `queries.created_at`
+ * (which is stored as UTC `timestamptz`).
+ *
+ * Example: on May 14 2026 at 02:00 Riyadh time (= May 13 23:00 UTC),
+ * this returns `2026-04-30T21:00:00.000Z` (= May 1 00:00 Riyadh).
+ */
 function startOfMonthRiyadh(): string {
-  // Approximation: KSA is UTC+3 year-round (no DST). Compute month-start in Riyadh time
-  // expressed as a UTC ISO string for the DB comparison.
   const now = new Date();
-  // Shift to Riyadh, take year+month, build back as UTC
-  const riyadhNow = new Date(now.getTime() + 3 * 60 * 60 * 1000);
-  const year = riyadhNow.getUTCFullYear();
-  const month = riyadhNow.getUTCMonth();
-  // Month start in Riyadh = year-month-01 00:00:00 +03 = year-month-(00:00 - 3h) UTC
-  const utcMonthStart = new Date(Date.UTC(year, month, 1, -3, 0, 0));
-  return utcMonthStart.toISOString();
+  const riyadh = new Date(now.getTime() + RIYADH_OFFSET_MS);
+  // First day of month in Riyadh-shifted UTC → subtract offset to get back
+  // to true UTC for the DB comparison.
+  const firstOfMonthShifted = Date.UTC(
+    riyadh.getUTCFullYear(),
+    riyadh.getUTCMonth(),
+    1
+  );
+  return new Date(firstOfMonthShifted - RIYADH_OFFSET_MS).toISOString();
 }

@@ -34,7 +34,7 @@ export async function logIn(input: unknown): Promise<LoginResult> {
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   });
@@ -50,15 +50,20 @@ export async function logIn(input: unknown): Promise<LoginResult> {
     if (msg.includes("rate limit") || msg.includes("too many")) {
       return { ok: false, code: "rate_limited" };
     }
-    console.error("[login] error", error);
+    // Don't leak email or full error message to logs.
+    console.error("[login] error", { code: error.code });
     return { ok: false, code: "error" };
   }
 
-  // Touch last_active. RLS allows the user to update their own row.
-  await supabase
-    .from("users")
-    .update({ last_active: new Date().toISOString() })
-    .eq("id", (await supabase.auth.getUser()).data.user?.id ?? "");
+  // Use the user returned from signInWithPassword directly — avoids a
+  // second getUser() round-trip and the race window between the two.
+  const userId = signInData?.user?.id;
+  if (userId) {
+    await supabase
+      .from("users")
+      .update({ last_active: new Date().toISOString() })
+      .eq("id", userId);
+  }
 
   return { ok: true };
 }
