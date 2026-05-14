@@ -14,7 +14,9 @@
 
 ## 0. Current state (2026-05-14)
 
-**Strategic posture**: not chasing public launch yet. We are still shaping the full product (engine + closed loop, see [`engine.md`](./engine.md)). Monetization and marketing work are explicitly deferred until product shape settles.
+**Product reframe (this iteration)**: Rizq is being repositioned as **a proposal-authoring tool with pricing intelligence baked in** — one button, one output. The price and the proposal are inseparable. The current v0.1 statistical `/tool` route is **iteration 1** of this product: a stripped-down price-lookup that returns a band but no artifact. v0.2 replaces it with the unified proposal flow (paste a client brief → priced bilingual Rizq-stamped proposal artifact). See [`engine-research.md`](./engine-research.md) for the decision-grade recommendation and [`engine.md`](./engine.md) for the long-term vision.
+
+**Strategic posture**: not chasing public launch yet. We are still shaping the full product. Monetization and marketing work are explicitly deferred until product shape settles.
 
 ### 0.1 Shipped on `rizq-tan.vercel.app`
 
@@ -22,7 +24,7 @@
 - ✅ Email waitlist capture (Resend-ready, stored in Supabase).
 - ✅ Auth: email + password, Google + LinkedIn OAuth, email verification, password reset.
 - ✅ Onboarding flow (language preference, city, specialty) with idempotency + skip option.
-- ✅ Pricing tool: specialty × city × tier × project-size → SQL-aggregated quartile statistics.
+- ✅ Pricing tool (iteration 1 of the proposal flow): specialty × city × tier × project-size → SQL-aggregated quartile statistics. **Note**: this is the v0.1 form; v0.2 reframes `/tool` to brief-paste intake → priced proposal artifact. The statistical core stays; the UX and output transform.
 - ✅ Statistical core: min / median / max + sample size + insufficient-data refusal + 24h dedupe.
 - ✅ Freemium quota: 1 lifetime anonymous, 3+bonus per Riyadh month for free, unlimited for Pro/admin. Atomic DB-trigger enforcement.
 - ✅ Crowd-sourced submissions with optional proof upload + admin review queue + bonus quota on approval.
@@ -60,13 +62,14 @@ These ship **only after** monetization is live and we are ready to bring traffic
 - 🔜 Launch channel choice (LinkedIn-founder-led vs press vs paid).
 - 🔜 Methodology page launch tone (trust-vs-technical balance — drafted as mixed for now).
 
-### 0.5 Deferred — v0.2+ vision (see `engine.md`)
+### 0.5 Deferred — v0.2+ vision (see `engine.md` and `engine-research.md`)
 
-- 🔜 Smart pricing engine (scope extraction + Bayesian + active elicitation) — v0.2.
-- 🔜 Proposal artifact generator — v0.3.
-- 🔜 Outcome tracking + per-freelancer models — v0.4.
-- 🔜 Client KYC + capture surfaces (WhatsApp, email) — v0.5.
-- 🔜 Buyer-side mode — v0.6.
+- 🔜 **v0.2 — the unified proposal flow** (the next big build, ~6–8 weeks once greenlit): brief intake (DeepSeek/Fanar scope extraction) + smart follow-up gap-filling + onboarding upgrade (brand block) + **Rizq-stamped bilingual proposal artifact** (PDF + share link + WhatsApp summary). This is *the* product, not three features. Unit-of-value shifts from queries → proposals.
+- 🔜 **v0.3 — outcome capture + compounding**: track open/reply/counter-offer/accept on shared proposals. Per-freelancer history weights their personal pricing.
+- 🔜 **v0.4 — voice + capture surfaces**: voice note ingestion (Fanar Speech), browser extension, mobile share-sheet.
+- 🔜 **v0.5 — silent buyer enrichment**: Wathiq / Maroof / Etimad lookups adjust the recommendation based on buyer identity.
+- 🔜 **v0.6 — buyer-side surface**: companies can look up "what should I pay for X in KSA" using the same engine. Two-sided market positioning.
+- 🔜 **v1.0 — mainstream**: WhatsApp Business integration, public transparency report, Rizq-stamped proposals become the assumed format for Saudi freelance work.
 
 ---
 
@@ -161,7 +164,9 @@ These ship **only after** monetization is live and we are ready to bring traffic
 - Primary CTA is visible without scrolling on 1080p screens and iPhone 12+
 - Email signup form submits to database without errors
 
-### 4.2 Pricing Benchmark Tool (Core Feature)
+### 4.2 Pricing Benchmark Tool (v0.1 — iteration 1 of the proposal flow)
+
+> **Note**: this section describes the v0.1 statistical tool as shipped. In v0.2 the same `/tool` route is reframed as the **unified proposal flow** (paste a client brief → priced bilingual Rizq-stamped artifact). The dropdown-driven flow described below stays for anonymous SEO/preview users; authenticated users get the brief-paste experience instead. The statistical core described here remains the underlying price engine in v0.2 — wrapped, not replaced. See [`engine-research.md` §7](./engine-research.md#7-the-recommended-phase-a-wedge--the-unified-proposal-flow) for the reframed flow.
 
 **User flow:**
 1. User lands on tool page (signed in or anonymous)
@@ -239,9 +244,11 @@ These ship **only after** monetization is live and we are ready to bring traffic
 - OAuth flows redirect correctly
 - Failed login attempts rate-limited (5 attempts per 15 min)
 
-### 4.4 Freemium Quota System
+### 4.4 Freemium Quota System (v0.1 — unit-of-value is the query)
 
-**Requirements:**
+> **Note**: in v0.2 the unit-of-value shifts from "query" (a number) to "proposal" (an artifact). v0.1 quota tiers below are correct for the current statistical tool; v0.2 reframes them as: anonymous = 1 lifetime price preview; free = 1 proposal/month + unlimited previews; Pro = 20 proposals/month + 100 previews + custom branding + analytics. Pricing tier (SAR 49/mo Pro) stays the same. See [`engine-research.md` §7.5](./engine-research.md#75-monetization-shift--unit-of-value-becomes-the-proposal).
+
+**Requirements (v0.1):**
 - Anonymous users: 1 free query without signup (cookie-tracked)
 - Authenticated free users: 3 queries per calendar month (rolling 30 days)
 - Quota resets at calendar month boundary

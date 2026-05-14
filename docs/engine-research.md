@@ -12,9 +12,11 @@
 
 ## 1. Recommendation — read this first
 
-**Build a focused engine wedge in 6–8 weeks that does three things Excel cannot:** (a) parse a freelancer's raw client brief into a structured scope object, (b) ask 1–3 bilingual clarifying questions when scope is ambiguous, and (c) generate a **Rizq-stamped bilingual proposal artifact** the freelancer hands to their buyer as third-party pricing authority. Drop all "patent" and "active-elicitation" framing — both are correct as engineering concepts but cause more harm than help as positioning and marketing claims. The market gap is real (Saudi platforms have zero pricing tools; international AI-proposal tools are all form-driven and English-first), LLM capability is production-ready for these three jobs, and the Rizq-stamped artifact creates the actual moat: not patent defensibility, but **credibility lock-in** — once Saudi buyers come to expect Rizq-stamped pricing, freelancers must use it.
+**Build one unified product in 6–8 weeks: the proposal-authoring flow with pricing intelligence baked in.** Not a pricing tool. Not a proposal tool. **One button, one output.** The freelancer pastes their client's brief; Rizq extracts the scope, computes the price using the freelancer's onboarding data + market data, asks 1–3 bilingual follow-up questions if scope is ambiguous, and produces a **Rizq-stamped bilingual proposal artifact** the freelancer hands to their buyer. The price is justified because it is embedded inside a methodology-grounded artifact. The proposal is credible because the price is data-grounded. Neither has utility without the other — and shipping them as separate features misses the whole point.
 
-Do not promise "AI that knows the smartest question to ask next" in marketing. Promise "Rizq writes you a proposal you can send the client". Then quietly engineer the rest.
+Drop all "patent", "active-elicitation", and "information-gain ranking" framing — they are correct as engineering concepts but cause harm as marketing claims. The market gap is real (Saudi platforms have zero pricing tools; international AI-proposal tools are all form-driven and English-first), LLM capability is production-ready for the parts that matter, and the Rizq-stamped artifact creates the actual moat: not algorithm defensibility, but **credibility lock-in** — once Saudi buyers come to expect Rizq-stamped pricing as the standard, freelancers must use it.
+
+Do not promise "AI that picks the smartest next question". Promise "Rizq writes the proposal you send your client. The price is part of it." Then quietly engineer the rest.
 
 ---
 
@@ -185,57 +187,98 @@ Mostaql could clone Rizq's statistical engine in two weeks. They cannot clone a 
 
 ---
 
-## 7. The recommended Phase A wedge — 6–8 weeks of engineering
+## 7. The recommended Phase A wedge — the unified proposal flow
 
-### 7.1 Scope (build all three, ship together)
+### 7.1 The user journey (one button, one output)
 
-**Feature 1: Brief intake**
-- New route: `/[locale]/tool/smart` (lives alongside the existing `/tool` for now).
-- UI: a single large textarea + optional file/image upload (PDF, screenshot).
-- Backend: DeepSeek (Fanar fallback for Arabic-dialect-heavy briefs) extracts a structured scope object via a Zod schema using [Vercel AI SDK `generateObject`](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-object).
-- Scope schema (initial):
-  ```ts
-  type Scope = {
-    specialty: SpecialtyEnum;
-    deliverables: string[];
-    deliverable_count: number | null;
-    revisions: number | null;
-    urgency: "rush_under_1_week" | "standard_1_4_weeks" | "long_term" | null;
-    complexity_signals: string[];
-    client_type: "individual" | "smb" | "corporate" | "government" | "agency" | null;
-    geography_target: "ksa_local" | "gcc" | "international" | null;
-    language_preference: "ar" | "en" | "both" | null;
-    budget_mentioned: number | null;
-    ip_transfer: "full_transfer" | "license" | "unclear" | null;
-    field_confidence: Record<keyof Scope, number>;  // 0..1 per field
-  };
-  ```
-- Each field carries a confidence score from the model — drives Feature 2.
+A Saudi freelancer in Riyadh just got a WhatsApp message from a client at 11pm. They tap Rizq.
 
-**Feature 2: Smart follow-up questions (NOT info-gain, just gap-filling)**
-- For every field with `field_confidence < 0.7` AND that affects price, ask a bilingual follow-up.
-- Hand-authored question templates per field. Examples:
-  - `revisions === null` → AR: "كم عدد المراجعات المتفق عليها؟" / EN: "How many revision rounds?"
-  - `urgency === null` → AR: "هل العميل مستعجل؟ متى يحتاج التسليم؟" / EN: "Is the client in a rush? When do they need delivery?"
-  - `ip_transfer === "unclear"` → AR: "هل سيتم تسليم ملكية التصميم كاملة أم رخصة استخدام؟"
-- Max 3 questions per session. If the freelancer skips, proceed with current scope and widen confidence band.
-- Never ship marketing copy saying "AI picks the smartest question". Ship "Rizq fills gaps with quick follow-ups."
+1. **Land on `/tool`** (existing route, repurposed) — single big textarea, placeholder *"ألصق رسالة العميل هنا"* / *"Paste the client's message here"*. Optional file/image upload alongside.
+2. **Paste the brief**, tap **«أنشئ العرض»** / **"Generate the proposal"** — one button, no dropdowns, no specialty/city selectors (those come from their onboarding profile, set once).
+3. **3–4 seconds**: skeleton state. Engine extracts scope, computes price (statistical core + their personal-history weighting), generates the bilingual artifact.
+4. **Optional inline follow-up**: if scope confidence is low for high-impact fields, engine asks 1–3 bilingual questions ("How many revisions?", "Local or international launch?"). Freelancer answers or skips.
+5. **The artifact appears** — Rizq-stamped bilingual proposal. The freelancer can tweak any block, then:
+   - **Download PDF**
+   - **Copy share link** (read-receipts on)
+   - **Send via WhatsApp** (formatted summary)
+6. **Saved to dashboard** as "Proposal #N" — re-runnable, fork-able for similar future gigs.
 
-**Feature 3: Rizq-stamped proposal artifact**
-- After scope is locked + price is calculated (using existing statistical core, weighted by freelancer's own past prices):
-- Generate a bilingual artifact via DeepSeek/Fanar with a fixed template:
-  - Freelancer branding block (logo, name, contact — set during onboarding)
-  - Scope block (auto-rendered from scope object)
-  - Price block (band + anchored recommendation + halal milestones)
-  - Provenance block (*"بناءً على N مشاريع مشابهة في [city] خلال آخر 12 شهر — منهجية رِزق"* with methodology link)
-  - Terms block (timeline, revisions, IP, Saudi-law clause)
-  - **Rizq verification stamp** — a small dignified seal, similar visual weight to a notary stamp
-- Output channels:
-  - Downloadable PDF (Puppeteer or Vercel's HTML-to-PDF)
-  - Shareable web link at `/[locale]/p/[proposal_id]` with view tracking
-  - WhatsApp-ready text summary
+### 7.2 Why this is ONE feature, not three
 
-### 7.2 Out of Phase A (intentionally)
+The original framing of this report had three features (brief intake / follow-up questions / artifact). That was misleading. **It is one feature: the proposal flow.** The three are internal mechanics of a single user-visible action — pasting a brief and getting an artifact back. The freelancer never thinks "first I extract, then I clarify, then I generate." They think "I'm writing a proposal."
+
+This matters because:
+- **The price is justified by being embedded in a methodology-grounded artifact.** A number alone is too thin to act on.
+- **The proposal is credible because the price is data-grounded.** A document alone is too unsupported to win negotiations.
+- **Excel can't do either, but can do neither even more decisively than each separately.** No Excel-fluent person can produce "brief → priced bilingual proposal artifact in 90 seconds" no matter how many hours they have.
+- **The lock-in is the artifact, not the algorithm.** Spend the engineering budget on the artifact's quality, the share-link experience, and the verification stamp's visual weight — not on Bayesian elegance.
+
+### 7.3 Internal mechanics (one flow, three steps)
+
+**Step 1 — Scope extraction.** DeepSeek (Fanar fallback for Arabic-dialect-heavy briefs) extracts a structured scope object via [Vercel AI SDK `generateObject`](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-object) against a Zod schema:
+
+```ts
+type Scope = {
+  specialty: SpecialtyEnum;
+  deliverables: string[];
+  deliverable_count: number | null;
+  revisions: number | null;
+  urgency: "rush_under_1_week" | "standard_1_4_weeks" | "long_term" | null;
+  complexity_signals: string[];
+  client_type: "individual" | "smb" | "corporate" | "government" | "agency" | null;
+  geography_target: "ksa_local" | "gcc" | "international" | null;
+  language_preference: "ar" | "en" | "both" | null;
+  budget_mentioned: number | null;
+  ip_transfer: "full_transfer" | "license" | "unclear" | null;
+  field_confidence: Record<keyof Scope, number>;
+};
+```
+
+**Step 2 — Smart follow-ups (rule-based gap-filling).** For fields with `field_confidence < 0.7` AND high price impact, fire hand-authored bilingual question templates. Max 3 per session. If freelancer skips, proceed with widened confidence band. Examples:
+- `revisions === null` → "كم عدد المراجعات المتفق عليها؟" / "How many revision rounds?"
+- `urgency === null` → "هل العميل مستعجل؟ متى يحتاج التسليم؟" / "Is the client in a rush?"
+- `ip_transfer === "unclear"` → "هل سيتم تسليم ملكية التصميم كاملة أم رخصة استخدام؟"
+
+**Step 3 — Rizq-stamped artifact.** Statistical price core (already shipped) weighted by the freelancer's personal history (new) produces the price band. Bilingual artifact rendered via fixed HTML template:
+- **Branding block** — logo, name, contact (from onboarding)
+- **Scope block** — auto-rendered from the scope object
+- **Price block** — band + anchored recommendation + halal milestones (default 50/50)
+- **Provenance block** — *"بناءً على N مشاريع مشابهة في [city] خلال آخر 12 شهر — منهجية رِزق"* with methodology link
+- **Terms block** — timeline, revisions, IP, Saudi-law clause
+- **Rizq verification stamp** — small, dignified seal with unique artifact ID resolving on rizq.sa
+
+Output channels: downloadable PDF (HTML-to-PDF) + shareable link at `/[locale]/p/[proposal_id]` with view tracking + WhatsApp-ready text summary.
+
+### 7.4 Onboarding upgrade (required for Phase A)
+
+Onboarding becomes more substantial because every proposal autopopulates from the freelancer's profile. Existing onboarding captures specialty + city + tier + preferred language. **New fields needed**:
+
+- **Brand block**: name, logo upload, contact (email + phone + WhatsApp)
+- **Pricing defaults**: preferred deposit % (default 50%), revisions offered (default 2), milestone structure
+- **IP terms default**: full transfer / license / per-project decision
+- **Voice**: short Arabic tagline that appears on every proposal
+
+Set once. Reused everywhere. The artifact looks personal-to-them out of the box.
+
+### 7.5 Monetization shift — unit-of-value becomes the proposal
+
+| | v0.1 today | Phase A reframed |
+|---|---|---|
+| Unit of value | A query (just a number) | **A proposal** (a real artifact) |
+| Free anonymous | 1 lifetime query | 1 lifetime **price preview** (number only, no artifact) — also serves SEO entry point |
+| Free authenticated | 3 queries / Riyadh month | **1 proposal / month** + price previews unlimited |
+| Pro tier | Unlimited queries | **20 proposals / month** + custom branding + read-receipt analytics + 100 price previews |
+| Pro price | SAR 49 / month | Unchanged — but willingness-to-pay is materially higher per unit |
+
+Why this works: each proposal has direct revenue consequence for the freelancer (each proposal potentially wins SAR 2,000–8,000 of work — see [Qemma 2026 rate ranges](https://qemma-soft.com/en/blog/freelancing-guide-saudi-arabia-2026)). SAR 49/month for 20 such artifacts is an obvious yes. SAR 49/month for unlimited median lookups is a harder sell.
+
+### 7.6 What the existing v0.1 `/tool` route becomes
+
+- **Keep statistical preview mode** at `/tool` for anonymous users — type specialty + city, get a price band (no artifact). This is the SEO entry point and free-funnel hook.
+- **Authenticated users** at `/tool` see the **unified proposal flow** instead — single textarea, paste-the-brief, generate the artifact.
+- The two surfaces share the underlying statistical core. The difference is what the user gives (dropdowns vs brief) and what they get back (number vs artifact).
+
+### 7.7 Out of Phase A (intentionally)
 
 - Voice note ingestion (Phase B — requires Fanar Speech)
 - Outcome tracking (Phase B)
@@ -244,46 +287,48 @@ Mostaql could clone Rizq's statistical engine in two weeks. They cannot clone a 
 - KYC / buyer-identity enrichment (Phase D — out of v0.2 entirely)
 - Buyer-side mode (Phase D)
 
-### 7.3 Why this scope and not larger
+### 7.8 Why keep Phase A tight (and not bigger)
 
-Three reasons to keep it tight:
-1. **Phase A creates the Excel-line crossing on its own.** Brief intake + bilingual artifact + per-freelancer weighting is enough to differentiate. Adding more features doesn't add more "not-Excel"; it adds risk.
-2. **The artifact is the only feature that creates compounding moat.** Spend disproportionately on making it gorgeous. Spend the rest of the budget here, not on info-gain math.
-3. **Validates the credibility-stamp positioning** without committing 12 months of engineering. If freelancers don't share the artifact, the moat hypothesis is wrong — and you find out cheap, not expensive.
+Three reasons:
+1. **The unified flow creates the Excel-line crossing on its own.** Brief intake + bilingual priced artifact + onboarding-driven personalization is enough to differentiate decisively. Adding voice notes, KYC, or Bayesian sophistication doesn't add more "not-Excel"; it adds risk.
+2. **The artifact is the moat.** Spend disproportionately on making it gorgeous, share-worthy, and trustworthy. Spend the rest of the budget here, not on algorithmic elegance freelancers will never see.
+3. **It validates the credibility-stamp hypothesis cheaply.** If freelancers don't share their artifacts with buyers, the entire moat thesis is wrong — and we find out in 8 weeks, not 12 months.
 
-### 7.4 Engineering build path
+### 7.9 Engineering build path
 
-Rough sequencing (assume 1 fullstack + 0.5 ML/backend, 6–8 weeks):
+Rough sequencing — **6–8 weeks** with 1 fullstack + 0.5 ML/backend + light design.
 
 | Week | Work |
 |---|---|
-| 1 | Scope schema + Zod validator. DeepSeek extraction prompt v1. 50-brief test harness (need real briefs — see §10). |
-| 2 | Bake-off: DeepSeek vs Fanar vs Jais on 50 briefs. Pick winner per language path. Wire `/[locale]/tool/smart` route. |
-| 3 | Follow-up question templates (Arabic + English, 8 fields × 2 langs = 16 templates). UI flow. |
-| 4 | Price calculation upgrade: use existing statistical core + per-freelancer weighting (new). Confidence band logic. |
-| 5 | Artifact generation: HTML template, bilingual rendering, branding capture flow, PDF export. |
-| 6 | `/[locale]/p/[proposal_id]` public route + view tracking + Rizq stamp visual. WhatsApp summary export. |
-| 7 | End-to-end test with 5 real freelancers (founder-recruited). Iterate on weak points. |
-| 8 | Final polish, telemetry, ship behind a `/tool/smart` opt-in toggle. Keep `/tool` (statistical) live as fallback. |
+| 1 | Scope schema + Zod validator. DeepSeek extraction prompt v1. 50-brief test corpus (founder-supplied — gating step, see §10). |
+| 2 | Bake-off: DeepSeek vs Fanar vs Jais on 50 briefs. Pick winner per language path. Repurpose `/[locale]/tool` route to the unified flow (auth gate decides between preview and full proposal mode). |
+| 3 | Follow-up question templates (~16 templates × 2 langs). Inline question UI flow. |
+| 4 | Onboarding upgrade: brand block + pricing defaults + IP defaults. Price calc upgrade with personal weighting. |
+| 5 | Artifact HTML template + bilingual rendering + Rizq verification stamp visual. PDF export. |
+| 6 | Public proposal route `/[locale]/p/[id]` + view tracking + WhatsApp text summary. |
+| 7 | End-to-end test with 5 real freelancers (founder-recruited from the §10 interview cohort). |
+| 8 | Polish, telemetry, ship. Anonymous `/tool` keeps the statistical preview mode as SEO entry + free-funnel hook. |
 
-### 7.5 Cost shape
+### 7.10 Cost shape
 
-At 1k smart-proposals/month:
+At 1k proposals/month:
 - DeepSeek tokens: ~$30/mo
 - Fanar tokens (Arabic-critical fraction): ~$20/mo
 - PDF rendering compute: ~$5/mo
 - Supabase storage for artifacts: existing tier
-- **Total marginal cost ~$0.06 per smart-proposal**
+- **Total marginal cost: ~$0.06 per proposal**
 
-Pro tier at SAR 49/mo = SAR 49 revenue per active user. Gross margin >95% even with heavy use. Cost is **not** a constraint.
+Pro tier at SAR 49/mo. Gross margin >95% even at heavy use. Cost is **not** a constraint.
 
-### 7.6 Definition of done for Phase A
+### 7.11 Definition of done
 
-The wedge ships when:
-- Founder + 5 real Saudi freelancers can each paste a real brief and get a usable proposal in <90 seconds
-- The artifact PDF + share link work end-to-end on mobile (70%+ of KSA traffic)
-- Smart mode is opt-in via toggle — statistical mode remains the safe default
-- Telemetry tracks: brief-paste rate, follow-up-question completion rate, artifact-share rate, artifact-view rate by buyers
+Phase A ships when:
+- A freelancer can paste a real WhatsApp brief and receive a usable proposal artifact in <90 seconds
+- The artifact PDF + share link + WhatsApp summary all work end-to-end on mobile (70%+ of KSA traffic)
+- Anonymous statistical preview still works at `/tool` for SEO / free-funnel entry
+- Founder + 5 real freelancers have each generated ≥3 proposals successfully without engineering help
+- Telemetry tracks: brief-paste rate, follow-up completion rate, artifact-share rate, artifact-view rate by buyers
+- The artifact-share rate ≥30% within 30 days post-launch (the moat hypothesis validation — see §9)
 
 ---
 
@@ -363,7 +408,7 @@ Question 4 is the decisive one. If 7/10 say yes to sharing the Rizq stamp with t
 
 ## 11. The one-paragraph summary for any stakeholder
 
-Rizq v0.1 is a credible statistical pricing benchmark that a competent Excel user could rebuild in 30 minutes — the founder's MEH is correct, and the Saudi freelance community confirms there is **no purpose-built pricing tool in the market** to compete with (Mostaql, Khamsat, Bahr all lack one; international AI-proposal tools are form-driven and English-first). The recommended move is a 6–8 week engineering wedge that adds three Excel-uncrossable features: brief-paste intake using DeepSeek/Fanar scope extraction, bilingual rule-based clarifying questions, and a **Rizq-stamped bilingual proposal artifact** the freelancer shares with their buyer as third-party pricing authority. The artifact is the actual moat — not patents, not algorithm cleverness — because it propagates virally through the freelancer→buyer relationship and slowly establishes Rizq as the Saudi pricing standard. Before any code is written, the founder should run 10 short freelancer interviews to validate the Rizq-stamp sharing hypothesis (question 4 in §9.1); 7/10 yes = greenlight, <4/10 = re-brainstorm. Total Phase A cost is engineering-time only (marginal LLM cost is ~$0.06/proposal, well under the SAR 49/mo Pro tier). LLM capability for the three features is production-ready in 2026 per stable canonical sources.
+Rizq v0.1 is a statistical pricing benchmark that a competent Excel user could rebuild in 30 minutes — the founder's MEH is correct, and the Saudi freelance community confirms there is **no purpose-built pricing tool in the market** (Mostaql, Khamsat, Bahr all lack one; international AI-proposal tools are form-driven and English-first). The recommended move is a 6–8 week engineering build that reframes Rizq as a **proposal-authoring tool with pricing intelligence baked in** — one button, one output. The freelancer pastes their client's brief; Rizq extracts scope, computes price using onboarding data + market data, fills scope gaps with 1–3 bilingual follow-ups if needed, and produces a **Rizq-stamped bilingual proposal artifact** the freelancer hands to their buyer. The price and the proposal are inseparable — neither has utility without the other. The artifact is the actual moat — not patents, not algorithm cleverness — because it propagates virally through the freelancer→buyer relationship and slowly establishes Rizq as the Saudi pricing standard. Unit-of-value shifts from "queries" to "proposals", with Pro pricing unchanged but willingness-to-pay materially higher because each proposal directly drives revenue. Before any code is written, the founder runs 10 freelancer interviews to validate the Rizq-stamp sharing hypothesis (question 4 in §9.1); 7/10 yes = greenlight, <4/10 = re-brainstorm. LLM capability is production-ready for the parts that matter; marginal cost is ~$0.06/proposal, well under SAR 49/mo Pro pricing.
 
 ---
 
