@@ -67,6 +67,9 @@ export default async function ToolPage({
     ? quota.mode
     : ((quota.cta === "signup" ? "anon" : "free") as "anon" | "free");
   const remaining = quota.ok ? quota.remaining : 0;
+  // Limit (3 + bonus_quota for free; 1 for anon; "unlimited" for pro/admin).
+  // Passing this to QuotaBadge keeps it in sync with the dashboard.
+  const limit = typeof quota.limit === "number" ? quota.limit : 3;
 
   return (
     <div className="relative min-h-screen flex flex-col bg-paper">
@@ -96,7 +99,7 @@ export default async function ToolPage({
             </p>
           </div>
           <div className="shrink-0">
-            <QuotaBadge locale={locale} mode={mode} remaining={remaining} />
+            <QuotaBadge locale={locale} mode={mode} remaining={remaining} limit={limit} />
           </div>
         </div>
 

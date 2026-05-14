@@ -7,6 +7,8 @@ export type QuotaState =
       ok: true;
       mode: "anon" | "free" | "pro" | "admin";
       remaining: number | "unlimited";
+      /** Total slots available (3 + bonus_quota for free; 1 for anon). */
+      limit: number | "unlimited";
       session_id: string | null;
       user_id: string | null;
     }
@@ -15,6 +17,7 @@ export type QuotaState =
       mode: "anon" | "free";
       reason: "exhausted";
       remaining: 0;
+      limit: number;
       // Path to send the user (login or upgrade)
       cta: "signup" | "upgrade";
     };
@@ -49,6 +52,7 @@ export async function getQuotaState(): Promise<QuotaState> {
         ok: true,
         mode: role,
         remaining: "unlimited",
+        limit: "unlimited",
         session_id: null,
         user_id: user.id,
       };
@@ -67,12 +71,20 @@ export async function getQuotaState(): Promise<QuotaState> {
     const remaining = Math.max(0, limit - used);
 
     if (remaining === 0) {
-      return { ok: false, mode: "free", reason: "exhausted", remaining: 0, cta: "upgrade" };
+      return {
+        ok: false,
+        mode: "free",
+        reason: "exhausted",
+        remaining: 0,
+        limit,
+        cta: "upgrade",
+      };
     }
     return {
       ok: true,
       mode: "free",
       remaining,
+      limit,
       session_id: null,
       user_id: user.id,
     };
@@ -89,12 +101,20 @@ export async function getQuotaState(): Promise<QuotaState> {
   const remaining = Math.max(0, ANON_FREE_QUERIES - used);
 
   if (remaining === 0) {
-    return { ok: false, mode: "anon", reason: "exhausted", remaining: 0, cta: "signup" };
+    return {
+      ok: false,
+      mode: "anon",
+      reason: "exhausted",
+      remaining: 0,
+      limit: ANON_FREE_QUERIES,
+      cta: "signup",
+    };
   }
   return {
     ok: true,
     mode: "anon",
     remaining,
+    limit: ANON_FREE_QUERIES,
     session_id,
     user_id: null,
   };
