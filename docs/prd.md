@@ -14,7 +14,9 @@
 
 ## 0. Current state (2026-05-14)
 
-What is already built and deployed on `rizq-tan.vercel.app`:
+**Strategic posture**: not chasing public launch yet. We are still shaping the full product (engine + closed loop, see [`engine.md`](./engine.md)). Monetization and marketing work are explicitly deferred until product shape settles.
+
+### 0.1 Shipped on `rizq-tan.vercel.app`
 
 - ✅ Bilingual (Arabic-primary RTL + English) landing page with hero, how-it-works, pricing, FAQ, footer.
 - ✅ Email waitlist capture (Resend-ready, stored in Supabase).
@@ -22,23 +24,43 @@ What is already built and deployed on `rizq-tan.vercel.app`:
 - ✅ Onboarding flow (language preference, city, specialty) with idempotency + skip option.
 - ✅ Pricing tool: specialty × city × tier × project-size → SQL-aggregated quartile statistics.
 - ✅ Statistical core: min / median / max + sample size + insufficient-data refusal + 24h dedupe.
-- ✅ Freemium quota: 1 lifetime anonymous, 3+bonus per Riyadh month for free, unlimited for Pro/admin. Atomic DB-trigger enforcement (no race).
+- ✅ Freemium quota: 1 lifetime anonymous, 3+bonus per Riyadh month for free, unlimited for Pro/admin. Atomic DB-trigger enforcement.
 - ✅ Crowd-sourced submissions with optional proof upload + admin review queue + bonus quota on approval.
 - ✅ User dashboard: query history, submissions, bonus tracking, profile settings.
 - ✅ Admin: review queue + approve/reject/edit with rate limits.
 - ✅ Error boundaries (locale-scoped + global), 404 page, sanitized error logging (no PII).
+- ✅ Legal pages: privacy + terms with PDPL-aware draft content (pending eventual lawyer review).
 - ✅ Sentry + PostHog instrumentation wired (DSN/keys to be set at launch).
 
-What remains to ship v0.1 publicly:
+### 0.2 Product-shape work (active focus)
 
-- 🚧 **Seed data**: tool is live but returns `insufficient_data` for most combinations. Need 500+ records before public launch (see §7.1).
-- 🚧 **Tap Payments + Pro tier paywall**: free quota dead-ends with no upgrade path.
-- 🚧 **Sentry DSN + PostHog project key + Resend domain verification.**
-- 🚧 **Public-facing legal pages** (privacy + terms — routes exist, content TBD).
-- 🚧 **OG images for social sharing.**
-- 🚧 **Public methodology page** (referenced from every result; not yet written).
+Things we are willing to build now because they shape the product before any monetization push.
 
-What is **deferred** beyond v0.1 (see `engine.md` for the v0.2+ vision):
+- 🚧 **Public methodology page** — referenced from every result per design principles. Trust-first founder voice + technical stats.
+- 🚧 **Legal content review** — current drafts are reasonable; flag for a Saudi lawyer pass before public launch (not blocking pre-launch dev).
+- 🚧 **(Optional product polish surfaces)** — any UX gaps we discover as we use the product ourselves before opening it up.
+
+### 0.3 Deferred — Monetization (revisit after product shape locked)
+
+These ship **only after we decide on engine direction** and have validated the product feels complete.
+
+- 🔜 Tap Payments integration + Pro tier paywall — also wires refund flow + ZATCA-aware invoice scaffolding.
+- 🔜 Annual tier (decided: yes, ship at monetization-go-time).
+- 🔜 Founder-lifetime tier for early supporters (revisit then).
+- 🔜 Tap vs Moyasar primary decision (revisit then).
+- 🔜 ZATCA-compliant invoicing on user request (only required once revenue crosses SAR 375k/yr; build as opt-in until then).
+
+### 0.4 Deferred — Marketing & launch (revisit after monetization)
+
+These ship **only after** monetization is live and we are ready to bring traffic.
+
+- 🔜 Seed data acquisition push (target 500+ records pre-public-launch). Strategy depends on engine decision — if v0.2 engine ships, seed-data ROI changes shape.
+- 🔜 OG images for social sharing.
+- 🔜 Sentry DSN + PostHog project key + Resend domain verification (instrumentation already wired — keys at launch).
+- 🔜 Launch channel choice (LinkedIn-founder-led vs press vs paid).
+- 🔜 Methodology page launch tone (trust-vs-technical balance — drafted as mixed for now).
+
+### 0.5 Deferred — v0.2+ vision (see `engine.md`)
 
 - 🔜 Smart pricing engine (scope extraction + Bayesian + active elicitation) — v0.2.
 - 🔜 Proposal artifact generator — v0.3.
@@ -451,25 +473,24 @@ v0.1 launches publicly when ALL of these are true:
 
 ---
 
-## 10. Open Questions (resolved as of 2026-05-14)
+## 10. Open Questions — Decision Log (2026-05-14)
 
-| # | Question | Decision | Status |
-|---|---|---|---|
-| 1 | Public benchmark page for SEO, or gated? | Anonymous gets 1 lifetime query (cookie-tracked); rest gated. | ✅ Shipped |
-| 2 | Anonymous quota: 1 or 0? | 1 lifetime query. | ✅ Shipped |
-| 3 | Submission feature in v0.1 or v0.2? | v0.1 — it's the moat. | ✅ Shipped |
-| 4 | LinkedIn OAuth at launch? | Yes — KSA market signal. | ✅ Shipped (Google + LinkedIn live; Apple deferred) |
-| 5 | Annual pricing tier at launch? | Defer to Month 3 — validate monthly first. | 🚧 Open |
-| 6 | Refund policy: 7-day vs pro-rated? | Pro-rated only. | 🚧 Open (to be wired into Tap integration) |
-| 7 | ZATCA-compliant invoices? | Only on user request until VAT threshold crossed. | 🚧 Open |
+| # | Question | Decision |
+|---|---|---|
+| 1 | Public benchmark for SEO, or gated? | Anonymous 1 lifetime query; rest gated. ✅ |
+| 2 | Anonymous quota: 1 or 0? | 1 lifetime. ✅ |
+| 3 | Submission feature in v0.1? | Yes — it's the moat. ✅ |
+| 4 | LinkedIn OAuth at launch? | Yes — Google + LinkedIn shipped; Apple deferred. ✅ |
+| 5 | Annual tier? | **Yes — ship at monetization-go-time, not month 3 wait.** |
+| 6 | Refund policy: 7-day vs pro-rated? | **Pro-rated. Wire into Tap when Tap is built.** |
+| 7 | ZATCA-compliant invoices? | **Build as opt-in scaffolding; not mandatory until SAR 375k/yr revenue crossed.** Context: ZATCA = Saudi tax authority, 15% VAT mandatory above 375k revenue; FATOORA e-invoicing required for VAT-registered entities. Below threshold, no obligation. |
+| 8 | Tap vs Moyasar as primary? | **Decide at monetization-go-time, not now.** |
+| 9 | Founder-lifetime tier for early supporters? | **Defer to monetization-go-time.** |
+| 10 | Seed data acquisition strategy? | **Defer — depends on engine decision. If v0.2 engine ships, seed-data ROI changes.** |
+| 11 | Launch channel (LinkedIn/X/press)? | **Defer to launch-prep time.** |
+| 12 | Methodology page tone? | **Mixed — trust-first founder voice up top, technical stats below.** Drafted as mixed. |
 
-### Still-open questions for the founder
-
-8. **Tap Payments vs Moyasar as primary**? Tap was the architecture default; confirm before integration starts.
-9. **Pro pricing**: confirmed SAR 49/month — should there also be a freelancer-lifetime offering for early supporters?
-10. **Seed data**: are we still on track for 500+ records pre-launch via the documented sources, or do we need a paid data acquisition push?
-11. **Launch channel**: LinkedIn (founder-led) + Twitter/X first, or wait for press? Choice affects which OG images get priority.
-12. **Methodology page tone**: technical (statistics, sample sizes) or trust-first (founder voice + examples)? Will shape the public face.
+**Why so many deferred**: founder is shaping the full product (engine + closed loop) before committing to monetization or marketing. Re-open this log after engine direction is locked.
 
 ---
 

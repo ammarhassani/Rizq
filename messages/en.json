@@ -100,6 +100,7 @@
     "contactEmail": "hello@rizq.sa",
     "termsLabel": "Terms",
     "privacyLabel": "Privacy",
+    "methodologyLabel": "Methodology",
     "langToggleLabel": "عربي",
     "copyright": "© 2026 Rizq. All rights reserved.",
     "navTool": "Pricing tool",
@@ -158,6 +159,28 @@
       "s8Body": "For privacy questions or to exercise your rights, email us below.",
       "contact": "Contact: {email}"
     }
+  },
+  "Methodology": {
+    "eyebrow": "How we calculate",
+    "title": "Rizq pricing methodology",
+    "intro": "I'm Ammar, the founder. This page explains where the numbers you see come from, how we compute them, and when we refuse to answer. The goal: use Rizq knowing exactly what we built it on — never trust us blindly.",
+    "s1Title": "1 · Where data comes from",
+    "s1Body": "Three primary sources: (a) Saudi freelancers who submitted real project prices with optional proof, (b) public data from Saudi platforms and government tenders, (c) Saudi-issued labor and wage indices. Every record carries its source, date, and a trust weight. We don't blend them into a single faceless number.",
+    "s2Title": "2 · How the range is built",
+    "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is a real market range — not a softened average.",
+    "s3Title": "3 · Why median, not mean",
+    "s3Body": "A mean is pulled around by outliers — one luxury project or one underpriced gig distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
+    "s4Title": "4 · Sample size and confidence",
+    "s4Body": "Every result shows \"based on N Saudi freelancers\". N matters: 5 records is our floor — under that we say \"insufficient data\" rather than guess. As N grows, the range narrows and confidence rises. We don't hide thin samples behind round numbers.",
+    "s5Title": "5 · What we don't yet model",
+    "s5Body": "Today we don't account for: exact project complexity, individual freelancer reputation, client urgency, or your network signals. These move real prices — but they need a smarter engine, which we're building for the next version. For now: the range is market-wide, not personal.",
+    "s6Title": "6 · Data freshness",
+    "s6Body": "Records older than 18 months are flagged and down-weighted. The Saudi market moves. \"Market price\" today isn't necessarily \"market price\" last year. The index updates continuously as new submissions come in.",
+    "s7Title": "7 · Submission review",
+    "s7Body": "Every contribution is hand-reviewed before it enters the public dataset. We reject incomplete or unrealistic records. This is slow — but it's the only way to protect the quality of every number after yours.",
+    "s8Title": "8 · A question or correction?",
+    "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest — email me. Rizq gets sharper with every note.",
+    "contact": "Reach me directly: {email}"
   },
   "Auth": {
     "shared": {
@@ -328,7 +351,8 @@
       "shareNotePublic": "Anyone with the link can see this result.",
       "shareNotePrivate": "This result is private. Make it public to get a shareable link.",
       "again": "Run another query",
-      "contributeYourPrice": "Paid a different price? Help improve the benchmark"
+      "contributeYourPrice": "Paid a different price? Help improve the benchmark",
+      "methodologyLink": "How did we calculate this?"
     },
     "insufficient": {
       "title": "Not enough data yet.",

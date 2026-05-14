@@ -149,6 +149,13 @@ export function ResultCard({
               : t("fallbackSpecialty")}
           </p>
         )}
+        <Link
+          href="/methodology"
+          className={`sm:col-span-2 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
+        >
+          <span>{t("methodologyLink")}</span>
+          <span className="inline-block rtl:rotate-180">→</span>
+        </Link>
       </div>
 
       {/* Share row */}

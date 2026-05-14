@@ -42,6 +42,12 @@ export async function SiteFooter({ locale }: Props) {
               {t("navTool")} →
             </Link>
             <Link
+              href="/methodology"
+              className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
+            >
+              {t("methodologyLabel")}
+            </Link>
+            <Link
               href="/terms"
               className={`text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
             >
