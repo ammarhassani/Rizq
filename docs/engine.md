@@ -129,7 +129,7 @@ Provenance weight × freshness decay × specialty-fit = effective comp weight.
 
 **Output**: `{ p10, p50, p90 }` price band + sample-size + provenance breakdown + win-rate-vs-price curve (once outcome data exists).
 
-**Step 5 · Smart follow-up gap-filling.** Engine identifies which scope fields have low confidence AND high price-impact, and generates 1–3 bilingual questions to fill those gaps. Implementation in v0.2 is **rule-based templates per field** with LLM phrasing on top — honest and ships in days. True information-gain ranking is a longer-term Phase C consideration only if heuristics prove insufficient. **Never marketed as "AI picks the smartest question" — that's vaporware framing.**
+**Step 5 · Smart follow-up gap-filling.** Engine identifies which scope fields have low confidence AND high price-impact, and generates 1–3 bilingual questions to fill those gaps. Implementation in v0.2 is **rule-based templates per field** with LLM phrasing on top — honest and small. True information-gain ranking is a possible later consideration only if heuristics prove insufficient. **Never marketed as "AI picks the smartest question" — that's vaporware framing.**
 
 Two delivery modes:
 - **Internal**: question the freelancer answers immediately (e.g. "Is this a one-time launch or ongoing retainer?").
@@ -211,16 +211,18 @@ None of them have engineering moats. All of them have credibility moats. The tec
 
 ### 3.4 Why a competitor can't replicate this quickly
 
-| Surface | How long to clone |
+These are rough estimates of how long a well-funded competitor would need to clone each layer if they decided to. They are **not** our own timelines — they're a competitive-defense reference.
+
+| Surface | Rough time for a competitor to clone |
 |---|---|
-| The statistical engine | 2 weeks |
-| The brief-extraction LLM pipeline | 4 weeks |
-| The bilingual proposal template | 2 weeks |
-| The Rizq dataset | 6+ months (data network effect) |
-| The Rizq verification-stamp brand authority | **2+ years** |
+| The statistical engine | days |
+| The brief-extraction LLM pipeline | weeks |
+| The bilingual proposal template | weeks |
+| The Rizq dataset | many months (data network effect) |
+| The Rizq verification-stamp brand authority | **years** |
 | Buyer-side expectation that "Rizq-stamped = trusted" | **uncopyable without going back in time** |
 
-Engineering is hours and weeks. Trust is years and reputation. The moat is the bottom three rows.
+Engineering is hours and days. Trust is years and reputation. The moat is the bottom three rows.
 
 ### 3.5 Implications for build strategy
 
@@ -453,49 +455,52 @@ Why this works: each proposal has direct revenue consequence for the freelancer.
 - Error boundaries, instrumentation, methodology page — unchanged
 - Statistical core (`/lib/pricing/...`) — embedded inside the proposal flow, not deleted
 
-### 8.6 Deliberately out of v0.2 (deferred to v0.3+)
+### 8.6 Deliberately out of v0.2 (deferred to later versions)
 
-- Voice note ingestion (Phase B — needs Fanar Speech, has WER caveats on dialect)
-- Outcome tracking dashboards (Phase B — capture the data, build the UI later)
-- Per-freelancer Bayesian model (Phase C — needs outcome data first)
-- Multi-source scraped data (Phase C+ — defer until submissions cross ~500)
-- Client KYC / public-registry enrichment (Phase D)
-- Buyer-side mode (Phase D)
-- WhatsApp Business API capture (Phase D)
-- True information-gain question ranking (only build if Phase A heuristics prove insufficient)
+- Voice note ingestion (v0.4 — needs Fanar Speech, has WER caveats on dialect)
+- Outcome tracking dashboards (v0.3 — capture the data in v0.2, build the UI later)
+- Per-freelancer Bayesian model (post-v0.3 — needs outcome data first)
+- Multi-source scraped data (post-v0.3 — defer until submissions cross ~500 records)
+- Client KYC / public-registry enrichment (v0.5)
+- Buyer-side mode (v0.6)
+- WhatsApp Business API capture (v0.4)
+- True information-gain question ranking (only build if v0.2 heuristics prove insufficient)
 
-### 8.7 Build timeline
+### 8.7 Build sequence (best-effort, no SLA)
 
-Rough sequencing: **6–8 weeks** with 1 fullstack + 0.5 ML/backend + light design.
+This is engineering-lead-paced — no week-by-week schedule, no deadline. Work blocks below are listed in **dependency order** — each block unblocks the next. We move at the pace that lets us ship something we'd be proud to put a Rizq stamp on. See [`engine-research.md` §7.9](./engine-research.md#79-build-sequence-dependency-ordered-best-effort-no-sla) for the same table.
 
-| Week | Work |
-|---|---|
-| 1 | Scope schema + Zod validator. DeepSeek extraction prompt v1. 50-brief test corpus (founder-supplied — gating step). |
-| 2 | Bake-off: DeepSeek vs Fanar vs Jais on 50 briefs. Pick winner per language path. Wire single-button `/tool` flow. |
-| 3 | Follow-up question templates (~16 templates × 2 langs). Inline question UI flow. |
-| 4 | Onboarding upgrade: brand block, pricing defaults, IP defaults. Price calc upgrade with personal weighting. |
-| 5 | Artifact HTML template + bilingual rendering + Rizq verification stamp visual. PDF export via Puppeteer/HTML-to-PDF. |
-| 6 | Public proposal route `/[locale]/p/[id]` + view tracking + WhatsApp text summary. |
-| 7 | End-to-end test with 5 real freelancers (founder-recruited from the §10 interview cohort). |
-| 8 | Polish, telemetry, ship. Old `/tool` becomes the public preview surface (anonymous gets the number only, sign-up gets the proposal). |
+| # | Block | Depends on |
+|---|---|---|
+| 1 | Scope schema + Zod validator + DeepSeek extraction prompt v1 | 50-brief test corpus (founder-supplied) |
+| 2 | LLM bake-off: DeepSeek vs Fanar vs Jais on the test corpus | Block 1 + Fanar/Jais API keys |
+| 3 | Repurpose `/[locale]/tool` route — auth gate splits preview (anon) from full proposal flow (authed) | Block 2 |
+| 4 | Follow-up question templates (Arabic + English) + inline question UI | Block 3 |
+| 5 | Onboarding upgrade — brand block, pricing defaults, IP defaults | parallel to LLM blocks |
+| 6 | Price calc upgrade — existing core weighted by freelancer's personal history | Block 5 |
+| 7 | Artifact HTML template + bilingual rendering + Rizq verification stamp visual | Block 6 + design assets |
+| 8 | PDF export + WhatsApp text summary | Block 7 |
+| 9 | Public proposal route `/[locale]/p/[id]` + view tracking | Block 8 |
+| 10 | End-to-end dogfooding with 5 real freelancers | all above |
+| 11 | Telemetry on share/open rates → moat hypothesis validation | Block 10 |
 
 ### 8.8 Definition of done
 
-The v0.2 wedge ships when:
-- A freelancer can paste a real WhatsApp brief and get a usable proposal artifact in < 90 seconds
+v0.2 ships when:
+- A freelancer can paste a real WhatsApp brief and receive a usable proposal artifact in a single short interaction
 - The PDF + share link + WhatsApp summary all work end-to-end on mobile
-- Artifact view tracking captures buyer-side opens (this is how we'll know the moat hypothesis is real)
+- Artifact view tracking captures buyer-side opens (this is how the moat hypothesis becomes empirically answerable)
 - Statistical preview mode at `/tool` works for anonymous users — the SEO + free-funnel entry point
 - Founder + 5 real freelancers each generated ≥ 3 proposals successfully without engineering help
 
 ### 8.9 Cost shape
 
-At 1k proposals/month:
-- DeepSeek tokens: ~$30/mo
-- Fanar tokens (Arabic-critical fraction): ~$20/mo
-- PDF rendering: ~$5/mo
+Per 1k proposals (whenever they land — months or years, doesn't matter):
+- DeepSeek tokens: ~$30
+- Fanar tokens (Arabic-critical fraction): ~$20
+- PDF rendering: ~$5
 - Storage: existing tier
-- **Marginal cost: ~$0.06 per proposal**. Pro tier at SAR 49 is >95% gross margin even at heavy use. Cost is **not** a constraint.
+- **Marginal cost: ~$0.06 per proposal**. Pro tier at SAR 49/mo is >95% gross margin even at heavy use. Cost is **not** a constraint.
 
 ---
 
@@ -514,7 +519,7 @@ At 1k proposals/month:
 
 **Strategic risks**
 - Mostaql or Bahr launches a competing pricing-proposal tool. Mitigation: speed-to-market on v0.2 + own the **neutral third-party authority** positioning that a platform with skin in the game cannot credibly take.
-- Buyers don't actually treat the Rizq stamp as authoritative. Mitigation: this is the moat hypothesis and must be validated. The v0.2 telemetry on artifact-share rate + buyer-side open rate reveals this within ~2 months of launch — kill or pivot then.
+- Buyers don't actually treat the Rizq stamp as authoritative. Mitigation: this is the moat hypothesis and must be validated. The v0.2 telemetry on artifact-share rate + buyer-side open rate reveals this once meaningful proposal volume exists — kill or pivot then.
 - Government regulation of AI pricing tools. Mitigation: build in transparent methodology + audit log from day one; position as decision-support, not auto-pricing.
 
 **Open product questions**
@@ -536,7 +541,7 @@ At 1k proposals/month:
 
 1. **Read this doc + [`engine-research.md`](./engine-research.md) + [`prd.md`](./prd.md) + [`architecture.md`](./architecture.md).** The research doc is the decision-grade recommendation; this doc is the long-term vision.
 2. **Run the 10 founder-led freelancer interviews** described in `engine-research.md` §9.1 **before any code is written**. Question 4 — "Would you share a Rizq-stamped proposal with your client?" — gates the whole v0.2 build. 7/10 yes = greenlight. <4/10 = re-brainstorm.
-3. **Have the founder collect 50 real Saudi freelance briefs** (WhatsApp screenshots, email forwards, RFPs). This is the v0.2 week-1 test corpus and is gating for the week-2 LLM bake-off.
+3. **Have the founder collect 50 real Saudi freelance briefs** (WhatsApp screenshots, email forwards, RFPs). This is the v0.2 test corpus and is gating for the LLM bake-off — see [`engine-research.md` §10.1](./engine-research.md#101-gating--three-things-must-exist-first).
 4. **Run a 1-day bake-off** of DeepSeek vs Fanar vs Jais on the 50 briefs. Pick the winner per language path before committing model strategy.
 5. **Convert this doc + the research doc into a v0.2 implementation plan** (the `superpowers:writing-plans` skill is the natural next tool). Plan should cover: scope schema, extraction pipeline, follow-up question templates, onboarding upgrade, artifact generator, public proposal route, quota plumbing migration (queries → proposals).
 6. **Build the evaluation harness alongside the engine.** A held-out set of 20+ real Saudi briefs with founder-confirmed correct scope extractions is the only way to know the LLM is doing its job.
