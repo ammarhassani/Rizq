@@ -27,6 +27,7 @@ type SubmissionRow = {
   status: "pending" | "approved" | "rejected" | "needs_info";
   price_sar: string | number;
   submitted_at: string;
+  moderator_notes: string | null;
   specialty: { name_ar: string; name_en: string; slug: string } | null;
   city: { name_ar: string; name_en: string; slug: string } | null;
 };
@@ -65,7 +66,7 @@ export default async function DashboardPage({
     supabase
       .from("pricing_submissions")
       .select(`
-        id, status, price_sar, submitted_at,
+        id, status, price_sar, submitted_at, moderator_notes,
         specialty:specialties (slug, name_ar, name_en),
         city:cities (slug, name_ar, name_en)
       `)
@@ -351,32 +352,56 @@ export default async function DashboardPage({
                         : statusKey === "needs_info"
                           ? "text-amber-700"
                           : "text-rizq-ink-soft";
+                  const needsAction = statusKey === "needs_info";
+
                   return (
-                    <li
-                      key={s.id}
-                      className="py-4 sm:py-5 flex items-center justify-between gap-4"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
-                          {sName}{" "}
-                          <span className="text-rizq-ink-soft/70">·</span>{" "}
-                          {cName}
-                        </p>
-                        <p className={`mt-1 text-xs text-rizq-ink-soft ${font}`}>
-                          {dateFmt.format(new Date(s.submitted_at))}
-                          <span className={`ms-3 ${statusTone}`}>
-                            {tMySubs(`status.${statusKey}`)}
+                    <li key={s.id} className="py-4 sm:py-5">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
+                            {sName}{" "}
+                            <span className="text-rizq-ink-soft/70">·</span>{" "}
+                            {cName}
+                          </p>
+                          <p className={`mt-1 text-xs text-rizq-ink-soft ${font}`}>
+                            {dateFmt.format(new Date(s.submitted_at))}
+                            <span className={`ms-3 ${statusTone}`}>
+                              {tMySubs(`status.${statusKey}`)}
+                            </span>
+                          </p>
+                        </div>
+                        <span className="hidden sm:inline-flex flex-col items-end shrink-0">
+                          <span className="font-sans tabular text-lg font-medium text-rizq-ink leading-none">
+                            {fmt.format(Number(s.price_sar))}
                           </span>
-                        </p>
+                          <span className={`text-[10px] tracking-wider uppercase text-rizq-ink-soft/60 mt-0.5 ${font}`}>
+                            {tTool("result.currency")}
+                          </span>
+                        </span>
                       </div>
-                      <span className="hidden sm:inline-flex flex-col items-end shrink-0">
-                        <span className="font-sans tabular text-lg font-medium text-rizq-ink leading-none">
-                          {fmt.format(Number(s.price_sar))}
-                        </span>
-                        <span className={`text-[10px] tracking-wider uppercase text-rizq-ink-soft/60 mt-0.5 ${font}`}>
-                          {tTool("result.currency")}
-                        </span>
-                      </span>
+
+                      {/* Moderator request + Update CTA */}
+                      {needsAction && (
+                        <div className="mt-3 ms-0 sm:ms-0 rounded-2xl border border-amber-300/40 bg-amber-50/60 px-4 py-3">
+                          {s.moderator_notes && (
+                            <>
+                              <p className={`text-[10px] tracking-[0.18em] uppercase text-amber-800 mb-1 ${font}`}>
+                                {tMySubs("moderatorNoteLabel")}
+                              </p>
+                              <p className={`text-sm text-rizq-ink-soft leading-relaxed mb-3 ${font}`}>
+                                {s.moderator_notes}
+                              </p>
+                            </>
+                          )}
+                          <Link
+                            href={`/submit?resubmit=${s.id}`}
+                            className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-4 py-2 text-sm font-medium hover:bg-rizq-green-dark transition-colors ${font}`}
+                          >
+                            <span>{tMySubs("updateCta")}</span>
+                            <span className="inline-block rtl:rotate-180">→</span>
+                          </Link>
+                        </div>
+                      )}
                     </li>
                   );
                 })}

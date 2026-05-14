@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { SiteNav } from "@/components/nav/SiteNav";
-import { SubmitForm } from "@/components/submit/SubmitForm";
+import { SubmitForm, type SubmitPrefill } from "@/components/submit/SubmitForm";
 import {
   getSpecialties,
   getCities,
@@ -21,12 +21,31 @@ export async function generateMetadata({
   return { title: `${t("title")} — رِزق` };
 }
 
+type PrefillRow = {
+  id: string;
+  status: string;
+  user_id: string;
+  project_type: string | null;
+  project_size: string | null;
+  price_sar: string | number;
+  project_duration_days: number | null;
+  client_type: string | null;
+  notes: string | null;
+  moderator_notes: string | null;
+  specialty: { slug: string } | null;
+  city: { slug: string } | null;
+  experience_tier: { slug: string } | null;
+};
+
 export default async function SubmitPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ resubmit?: string }>;
 }) {
   const { locale } = await params;
+  const { resubmit } = await searchParams;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -35,7 +54,52 @@ export default async function SubmitPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    redirect(`/${locale}/login?returnTo=/${locale}/submit`);
+    const next = resubmit
+      ? `/${locale}/submit?resubmit=${resubmit}`
+      : `/${locale}/submit`;
+    redirect(`/${locale}/login?returnTo=${encodeURIComponent(next)}`);
+  }
+
+  // If ?resubmit=<id>, fetch the submission. Must belong to user and be in
+  // needs_info — otherwise drop to a regular submit form.
+  let prefill: SubmitPrefill | undefined;
+  if (resubmit && /^[0-9a-f-]{36}$/i.test(resubmit)) {
+    const { data } = await supabase
+      .from("pricing_submissions")
+      .select(
+        `id, status, user_id, project_type, project_size, price_sar,
+         project_duration_days, client_type, notes, moderator_notes,
+         specialty:specialties (slug),
+         city:cities (slug),
+         experience_tier:experience_tiers (slug)`
+      )
+      .eq("id", resubmit)
+      .maybeSingle();
+    const row = data as unknown as PrefillRow | null;
+    if (
+      row &&
+      row.user_id === user.id &&
+      row.status === "needs_info" &&
+      row.specialty &&
+      row.city &&
+      row.experience_tier
+    ) {
+      prefill = {
+        submission_id: row.id,
+        specialty_slug: row.specialty.slug,
+        city_slug: row.city.slug,
+        experience_tier_slug: row.experience_tier.slug,
+        project_type: row.project_type ?? "",
+        project_size:
+          (row.project_size as SubmitPrefill["project_size"]) ?? "",
+        price_sar: Number(row.price_sar),
+        project_duration_days: row.project_duration_days ?? "",
+        client_type:
+          (row.client_type as SubmitPrefill["client_type"]) ?? "",
+        notes: row.notes ?? "",
+        moderator_notes: row.moderator_notes,
+      };
+    }
   }
 
   const [specialties, cities, tiers] = await Promise.all([
@@ -76,6 +140,7 @@ export default async function SubmitPage({
           specialties={specialtyOptions}
           cities={cityOptions}
           tiers={tierOptions}
+          prefill={prefill}
         />
       </main>
     </div>

@@ -450,6 +450,20 @@
       "approved": "Approved (+2)",
       "rejected": "Rejected",
       "needs_info": "Needs info"
+    },
+    "moderatorNoteLabel": "Reviewer note",
+    "updateCta": "Update & resubmit"
+  },
+  "Resubmit": {
+    "banner": "The reviewer asked for an update before approving:",
+    "submit": "Resubmit for review",
+    "submitting": "Sending…",
+    "successTitle": "Resubmitted.",
+    "successBody": "We'll review again. Thanks.",
+    "errors": {
+      "notOwner": "This submission isn't yours.",
+      "wrongState": "This submission can't be updated right now.",
+      "notFound": "Submission not found."
     }
   }
 }
