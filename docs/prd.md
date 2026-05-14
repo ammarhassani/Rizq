@@ -2,12 +2,49 @@
 
 | Field | Value |
 |---|---|
-| Document version | v1.0 |
+| Document version | v1.1 |
 | Product version | v0.1 (Layer 1: Pricing Benchmark MVP) |
 | Author | Ammar Al-Hassani |
-| Date | May 12, 2026 |
-| Status | Draft — for build planning |
-| Related docs | Rizq BRD v1.0, Rizq Tech Architecture v1.0 |
+| Date created | 2026-05-12 |
+| Date updated | 2026-05-14 |
+| Status | **v0.1 mostly shipped; this PRD reflects current state + remaining work to launch** |
+| Related docs | `brd.md`, `architecture.md`, `engine.md` (v0.2+ vision) |
+
+---
+
+## 0. Current state (2026-05-14)
+
+What is already built and deployed on `rizq-tan.vercel.app`:
+
+- ✅ Bilingual (Arabic-primary RTL + English) landing page with hero, how-it-works, pricing, FAQ, footer.
+- ✅ Email waitlist capture (Resend-ready, stored in Supabase).
+- ✅ Auth: email + password, Google + LinkedIn OAuth, email verification, password reset.
+- ✅ Onboarding flow (language preference, city, specialty) with idempotency + skip option.
+- ✅ Pricing tool: specialty × city × tier × project-size → SQL-aggregated quartile statistics.
+- ✅ Statistical core: min / median / max + sample size + insufficient-data refusal + 24h dedupe.
+- ✅ Freemium quota: 1 lifetime anonymous, 3+bonus per Riyadh month for free, unlimited for Pro/admin. Atomic DB-trigger enforcement (no race).
+- ✅ Crowd-sourced submissions with optional proof upload + admin review queue + bonus quota on approval.
+- ✅ User dashboard: query history, submissions, bonus tracking, profile settings.
+- ✅ Admin: review queue + approve/reject/edit with rate limits.
+- ✅ Error boundaries (locale-scoped + global), 404 page, sanitized error logging (no PII).
+- ✅ Sentry + PostHog instrumentation wired (DSN/keys to be set at launch).
+
+What remains to ship v0.1 publicly:
+
+- 🚧 **Seed data**: tool is live but returns `insufficient_data` for most combinations. Need 500+ records before public launch (see §7.1).
+- 🚧 **Tap Payments + Pro tier paywall**: free quota dead-ends with no upgrade path.
+- 🚧 **Sentry DSN + PostHog project key + Resend domain verification.**
+- 🚧 **Public-facing legal pages** (privacy + terms — routes exist, content TBD).
+- 🚧 **OG images for social sharing.**
+- 🚧 **Public methodology page** (referenced from every result; not yet written).
+
+What is **deferred** beyond v0.1 (see `engine.md` for the v0.2+ vision):
+
+- 🔜 Smart pricing engine (scope extraction + Bayesian + active elicitation) — v0.2.
+- 🔜 Proposal artifact generator — v0.3.
+- 🔜 Outcome tracking + per-freelancer models — v0.4.
+- 🔜 Client KYC + capture surfaces (WhatsApp, email) — v0.5.
+- 🔜 Buyer-side mode — v0.6.
 
 ---
 
@@ -381,8 +418,13 @@ Sources:
 
 ## 8. Out-of-Scope (Reminders)
 
-- ❌ AI proposal generation (v0.2)
-- ❌ Contract templates (v0.3)
+- 🔜 **Smart pricing engine** (scope extraction + Bayesian + active elicitation) → v0.2, see `engine.md`
+- 🔜 **Proposal artifact generator** (bilingual PDF + share links + read-receipts) → v0.3, see `engine.md`
+- 🔜 **Outcome tracking + per-freelancer models** → v0.4, see `engine.md`
+- 🔜 **Client KYC** (Wathiq / Maroof / Etimad enrichment) → v0.5, see `engine.md`
+- 🔜 **Capture surfaces** (WhatsApp Business / Gmail / browser extension) → v0.5, see `engine.md`
+- 🔜 **Buyer-side mode** (engine as neutral pricing authority for both sides) → v0.6, see `engine.md`
+- ❌ Arabic contract templates (separate Layer 3 product)
 - ❌ Late payment chasing / reminder bot
 - ❌ Lead generation / freelancer-client matching
 - ❌ ZATCA invoice generation
@@ -409,15 +451,25 @@ v0.1 launches publicly when ALL of these are true:
 
 ---
 
-## 10. Open Questions for the Founder
+## 10. Open Questions (resolved as of 2026-05-14)
 
-1. Do you want a public benchmark page (free, no auth) for SEO, or should everything be gated?
-2. Should anonymous users get 1 free query or zero? (Trade-off: friction vs. signup conversion)
-3. Should the data submission feature launch in v0.1 or v0.2? (Recommendation: v0.1, it's the moat)
-4. Do you want to integrate LinkedIn login at launch or wait? (Recommendation: launch with it — KSA market)
-5. Annual pricing tier at launch (490 SAR/year) or wait until Month 3?
-6. Refund policy: 7-day full refund OR pro-rated only? (Pro-rated recommended)
-7. Do you want to issue ZATCA-compliant invoices for Pro subscriptions? (Required only if you cross VAT threshold — but good practice)
+| # | Question | Decision | Status |
+|---|---|---|---|
+| 1 | Public benchmark page for SEO, or gated? | Anonymous gets 1 lifetime query (cookie-tracked); rest gated. | ✅ Shipped |
+| 2 | Anonymous quota: 1 or 0? | 1 lifetime query. | ✅ Shipped |
+| 3 | Submission feature in v0.1 or v0.2? | v0.1 — it's the moat. | ✅ Shipped |
+| 4 | LinkedIn OAuth at launch? | Yes — KSA market signal. | ✅ Shipped (Google + LinkedIn live; Apple deferred) |
+| 5 | Annual pricing tier at launch? | Defer to Month 3 — validate monthly first. | 🚧 Open |
+| 6 | Refund policy: 7-day vs pro-rated? | Pro-rated only. | 🚧 Open (to be wired into Tap integration) |
+| 7 | ZATCA-compliant invoices? | Only on user request until VAT threshold crossed. | 🚧 Open |
+
+### Still-open questions for the founder
+
+8. **Tap Payments vs Moyasar as primary**? Tap was the architecture default; confirm before integration starts.
+9. **Pro pricing**: confirmed SAR 49/month — should there also be a freelancer-lifetime offering for early supporters?
+10. **Seed data**: are we still on track for 500+ records pre-launch via the documented sources, or do we need a paid data acquisition push?
+11. **Launch channel**: LinkedIn (founder-led) + Twitter/X first, or wait for press? Choice affects which OG images get priority.
+12. **Methodology page tone**: technical (statistics, sample sizes) or trust-first (founder voice + examples)? Will shape the public face.
 
 ---
 
@@ -426,8 +478,10 @@ v0.1 launches publicly when ALL of these are true:
 | Stakeholder | Role | Sign-off |
 |---|---|---|
 | Ammar Al-Hassani | Founder / Product Owner | _Pending_ |
-| Claude Code | Engineering Lead | _Pending after Tech Architecture review_ |
+| Claude Code | Engineering Lead | _Acknowledged — v0.1 implementation aligned with this PRD as of 2026-05-14_ |
 
 ---
 
-**End of PRD v1.0**
+**End of PRD v1.1**
+
+For the v0.2+ pricing engine vision (patent-shaped active-elicitation system), see [`engine.md`](./engine.md).
