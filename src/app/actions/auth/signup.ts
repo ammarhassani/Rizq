@@ -40,7 +40,9 @@ export async function signUp(input: unknown): Promise<SignupResult> {
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback?next=/${parsed.data.language_preference}/onboarding`,
+      // Route through /dashboard; it forwards new users to /onboarding via
+      // the users.onboarded_at gate so returning users skip the screen.
+      emailRedirectTo: `${origin}/auth/callback?next=/${parsed.data.language_preference}/dashboard`,
       data: {
         name: parsed.data.name ?? null,
         preferred_language: parsed.data.language_preference,

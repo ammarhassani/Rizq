@@ -40,7 +40,7 @@ export async function resendVerificationEmail(
     type: "signup",
     email: parsed.data.email,
     options: {
-      emailRedirectTo: `${origin}/auth/callback?next=/${parsed.data.locale}/onboarding`,
+      emailRedirectTo: `${origin}/auth/callback?next=/${parsed.data.locale}/dashboard`,
     },
   });
 

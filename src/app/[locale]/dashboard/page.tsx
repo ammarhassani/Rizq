@@ -48,7 +48,7 @@ export default async function DashboardPage({
   const [profileRes, quota, historyRes, submissionsRes] = await Promise.all([
     supabase
       .from("users")
-      .select("name, email, preferred_language, role, bonus_quota")
+      .select("name, email, preferred_language, role, bonus_quota, onboarded_at")
       .eq("id", user.id)
       .single(),
     getQuotaState(),
@@ -76,6 +76,12 @@ export default async function DashboardPage({
   ]);
 
   const profile = profileRes.data;
+  // Gate first-time users into onboarding. Backfill in the migration set
+  // onboarded_at = created_at for existing users, so only brand-new signups
+  // see this redirect.
+  if (profile && profile.onboarded_at === null) {
+    redirect(`/${locale}/onboarding`);
+  }
   const history = (historyRes.data ?? []) as unknown as HistoryRow[];
   const submissions = (submissionsRes.data ?? []) as unknown as SubmissionRow[];
   const isAdmin = profile?.role === "admin";

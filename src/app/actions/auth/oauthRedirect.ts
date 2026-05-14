@@ -26,7 +26,9 @@ export async function startOAuth(
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/auth/callback?next=/${locale}/onboarding`,
+      // Always route through /dashboard. The dashboard checks
+      // users.onboarded_at and forwards to /onboarding only for new users.
+      redirectTo: `${origin}/auth/callback?next=/${locale}/dashboard`,
     },
   });
 

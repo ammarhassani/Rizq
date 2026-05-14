@@ -20,6 +20,17 @@ export default async function OnboardingPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
+  // If already onboarded, skip straight to the dashboard. Prevents the
+  // returning-OAuth-user loop where every sign-in re-routed here.
+  const { data: profile } = await supabase
+    .from("users")
+    .select("onboarded_at")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profile?.onboarded_at) {
+    redirect(`/${locale}/dashboard`);
+  }
+
   const t = await getTranslations({ locale, namespace: "Onboarding" });
 
   return (
