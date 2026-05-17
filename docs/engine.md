@@ -482,7 +482,6 @@ This is engineering-lead-paced — no week-by-week schedule, no deadline. Work b
 | 8 | PDF export + WhatsApp text summary | Block 7 |
 | 9 | Public proposal route `/[locale]/p/[id]` + view tracking | Block 8 |
 | 10 | End-to-end dogfooding with 5 real freelancers | all above |
-| 11 | Telemetry on share/open rates → moat hypothesis validation | Block 10 |
 
 ### 8.8 Definition of done
 
@@ -519,7 +518,7 @@ Per 1k proposals (whenever they land — months or years, doesn't matter):
 
 **Strategic risks**
 - Mostaql or Bahr launches a competing pricing-proposal tool. Mitigation: speed-to-market on v0.2 + own the **neutral third-party authority** positioning that a platform with skin in the game cannot credibly take.
-- Buyers don't actually treat the Rizq stamp as authoritative. Mitigation: this is the moat hypothesis and must be validated. The v0.2 telemetry on artifact-share rate + buyer-side open rate reveals this once meaningful proposal volume exists — kill or pivot then.
+- Buyers don't actually treat the Rizq stamp as authoritative. This is the moat hypothesis — knowingly accepted as an unmeasured bet (founder decision 2026-05-14). v0.2 ships no instrumentation; we proceed on conviction + qualitative freelancer feedback and accept we won't have hard data until/unless measurement is added later.
 - Government regulation of AI pricing tools. Mitigation: build in transparent methodology + audit log from day one; position as decision-support, not auto-pricing.
 
 **Open product questions**
@@ -539,13 +538,13 @@ Per 1k proposals (whenever they land — months or years, doesn't matter):
 
 ## 11. Suggested next steps (for the CTO)
 
-**Founder decision (2026-05-14): no pre-validation gate. Engineering starts immediately on founder conviction.** The moat hypothesis is knowingly accepted as risk and validated by post-ship telemetry (see [`engine-research.md` §9.1](./engine-research.md#91-the-moat-hypothesis--knowingly-accepted-telemetry-validated) and [§10](./engine-research.md#10-before-we-start--nothing-blocks-us)).
+**Founder decisions (2026-05-14): no pre-validation gate and no analytics instrumentation. Engineering starts immediately on founder conviction.** The moat hypothesis is a knowingly accepted, unmeasured bet (see [`engine-research.md` §9.1](./engine-research.md#91-the-moat-hypothesis--knowingly-accepted-unmeasured) and [§10](./engine-research.md#10-before-we-start--nothing-blocks-us)).
 
 1. **Read this doc + [`engine-research.md`](./engine-research.md) + [`prd.md`](./prd.md) + [`architecture.md`](./architecture.md).** The research doc is the decision-grade recommendation; this doc is the long-term vision.
-2. **Convert this doc + the research doc into a v0.2 implementation plan** (the `superpowers:writing-plans` skill is the natural next tool). Plan should cover: scope schema, extraction pipeline, follow-up question templates, onboarding upgrade, artifact generator, public proposal route, quota plumbing migration (queries → proposals), and the §7.11 telemetry.
+2. **Convert this doc + the research doc + [`v0.2-spec.md`](./v0.2-spec.md) into a v0.2 implementation plan** (the `superpowers:writing-plans` skill is the natural next tool). Plan should cover: scope schema, extraction pipeline, follow-up question templates, onboarding upgrade, artifact generator, public proposal route, quota plumbing migration (queries → proposals).
 3. **Start with block 1 of the build sequence** (§8.7): scope schema + Zod validator + DeepSeek extraction prompt v1, validated against the founder's own example briefs plus synthetic ones. Refine against real briefs as they accumulate through dogfooding.
-4. **Ship on DeepSeek.** Do not pre-run a Fanar/Jais bake-off — the ask-if-unsure follow-up loop is the architectural safety net for dialect uncertainty. Revisit alternative models only if post-ship telemetry shows a real extraction-quality problem.
-5. **Wire the §7.11 telemetry with v0.2, not after.** This is the one true non-negotiable: it converts the knowingly-accepted moat risk into a measurable signal. It does not get cut.
+4. **Ship on DeepSeek.** Do not pre-run a Fanar/Jais bake-off — the ask-if-unsure follow-up loop is the architectural safety net for dialect uncertainty. Revisit alternative models only if freelancers report bad extractions.
+5. **No analytics instrumentation in v0.2** (founder decision 2026-05-14). The moat is an accepted, unmeasured bet; measurement is a later additive change, not a v0.2 deliverable.
 6. **Build a lightweight evaluation harness alongside the engine.** A small held-out set of founder-confirmed correct scope extractions is enough to catch regressions — it grows as dogfooding produces real briefs.
 
 ---
