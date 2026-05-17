@@ -539,12 +539,14 @@ Per 1k proposals (whenever they land — months or years, doesn't matter):
 
 ## 11. Suggested next steps (for the CTO)
 
+**Founder decision (2026-05-14): no pre-validation gate. Engineering starts immediately on founder conviction.** The moat hypothesis is knowingly accepted as risk and validated by post-ship telemetry (see [`engine-research.md` §9.1](./engine-research.md#91-the-moat-hypothesis--knowingly-accepted-telemetry-validated) and [§10](./engine-research.md#10-before-we-start--nothing-blocks-us)).
+
 1. **Read this doc + [`engine-research.md`](./engine-research.md) + [`prd.md`](./prd.md) + [`architecture.md`](./architecture.md).** The research doc is the decision-grade recommendation; this doc is the long-term vision.
-2. **Run the 10 founder-led freelancer interviews** described in `engine-research.md` §9.1 **before any code is written**. Question 4 — "Would you share a Rizq-stamped proposal with your client?" — gates the whole v0.2 build. 7/10 yes = greenlight. <4/10 = re-brainstorm.
-3. **Have the founder collect 50 real Saudi freelance briefs** (WhatsApp screenshots, email forwards, RFPs). This is the v0.2 test corpus and is gating for the LLM bake-off — see [`engine-research.md` §10.1](./engine-research.md#101-gating--three-things-must-exist-first).
-4. **Run a 1-day bake-off** of DeepSeek vs Fanar vs Jais on the 50 briefs. Pick the winner per language path before committing model strategy.
-5. **Convert this doc + the research doc into a v0.2 implementation plan** (the `superpowers:writing-plans` skill is the natural next tool). Plan should cover: scope schema, extraction pipeline, follow-up question templates, onboarding upgrade, artifact generator, public proposal route, quota plumbing migration (queries → proposals).
-6. **Build the evaluation harness alongside the engine.** A held-out set of 20+ real Saudi briefs with founder-confirmed correct scope extractions is the only way to know the LLM is doing its job.
+2. **Convert this doc + the research doc into a v0.2 implementation plan** (the `superpowers:writing-plans` skill is the natural next tool). Plan should cover: scope schema, extraction pipeline, follow-up question templates, onboarding upgrade, artifact generator, public proposal route, quota plumbing migration (queries → proposals), and the §7.11 telemetry.
+3. **Start with block 1 of the build sequence** (§8.7): scope schema + Zod validator + DeepSeek extraction prompt v1, validated against the founder's own example briefs plus synthetic ones. Refine against real briefs as they accumulate through dogfooding.
+4. **Ship on DeepSeek.** Do not pre-run a Fanar/Jais bake-off — the ask-if-unsure follow-up loop is the architectural safety net for dialect uncertainty. Revisit alternative models only if post-ship telemetry shows a real extraction-quality problem.
+5. **Wire the §7.11 telemetry with v0.2, not after.** This is the one true non-negotiable: it converts the knowingly-accepted moat risk into a measurable signal. It does not get cut.
+6. **Build a lightweight evaluation harness alongside the engine.** A small held-out set of founder-confirmed correct scope extractions is enough to catch regressions — it grows as dogfooding produces real briefs.
 
 ---
 

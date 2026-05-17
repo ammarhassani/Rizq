@@ -362,21 +362,17 @@ Each version follows when the previous one has shipped and produced data worth l
 
 ## 9. Honest risks & gaps
 
-### 9.1 The product-fit interview gap (single most important caveat)
+### 9.1 The moat hypothesis — knowingly accepted, telemetry-validated
 
-**I cannot interview 10 real Saudi freelancers.** Everything in §3 is from public sources — community posts, blog posts, freelancer guides. The pattern is consistent and convincing, but it is **not primary research**.
+The riskiest assumption is: **buyers treat the Rizq stamp as authoritative, so freelancers share it.** Earlier drafts gated v0.2 on 10 founder-led freelancer interviews to pre-validate this. **Founder decision (2026-05-14): skip the interviews.** The reasoning is sound and on the record:
 
-Before committing engineering effort to v0.2, the founder should personally do 10 conversations. Use this outreach script (Arabic):
+- **Stated preference ≠ revealed preference.** Ten "yes I'd share it" answers produce a comfortable number that doesn't predict behavior. The only real validator is telemetry — do freelancers actually share, do buyers actually open.
+- **The architecture already de-risks the dialect concern.** The follow-up-question loop is the safety net: extraction never needs to be perfect, it needs to be *honest about uncertainty* and ask when unsure. That's a prompt-engineering problem, not a model-quality gate.
+- **Best-effort, no-SLA, founder-conviction build.** The cost of being wrong is bounded — no deadline, no team committed. Velocity over a weak proxy is a defensible early-stage tradeoff.
 
-> "السلام عليكم، أنا أبني أداة تساعد المستقلين السعوديين يسعّرون شغلهم بشكل أعدل. حابب أسألك ٤ أسئلة سريعة (٥ دقائق فقط) عن كيف تسعّر اليوم وأكبر مشكلة تواجهها."
+**The accepted risk, stated once for the record:** we commit engineering effort to an unproven moat hypothesis. This is acceptable *only because* the validation is instrumented post-ship rather than skipped. **Instrumentation is therefore the real non-negotiable** (see §9.2 and §7.11): if v0.2 ships without artifact-share-rate and buyer-open tracking, we will have taken the risk without buying the information. That telemetry is not optional polish. It does not get cut.
 
-Four questions:
-1. آخر مرة سعّرت فيها مشروع، كيف وصلت للسعر؟
-2. هل تذكر مرة سعّرت فيها بسعر ندمت عليه؟ ليش ندمت؟
-3. لو فيه أداة تكتب لك العرض التجاري للعميل بناءً على بيانات السوق السعودي، كم راح تستخدمها؟
-4. لو الأداة تعطيك نطاق سعر «مختوم من رِزق»، هل تشارك المختوم مع عميلك؟ ليش؟
-
-Question 4 is the decisive one. If 7/10 say yes to sharing the Rizq stamp with their buyer, the moat hypothesis is validated and v0.2 is greenlit. If <4/10, the moat is broken and we need to rethink.
+The interview script is preserved in git history (commit a8c3316) if the founder ever wants informal qualitative signal — but it is not a gate and not a prerequisite.
 
 ### 9.2 Other open risks
 
@@ -387,32 +383,32 @@ Question 4 is the decisive one. If 7/10 say yes to sharing the Rizq stamp with t
 | Mostaql or Bahr ship a competing tool first | Speed-to-market; the Rizq-stamp authority play takes a brand stance an existing platform can't credibly take |
 | Saudi PDPL on inquiry text containing PII | PII detection + redaction at ingestion; configurable retention; per-user data export already partly built |
 | Cost spike on a single 100k-token brief | Hard token cap per call (~5k tokens); per-user rate limit already in place |
-| The Rizq stamp positioning fails buyer-side | v0.2 telemetry on artifact-share + buyer-side view rates reveals this once meaningful volume exists — kill or refine then |
+| The Rizq stamp positioning fails buyer-side | **The accepted risk (§9.1).** v0.2 telemetry on artifact-share + buyer-side view rates reveals this once meaningful volume exists — kill or refine then. Telemetry is non-negotiable precisely because this is unvalidated. |
 
-### 9.3 What I could not verify
+### 9.3 What remains unverified (knowingly, by founder decision)
 
-- Real Saudi freelancer demand at scale (no primary interviews — see §9.1)
-- Whether Fanar API quotas/pricing are commercially viable at Rizq's projected volume (need a 30-min check with the Fanar/QCRI team)
-- Whether buyers will actually treat the Rizq stamp as authoritative (revealed by v0.2 telemetry once it ships, not pre-launch research)
-- The current Rizq dataset's accuracy against the Qemma 2026 benchmark ranges (§3.2) — quick spot-check needed
+- Real Saudi freelancer demand at scale — no primary interviews; founder accepts this and relies on post-ship telemetry (§9.1)
+- Whether buyers actually treat the Rizq stamp as authoritative — the accepted risk; revealed by v0.2 telemetry, not pre-launch research
+- Whether DeepSeek's Saudi-dialect extraction is good enough — de-risked architecturally by the ask-if-unsure loop, not by a pre-ship bake-off; revisit only if telemetry shows an extraction-quality problem
+- The current Rizq dataset's accuracy against the Qemma 2026 benchmark ranges (§3.2) — optional spot-check, not a blocker
 
 ---
 
-## 10. What we need before we start — best-effort prerequisites
+## 10. Before we start — nothing blocks us
 
-No SLA. No deadline. Two buckets: **gating** (must exist before any engine code) and **gathered along the way** (decided or built as we work).
+No SLA. No deadline. **Founder decision (2026-05-14): nothing external gates the start. We begin now.**
 
-### 10.1 Gating — three things must exist first
+### 10.1 Nothing blocks the start
 
-These three block engineering. Everything else can be decided in flight.
+Earlier drafts gated v0.2 on three founder-supplied prerequisites (10 interviews, a 50-brief corpus, Fanar/Jais keys). The founder reviewed and collapsed all three — correctly. The reasoning is on the record in §9.1. Restated here:
 
-1. **The moat-validation interviews (founder-led).** 10 real Saudi freelancers, the Arabic script in §9.1, with question 4 as the decisive ask: *"would you share a Rizq-stamped proposal with your client?"* 7/10 yes = greenlight v0.2. <4/10 = re-brainstorm before any code. There is no point building the artifact if freelancers won't propagate it.
+- **Interviews** — dropped. Stated preference doesn't predict behavior; telemetry is the only real validator (§9.1). Not a gate.
+- **50-brief corpus** — *not* a gate. We start the scope schema + extraction prompt with the founder's own briefs plus synthetic ones, and refine against real briefs as they arrive through dogfooding. The corpus is a *quality input gathered while building*, not a precondition.
+- **Fanar/Jais keys** — *not* a gate. Ship on DeepSeek. The ask-if-unsure follow-up loop is the architectural safety net for dialect uncertainty (§9.1). Only revisit alternative models if post-ship telemetry shows a real extraction-quality problem. Don't pre-optimize a model choice for an unobserved problem.
 
-2. **50 real Saudi freelance briefs (founder-supplied).** WhatsApp screenshots, email forwards, RFPs. Mix of dialect, MSA, code-switched, with deliverables of varying clarity. From founder's network or the interview participants. Without this corpus, scope extraction cannot be tested, tuned, or trusted.
+**Conclusion: engineering can begin immediately.** The first concrete move is the scope schema + Zod validator + DeepSeek extraction prompt v1 (block 1 of §7.9), validated against the founder's own example briefs and synthetic ones.
 
-3. **Fanar + Jais API keys (founder-acquired).** DeepSeek key is already in hand. The other two are needed for the Arabic-quality bake-off. Both are free or cheap to start; signup is roughly a 10-minute exercise per provider at [fanar.qa](https://fanar.qa) and [inceptionai.ai/jais](https://inceptionai.ai/jais).
-
-That's the entire gating list.
+The one genuine non-negotiable is **not** a prerequisite — it's a constraint on the build itself: the telemetry in §7.11 / §9.2 must ship *with* v0.2, not after. That's how the knowingly-accepted moat risk (§9.1) gets converted into a real signal. It does not get cut.
 
 ### 10.2 Founder product decisions (gathered as we work)
 
@@ -451,23 +447,23 @@ These will surface during engineering. No need to decide them upfront — but th
 - Quota plumbing migration: queries → proposals (DB column rename + tier-config update, low risk).
 - Telemetry events: `proposal_generated`, `artifact_downloaded`, `artifact_shared`, `artifact_viewed_by_buyer`, `followup_answered`, `followup_skipped`.
 
-### 10.6 One-hour data sanity check (not gating, but worth doing)
+### 10.6 One-hour data sanity check (optional, not blocking)
 
-Spot-check Rizq's current dataset's medians against the [Qemma 2026 KSA rate ranges](https://qemma-soft.com/en/blog/freelancing-guide-saudi-arabia-2026). If our medians differ by >30% from Qemma's published ranges in 3+ specialties, dataset cleanup should happen alongside v0.2 — not after. If they match within 20%, our base data is sound and we proceed without cleanup.
+Spot-check Rizq's current dataset's medians against the [Qemma 2026 KSA rate ranges](https://qemma-soft.com/en/blog/freelancing-guide-saudi-arabia-2026). If our medians differ by >30% from Qemma's published ranges in 3+ specialties, dataset cleanup should happen alongside v0.2. If they match within 20%, base data is sound. Either way, not a blocker — just informs whether dataset cleanup rides along with the v0.2 work.
 
-### 10.7 Honest gaps I won't paper over
+### 10.7 Honest gaps, knowingly accepted
 
-- I can't validate Fanar/Jais commercial pricing until accounts are created.
-- I can't validate the moat without the 10 interviews — and no engineering effort will substitute for them.
-- I can't size LLM cost precisely without running the 50-brief corpus through real APIs.
+- Fanar/Jais commercial pricing is unknown until accounts are created — but we're not gating on a bake-off, so this is deferred, not blocking.
+- The moat is unproven and conviction won't prove it — accepted risk (§9.1), validated by post-ship telemetry, which is why telemetry is the one true non-negotiable.
+- Precise LLM cost is unknown until real briefs run through real APIs — but the ~$0.06/proposal estimate has >95% margin headroom, so cost is not a decision-relevant unknown.
 
-These all become known the moment §10.1 is complete.
+None of these block the start. All become known as v0.2 is built and dogfooded.
 
 ---
 
 ## 11. The one-paragraph summary for any stakeholder
 
-Rizq v0.1 is a statistical pricing benchmark that a competent Excel user could rebuild in 30 minutes — the founder's MEH is correct, and the Saudi freelance community confirms there is **no purpose-built pricing tool in the market** (Mostaql, Khamsat, Bahr all lack one; international AI-proposal tools are form-driven and English-first). The recommended move is to reframe Rizq as a **proposal-authoring tool with pricing intelligence baked in** — one button, one output, built best-effort with no calendar SLA. The freelancer pastes their client's brief; Rizq extracts scope, computes price using onboarding data + market data, fills scope gaps with 1–3 bilingual follow-ups if needed, and produces a **Rizq-stamped bilingual proposal artifact** the freelancer hands to their buyer. The price and the proposal are inseparable — neither has utility without the other. The artifact is the actual moat — not patents, not algorithm cleverness — because it propagates virally through the freelancer→buyer relationship and slowly establishes Rizq as the Saudi pricing standard. Unit-of-value shifts from "queries" to "proposals", with Pro pricing unchanged but willingness-to-pay materially higher because each proposal directly drives revenue. Before any code is written, the founder runs 10 freelancer interviews to validate the Rizq-stamp sharing hypothesis (question 4 in §9.1); 7/10 yes = greenlight, <4/10 = re-brainstorm. LLM capability is production-ready for the parts that matter; marginal cost is ~$0.06/proposal, well under SAR 49/mo Pro pricing.
+Rizq v0.1 is a statistical pricing benchmark that a competent Excel user could rebuild in 30 minutes — the founder's MEH is correct, and the Saudi freelance community confirms there is **no purpose-built pricing tool in the market** (Mostaql, Khamsat, Bahr all lack one; international AI-proposal tools are form-driven and English-first). The recommended move is to reframe Rizq as a **proposal-authoring tool with pricing intelligence baked in** — one button, one output, built best-effort with no calendar SLA. The freelancer pastes their client's brief; Rizq extracts scope, computes price using onboarding data + market data, fills scope gaps with 1–3 bilingual follow-ups if needed, and produces a **Rizq-stamped bilingual proposal artifact** the freelancer hands to their buyer. The price and the proposal are inseparable — neither has utility without the other. The artifact is the actual moat — not patents, not algorithm cleverness — because it propagates virally through the freelancer→buyer relationship and slowly establishes Rizq as the Saudi pricing standard. Unit-of-value shifts from "queries" to "proposals", with Pro pricing unchanged but willingness-to-pay materially higher because each proposal directly drives revenue. Per founder decision (2026-05-14), there is no pre-validation gate — engineering starts immediately on founder conviction; the moat hypothesis is knowingly accepted as risk and validated by post-ship telemetry (§9.1), which makes that telemetry the one true non-negotiable of the build. LLM capability is production-ready for the parts that matter; the ask-if-unsure follow-up loop is the architectural safety net for Saudi-dialect extraction; marginal cost is ~$0.06/proposal, well under SAR 49/mo Pro pricing.
 
 ---
 

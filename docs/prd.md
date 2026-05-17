@@ -64,7 +64,7 @@ These ship **only after** monetization is live and we are ready to bring traffic
 
 ### 0.5 Deferred — v0.2+ vision (see `engine.md` and `engine-research.md`)
 
-- 🔜 **v0.2 — the unified proposal flow** (the next big build, best-effort, no SLA): brief intake (DeepSeek/Fanar scope extraction) + smart follow-up gap-filling + onboarding upgrade (brand block) + **Rizq-stamped bilingual proposal artifact** (PDF + share link + WhatsApp summary). This is *the* product, not three features. Unit-of-value shifts from queries → proposals. See [`engine-research.md` §10](./engine-research.md#10-what-we-need-before-we-start--best-effort-prerequisites) for the prerequisites.
+- 🔜 **v0.2 — the unified proposal flow** (the next big build, best-effort, no SLA): brief intake (DeepSeek/Fanar scope extraction) + smart follow-up gap-filling + onboarding upgrade (brand block) + **Rizq-stamped bilingual proposal artifact** (PDF + share link + WhatsApp summary). This is *the* product, not three features. Unit-of-value shifts from queries → proposals. No pre-validation gate — engineering starts on founder conviction; see [`engine-research.md` §10](./engine-research.md#10-before-we-start--nothing-blocks-us).
 - 🔜 **v0.3 — outcome capture + compounding**: track open/reply/counter-offer/accept on shared proposals. Per-freelancer history weights their personal pricing.
 - 🔜 **v0.4 — voice + capture surfaces**: voice note ingestion (Fanar Speech), browser extension, mobile share-sheet.
 - 🔜 **v0.5 — silent buyer enrichment**: Wathiq / Maroof / Etimad lookups adjust the recommendation based on buyer identity.
