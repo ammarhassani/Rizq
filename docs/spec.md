@@ -40,29 +40,30 @@ Every row knows where it came from and how much to trust it. Nothing is anonymou
 Real, public Saudi price references compiled **once** into structured rows (not recurring seeding):
 - Qemma 2026 Saudi rate guide (logo 500–3000, web 2000–8000, app 8000–30000, …)
 - Saudi agency public rate cards
-- Mostaql / Khamsat visible price ranges
+- Aggregate Mostaql/Khamsat price ranges *as reported by third-party guides* (an editorial range like "logo gigs run 500–3000" — never harvested per-listing from the platforms themselves; see §2.3)
 - HRDF / MHRSD freelance income statistics
 - Saudi freelance pricing blogs/guides
 
 Bounded task: 12 specialties × 5 tiers, curate published sources per cell, one pass. `provenance='published_ref'`, `source_ref`=citation. This is the day-zero spine — real and citable.
 
-### 2.3 Collector 2 — Automated public-listing ingestion (the volume engine)
+### 2.3 Collector 2 — Licensed & non-personal volume sources
 
-Programmatic, not manual. Adapter per source, common normalized output → store:
-- **Mostaql** — completed projects expose budgets
-- **Khamsat** — gig package prices
-- **Bahr** — listings
-- **Etimad** — government tender awards (fully public record)
+**Legal finding (researched 2026-05-18):** the Arabic freelance marketplaces (Mostaql/Khamsat/Bahr) expose **no public APIs**, their ToS prohibit automated abuse, and — critically — **Saudi PDPL has no "publicly available data" exemption**. A named freelancer's listed price is personal data; scraping and reprocessing it has real PDPL exposure (SDAIA actively enforcing) and the Anti-Cyber Crime Law treats ToS-violating access as a criminal offence. **Automated scraping of marketplace personal pricing data is out — by law, not by preference.**
 
-Adapter interface: `fetch() → RawListing[]` → `normalize() → BenchmarkRow[]` (`provenance='ingested'`, `source_ref`=listing URL, `confidence` per source quality). ToS is gray for the platforms — pursue partnership/API where possible, ingest public pages where not; provenance tagging keeps it honest and separable. This is the only path to real *volume* without users.
+The volume engine is therefore built only from sources that are licensed or non-personal:
+- **Saudi Open Data Portal** (`open.data.gov.sa`) — Etimad / government procurement datasets under the **Saudi Open Data License**: commercial reuse + adaptation explicitly permitted with attribution. Fully legal, downloadable datasets (not scraped — the portal is consumed via its published dataset files).
+- **Aggregate published rate references** — guide/agency rate *ranges* ("logo: 500–3000 SAR"). These are editorial aggregates, **not** personal data → safe to curate. (Overlaps Collector 1; same legal footing.)
+- **Formal data-license / partnership deals** — if a marketplace ever grants consented, licensed access, it enters here as `provenance='partner'`. Business development, not engineering.
+
+Adapter interface stays: `fetch() → Raw[] → normalize() → BenchmarkRow[]`, `provenance='ingested'` (open-data) or `'partner'` (licensed), `source_ref`=dataset/license citation. No adapter ever touches a marketplace's authenticated or ToS-protected surface.
 
 ### 2.4 Collector 3 — LLM-reasoned constrained prior
 
 For (specialty × city × tier × size) cells the above don't cover: DeepSeek produces a reasoned range **boxed by the anchor table** — it interpolates between known anchors, never invents free-hand. `provenance='reasoned'`, `source_ref`=model id + prompt hash, `confidence` low. Fills gaps day zero; demoted automatically as real rows (`ingested`/`submitted`) arrive for that cell.
 
-### 2.5 Collector 4 — Crowd submissions (correction signal only)
+### 2.5 Collector 4 — Crowd submissions (luxury, never essential)
 
-Existing submission→review→`benchmark_records` pipeline stays but is **demoted**: not the spine, just a correction/enrichment stream once users exist. `provenance='submitted'`. Zero weight in the day-zero plan.
+The existing submission→review→`benchmark_records` pipeline stays, but the app is **fully functional with zero submissions, forever**. It is not a dependency, not a launch requirement, not a "we'll get data eventually" assumption. If submissions come, the resolver weights them in (`provenance='submitted'`) and the citation upgrades. If none ever come, nothing breaks — Collectors 1–3 already produce a real, cited price for every cell. Pure upside, zero load-bearing.
 
 ### 2.6 The resolver
 
@@ -145,7 +146,7 @@ Each phase exists because the next can't be wired without it. No dates, no versi
 
 **Phase A — Backbone.** Extend `benchmark_records` (provenance/freshness). Build `resolvePrice` with weighting + fallback + insufficient-data refusal. Unit-tested against hand-built fixtures. *Nothing prices without this.*
 
-**Phase B — Fill the backbone.** (B1) Curate the published-reference anchor table → real rows. (B2) LLM-reasoned constrained prior covers gap cells. (B3) Ingestion adapters (Mostaql/Khamsat/Bahr/Etimad) + `ingestion_runs` + normalizer. B1 first (it boxes B2 and validates B3). After B, the resolver returns real, cited numbers for every cell.
+**Phase B — Fill the backbone.** (B1) Curate the published-reference anchor table → real rows. (B2) LLM-reasoned constrained prior covers gap cells. (B3) Saudi Open Data dataset adapters (Etimad/government procurement) + `ingestion_runs` + normalizer — licensed/non-personal sources only, no marketplace scraping (§2.3). B1 first (it boxes B2 and validates B3). After B, the resolver returns real, cited numbers for every cell.
 
 **Phase C — Price computer.** Profile-driven hard dimensions + brief-derived size + within-band modifiers + personal-history weighting, on top of `resolvePrice`.
 
@@ -173,7 +174,7 @@ Parallelizable: B and a C-skeleton can overlap once A exists. E depends on C+D. 
 | D8 | Free tier | 1 proposal/month + unlimited previews |
 | D9 | Pro tier | 20 proposals/month + branding + 100 previews (SAR 49/mo) |
 | D10 | Halal milestone wording | I draft Saudi-polite AR/EN, you approve before ship |
-| D11 | Ingestion stance | Partnership/API-first; public-page ingest where no API; provenance-tagged + robots-respecting. Approve this posture or constrain it. |
+| D11 | Data-source stance | **No marketplace scraping** (PDPL + Anti-Cyber Crime — see §2.3). Volume from Saudi Open Data licensed datasets + aggregate published references + any consented partnership deals only. Approve this posture or constrain further. |
 
 Silence = build to these.
 
@@ -184,7 +185,8 @@ Silence = build to these.
 | Risk | Position |
 |---|---|
 | Day-zero data thin | Published anchors + constrained reasoned prior give a real, cited number for every cell from day one; honesty rule (§2.7) keeps the stamp credible while thin |
-| Ingestion ToS gray | Partnership-first; provenance-separated so anything contestable is isolatable and removable; never the sole source for a stamped number |
+| Marketplace data is legally off-limits (PDPL/Anti-Cyber Crime, researched 2026-05-18) | Designed out entirely — no scraping adapters. Volume comes from Saudi Open Data licensed datasets + non-personal aggregate published ranges + consented partnerships only (§2.3) |
+| Curated published ranges contain personal data | They don't — only editorial aggregate ranges are curated, never individual named-freelancer prices |
 | Reasoned prior hallucinates | Boxed by anchor table; low confidence; auto-demoted as real rows arrive; never unconstrained |
 | Brief is garbage | Profile-spine + priors + ≤3 follow-ups; extraction never load-bearing (§4) |
 | Moat unproven | Accepted, unmeasured (founder decision); no analytics in scope; honest sourcing is the defense, not a dashboard |
@@ -194,7 +196,7 @@ Silence = build to these.
 
 ## 10. Genuinely out of scope (not "deferred" — not building)
 
-Analytics/telemetry, voice notes, image/PDF brief upload, win-loss tracking, Bayesian/embedding pricing, Fanar/Jais (unless freelancers report bad extractions), KYC/buyer enrichment, buyer-side surface, WhatsApp Business API. Excluded by decision, not parked behind a version number.
+Marketplace scraping (Mostaql/Khamsat/Bahr — legally excluded, §2.3), analytics/telemetry, voice notes, image/PDF brief upload, win-loss tracking, Bayesian/embedding pricing, Fanar/Jais (unless freelancers report bad extractions), KYC/buyer enrichment, buyer-side surface, WhatsApp Business API. Excluded by decision or by law, not parked behind a version number.
 
 ---
 
