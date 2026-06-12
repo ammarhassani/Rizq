@@ -352,11 +352,12 @@
       "shareNotePrivate": "This result is private. Make it public to get a shareable link.",
       "again": "Run another query",
       "contributeYourPrice": "Paid a different price? Help improve the benchmark",
-      "methodologyLink": "How did we calculate this?"
+      "methodologyLink": "How did we calculate this?",
+      "confidenceLabel": "Confidence"
     },
     "insufficient": {
       "title": "Not enough data yet.",
-      "body": "We need 5 records to publish a benchmark. Try a different specialty or city — we add data weekly.",
+      "body": "We need 3 records to publish a benchmark. Try a different specialty or city — we add data weekly.",
       "tryAgain": "Try a different combination"
     },
     "quota": {

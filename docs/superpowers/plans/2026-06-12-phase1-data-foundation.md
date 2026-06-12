@@ -33,7 +33,7 @@
 ## File Structure
 
 **New files:**
-- `supabase/migrations/20260612120000_extend_benchmark_provenance.sql` — enum, 5 new columns, backfill, indexes, updated approval trigger.
+- `supabase/migrations/20260612120000_extend_benchmark_provenance.sql` — enum, 5 new columns, backfill, indexes (crowd trigger untouched — defaults cover it).
 - `supabase/migrations/20260612120100_collector_registry_and_runs.sql` — `collector_registry` + `ingestion_runs` tables, seed registry rows, `run_ingestion` admin RPC.
 - `src/lib/pricing/provenance.ts` — `BenchmarkProvenance` type, weights, bilingual labels (pure).
 - `src/lib/pricing/freshness.ts` — `freshnessDecay`, `monthsBetween` (pure).
@@ -196,45 +196,17 @@ create index if not exists benchmark_provenance_idx
   on public.benchmark_records (specialty_id, experience_tier_id, provenance)
   where active = true and flagged_as_outlier = false;
 
--- Keep the crowd-approval trigger consistent with the new columns.
--- (Mirrors approved pricing_submissions into benchmark_records.)
-create or replace function private.on_submission_approve()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  if new.status = 'approved' and (old.status is distinct from 'approved') then
-    insert into public.benchmark_records (
-      specialty_id, city_id, experience_tier_id,
-      project_type, project_size, price_sar, client_type,
-      source, source_user_id, verified, verified_at, verified_by, notes,
-      provenance, confidence, captured_at, source_ref, collector_id
-    )
-    values (
-      new.specialty_id, new.city_id, new.experience_tier_id,
-      new.project_type, new.project_size, new.price_sar, new.client_type,
-      'user_submitted'::public.benchmark_source, new.user_id,
-      true, now(), new.reviewed_by, new.notes,
-      'submitted'::public.benchmark_provenance, 0.50, now(),
-      'verified freelancer submission', 'submitted'
-    );
-
-    update public.users
-      set bonus_quota = bonus_quota + 2
-      where id = new.user_id;
-  end if;
-  return new;
-end;
-$$;
+-- NOTE: the existing private.on_submission_approve() trigger (which mirrors
+-- approved crowd submissions into benchmark_records) is intentionally NOT
+-- modified. The new column DEFAULTS above (provenance='submitted',
+-- confidence=0.50, captured_at=now()) produce exactly the right values for an
+-- approved submission, so the working trigger keeps functioning untouched —
+-- smaller blast radius, nothing to reconstruct.
 
 -- Refresh the seed comment.
 comment on table public.benchmark_records is
   'Pricing dataset under the FLRP provenance model. Legacy founder seed = provenance:founder (conf 0.30). resolvePrice weights by provenance × confidence × freshness.';
 ```
-
-> **Note for the implementer:** open the existing `supabase/migrations/20260513184931_create_pricing_submissions.sql` and confirm the column names referenced in the `insert` (`project_type`, `project_size`, `client_type`, `reviewed_by`, `notes`, `user_id`) match that table exactly; adjust the `on_submission_approve` body to mirror the original trigger's column list **plus** the five new provenance columns. Do not change its signature or the `on_submission_approve` trigger binding.
 
 - [ ] **Step 2: Apply the migration**
 

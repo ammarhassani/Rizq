@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { calculate, type ToolActionResult } from "@/app/actions/tool/calculate";
+import { PROVENANCE_LABEL } from "@/lib/pricing/provenance";
 import { track } from "@/lib/analytics/track";
 import { ResultCard } from "./ResultCard";
 import { ResultSkeleton } from "./ResultSkeleton";
@@ -139,7 +140,7 @@ export function ToolFlow({
         city,
         tier,
         project_size: projectSize || null,
-        median: result.result.status === "ok" ? result.result.median : null,
+        median: result.result.status === "ok" ? result.result.anchor : null,
         sample_size:
           result.result.status === "ok" ? result.result.sample_size : null,
         fallback_used:
@@ -170,12 +171,15 @@ export function ToolFlow({
         locale={locale}
         query_id={view.data.query_id}
         min={r.min}
-        median={r.median}
+        median={r.anchor}
         max={r.max}
         sample_size={r.sample_size}
         fallback_used={r.fallback_used}
         fallback_kind={r.fallback_kind}
         comparison_percent_below={r.comparison_percent_below}
+        provenanceLabel={PROVENANCE_LABEL[r.dominant_provenance][locale === "ar" ? "ar" : "en"]}
+        provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
+        confidenceScore={r.confidence_score}
         canShare={canShare}
         onReset={reset}
       />

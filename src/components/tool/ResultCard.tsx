@@ -17,6 +17,9 @@ type Props = {
   fallback_used: boolean;
   fallback_kind: "none" | "region" | "specialty";
   comparison_percent_below: number;
+  provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
+  provenanceCitation?: string;  // pre-localized full citation sentence
+  confidenceScore?: number;     // 0..1
   // Whether the user is authenticated and can toggle share (anon = readonly)
   canShare: boolean;
   // Whether public_share is already on (e.g. when revisiting the result)
@@ -34,6 +37,9 @@ export function ResultCard({
   fallback_used,
   fallback_kind,
   comparison_percent_below,
+  provenanceLabel,
+  provenanceCitation,
+  confidenceScore,
   canShare,
   initiallyShared = false,
   onReset,
@@ -147,6 +153,23 @@ export function ResultCard({
             {fallback_kind === "region"
               ? t("fallbackRegion")
               : t("fallbackSpecialty")}
+          </p>
+        )}
+        {provenanceLabel && (
+          <p className={`sm:col-span-2 flex flex-wrap items-center gap-2 text-sm text-rizq-ink ${font}`}>
+            <span className="inline-flex items-center gap-1 rounded-full border border-rizq-green/30 bg-rizq-green/10 px-2.5 py-0.5 text-xs text-rizq-green">
+              {provenanceLabel}
+            </span>
+            {typeof confidenceScore === "number" && (
+              <span className="text-xs text-rizq-ink-soft/70">
+                {t("confidenceLabel")}: {numberFmt.format(Math.round(confidenceScore * 100))}%
+              </span>
+            )}
+          </p>
+        )}
+        {provenanceCitation && (
+          <p className={`sm:col-span-2 text-xs text-rizq-ink-soft italic ${font}`}>
+            {provenanceCitation}
           </p>
         )}
         <Link
