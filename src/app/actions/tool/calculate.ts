@@ -122,6 +122,8 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
       p_session_id: quota.session_id,
       p_project_size: parsed.data.project_size ?? null,
       p_result_min: result.min,
+      // queries.result_median stores the resolver's anchor (p50, rounded to the
+      // nearest 50 SAR then clamped into [min,max]). The column name is legacy.
       p_result_median: result.anchor,
       p_result_max: result.max,
       p_result_sample_size: result.sample_size,
@@ -154,19 +156,12 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
       ? ("unlimited" as const)
       : Math.max(0, quota.remaining - 1);
 
-  if (result.status === "ok") {
-    return {
-      ok: true,
-      query_id: inserted.id,
-      result: { ...result, id: inserted.id },
-      quota: { mode: quota.mode, remaining },
-    };
-  }
-
+  // invalid_input and insufficient_data already returned earlier, so result is
+  // always status "ok" here — attach the inserted query id for sharing.
   return {
     ok: true,
     query_id: inserted.id,
-    result,
+    result: { ...result, id: inserted.id },
     quota: { mode: quota.mode, remaining },
   };
 }

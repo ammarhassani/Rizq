@@ -124,7 +124,11 @@ async function fetchRows(
         captured_at: captured,
       } satisfies AggRow;
     })
-    .filter((r) => Number.isFinite(r.price_sar));
+    // Keep only rows aggregate() will actually use: finite, non-negative price,
+    // and non-zero confidence (a 0-confidence row contributes 0 weight and must
+    // not count toward MIN_SAMPLE, or an all-zero-confidence cell would yield a
+    // 0/0/0 band). The DB also enforces price_sar >= 0; this keeps the count honest.
+    .filter((r) => Number.isFinite(r.price_sar) && r.price_sar >= 0 && r.confidence > 0);
 }
 
 async function finalize(
