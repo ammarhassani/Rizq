@@ -18,7 +18,8 @@ describe("weightedPercentile", () => {
       { value: 100, weight: 9 },
       { value: 1000, weight: 1 },
     ];
-    expect(weightedPercentile(pairs, 0.5)).toBeLessThan(550);
+    // centers: 100→0.45, 1000→0.95; p0.5 → 100 + 900*((0.5-0.45)/0.5) = 190
+    expect(weightedPercentile(pairs, 0.5)).toBe(190);
   });
 
   it("ignores zero/negative weights", () => {

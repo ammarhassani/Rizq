@@ -48,8 +48,12 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
 
   const pairs = weighted.map((r) => ({ value: r.price_sar, weight: r.weight }));
   const min = round10(weightedPercentile(pairs, 0.1));
-  const anchor = round50(weightedPercentile(pairs, 0.5));
   const max = round10(weightedPercentile(pairs, 0.9));
+  // The anchor (median) rounds to the nearest 50 SAR for a clean headline price,
+  // while min/max round to 10. In very tight markets that coarser rounding can
+  // overshoot the band edges, so clamp the anchor back inside [min, max] — the
+  // Aggregate contract guarantees min ≤ anchor ≤ max.
+  const anchor = Math.max(min, Math.min(max, round50(weightedPercentile(pairs, 0.5))));
 
   const byProv = new Map<BenchmarkProvenance, { count: number; weight: number }>();
   for (const r of weighted) {

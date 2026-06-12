@@ -56,6 +56,29 @@ describe("aggregate", () => {
     expect(strongLarge.confidence_score).toBeLessThanOrEqual(1);
   });
 
+  it("pins the confidence_score formula (meanWeight × sample factor)", () => {
+    // 10 fresh published_ref rows: weight = 0.6 × 0.6 × 1.0 = 0.36 each;
+    // meanWeight 0.36 × sampleFactor min(1, 10/10)=1 → 0.36.
+    const out = aggregate(
+      Array.from({ length: 10 }, (_, i) => row(1000 + i * 20, "published_ref", 0.6, 0)),
+      NOW
+    )!;
+    expect(out.confidence_score).toBeCloseTo(0.36, 2);
+  });
+
+  it("keeps min ≤ anchor ≤ max when 50-SAR anchor rounding overshoots a tight band", () => {
+    // Regression: round50(p50≈976)=1000 would exceed the 10-SAR-rounded max (980).
+    const out = aggregate(
+      [974, 975, 976, 977, 978].map((p) => row(p, "founder", 0.3)),
+      NOW
+    )!;
+    expect(out.min).toBe(970);
+    expect(out.max).toBe(980);
+    expect(out.anchor).toBe(980); // clamped down from 1000 into [min, max]
+    expect(out.min).toBeLessThanOrEqual(out.anchor);
+    expect(out.anchor).toBeLessThanOrEqual(out.max);
+  });
+
   const SCENARIOS: { name: string; rows: AggRow[]; expectDominant: BenchmarkProvenance }[] = [
     { name: "graphic-design exact founder", rows: [820, 970, 1060, 1140, 1230].map((p) => row(p, "founder", 0.3)), expectDominant: "founder" },
     { name: "graphic-design with submitted mix", rows: [...[900, 1000].map((p) => row(p, "submitted", 0.5)), ...[850, 1050, 1100].map((p) => row(p, "founder", 0.3))], expectDominant: "submitted" },

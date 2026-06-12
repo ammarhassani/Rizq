@@ -26,6 +26,8 @@ export function buildCitation(input: CitationInput): { ar: string; en: string } 
         ? " Widened across all cities."
         : "";
 
+  // TODO(i18n): Arabic counted-noun grammar varies by n (سجل واحد / N سجلات / N سجلاً).
+  // Current form reads correctly for n≥11; refine pluralization in a later polish pass.
   const ar = `تقدير رِزق بناءً على ${n} سجلاً (${label.ar}) حتى عام ${year}.${widenAr}`;
   const en = `Rizq estimate based on ${n} record(s) (${label.en}) through ${year}.${widenEn}`;
   return { ar, en };

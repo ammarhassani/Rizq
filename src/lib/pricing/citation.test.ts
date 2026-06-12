@@ -25,4 +25,15 @@ describe("buildCitation", () => {
     expect(c.en.toLowerCase()).toContain("region");
     expect(c.ar).toContain("المنطقة");
   });
+
+  it("uses the all-cities note for a specialty-level widening", () => {
+    const c = buildCitation({
+      dominant: "reasoned",
+      sample_size: 4,
+      date_range: { earliest: "2026-02-01T00:00:00Z", latest: "2026-06-01T00:00:00Z" },
+      fallback_kind: "specialty",
+    });
+    expect(c.en.toLowerCase()).toContain("all cities");
+    expect(c.ar).toContain("جميع المدن");
+  });
 });
