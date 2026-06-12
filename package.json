@@ -48,19 +48,5 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.6"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "@parcel/watcher",
-      "@swc/core",
-      "unrs-resolver",
-      "msw"
-    ],
-    "ignoredBuiltDependencies": [
-      "@sentry/cli",
-      "core-js",
-      "protobufjs"
-    ]
   }
 }

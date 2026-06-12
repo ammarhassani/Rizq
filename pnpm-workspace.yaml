@@ -1,14 +1,9 @@
-onlyBuiltDependencies:
-  - sharp
-  - "@parcel/watcher"
-  - "@swc/core"
-  - unrs-resolver
-  - msw
-ignoredBuiltDependencies:
-  - "@sentry/cli"
-  - core-js
-  - protobufjs
 allowBuilds:
-  "@sentry/cli": false
+  '@parcel/watcher': true
+  '@sentry/cli': false
+  '@swc/core': true
   core-js: false
+  msw: true
   protobufjs: false
+  sharp: true
+  unrs-resolver: true
