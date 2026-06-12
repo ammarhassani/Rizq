@@ -1,3 +1,4 @@
+import "server-only";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 
 /** Server-only DeepSeek provider (Vercel AI SDK). Never import in client code. */

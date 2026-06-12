@@ -9,7 +9,6 @@ const PriorSchema = z.object({
   median: z.number().positive(),
   max: z.number().positive(),
   reasoning_ar: z.string(),
-  confidence: z.number().min(0).max(1),
 });
 
 export type AnchorRow = {
@@ -85,7 +84,8 @@ Estimate a price range (min, median, max) in SAR. Rules:
       captured_at: new Date().toISOString(),
       notes: object.reasoning_ar.slice(0, 500),
     };
-  } catch {
+  } catch (err) {
+    console.error("[generateReasonedRow] failed for cell", cell.specialty_id, err);
     return null;
   }
 }
