@@ -1,0 +1,12 @@
+# Supabase CLI configuration for the rizq project.
+# Schema lives in ./migrations — recovered from the live project (2026-06-12)
+# after the local copy was lost. These 14 files match the remote migration
+# history exactly.
+#
+# To reconnect this folder to the hosted project:
+#   supabase link --project-ref qjtisvfjhqizvtqrixut
+#   supabase migration list       # confirm local == remote (all 14 applied)
+#
+# If the CLI rejects this minimal config, run `supabase init` to regenerate a
+# full config.toml — your migrations/ folder will still be used as-is.
+project_id = "qjtisvfjhqizvtqrixut"
