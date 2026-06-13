@@ -109,6 +109,7 @@
   "Nav": {
     "tool": "Pricing tool",
     "dashboard": "Account",
+    "calendar": "Calendar",
     "hadaf": "Hadaf",
     "invoices": "Invoices",
     "login": "Sign in",

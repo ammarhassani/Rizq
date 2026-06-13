@@ -68,7 +68,7 @@ export async function getBusinessInsightsAction(opts?: {
   const [proposalsRes, gigsRes, clientsRes, incomeRes, deadlinesRaw] = await Promise.allSettled([
     supabase
       .from("proposals")
-      .select("title, client_id, status, final_price_sar, created_at, clients(name)")
+      .select("client_name, client_id, status, price_anchor, created_at, clients(name)")
       .eq("user_id", userId)
       .gte("created_at", thirtyDaysAgo)
       .order("created_at", { ascending: false })
@@ -98,11 +98,12 @@ export async function getBusinessInsightsAction(opts?: {
   const proposals: BusinessInsightsCtx["proposals"] =
     proposalsRes.status === "fulfilled" && proposalsRes.value.data
       ? proposalsRes.value.data.map((p) => ({
-          title: (p.title as string | null) ?? null,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          title: ((p.client_name as string | null) ?? ((p.clients as any)?.name as string | null)) ?? null,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           clientName: ((p.clients as any)?.name as string | null) ?? null,
           status: p.status as string,
-          amount: p.final_price_sar != null ? Number(p.final_price_sar) : null,
+          amount: p.price_anchor != null ? Number(p.price_anchor) : null,
           date: p.created_at != null ? String(p.created_at).slice(0, 10) : null,
         }))
       : [];

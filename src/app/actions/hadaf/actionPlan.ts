@@ -90,7 +90,7 @@ export async function generateHadafActionPlanAction(): Promise<HadafActionPlanRe
   // ── Active proposals (sent + viewed, owner-scoped) ───────────────────────
   const { data: proposalRows } = await supabase
     .from("proposals")
-    .select("title, price_anchor, client_name, created_at")
+    .select("price_anchor, client_name, created_at")
     .eq("user_id", userId)
     .in("status", ["sent", "viewed"])
     .order("created_at", { ascending: false })
@@ -102,7 +102,8 @@ export async function generateHadafActionPlanAction(): Promise<HadafActionPlanRe
       (now.getTime() - sentAt.getTime()) / (1000 * 60 * 60 * 24)
     );
     return {
-      title: p.title as string | null,
+      // proposals has no title column — use the typed client name as the label
+      title: p.client_name as string | null,
       price_anchor: p.price_anchor as number | null,
       client: p.client_name as string | null,
       days_since_sent: daysSinceSent,

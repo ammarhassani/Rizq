@@ -171,9 +171,10 @@ export async function getHadafStatusAction(opts?: {
         streak_history: status.streak_history,
         generated_at: now.toISOString(),
         valid_until: validUntil,
-        // Preserve existing AI plan (don't overwrite on recalc)
-        ai_action_plan_ar: null,
-        ai_action_plan_en: null,
+        // ai_action_plan_ar/en are intentionally OMITTED: on a new insert they
+        // default to null; on conflict (recalc) they're not in the UPDATE SET,
+        // so any existing AI action plan is preserved (only the reminder action
+        // writes them).
       },
       { onConflict: "user_id" }
     );

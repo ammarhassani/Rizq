@@ -45,14 +45,20 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
 
-  // Fetch user profile for name + specialty/city
+  // Fetch user profile: name + onboarding specialty/city/tier IDs (M8 columns).
+  // NOTE: users has no *_slug columns — quick pricing resolves slugs from the
+  // ref tables below using these FK ids.
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, specialty_slug, city_slug, experience_tier_slug")
+    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id")
     .eq("id", userId)
     .maybeSingle();
 
-  const userName = (profile?.full_name as string | null) ?? userData.user.email?.split("@")[0] ?? null;
+  const userName =
+    (profile?.full_name_ar as string | null) ??
+    (profile?.name as string | null) ??
+    userData.user.email?.split("@")[0] ??
+    null;
 
   // --- Parallel data fetches, each wrapped in try/catch ---
   const now = new Date();
@@ -60,26 +66,28 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
   const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
 
-  // Proposals (last 30d, last 5)
+  // Proposals (last 30d, last 5). proposals has no title/final_price_sar columns —
+  // use client_name (typed) as the label and price_anchor as the amount.
   type ProposalRow = {
     id: string;
-    title: string | null;
+    client_name: string | null;
     status: string;
-    final_price_sar: number | null;
+    price_anchor: number | null;
     created_at: string | null;
     clients: { name: string } | null;
   };
   let proposals: ProposalRow[] = [];
-  try {
-    const { data } = await supabase
+  {
+    const { data, error } = await supabase
       .from("proposals")
-      .select("id, title, status, final_price_sar, created_at, clients(name)")
+      .select("id, client_name, status, price_anchor, created_at, clients(name)")
       .eq("user_id", userId)
       .gte("created_at", thirtyDaysAgo)
       .order("created_at", { ascending: false })
       .limit(5);
+    if (error) console.error("[dashboard] proposals query failed", error.message);
     proposals = (data ?? []) as unknown as ProposalRow[];
-  } catch { /* widget shows error state */ }
+  }
 
   // Upcoming invoice deadlines (next 7 items)
   let invoiceDeadlines: UpcomingInvoice[] = [];
@@ -137,22 +145,34 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     }) ?? null;
   } catch { /* widget shows 0 state */ }
 
-  // Quick pricing — resolve for user's specialty/city/tier if known
+  // Quick pricing — resolve slugs from the user's onboarding FK ids (if set),
+  // then call resolvePrice. Most users haven't set these yet → widget shows CTA.
   let quickPricingAnchor: number | null = null;
   let quickPricingSpecialty: string | null = null;
-  const specSlug = (profile?.specialty_slug as string | null) ?? null;
-  const citySlug = (profile?.city_slug as string | null) ?? null;
-  const tierSlug = (profile?.experience_tier_slug as string | null) ?? null;
-  if (specSlug && citySlug && tierSlug) {
+  const specialtyId = (profile?.primary_specialty_id as string | null) ?? null;
+  const cityId = (profile?.city_id as string | null) ?? null;
+  const tierId = (profile?.experience_tier_id as string | null) ?? null;
+  if (specialtyId && cityId && tierId) {
     try {
-      const res = await resolvePrice({
-        specialty_slug: specSlug,
-        city_slug: citySlug,
-        experience_tier_slug: tierSlug,
-      });
-      if (res.status === "ok") {
-        quickPricingAnchor = res.anchor;
-        quickPricingSpecialty = specSlug;
+      const [specRes, cityRes, tierRes] = await Promise.all([
+        supabase.from("specialties").select("slug, name_ar, name_en").eq("id", specialtyId).maybeSingle(),
+        supabase.from("cities").select("slug").eq("id", cityId).maybeSingle(),
+        supabase.from("experience_tiers").select("slug").eq("id", tierId).maybeSingle(),
+      ]);
+      const sSlug = specRes.data?.slug as string | undefined;
+      const cSlug = cityRes.data?.slug as string | undefined;
+      const tSlug = tierRes.data?.slug as string | undefined;
+      if (sSlug && cSlug && tSlug) {
+        const res = await resolvePrice({
+          specialty_slug: sSlug,
+          city_slug: cSlug,
+          experience_tier_slug: tSlug,
+        });
+        if (res.status === "ok") {
+          quickPricingAnchor = res.anchor;
+          quickPricingSpecialty =
+            (isAr ? (specRes.data?.name_ar as string | null) : (specRes.data?.name_en as string | null)) ?? sSlug;
+        }
       }
     } catch { /* skip gracefully */ }
   }
@@ -194,15 +214,18 @@ export default async function DashboardPage({ params }: { params: Promise<Params
 
           {/* Recent Proposals */}
           <RecentProposalsWidget
-            proposals={proposals.map((p) => ({
-              id: p.id,
-              title: p.title,
+            proposals={proposals.map((p) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              client_name: (p.clients as any)?.name ?? null,
-              status: p.status,
-              final_price_sar: p.final_price_sar,
-              created_at: p.created_at,
-            }))}
+              const linked = ((p.clients as any)?.name as string | null) ?? null;
+              return {
+                id: p.id,
+                title: p.client_name ?? linked,
+                client_name: linked,
+                status: p.status,
+                final_price_sar: p.price_anchor,
+                created_at: p.created_at,
+              };
+            })}
             locale={locale as "ar" | "en"}
           />
 
