@@ -494,5 +494,58 @@
       "wrongState": "لا يمكن تحديث هذه المساهمة الآن.",
       "notFound": "لم نعثر على المساهمة."
     }
+  },
+  "Proposals": {
+    "artifact": {
+      "sections": {
+        "branding": "المقدم",
+        "client_ref": "مُقدَّم إلى",
+        "scope_of_work": "نطاق العمل",
+        "pricing": "التسعير",
+        "milestones": "مراحل الدفع",
+        "timeline": "الجدول الزمني",
+        "ip_terms": "الملكية الفكرية",
+        "verification": "التحقق",
+        "terms_footer": "الشروط العامة"
+      },
+      "currency": "ريال",
+      "deliverable": "تسليم",
+      "revisions": "مراجعة",
+      "revisionsCount": "{n} مراجعات",
+      "deposit": "دفعة مقدمة",
+      "delivery": "عند التسليم",
+      "startDate": "تاريخ البدء",
+      "deliveryDate": "تاريخ التسليم",
+      "validUntil": "صالح حتى",
+      "validityDays": "{n} يومًا",
+      "jurisdiction": "الاختصاص القضائي",
+      "ksa": "المملكة العربية السعودية",
+      "ipFull": "تنتقل كامل حقوق الملكية الفكرية للعميل عند اكتمال الدفع.",
+      "ipLicense": "يحتفظ المستقل بحقوق الملكية الفكرية ويمنح العميل ترخيصًا للاستخدام.",
+      "ipPerProject": "تُحدَّد حقوق الملكية الفكرية لكل مشروع وفق الاتفاق الخاص به.",
+      "proposalId": "رقم العرض",
+      "methodologyLink": "كيف نحسب هذا السعر؟",
+      "anchor": "السعر المقترح",
+      "priceRange": "النطاق السعري",
+      "min": "الأدنى",
+      "max": "الأعلى",
+      "citation": "المصدر",
+      "noClient": "عميل محترم",
+      "noDescription": "—",
+      "noDeliverables": "سيُحدَّد النطاق الكامل عند توقيع العقد.",
+      "noDates": "يُتفق عليه",
+      "triggerDeposit": "دفعة مقدمة عند البدء",
+      "triggerDelivery": "عند استلام التسليم النهائي"
+    },
+    "share": {
+      "downloadPdf": "تحميل PDF",
+      "contactFreelancer": "تواصل مع المستقل",
+      "generatedBy": "صُنع بـ رِزق — منظومة المستقلين السعوديين",
+      "share": "مشاركة",
+      "whatsapp": "واتساب",
+      "notFound": "هذا العرض غير موجود أو لم يُفعَّل للمشاركة.",
+      "metaTitle": "عرض تقديمي من رِزق",
+      "metaDescription": "عرض تقديمي احترافي صادر عن رِزق — معيار التسعير للمستقلين السعوديين."
+    }
   }
 }
