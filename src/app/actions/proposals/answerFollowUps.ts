@@ -10,6 +10,7 @@ import {
 } from "@/lib/proposals/artifact";
 import { applyAnswers } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
+import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 import type { Scope } from "@/lib/ai/scope";
 
 // ---------------------------------------------------------------------------
@@ -141,44 +142,42 @@ export async function answerFollowUps(
       ? resolveResult.provenance_citation_en
       : resolveResult.provenance_citation_ar;
 
-  // Load user profile for artifact branding
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", userId)
-    .single();
+  // Load user brand defaults (M8 columns) for artifact personalisation.
+  const brand = await loadUserBrandDefaults(
+    supabase,
+    userId,
+    userResult.user.email ?? null
+  );
 
-  const freelancerName =
-    (userProfile?.name as string | null) ??
-    userResult.user.email ??
-    "مستقل / Freelancer";
-  const contactEmail =
-    (userProfile?.email as string | null) ?? userResult.user.email ?? null;
+  // IP terms: scope-derived → user default → 'full_transfer'
+  const scopeDerivedIpTerms: "full_transfer" | "license" | "per_project" | null =
+    updatedScope.ip_transfer === "full_transfer"
+      ? "full_transfer"
+      : updatedScope.ip_transfer === "license"
+        ? "license"
+        : null;
+  const resolvedIpTerms: "full_transfer" | "license" | "per_project" =
+    scopeDerivedIpTerms ?? brand.defaultIpTerms ?? "full_transfer";
 
   const artifactInput: ArtifactInput = {
     locale: briefLang,
     proposalId: proposal_id,
-    freelancerName,
-    brandNameAr: null,
-    taglineAr: null,
-    logoUrl: null,
-    brandColors: null,
-    contact: { email: contactEmail, phone: null, whatsapp: null },
+    freelancerName: brand.freelancerName,
+    brandNameAr: brand.brandNameAr,
+    taglineAr: brand.taglineAr,
+    logoUrl: brand.logoUrl,
+    brandColors: brand.brandColors,
+    contact: brand.contact,
     clientName: (proposal.client_name as string | null) ?? null,
     deliverables: updatedScope.deliverables,
     projectDescriptionAr: null,
-    revisions: updatedScope.revisions,
+    revisions: updatedScope.revisions ?? brand.defaultRevisions,
     priceMin: proposalPrice.min,
     priceAnchor: proposalPrice.anchor,
     priceMax: proposalPrice.max,
     provenanceCitation,
-    depositPct: 50,
-    ipTerms:
-      updatedScope.ip_transfer === "full_transfer"
-        ? "full_transfer"
-        : updatedScope.ip_transfer === "license"
-          ? "license"
-          : "full_transfer",
+    depositPct: brand.defaultDepositPct ?? 50,
+    ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
     validityDays: 30,

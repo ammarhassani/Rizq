@@ -262,7 +262,19 @@ export async function generatePaymentReminderAction(
     }
   }
 
-  // Tone hardcoded to "balanced" — no preferred_tone column query
+  // Fetch preferred_tone from users (M8 column — exists as of migration 20260613230814).
+  const VALID_TONES = new Set<string>(["formal", "balanced", "friendly"]);
+  const { data: toneRow } = await supabase
+    .from("users")
+    .select("preferred_tone")
+    .eq("id", userId)
+    .single();
+  const rawTone = toneRow?.preferred_tone as string | null | undefined;
+  const reminderTone: "formal" | "balanced" | "friendly" =
+    rawTone && VALID_TONES.has(rawTone)
+      ? (rawTone as "formal" | "balanced" | "friendly")
+      : "balanced";
+
   const draft = await draftPaymentReminder({
     invoiceNumber: invoice.invoice_number as string,
     totalSar: Number(invoice.total_sar) || 0,
@@ -271,7 +283,7 @@ export async function generatePaymentReminderAction(
     clientName,
     clientCompany,
     paymentDetails: invoice.payment_details as string | null,
-    tone: "balanced",
+    tone: reminderTone,
   });
 
   if (!draft) return { ok: false, code: "ai_error" };

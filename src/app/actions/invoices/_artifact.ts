@@ -13,6 +13,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildInvoiceArtifact } from "@/lib/invoices/artifact";
 import type { InvoiceArtifactData, InvoiceArtifactInput } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem } from "@/lib/invoices/items";
+import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 
 // ---------------------------------------------------------------------------
 // Narrow invoice row shape (only the columns we actually SELECT in actions).
@@ -44,11 +45,11 @@ export type InvoiceRowForArtifact = {
  * Assemble InvoiceArtifactInput from a persisted invoice row.
  *
  * Side-effects: two (or three) Supabase SELECT queries.
- *   1. users.name, email, role  (for freelancer identity + free-tier flag)
+ *   1. users brand/contact/defaults (role for tier gate; M8 fields for branding)
  *   2. clients.name, name_en, company  (only when invoice.client_id is set)
  *
- * Brand fields (logo, custom colours, tagline) pass null — M8 is not built;
- * the artifact lib falls back to Rizq defaults automatically.
+ * All M8 brand fields fall through to null when absent — the artifact lib
+ * falls back to Rizq defaults automatically.
  *
  * locale defaults to "ar".
  */
@@ -63,21 +64,21 @@ export async function buildInvoiceArtifactInputFromRow({
   invoice: InvoiceRowForArtifact;
   locale?: "ar" | "en";
 }): Promise<InvoiceArtifactInput> {
-  // 1. Load user profile (name + email for freelancer identity; role for tier gate)
-  const { data: userProfile } = await supabase
+  // 1. Load user brand/contact defaults + role for tier gate.
+  //    We need `role` separately as it isn't in loadUserBrandDefaults.
+  const { data: roleRow } = await supabase
     .from("users")
-    .select("name, email, role")
+    .select("role")
     .eq("id", userId)
     .single();
 
-  const freelancerName =
-    (userProfile?.name as string | null) ??
-    (userProfile?.email as string | null) ??
-    "مستقل / Freelancer";
-
-  const contactEmail = (userProfile?.email as string | null) ?? null;
-  const role = (userProfile?.role as string | null) ?? "free";
+  const role = (roleRow?.role as string | null) ?? "free";
   const isFreeTier = role !== "pro" && role !== "admin";
+
+  // Load brand/contact/defaults (M8 columns).
+  const brand = await loadUserBrandDefaults(supabase, userId);
+
+  const freelancerName = brand.freelancerName;
 
   // 2. Optionally load client name/company
   let clientName: string | null = null;
@@ -138,13 +139,13 @@ export async function buildInvoiceArtifactInputFromRow({
     issueDate: invoice.created_at,
     dueDate: invoice.due_date ?? null,
 
-    // M8 brand fields — not built yet; pass null → lib uses Rizq defaults
+    // M8 brand fields — real user values with null→Rizq-default fallback in lib
     freelancerName,
-    brandNameAr: null,
-    taglineAr: null,
-    logoUrl: null,
-    brandColors: null,
-    contact: { email: contactEmail, phone: null, whatsapp: null },
+    brandNameAr: brand.brandNameAr,
+    taglineAr: brand.taglineAr,
+    logoUrl: brand.logoUrl,
+    brandColors: brand.brandColors,
+    contact: brand.contact,
 
     clientName,
     clientCompany,

@@ -10,6 +10,7 @@ import {
 import { buildArtifactData } from "@/lib/proposals/artifact";
 import { selectFollowUps, type FollowUpTemplate } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
+import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 import type { PricingJson } from "@/lib/proposals/templateHelpers";
 
 // ---------------------------------------------------------------------------
@@ -224,40 +225,43 @@ export async function generateProposal(
       ? resolveResult.provenance_citation_en
       : resolveResult.provenance_citation_ar;
 
-  // 10. Load user profile for freelancer name/email
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", userId)
-    .single();
+  // 10. Load user brand defaults (M8 columns) for artifact personalisation.
+  const brand = await loadUserBrandDefaults(
+    supabase,
+    userId,
+    userResult.user.email ?? null
+  );
 
-  const freelancerName =
-    (userProfile?.name as string | null) ??
-    userResult.user.email ??
-    "مستقل / Freelancer";
-  const contactEmail =
-    (userProfile?.email as string | null) ?? userResult.user.email ?? null;
+  const freelancerName = brand.freelancerName;
 
-  // 11. Build artifact (apply template defaults when present)
-  const resolvedRevisions = templateDefaults?.revisions ?? scope.revisions;
-  const resolvedDepositPct = templateDefaults?.deposit_pct ?? 50;
-  const resolvedIpTerms: "full_transfer" | "license" | "per_project" =
-    templateDefaults?.ip_terms ??
-    (scope.ip_transfer === "full_transfer"
+  // 11. Build artifact (apply template defaults when present; user defaults as fallback)
+  const resolvedRevisions =
+    templateDefaults?.revisions ?? scope.revisions ?? brand.defaultRevisions;
+  // Precedence: template > user-default > 50
+  const resolvedDepositPct =
+    templateDefaults?.deposit_pct ?? brand.defaultDepositPct ?? 50;
+  // Precedence: template > scope-derived > user default > 'full_transfer'
+  const scopeDerivedIpTerms: "full_transfer" | "license" | "per_project" | null =
+    scope.ip_transfer === "full_transfer"
       ? "full_transfer"
       : scope.ip_transfer === "license"
         ? "license"
-        : "full_transfer");
+        : null;
+  const resolvedIpTerms: "full_transfer" | "license" | "per_project" =
+    templateDefaults?.ip_terms ??
+    scopeDerivedIpTerms ??
+    brand.defaultIpTerms ??
+    "full_transfer";
 
   const artifactData = buildArtifactData({
     locale: briefLang === "en" ? "en" : "ar",
     proposalId: "pending", // placeholder; will update after insert
     freelancerName,
-    brandNameAr: null,
-    taglineAr: null,
-    logoUrl: null,
-    brandColors: null,
-    contact: { email: contactEmail, phone: null, whatsapp: null },
+    brandNameAr: brand.brandNameAr,
+    taglineAr: brand.taglineAr,
+    logoUrl: brand.logoUrl,
+    brandColors: brand.brandColors,
+    contact: brand.contact,
     clientName: resolvedClientName,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
@@ -322,16 +326,16 @@ export async function generateProposal(
 
   const proposalId = insertData.id as string;
 
-  // Update artifact_json with the real proposal ID
+  // Update artifact_json with the real proposal ID (keep brand fields consistent)
   const artifactWithId = buildArtifactData({
     locale: briefLang === "en" ? "en" : "ar",
     proposalId,
     freelancerName,
-    brandNameAr: null,
-    taglineAr: null,
-    logoUrl: null,
-    brandColors: null,
-    contact: { email: contactEmail, phone: null, whatsapp: null },
+    brandNameAr: brand.brandNameAr,
+    taglineAr: brand.taglineAr,
+    logoUrl: brand.logoUrl,
+    brandColors: brand.brandColors,
+    contact: brand.contact,
     clientName: resolvedClientName,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,

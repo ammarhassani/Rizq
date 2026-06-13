@@ -195,10 +195,19 @@ export async function draftFollowupAction(
 
   const lastGig = lastGigRows?.[0] ?? null;
 
-  // Tone defaults to "balanced". A per-user `users.preferred_tone` column is
-  // deferred (arrives with Onboarding v2 / Settings in a later phase); until it
-  // exists, don't query it — a missing-column SELECT would just 400 every call.
-  const tone: "formal" | "balanced" | "friendly" = "balanced";
+  // Fetch preferred_tone from users (M8 column — exists as of migration 20260613230814).
+  // Validate against the union; default to "balanced" if absent or invalid.
+  const VALID_TONES = new Set<string>(["formal", "balanced", "friendly"]);
+  const { data: toneRow } = await supabase
+    .from("users")
+    .select("preferred_tone")
+    .eq("id", user.id)
+    .single();
+  const rawTone = toneRow?.preferred_tone as string | null | undefined;
+  const tone: "formal" | "balanced" | "friendly" =
+    rawTone && VALID_TONES.has(rawTone)
+      ? (rawTone as "formal" | "balanced" | "friendly")
+      : "balanced";
 
   const followupCtx = {
     name: client.name as string,

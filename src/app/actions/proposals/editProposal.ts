@@ -6,6 +6,7 @@ import { summarizeChange } from "@/lib/ai/changeSummary";
 import { buildArtifactData } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
 import type { ArtifactData } from "@/lib/proposals/artifact";
+import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -101,19 +102,13 @@ export async function editProposal(
       ? Math.max(priceMin, Math.min(priceMax, price_anchor))
       : currentAnchor;
 
-  // Fetch user profile for freelancer name (non-fatal)
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select("name, email")
-    .eq("id", userId)
-    .single();
-
-  const freelancerName =
-    (userProfile?.name as string | null) ??
-    userResult.user.email ??
-    "مستقل / Freelancer";
-  const contactEmail =
-    (userProfile?.email as string | null) ?? userResult.user.email ?? null;
+  // Load user brand defaults (M8 columns) for artifact personalisation (non-fatal).
+  const brand = await loadUserBrandDefaults(
+    supabase,
+    userId,
+    userResult.user.email ?? null
+  );
+  const freelancerName = brand.freelancerName;
 
   // Rebuild artifact_json from patched scope + new anchor so the artifact
   // and share page reflect the change (spec: edit must be visible everywhere).
@@ -168,11 +163,11 @@ export async function editProposal(
     locale: "ar", // proposals default to Arabic; artifact locale preserved via sections
     proposalId: proposal_id,
     freelancerName,
-    brandNameAr: null,
-    taglineAr: null,
-    logoUrl: null,
-    brandColors: null,
-    contact: { email: contactEmail, phone: null, whatsapp: null },
+    brandNameAr: brand.brandNameAr,
+    taglineAr: brand.taglineAr,
+    logoUrl: brand.logoUrl,
+    brandColors: brand.brandColors,
+    contact: brand.contact,
     clientName: (proposal["client_name"] as string | null) ?? null,
     deliverables: (newScope.deliverables as string[]) ?? [],
     projectDescriptionAr,
