@@ -873,6 +873,16 @@
         "quotaExhausted": "Free limit reached (10 clients). Upgrade to Pro.",
         "generic": "Something went wrong. Try again."
       }
+    },
+    "ai": {
+      "generateInsights": "Rizq Analysis — Generate insights",
+      "draftFollowup": "Draft follow-up message",
+      "generatePersona": "Generate client persona",
+      "copy": "Copy",
+      "whatsapp": "WhatsApp",
+      "upgradeHint": "This is a Pro feature — upgrade to use it.",
+      "loading": "Processing…",
+      "personaNeeds3Gigs": "Generating a persona requires at least 3 gigs with this client."
     }
   }
 }

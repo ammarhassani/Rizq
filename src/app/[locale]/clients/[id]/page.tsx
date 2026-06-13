@@ -284,6 +284,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<Par
             clientId={id}
             clientName={client.name}
             initialNotes={client.notes ?? ""}
+            totalGigs={client.total_gigs ?? 0}
           />
         </div>
       </main>
