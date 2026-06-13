@@ -4,6 +4,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { assembleArtifactJson, type InvoiceRowForArtifact } from "./_artifact";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,15 +44,18 @@ export async function setInvoiceShare(
 
   const supabase = await createClient();
 
-  // Auth check — must be the owner (RLS will also enforce this on the UPDATE).
+  // Auth check — owner-scoped (RLS enforces too; the explicit eq is defense-in-depth
+  // and matches every other action in this module).
   const { data: userResult } = await supabase.auth.getUser();
   if (!userResult.user) return { ok: false, code: "unauthorized" };
+  const userId = userResult.user.id;
 
   // Load the existing invoice to check share_token + status + client linkage.
   const { data: invoice, error: fetchErr } = await supabase
     .from("invoices")
     .select("id, share_token, status, public_share, client_id, invoice_number, total_sar")
     .eq("id", invoice_id)
+    .eq("user_id", userId)
     .single();
 
   if (fetchErr || !invoice) return { ok: false, code: "not_found" };
@@ -63,6 +67,7 @@ export async function setInvoiceShare(
     updated_at: new Date().toISOString(),
   };
 
+  let statusBumped = false;
   if (share) {
     // Generate a new token if absent.
     if (!token) {
@@ -82,17 +87,65 @@ export async function setInvoiceShare(
     if (currentStatus === "draft") {
       update["status"] = "sent";
       update["sent_at"] = new Date().toISOString();
+      statusBumped = true;
     }
   }
 
   const { error: updateErr } = await supabase
     .from("invoices")
     .update(update)
-    .eq("id", invoice_id);
+    .eq("id", invoice_id)
+    .eq("user_id", userId);
 
   if (updateErr) {
     console.error("[setInvoiceShare] update failed", updateErr);
     return { ok: false, code: "error" };
+  }
+
+  // If we bumped draft → sent, the stored artifact_json still carries the old
+  // 'draft' status — and BOTH the public share page and the detail page render
+  // the status badge from artifact_json.invoice_meta.status. Rebuild it so a
+  // share-from-draft doesn't display a stale "Draft" badge publicly.
+  if (statusBumped) {
+    const { data: freshRow } = await supabase
+      .from("invoices")
+      .select(
+        "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      )
+      .eq("id", invoice_id)
+      .eq("user_id", userId)
+      .single();
+
+    if (freshRow) {
+      const artifactRow: InvoiceRowForArtifact = {
+        id: freshRow.id as string,
+        invoice_number: freshRow.invoice_number as string,
+        status: freshRow.status as string,
+        description: (freshRow.description as string | null) ?? null,
+        items: freshRow.items,
+        subtotal_sar: Number(freshRow.subtotal_sar),
+        vat_pct: Number(freshRow.vat_pct),
+        vat_sar: Number(freshRow.vat_sar),
+        total_sar: Number(freshRow.total_sar),
+        payment_method: freshRow.payment_method as string,
+        payment_details: (freshRow.payment_details as string | null) ?? null,
+        due_date: (freshRow.due_date as string | null) ?? null,
+        created_at: freshRow.created_at as string,
+        client_id: (freshRow.client_id as string | null) ?? null,
+      };
+      const artifactJson = await assembleArtifactJson({
+        supabase,
+        userId,
+        invoice: artifactRow,
+      });
+      if (artifactJson) {
+        await supabase
+          .from("invoices")
+          .update({ artifact_json: artifactJson })
+          .eq("id", invoice_id)
+          .eq("user_id", userId);
+      }
+    }
   }
 
   // Revalidate the invoice detail page so the server component reflects the change.
@@ -100,7 +153,6 @@ export async function setInvoiceShare(
   revalidatePath(`/en/invoices/${invoice_id}`);
 
   // Best-effort: insert 'invoice_sent' timeline event and bump last_contacted_at.
-  const userId = userResult.user.id;
   const clientId = invoice.client_id as string | null;
   if (share && clientId) {
     const invoiceNumber = invoice.invoice_number as string | null;
