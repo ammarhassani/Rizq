@@ -20,6 +20,9 @@ export const SPECIALTY_SLUGS = [
 
 /** Build the scope schema; specialty constrained to the given slugs. */
 export function buildScopeSchema(slugs: readonly string[]) {
+  if (slugs.length === 0) {
+    throw new Error("[buildScopeSchema] slugs must be a non-empty list");
+  }
   return z.object({
     specialty: z.enum(slugs as [string, ...string[]]),
     deliverables: z.array(z.string()).min(1),
@@ -137,7 +140,7 @@ Expected JSON:
   "client_type": "individual",
   "geography_target": "ksa_local",
   "language_preference": "both",
-  "budget_mentioned": 5000,
+  "budget_mentioned": null,
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.96,
@@ -248,6 +251,7 @@ export async function extractScope(
       model: deepseek(REASONING_MODEL),
       schema: ScopeSchema,
       prompt,
+      abortSignal: AbortSignal.timeout(8_000),
     });
     const scope = result.object;
     return {
