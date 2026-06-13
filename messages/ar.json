@@ -778,6 +778,13 @@
       "deleteConfirmBtn": "تأكيد الحذف",
       "deleting": "جارٍ الحذف…",
       "cancel": "إلغاء"
+    },
+    "ai": {
+      "suggestedCategory": "تصنيف مقترح:",
+      "generateForecast": "توليد الإسقاط (احترافي)",
+      "forecastNarrativeLabel": "تحليل رِزق",
+      "upgradeHint": "الإسقاط المالي ميزة احترافية. ترقَّ للاحترافي لتفعيلها.",
+      "anomalyBanner": "تنبيه: سعر غير معتاد لهذا التصنيف."
     }
   },
   "Clients": {

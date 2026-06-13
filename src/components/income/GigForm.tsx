@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createGig, updateGig } from "@/app/actions/gigs/gigs";
+import {
+  suggestGigCategoryAction,
+  checkGigAnomalyAction,
+} from "@/app/actions/gigs/incomeAi";
 import { track } from "@/lib/analytics/track";
 import { Loader2 } from "lucide-react";
 
@@ -45,8 +49,15 @@ const STATUS_LABELS_EN: Record<string, string> = {
   paid: "Paid",
 };
 
+type CategoryHint = {
+  category_ar: string;
+  category_en: string;
+  confidence: number;
+};
+
 export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: Props) {
   const t = useTranslations("Income.form");
+  const tAi = useTranslations("Income.ai");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -65,9 +76,43 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
   const [paymentMethod, setPaymentMethod] = useState(initialData?.payment_method ?? "bank_transfer");
   const [notes, setNotes] = useState(initialData?.payment_notes ?? "");
 
+  // ── Category AI suggestion state ────────────────────────────────────────
+  const [categoryHint, setCategoryHint] = useState<CategoryHint | null>(null);
+  const [isSuggestingCategory, setIsSuggestingCategory] = useState(false);
+  const suggestDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const inputClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`;
   const labelClass = `block text-sm font-medium text-rizq-ink mb-2 ${font}`;
 
+  // ── Suggest category on title blur / debounce ────────────────────────────
+  const handleTitleBlur = useCallback(() => {
+    if (suggestDebounceRef.current) clearTimeout(suggestDebounceRef.current);
+    const trimmed = title.trim();
+    if (!trimmed || trimmed.length < 3) return;
+    // Only suggest if no category has been set yet (don't override user's pick)
+    if (category.trim()) return;
+
+    setIsSuggestingCategory(true);
+    suggestDebounceRef.current = setTimeout(async () => {
+      try {
+        const result = await suggestGigCategoryAction({ title: trimmed });
+        if (result.ok && result.suggestion) {
+          setCategoryHint(result.suggestion);
+        }
+      } catch {
+        // non-blocking — ignore
+      } finally {
+        setIsSuggestingCategory(false);
+      }
+    }, 300);
+  }, [title, category]);
+
+  function applyCategory(hint: CategoryHint) {
+    setCategory(isAr ? hint.category_ar : hint.category_en);
+    setCategoryHint(null);
+  }
+
+  // ── Submit ───────────────────────────────────────────────────────────────
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) {
@@ -103,6 +148,14 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         }
 
         track("gig_created", { locale });
+
+        // Non-blocking anomaly check after successful create
+        if (result.ok && "id" in result) {
+          const newId = result.id;
+          // Fire and forget — don't await, don't block navigation
+          void checkGigAnomalyAction({ gig_id: newId }).catch(() => {});
+        }
+
         router.push("/income" as "/income");
       } else {
         if (!initialData?.id) return;
@@ -126,6 +179,10 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         }
 
         track("gig_updated", { locale });
+
+        // Non-blocking anomaly re-check after edit
+        void checkGigAnomalyAction({ gig_id: initialData.id }).catch(() => {});
+
         onSuccess?.();
         router.refresh();
       }
@@ -170,7 +227,8 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); setCategoryHint(null); }}
+          onBlur={handleTitleBlur}
           placeholder={t("titlePlaceholder")}
           className={inputClass}
         />
@@ -231,16 +289,52 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         <label className={labelClass}>
           {t("categoryLabel")} <span className={`ms-1 text-rizq-ink-soft/60 font-normal`}>({t("optional")})</span>
         </label>
-        <input
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder={t("categoryPlaceholder")}
-          className={inputClass}
-        />
+        <div className="space-y-2">
+          <div className="relative">
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => { setCategory(e.target.value); setCategoryHint(null); }}
+              placeholder={t("categoryPlaceholder")}
+              className={inputClass}
+            />
+            {isSuggestingCategory && (
+              <span className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2`}>
+                <Loader2 size={14} className="animate-spin text-rizq-green/60" />
+              </span>
+            )}
+          </div>
+
+          {/* Category suggestion chip — only when confidence >= 0.6 */}
+          {categoryHint && categoryHint.confidence >= 0.6 && (
+            <button
+              type="button"
+              onClick={() => applyCategory(categoryHint)}
+              className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-green/40 bg-rizq-green/8 px-3 py-1.5 text-sm text-rizq-green hover:bg-rizq-green/15 transition-colors ${font}`}
+            >
+              <span className="text-xs opacity-70">{tAi("suggestedCategory")}</span>
+              <span className="font-medium">
+                {isAr ? categoryHint.category_ar : categoryHint.category_en}
+              </span>
+              <span className="text-xs opacity-70">✓</span>
+            </button>
+          )}
+
+          {/* Dim hint when confidence < 0.6 */}
+          {categoryHint && categoryHint.confidence < 0.6 && (
+            <button
+              type="button"
+              onClick={() => applyCategory(categoryHint)}
+              className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-1.5 text-sm text-rizq-ink-soft/60 hover:border-rizq-green/30 transition-colors ${font}`}
+            >
+              <span className="text-xs opacity-70">{tAi("suggestedCategory")}</span>
+              <span>{isAr ? categoryHint.category_ar : categoryHint.category_en}</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Payment method (edit mode only — shown always for context) */}
+      {/* Payment method */}
       <div>
         <label className={labelClass}>{t("paymentMethodLabel")}</label>
         <div dir={dir} className="flex flex-wrap gap-2">

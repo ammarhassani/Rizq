@@ -778,6 +778,13 @@
       "deleteConfirmBtn": "Confirm delete",
       "deleting": "Deleting…",
       "cancel": "Cancel"
+    },
+    "ai": {
+      "suggestedCategory": "Suggested category:",
+      "generateForecast": "Generate forecast (Pro)",
+      "forecastNarrativeLabel": "Rizq Analysis",
+      "upgradeHint": "Income forecasting is a Pro feature. Upgrade to unlock it.",
+      "anomalyBanner": "Alert: unusual price for this category."
     }
   },
   "Clients": {

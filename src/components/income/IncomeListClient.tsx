@@ -6,11 +6,29 @@ import { Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { GigCard, type GigRow } from "./GigCard";
 import { markGigStatus } from "@/app/actions/gigs/gigs";
+import { forecastIncomeAction } from "@/app/actions/gigs/incomeAi";
 
 type FilterChip = "all" | "paid" | "pending" | "this_month" | "last_month" | "this_year";
 type SortKey = "delivery_date" | "amount" | "status";
 
 type Props = { gigs: GigRow[]; locale: "ar" | "en" };
+
+type ForecastState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "upgrade" }
+  | {
+      status: "done";
+      narrative_ar: string;
+      narrative_en: string;
+      factors_ar: string[];
+      factors_en: string[];
+      current_month_projection: number;
+      next_month_projection: number;
+      confidence_low: number;
+      confidence_high: number;
+    }
+  | { status: "error" };
 
 function getMonthRange(offset: number): { start: Date; end: Date } {
   const now = new Date();
@@ -21,8 +39,15 @@ function getMonthRange(offset: number): { start: Date; end: Date } {
   return { start, end };
 }
 
+function fmtPrice(n: number, locale: "ar" | "en"): string {
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
 export function IncomeListClient({ gigs, locale }: Props) {
   const t = useTranslations("Income.list");
+  const tAi = useTranslations("Income.ai");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -31,6 +56,8 @@ export function IncomeListClient({ gigs, locale }: Props) {
   const [sort, setSort] = useState<SortKey>("delivery_date");
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  const [forecast, setForecast] = useState<ForecastState>({ status: "idle" });
 
   const filtered = useMemo(() => {
     let list = [...gigs];
@@ -101,6 +128,36 @@ export function IncomeListClient({ gigs, locale }: Props) {
     });
   }
 
+  function handleGenerateForecast() {
+    setForecast({ status: "loading" });
+    startTransition(async () => {
+      try {
+        const result = await forecastIncomeAction();
+        if (!result.ok) {
+          if (result.code === "upgrade") {
+            setForecast({ status: "upgrade" });
+          } else {
+            setForecast({ status: "error" });
+          }
+          return;
+        }
+        setForecast({
+          status: "done",
+          narrative_ar: result.narrative_ar,
+          narrative_en: result.narrative_en,
+          factors_ar: result.factors_ar,
+          factors_en: result.factors_en,
+          current_month_projection: result.current_month_projection,
+          next_month_projection: result.next_month_projection,
+          confidence_low: result.confidence_low,
+          confidence_high: result.confidence_high,
+        });
+      } catch {
+        setForecast({ status: "error" });
+      }
+    });
+  }
+
   return (
     <div className="space-y-4">
       {/* Filter chips */}
@@ -133,6 +190,101 @@ export function IncomeListClient({ gigs, locale }: Props) {
             <option key={s.key} value={s.key}>{s.label}</option>
           ))}
         </select>
+      </div>
+
+      {/* ── AI Forecast section ─────────────────────────────────────────── */}
+      <div dir={dir} className={`rounded-2xl border border-rizq-gold/20 bg-white/40 px-5 py-4 space-y-3 ${font}`}>
+        {/* Generate button */}
+        {(forecast.status === "idle" || forecast.status === "error") && (
+          <button
+            type="button"
+            onClick={handleGenerateForecast}
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 bg-rizq-green/8 px-4 py-2 text-sm font-medium text-rizq-green hover:bg-rizq-green/15 transition-colors ${font}`}
+          >
+            {forecast.status === "error"
+              ? (isAr ? "أعد المحاولة" : "Try again")
+              : (isAr ? tAi("generateForecast") : tAi("generateForecast"))}
+          </button>
+        )}
+
+        {/* Loading */}
+        {forecast.status === "loading" && (
+          <div className={`flex items-center gap-2 text-sm text-rizq-ink-soft ${font}`}>
+            <Loader2 size={14} className="animate-spin text-rizq-green" />
+            <span>{isAr ? "جارٍ توليد الإسقاط…" : "Generating forecast…"}</span>
+          </div>
+        )}
+
+        {/* Upgrade hint */}
+        {forecast.status === "upgrade" && (
+          <p className={`text-sm text-amber-700 ${font}`}>
+            {tAi("upgradeHint")}
+          </p>
+        )}
+
+        {/* Forecast result */}
+        {forecast.status === "done" && (
+          <div className="space-y-3">
+            {/* Projection numbers */}
+            <div dir={dir} className="flex flex-wrap gap-4">
+              <div>
+                <p className="text-xs text-rizq-ink-soft/60 mb-0.5">
+                  {isAr ? "هذا الشهر (متوقع)" : "This month (projected)"}
+                </p>
+                <p className="tabular font-sans text-base font-semibold text-rizq-green">
+                  {fmtPrice(forecast.current_month_projection, locale)}{" "}
+                  <span className={`text-xs text-rizq-ink-soft/60 font-normal ${font}`}>
+                    {isAr ? "ريال" : "SAR"}
+                  </span>
+                </p>
+                <p className="text-xs text-rizq-ink-soft/50">
+                  {fmtPrice(forecast.confidence_low, locale)} – {fmtPrice(forecast.confidence_high, locale)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-rizq-ink-soft/60 mb-0.5">
+                  {isAr ? "الشهر القادم (متوقع)" : "Next month (projected)"}
+                </p>
+                <p className="tabular font-sans text-base font-semibold text-rizq-ink">
+                  {fmtPrice(forecast.next_month_projection, locale)}{" "}
+                  <span className={`text-xs text-rizq-ink-soft/60 font-normal ${font}`}>
+                    {isAr ? "ريال" : "SAR"}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Narrative */}
+            <div className={`rounded-xl bg-rizq-green/5 border border-rizq-green/15 px-4 py-3 space-y-1 ${font}`}>
+              <p className="text-xs text-rizq-green/70 font-medium uppercase tracking-wide">
+                {tAi("forecastNarrativeLabel")}
+              </p>
+              <p className={`text-sm text-rizq-ink leading-relaxed ${font}`}>
+                {isAr ? forecast.narrative_ar : forecast.narrative_en}
+              </p>
+              {/* Factor bullets */}
+              {(isAr ? forecast.factors_ar : forecast.factors_en).length > 0 && (
+                <ul className={`mt-2 space-y-0.5 ${font}`}>
+                  {(isAr ? forecast.factors_ar : forecast.factors_en).map((f, i) => (
+                    <li key={i} className="text-xs text-rizq-ink-soft flex items-start gap-1.5">
+                      <span className="text-rizq-green mt-0.5">•</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Re-generate button */}
+            <button
+              type="button"
+              onClick={handleGenerateForecast}
+              className={`text-xs text-rizq-ink-soft/50 hover:text-rizq-green transition-colors ${font}`}
+            >
+              {isAr ? "تحديث" : "Refresh"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* List */}
