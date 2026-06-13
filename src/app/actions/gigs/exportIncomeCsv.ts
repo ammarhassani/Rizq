@@ -49,15 +49,17 @@ export async function exportIncomeCsv(): Promise<ExportIncomeCsvResult> {
   if (!userResult.user) return { ok: false, code: "unauthorized" };
   const userId = userResult.user.id;
 
-  // Pro gate — check subscription tier
-  const { data: subRow } = await supabase
-    .from("subscriptions")
-    .select("tier")
-    .eq("user_id", userId)
-    .maybeSingle();
+  // Pro gate — public.users.role is the single source of truth for tier
+  // across the app (quota triggers, clientAi, incomeAi all read it). There is
+  // no separate `subscriptions` table; gate on role here too.
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", userId)
+    .single();
 
-  const tier = (subRow?.tier as string | null) ?? "free";
-  if (tier !== "pro") {
+  const role = (profile?.role ?? "free") as string;
+  if (role !== "pro" && role !== "admin") {
     return { ok: false, code: "upgrade" };
   }
 

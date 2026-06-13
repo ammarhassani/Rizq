@@ -195,17 +195,10 @@ export async function draftFollowupAction(
 
   const lastGig = lastGigRows?.[0] ?? null;
 
-  // Fetch user's preferred tone from their profile (default: balanced)
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select("preferred_tone")
-    .eq("id", user.id)
-    .single();
-
-  const tone = (userProfile?.preferred_tone ?? "balanced") as
-    | "formal"
-    | "balanced"
-    | "friendly";
+  // Tone defaults to "balanced". A per-user `users.preferred_tone` column is
+  // deferred (arrives with Onboarding v2 / Settings in a later phase); until it
+  // exists, don't query it — a missing-column SELECT would just 400 every call.
+  const tone: "formal" | "balanced" | "friendly" = "balanced";
 
   const followupCtx = {
     name: client.name as string,
