@@ -1,0 +1,250 @@
+"use client";
+
+/**
+ * ProposalDetailActions — Phase-2 task 2.9 (frontend, part 2)
+ *
+ * Client island rendered on the proposal detail page.
+ * Provides: Finalize, Share (opens ShareModal), Mark accepted/declined.
+ * After each mutation, calls router.refresh() so the server data re-renders.
+ */
+
+import { useState, useTransition } from "react";
+import { Loader2, Share2, CheckCircle, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
+import { markStatus } from "@/app/actions/proposals/markStatus";
+import { track } from "@/lib/analytics/track";
+import { ShareModal } from "./ShareModal";
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
+
+type Props = {
+  locale: "ar" | "en";
+  proposalId: string;
+  status: string;
+  publicShare: boolean;
+  shareToken: string | null;
+};
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+export function ProposalDetailActions({
+  locale,
+  proposalId,
+  status,
+  publicShare,
+  shareToken,
+}: Props) {
+  const t = useTranslations("Proposals.detail");
+  const router = useRouter();
+  const isAr = locale === "ar";
+  const font = isAr ? "font-arabic" : "font-sans";
+  const dir = isAr ? "rtl" : "ltr";
+
+  // Modal state
+  const [showShare, setShowShare] = useState(false);
+
+  // Decline flow
+  const [showDeclineReason, setShowDeclineReason] = useState(false);
+  const [declineReason, setDeclineReason] = useState("");
+
+  // Transitions
+  const [isFinalizing, startFinalizeTransition] = useTransition();
+  const [isMarkingStatus, startMarkStatusTransition] = useTransition();
+
+  // ---------------------------------------------------------------------------
+  // Handlers
+  // ---------------------------------------------------------------------------
+
+  function handleFinalize() {
+    startFinalizeTransition(async () => {
+      const result = await finalizeProposal({ proposal_id: proposalId });
+      if (result.ok) {
+        track("proposal_finalized", { locale, proposal_id: proposalId });
+        router.refresh();
+      }
+    });
+  }
+
+  function handleMarkAccepted() {
+    startMarkStatusTransition(async () => {
+      const result = await markStatus({ proposal_id: proposalId, status: "accepted" });
+      if (result.ok) {
+        track("proposal_status_changed", {
+          locale,
+          proposal_id: proposalId,
+          status: "accepted",
+        });
+        router.refresh();
+      }
+    });
+  }
+
+  function handleMarkDeclined() {
+    if (!showDeclineReason) {
+      setShowDeclineReason(true);
+      return;
+    }
+    startMarkStatusTransition(async () => {
+      const result = await markStatus({
+        proposal_id: proposalId,
+        status: "declined",
+        reason: declineReason.trim() || undefined,
+      });
+      if (result.ok) {
+        track("proposal_status_changed", {
+          locale,
+          proposal_id: proposalId,
+          status: "declined",
+        });
+        setShowDeclineReason(false);
+        setDeclineReason("");
+        router.refresh();
+      }
+    });
+  }
+
+  // Whether this status can transition to accepted/declined
+  const canMarkOutcome = ["sent", "viewed", "final"].includes(status);
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
+
+  return (
+    <>
+      <div
+        dir={dir}
+        className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 space-y-4 ${font}`}
+      >
+        <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase">
+          {/* Section label reuse from ProposalFlow */}
+          {isAr ? "الإجراءات" : "Actions"}
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          {/* Finalize — only when draft */}
+          {status === "draft" && (
+            <button
+              type="button"
+              onClick={handleFinalize}
+              disabled={isFinalizing}
+              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+            >
+              {isFinalizing ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  {t("finalizing")}
+                </>
+              ) : (
+                t("finalize")
+              )}
+            </button>
+          )}
+
+          {/* Share */}
+          <button
+            type="button"
+            onClick={() => setShowShare(true)}
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-6 py-3 text-sm font-medium hover:bg-rizq-green/8 transition-all ${font}`}
+          >
+            <Share2 size={14} />
+            {t("share")}
+          </button>
+
+          {/* Mark accepted / declined */}
+          {canMarkOutcome && status !== "accepted" && status !== "declined" && (
+            <>
+              <button
+                type="button"
+                onClick={handleMarkAccepted}
+                disabled={isMarkingStatus}
+                className={`inline-flex items-center gap-2 rounded-full border border-emerald-400/40 text-emerald-700 px-6 py-3 text-sm font-medium hover:bg-emerald-50 transition-all disabled:opacity-70 ${font}`}
+              >
+                {isMarkingStatus ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <CheckCircle size={14} />
+                )}
+                {isMarkingStatus ? t("markingStatus") : t("markAccepted")}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleMarkDeclined}
+                disabled={isMarkingStatus}
+                className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-6 py-3 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
+              >
+                {isMarkingStatus ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <XCircle size={14} />
+                )}
+                {isMarkingStatus ? t("markingStatus") : t("markDeclined")}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Decline reason sub-form */}
+        {showDeclineReason && !isMarkingStatus && (
+          <div
+            dir={dir}
+            className={`rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3 animate-fade-in ${font}`}
+          >
+            <label
+              htmlFor="decline-reason"
+              className={`block text-sm font-medium text-rizq-ink ${font}`}
+            >
+              {t("declineReasonLabel")}
+            </label>
+            <textarea
+              id="decline-reason"
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+              rows={3}
+              placeholder={t("declineReasonPlaceholder")}
+              className={`w-full rounded-xl border border-red-200 bg-white/80 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 resize-none ${font}`}
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleMarkDeclined}
+                disabled={isMarkingStatus}
+                className={`inline-flex items-center gap-2 rounded-full bg-red-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-70 ${font}`}
+              >
+                {t("declineConfirm")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeclineReason(false);
+                  setDeclineReason("");
+                }}
+                className={`text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors ${font}`}
+              >
+                {t("cancel")}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Share modal */}
+      {showShare && (
+        <ShareModal
+          locale={locale}
+          proposalId={proposalId}
+          initialShared={publicShare}
+          initialToken={shareToken}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+    </>
+  );
+}

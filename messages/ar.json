@@ -606,6 +606,59 @@
       "notFound": "هذا العرض غير موجود أو لم يُفعَّل للمشاركة.",
       "metaTitle": "عرض تقديمي من رِزق",
       "metaDescription": "عرض تقديمي احترافي صادر عن رِزق — معيار التسعير للمستقلين السعوديين."
+    },
+    "list": {
+      "eyebrow": "عروضي",
+      "title": "عروضك التقديمية.",
+      "subtitle": "كل عرض أنشأته بختم رِزق في مكان واحد.",
+      "newProposal": "+ عرض جديد",
+      "client": "العميل",
+      "newClient": "عميل جديد",
+      "currency": "ريال",
+      "status": {
+        "draft": "مسودة",
+        "final": "معتمد",
+        "sent": "مُرسَل",
+        "viewed": "تمت المشاهدة",
+        "accepted": "مقبول",
+        "declined": "مرفوض",
+        "expired": "منتهي الصلاحية"
+      },
+      "daysAgo": "منذ {n} يومًا",
+      "todayAgo": "اليوم",
+      "yesterdayAgo": "أمس",
+      "emptyTitle": "ما عندك أي عروض حتى الآن.",
+      "emptyBody": "ألصق رسالة عميلك لإنشاء أول عرض احترافي بختم رِزق.",
+      "emptyCta": "أنشئ أول عرض"
+    },
+    "detail": {
+      "versionHistory": "سجل النسخ",
+      "versionLabel": "نسخة {v}",
+      "noSummary": "بدون ملاحظات",
+      "expiredNotice": "انتهت صلاحية هذا العرض. يمكنك اعتماده مجددًا لتمديد الصلاحية.",
+      "finalize": "اعتمد العرض",
+      "finalizing": "جارٍ الاعتماد…",
+      "share": "مشاركة",
+      "markAccepted": "قبِل العميل",
+      "markDeclined": "رفض العميل",
+      "markingStatus": "جارٍ التحديث…",
+      "declineReasonLabel": "سبب الرفض (اختياري)",
+      "declineReasonPlaceholder": "أي تفاصيل مفيدة",
+      "declineConfirm": "تأكيد الرفض",
+      "cancel": "إلغاء",
+      "shareModal": {
+        "title": "مشاركة العرض",
+        "enableShare": "تفعيل المشاركة",
+        "disableShare": "إيقاف المشاركة",
+        "enabling": "جارٍ التفعيل…",
+        "shareNote": "أي شخص لديه الرابط يمكنه رؤية العرض (للقراءة فقط).",
+        "copyLink": "نسخ الرابط",
+        "copied": "تم النسخ",
+        "downloadPdf": "تحميل PDF",
+        "downloadPdfNote": "افتح رابط المشاركة ثم اطبع من المتصفح.",
+        "whatsapp": "واتساب",
+        "close": "إغلاق"
+      }
     }
   }
 }
