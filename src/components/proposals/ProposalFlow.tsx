@@ -32,12 +32,15 @@ import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
 type Option = { slug: string; label: string; hint?: string };
 
+type TemplateOption = { id: string; name_ar: string; name_en: string | null };
+
 type Props = {
   locale: "ar" | "en";
   specialties: Option[];
   cities: Option[];
   tiers: Option[];
   defaultCitySlug: string;
+  templates?: TemplateOption[];
 };
 
 type ViewKind =
@@ -78,7 +81,7 @@ function CopyButton({ text, label, copiedLabel, font }: { text: string; label: s
 // Main component
 // ---------------------------------------------------------------------------
 
-export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug }: Props) {
+export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, templates = [] }: Props) {
   const t = useTranslations("Proposals.new");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -89,6 +92,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   const [clientName, setClientName] = useState("");
   const [citySlug, setCitySlug] = useState(defaultCitySlug);
   const [tierSlug, setTierSlug] = useState("mid");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   // Finalize/share transitions
   const [isFinalizing, startFinalizeTransition] = useTransition();
@@ -121,6 +125,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         client_name: clientName.trim() || undefined,
         city_slug: citySlug,
         experience_tier_slug: tierSlug,
+        template_id: selectedTemplateId || undefined,
       });
 
       if (!result.ok) {
@@ -445,6 +450,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
                 setClientName("");
                 setCitySlug(defaultCitySlug);
                 setTierSlug("mid");
+                setSelectedTemplateId("");
                 setView({ kind: "form" });
               }}
               className={`text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors ${font}`}
@@ -470,6 +476,31 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
       className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-6 animate-fade-in"
       noValidate
     >
+      {/* Template picker — only shown when the owner has saved templates */}
+      {templates.length > 0 && (
+        <div>
+          <label
+            htmlFor="template"
+            className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
+          >
+            {t("templatePicker")}
+          </label>
+          <select
+            id="template"
+            value={selectedTemplateId}
+            onChange={(e) => setSelectedTemplateId(e.target.value)}
+            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
+          >
+            <option value="">{t("templatePickerNone")}</option>
+            {templates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {isAr ? tpl.name_ar : (tpl.name_en ?? tpl.name_ar)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Brief textarea */}
       <div>
         <label

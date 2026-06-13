@@ -353,7 +353,8 @@
       "again": "احسب مرة أخرى",
       "contributeYourPrice": "هل حصلت على سعر مختلف؟ ساهم في تحسين المعيار",
       "methodologyLink": "كيف نحسب هذا الرقم؟",
-      "confidenceLabel": "درجة الثقة"
+      "confidenceLabel": "درجة الثقة",
+      "createProposal": "أنشئ عرضًا سعريًا كاملاً"
     },
     "insufficient": {
       "title": "بيانات غير كافية بعد.",
@@ -550,6 +551,8 @@
       "cityPlaceholder": "اختر مدينتك",
       "tierLabel": "سنوات الخبرة",
       "tierPlaceholder": "اختر مستوى خبرتك",
+      "templatePicker": "ابدأ من قالب / Start from a template",
+      "templatePickerNone": "بدون قالب",
       "submit": "أنشئ العرض",
       "submitting": "جارٍ الإنشاء…",
       "back": "رجوع",
@@ -646,6 +649,7 @@
       "declineReasonPlaceholder": "أي تفاصيل مفيدة",
       "declineConfirm": "تأكيد الرفض",
       "cancel": "إلغاء",
+      "saveAsTemplate": "حفظ كقالب",
       "shareModal": {
         "title": "مشاركة العرض",
         "enableShare": "تفعيل المشاركة",
@@ -659,6 +663,31 @@
         "whatsapp": "واتساب",
         "close": "إغلاق"
       }
+    },
+    "templates": {
+      "eyebrow": "مكتبة القوالب",
+      "title": "قوالبك.",
+      "subtitle": "ابدأ عرضك القادم من قالب محفوظ.",
+      "newProposal": "عرض جديد",
+      "backToProposals": "العودة للعروض",
+      "name": "اسم القالب",
+      "specialty": "التخصص",
+      "usage": "الاستخدامات",
+      "defaultBadge": "افتراضي",
+      "setDefault": "تعيين كافتراضي",
+      "settingDefault": "جارٍ التعيين…",
+      "delete": "حذف",
+      "deleting": "جارٍ الحذف…",
+      "emptyTitle": "ما عندك قوالب بعد.",
+      "emptyBody": "احفظ عرضًا كقالب لتسريع العروض القادمة.",
+      "saveAsTemplate": "حفظ كقالب",
+      "namePromptLabel": "اسم القالب",
+      "namePromptPlaceholder": "مثال: موقع شركة",
+      "namePromptSubmit": "حفظ",
+      "namePromptSubmitting": "جارٍ الحفظ…",
+      "setAsDefault": "تعيين كافتراضي",
+      "startFromTemplate": "ابدأ من قالب / Start from a template",
+      "noTemplate": "بدون قالب"
     }
   }
 }

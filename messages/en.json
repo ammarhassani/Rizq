@@ -353,7 +353,8 @@
       "again": "Run another query",
       "contributeYourPrice": "Paid a different price? Help improve the benchmark",
       "methodologyLink": "How did we calculate this?",
-      "confidenceLabel": "Confidence"
+      "confidenceLabel": "Confidence",
+      "createProposal": "Create a full proposal"
     },
     "insufficient": {
       "title": "Not enough data yet.",
@@ -550,6 +551,8 @@
       "cityPlaceholder": "Pick your city",
       "tierLabel": "Years of experience",
       "tierPlaceholder": "Pick your level",
+      "templatePicker": "Start from a template",
+      "templatePickerNone": "No template",
       "submit": "Generate the proposal",
       "submitting": "Generating…",
       "back": "Back",
@@ -646,6 +649,7 @@
       "declineReasonPlaceholder": "Any helpful details",
       "declineConfirm": "Confirm decline",
       "cancel": "Cancel",
+      "saveAsTemplate": "Save as template",
       "shareModal": {
         "title": "Share proposal",
         "enableShare": "Enable sharing",
@@ -659,6 +663,31 @@
         "whatsapp": "WhatsApp",
         "close": "Close"
       }
+    },
+    "templates": {
+      "eyebrow": "Template library",
+      "title": "Your templates.",
+      "subtitle": "Start your next proposal from a saved template.",
+      "newProposal": "New proposal",
+      "backToProposals": "Back to proposals",
+      "name": "Template name",
+      "specialty": "Specialty",
+      "usage": "Uses",
+      "defaultBadge": "Default",
+      "setDefault": "Set as default",
+      "settingDefault": "Setting…",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "emptyTitle": "No templates yet.",
+      "emptyBody": "Save a proposal as a template to speed up future proposals.",
+      "saveAsTemplate": "Save as template",
+      "namePromptLabel": "Template name",
+      "namePromptPlaceholder": "e.g. Marketing site",
+      "namePromptSubmit": "Save",
+      "namePromptSubmitting": "Saving…",
+      "setAsDefault": "Set as default",
+      "startFromTemplate": "Start from a template",
+      "noTemplate": "No template"
     }
   }
 }

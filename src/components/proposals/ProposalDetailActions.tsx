@@ -9,11 +9,12 @@
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Share2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Share2, CheckCircle, XCircle, BookmarkPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
 import { markStatus } from "@/app/actions/proposals/markStatus";
+import { saveTemplateFromProposal } from "@/app/actions/proposals/templates";
 import { track } from "@/lib/analytics/track";
 import { ShareModal } from "./ShareModal";
 
@@ -41,6 +42,7 @@ export function ProposalDetailActions({
   shareToken,
 }: Props) {
   const t = useTranslations("Proposals.detail");
+  const tTemplates = useTranslations("Proposals.templates");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -53,9 +55,15 @@ export function ProposalDetailActions({
   const [showDeclineReason, setShowDeclineReason] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
 
+  // Template save flow
+  const [showTemplateSave, setShowTemplateSave] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [templateSaved, setTemplateSaved] = useState(false);
+
   // Transitions
   const [isFinalizing, startFinalizeTransition] = useTransition();
   const [isMarkingStatus, startMarkStatusTransition] = useTransition();
+  const [isSavingTemplate, startSaveTemplateTransition] = useTransition();
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -109,6 +117,23 @@ export function ProposalDetailActions({
     });
   }
 
+  function handleSaveTemplate() {
+    if (!templateName.trim()) return;
+    startSaveTemplateTransition(async () => {
+      const result = await saveTemplateFromProposal({
+        proposal_id: proposalId,
+        name_ar: templateName.trim(),
+        name_en: templateName.trim(),
+      });
+      if (result.ok) {
+        track("proposal_template_saved", { locale, proposal_id: proposalId });
+        setTemplateSaved(true);
+        setShowTemplateSave(false);
+        setTemplateName("");
+      }
+    });
+  }
+
   // Whether this status can transition to accepted/declined
   const canMarkOutcome = ["sent", "viewed", "final"].includes(status);
 
@@ -156,6 +181,25 @@ export function ProposalDetailActions({
             <Share2 size={14} />
             {t("share")}
           </button>
+
+          {/* Save as template */}
+          {!templateSaved ? (
+            <button
+              type="button"
+              onClick={() => setShowTemplateSave((s) => !s)}
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink-soft px-6 py-3 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
+            >
+              <BookmarkPlus size={14} />
+              {tTemplates("saveAsTemplate")}
+            </button>
+          ) : (
+            <span
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/30 bg-rizq-green/10 text-rizq-green px-6 py-3 text-sm font-medium ${font}`}
+            >
+              <BookmarkPlus size={14} />
+              {tTemplates("saveAsTemplate")} ✓
+            </span>
+          )}
 
           {/* Mark accepted / declined */}
           {canMarkOutcome && status !== "accepted" && status !== "declined" && (
@@ -234,6 +278,51 @@ export function ProposalDetailActions({
           </div>
         )}
       </div>
+
+      {/* Template name prompt */}
+      {showTemplateSave && (
+        <div
+          dir={dir}
+          className={`rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 p-4 space-y-3 animate-fade-in ${font}`}
+        >
+          <label
+            htmlFor="template-name"
+            className={`block text-sm font-medium text-rizq-ink ${font}`}
+          >
+            {tTemplates("namePromptLabel")}
+          </label>
+          <input
+            id="template-name"
+            type="text"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+            placeholder={tTemplates("namePromptPlaceholder")}
+            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 transition-colors ${font}`}
+          />
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleSaveTemplate}
+              disabled={!templateName.trim() || isSavingTemplate}
+              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-2.5 text-sm font-medium hover:bg-rizq-green-dark transition-colors disabled:opacity-50 ${font}`}
+            >
+              {isSavingTemplate
+                ? tTemplates("namePromptSubmitting")
+                : tTemplates("namePromptSubmit")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowTemplateSave(false);
+                setTemplateName("");
+              }}
+              className={`text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors ${font}`}
+            >
+              {t("cancel")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Share modal */}
       {showShare && (

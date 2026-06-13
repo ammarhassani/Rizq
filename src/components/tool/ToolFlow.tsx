@@ -20,6 +20,7 @@ type Props = {
   cities: Option[];
   tiers: Option[];
   canShare: boolean;
+  isAuthed: boolean;
 };
 
 const VALID_SIZES = new Set(["small", "medium", "large", "enterprise"]);
@@ -52,6 +53,7 @@ export function ToolFlow({
   cities,
   tiers,
   canShare,
+  isAuthed,
 }: Props) {
   const t = useTranslations("Tool");
   const search = useSearchParams();
@@ -181,6 +183,7 @@ export function ToolFlow({
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
         canShare={canShare}
+        isAuthed={isAuthed}
         onReset={reset}
       />
     );

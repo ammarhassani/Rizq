@@ -14,6 +14,7 @@ import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCities, getExperienceTiers } from "@/lib/pricing/refDataDb";
+import { listTemplates } from "@/app/actions/proposals/templates";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
 
@@ -65,8 +66,13 @@ export default async function ProposalNewPage({
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const isAr = locale === "ar";
 
-  // Load ref data in parallel
-  const [cities, tiers] = await Promise.all([getCities(), getExperienceTiers()]);
+  // Load ref data + templates in parallel
+  const [cities, tiers, templatesResult] = await Promise.all([
+    getCities(),
+    getExperienceTiers(),
+    listTemplates(),
+  ]);
+  const userTemplates = templatesResult.ok ? templatesResult.templates : [];
 
   // Load user profile for default city
   const { data: userProfile } = await supabase
@@ -137,6 +143,11 @@ export default async function ProposalNewPage({
           cities={cityOptions}
           tiers={tierOptions}
           defaultCitySlug={defaultCitySlug}
+          templates={userTemplates.map((t) => ({
+            id: t.id,
+            name_ar: t.name_ar,
+            name_en: t.name_en,
+          }))}
         />
       </main>
     </div>

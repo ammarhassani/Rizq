@@ -10,6 +10,7 @@ import {
 import { buildArtifactData } from "@/lib/proposals/artifact";
 import { selectFollowUps, type FollowUpTemplate } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
+import type { PricingJson } from "@/lib/proposals/templateHelpers";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -20,6 +21,7 @@ const InputSchema = z.object({
   client_name: z.string().optional(),
   city_slug: z.string().min(1).max(64),
   experience_tier_slug: z.string().min(1).max(64),
+  template_id: z.string().uuid().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -108,6 +110,20 @@ export async function generateProposal(
   const { data: userResult } = await supabase.auth.getUser();
   if (!userResult.user) return { ok: false, code: "unauthorized" };
   const userId = userResult.user.id;
+
+  // 2b. Load template defaults when template_id is provided
+  let templateDefaults: PricingJson | null = null;
+  if (input.template_id) {
+    const { data: tplRow } = await supabase
+      .from("proposal_templates")
+      .select("pricing_json")
+      .eq("id", input.template_id)
+      .eq("user_id", userId)
+      .single();
+    if (tplRow?.pricing_json) {
+      templateDefaults = tplRow.pricing_json as PricingJson;
+    }
+  }
 
   // 3. Load ref context + build ctx lines for scope extraction
   const refCtx = await loadRefContext();
@@ -200,7 +216,17 @@ export async function generateProposal(
   const contactEmail =
     (userProfile?.email as string | null) ?? userResult.user.email ?? null;
 
-  // 11. Build artifact
+  // 11. Build artifact (apply template defaults when present)
+  const resolvedRevisions = templateDefaults?.revisions ?? scope.revisions;
+  const resolvedDepositPct = templateDefaults?.deposit_pct ?? 50;
+  const resolvedIpTerms: "full_transfer" | "license" | "per_project" =
+    templateDefaults?.ip_terms ??
+    (scope.ip_transfer === "full_transfer"
+      ? "full_transfer"
+      : scope.ip_transfer === "license"
+        ? "license"
+        : "full_transfer");
+
   const artifactData = buildArtifactData({
     locale: briefLang === "en" ? "en" : "ar",
     proposalId: "pending", // placeholder; will update after insert
@@ -213,18 +239,13 @@ export async function generateProposal(
     clientName: input.client_name ?? null,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
-    revisions: scope.revisions,
+    revisions: resolvedRevisions,
     priceMin: proposalPrice.min,
     priceAnchor: proposalPrice.anchor,
     priceMax: proposalPrice.max,
     provenanceCitation,
-    depositPct: 50,
-    ipTerms:
-      scope.ip_transfer === "full_transfer"
-        ? "full_transfer"
-        : scope.ip_transfer === "license"
-          ? "license"
-          : "full_transfer",
+    depositPct: resolvedDepositPct,
+    ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
     validityDays: 30,
@@ -258,6 +279,7 @@ export async function generateProposal(
       personal_weight: proposalPrice.personal_weight,
       artifact_json: artifactData,
       client_name: input.client_name ?? null,
+      template_id: input.template_id ?? null,
       status: "draft",
       version: 1,
     })
@@ -290,18 +312,13 @@ export async function generateProposal(
     clientName: input.client_name ?? null,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
-    revisions: scope.revisions,
+    revisions: resolvedRevisions,
     priceMin: proposalPrice.min,
     priceAnchor: proposalPrice.anchor,
     priceMax: proposalPrice.max,
     provenanceCitation,
-    depositPct: 50,
-    ipTerms:
-      scope.ip_transfer === "full_transfer"
-        ? "full_transfer"
-        : scope.ip_transfer === "license"
-          ? "license"
-          : "full_transfer",
+    depositPct: resolvedDepositPct,
+    ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
     validityDays: 30,
@@ -311,6 +328,22 @@ export async function generateProposal(
     .from("proposals")
     .update({ artifact_json: artifactWithId, updated_at: new Date().toISOString() })
     .eq("id", proposalId);
+
+  // 12b. Increment template usage_count (non-blocking; best-effort)
+  if (input.template_id) {
+    const { data: tplForCount } = await supabase
+      .from("proposal_templates")
+      .select("usage_count")
+      .eq("id", input.template_id)
+      .eq("user_id", userId)
+      .single();
+    if (tplForCount) {
+      await supabase
+        .from("proposal_templates")
+        .update({ usage_count: (tplForCount.usage_count as number) + 1 })
+        .eq("id", input.template_id);
+    }
+  }
 
   // 13. Load enabled follow-up question templates
   const { data: templateRows } = await supabase

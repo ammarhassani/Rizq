@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Copy, Globe, HandCoins, Lock, RotateCcw } from "lucide-react";
+import { Check, Copy, Globe, HandCoins, Lock, RotateCcw, FileText } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { toggleShare } from "@/app/actions/tool/calculate";
+import { track } from "@/lib/analytics/track";
 
 type Props = {
   locale: "ar" | "en";
@@ -24,6 +25,8 @@ type Props = {
   canShare: boolean;
   // Whether public_share is already on (e.g. when revisiting the result)
   initiallyShared?: boolean;
+  // Whether the viewer is authenticated — used to route the proposal CTA
+  isAuthed: boolean;
   onReset: () => void;
 };
 
@@ -42,6 +45,7 @@ export function ResultCard({
   confidenceScore,
   canShare,
   initiallyShared = false,
+  isAuthed,
   onReset,
 }: Props) {
   const t = useTranslations("Tool.result");
@@ -252,6 +256,26 @@ export function ResultCard({
           </Link>
         </div>
       )}
+
+      {/* Proposal CTA — prominent, shown to all users.
+          Authed → /proposals/new; anon → /signup?next=/proposals/new */}
+      <div className="mt-6 pt-5 border-t border-rizq-gold/15">
+        <Link
+          href={
+            isAuthed
+              ? "/proposals/new"
+              : `/signup?next=/proposals/new`
+          }
+          onClick={() => track("proposal_cta_clicked", { authed: isAuthed })}
+          className={`group inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
+        >
+          <FileText size={14} strokeWidth={1.8} />
+          <span>{t("createProposal")}</span>
+          <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
+            →
+          </span>
+        </Link>
+      </div>
     </article>
   );
 }
