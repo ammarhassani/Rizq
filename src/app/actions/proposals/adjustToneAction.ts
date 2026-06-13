@@ -23,7 +23,11 @@ type Input = z.infer<typeof InputSchema>;
 // ---------------------------------------------------------------------------
 
 type AdjustToneResult =
-  | { ok: true; modified: string[] }
+  | {
+      ok: true;
+      modified: string[];
+      artifact_json: import("@/lib/proposals/artifact").ArtifactData;
+    }
   | { ok: false; code: "unauthorized" | "not_found" | "error" };
 
 // ---------------------------------------------------------------------------
@@ -215,7 +219,12 @@ export async function adjustProposalTone(rawInput: Input): Promise<AdjustToneRes
 
   if (toneSections.length === 0) {
     // Nothing to rewrite (proposal has no aiEditable text yet).
-    return { ok: true, modified: [] };
+    // Return the current artifact unchanged so the UI can still re-render it.
+    return {
+      ok: true,
+      modified: [],
+      artifact_json: (artifactJson ?? { sections: [] }) as import("@/lib/proposals/artifact").ArtifactData,
+    };
   }
 
   // Call AI tone adjustment.
@@ -257,5 +266,9 @@ export async function adjustProposalTone(rawInput: Input): Promise<AdjustToneRes
     return { ok: false, code: "error" };
   }
 
-  return { ok: true, modified: adjustResult.modified };
+  return {
+    ok: true,
+    modified: adjustResult.modified,
+    artifact_json: updatedArtifactJson as import("@/lib/proposals/artifact").ArtifactData,
+  };
 }

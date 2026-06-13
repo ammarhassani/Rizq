@@ -537,6 +537,66 @@
       "triggerDeposit": "دفعة مقدمة عند البدء",
       "triggerDelivery": "عند استلام التسليم النهائي"
     },
+    "new": {
+      "eyebrow": "مولّد العروض",
+      "title": "أنشئ عرضك التقديمي.",
+      "subtitle": "ألصق رسالة العميل — رِزق يستخرج النطاق ويحسب السعر ويكتب العرض.",
+      "briefLabel": "رسالة العميل",
+      "briefPlaceholder": "ألصق رسالة العميل هنا…",
+      "clientNameLabel": "اسم العميل",
+      "clientNamePlaceholder": "مثال: شركة نخبة",
+      "optional": "اختياري",
+      "cityLabel": "المدينة",
+      "cityPlaceholder": "اختر مدينتك",
+      "tierLabel": "سنوات الخبرة",
+      "tierPlaceholder": "اختر مستوى خبرتك",
+      "submit": "أنشئ العرض",
+      "submitting": "جارٍ الإنشاء…",
+      "back": "رجوع",
+      "finalize": "اعتمد العرض",
+      "finalizing": "جارٍ الاعتماد…",
+      "share": "مشاركة",
+      "sharing": "جارٍ المشاركة…",
+      "copyLink": "نسخ الرابط",
+      "copied": "تم النسخ",
+      "whatsapp": "واتساب",
+      "shareNote": "أي شخص لديه الرابط يمكنه رؤية العرض.",
+      "newProposal": "إنشاء عرض جديد",
+      "actions": "الإجراءات",
+      "steps": {
+        "extracting": "استخراج نطاق العمل…",
+        "computing": "حساب السعر السوقي…",
+        "analyzing": "تحليل تاريخك السابق…",
+        "generating": "إنشاء العرض التقديمي…"
+      },
+      "followUp": {
+        "done": "تم — أنشئ العرض",
+        "skipAll": "تخطّي الكل",
+        "skip": "تخطّي"
+      },
+      "tone": {
+        "label": "تحليل رِزق — ضبط النبرة",
+        "formal": "رسمية",
+        "balanced": "متوازنة",
+        "friendly": "ودّية",
+        "persuasive": "مقنعة للسعر"
+      },
+      "quota": {
+        "exhaustedEyebrow": "استنفدت حصتك",
+        "exhaustedTitle": "انتهت عروضك المجانية.",
+        "exhaustedBody": "ترقَّ للاحترافي للحصول على عروض غير محدودة.",
+        "exhaustedCta": "ترقية الآن"
+      },
+      "errors": {
+        "briefRequired": "ألصق رسالة العميل أولًا.",
+        "selectCityTier": "اختر المدينة ومستوى الخبرة.",
+        "extractionFailedEyebrow": "تعذّر تحليل الرسالة",
+        "extractionFailedTitle": "لم نستطع تحليل الرسالة تلقائيًا.",
+        "extractionFailedBody": "راجع الرسالة وتأكد أنها تحتوي على وصف واضح للمشروع، ثم حاول مرة أخرى.",
+        "extractionRetry": "حاول مجددًا",
+        "generic": "حدث خطأ. حاول مرة أخرى."
+      }
+    },
     "share": {
       "downloadPdf": "تحميل PDF",
       "contactFreelancer": "تواصل مع المستقل",

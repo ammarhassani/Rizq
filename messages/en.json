@@ -537,6 +537,66 @@
       "triggerDeposit": "Deposit upon project start",
       "triggerDelivery": "Upon receipt of final delivery"
     },
+    "new": {
+      "eyebrow": "Proposal studio",
+      "title": "Generate your proposal.",
+      "subtitle": "Paste the client's message — Rizq extracts the scope, prices it, and writes the proposal.",
+      "briefLabel": "Client message",
+      "briefPlaceholder": "Paste the client's message here…",
+      "clientNameLabel": "Client name",
+      "clientNamePlaceholder": "e.g. Nukhba Co.",
+      "optional": "optional",
+      "cityLabel": "City",
+      "cityPlaceholder": "Pick your city",
+      "tierLabel": "Years of experience",
+      "tierPlaceholder": "Pick your level",
+      "submit": "Generate the proposal",
+      "submitting": "Generating…",
+      "back": "Back",
+      "finalize": "Finalize proposal",
+      "finalizing": "Finalizing…",
+      "share": "Share",
+      "sharing": "Sharing…",
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "whatsapp": "WhatsApp",
+      "shareNote": "Anyone with the link can view this proposal.",
+      "newProposal": "Create a new proposal",
+      "actions": "Actions",
+      "steps": {
+        "extracting": "Extracting scope…",
+        "computing": "Computing market price…",
+        "analyzing": "Analyzing your history…",
+        "generating": "Generating proposal…"
+      },
+      "followUp": {
+        "done": "Done — generate proposal",
+        "skipAll": "Skip all",
+        "skip": "Skip"
+      },
+      "tone": {
+        "label": "Rizq Insight — Adjust tone",
+        "formal": "Formal",
+        "balanced": "Balanced",
+        "friendly": "Friendly",
+        "persuasive": "Persuasive"
+      },
+      "quota": {
+        "exhaustedEyebrow": "Quota reached",
+        "exhaustedTitle": "You've used your free proposals.",
+        "exhaustedBody": "Upgrade to Pro for unlimited proposals.",
+        "exhaustedCta": "Upgrade now"
+      },
+      "errors": {
+        "briefRequired": "Paste the client's message first.",
+        "selectCityTier": "Pick your city and experience level.",
+        "extractionFailedEyebrow": "Couldn't parse message",
+        "extractionFailedTitle": "We couldn't analyze the message automatically.",
+        "extractionFailedBody": "Review the message and make sure it has a clear project description, then try again.",
+        "extractionRetry": "Try again",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
     "share": {
       "downloadPdf": "Download PDF",
       "contactFreelancer": "Contact freelancer",

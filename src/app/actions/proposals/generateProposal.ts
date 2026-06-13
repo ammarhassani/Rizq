@@ -33,6 +33,7 @@ export type GenerateProposalResult =
       follow_ups: FollowUpTemplate[];
       price: { min: number; anchor: number; max: number };
       confidence: number;
+      artifact_json: import("@/lib/proposals/artifact").ArtifactData;
     }
   | {
       ok: false;
@@ -332,5 +333,6 @@ export async function generateProposal(
       max: proposalPrice.max,
     },
     confidence: aggregateConfidence(scope.field_confidence),
+    artifact_json: artifactWithId,
   };
 }

@@ -26,7 +26,11 @@ const InputSchema = z.object({
 // ---------------------------------------------------------------------------
 
 export type AnswerFollowUpsResult =
-  | { ok: true; price: { min: number; anchor: number; max: number } }
+  | {
+      ok: true;
+      price: { min: number; anchor: number; max: number };
+      artifact_json: import("@/lib/proposals/artifact").ArtifactData;
+    }
   | {
       ok: false;
       code:
@@ -215,5 +219,6 @@ export async function answerFollowUps(
       anchor: proposalPrice.anchor,
       max: proposalPrice.max,
     },
+    artifact_json: artifactData,
   };
 }
