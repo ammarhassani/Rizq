@@ -2,7 +2,8 @@
  * /[locale]/p/[token] — Public proposal share page (Phase-2 task 2.8)
  *
  * Server component. Mirrors the pattern from /[locale]/r/[id]/page.tsx.
- * RLS: anon SELECT is open for proposals where public_share = true AND status <> 'draft'.
+ * Public data comes via the get_shared_proposal RPC (returns ONLY safe artifact
+ * fields); raw brief_text/scope_json/extraction/user_id are never exposed.
  */
 
 import { notFound } from "next/navigation";
@@ -25,8 +26,6 @@ type Params = { locale: string; token: string };
 
 type ProposalRow = {
   id: string;
-  share_token: string;
-  public_share: boolean;
   status: string;
   artifact_json: unknown;
   brief_language: string | null;
@@ -43,16 +42,14 @@ async function fetchPublicProposal(token: string): Promise<ProposalRow | null> {
   if (!/^[A-Za-z0-9_-]+$/.test(token)) return null;
 
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("proposals")
-    .select("id, share_token, public_share, status, artifact_json, brief_language")
-    .eq("share_token", token)
-    .eq("public_share", true)
-    .neq("status", "draft")
-    .maybeSingle();
+  // Public surface = the get_shared_proposal RPC: returns ONLY safe artifact
+  // fields, already filtered to public_share = true AND status <> 'draft'.
+  const { data, error } = await supabase.rpc("get_shared_proposal", {
+    p_token: token,
+  });
 
-  if (error || !data) return null;
-  return data as ProposalRow;
+  if (error || !Array.isArray(data) || data.length === 0) return null;
+  return data[0] as ProposalRow;
 }
 
 // ---------------------------------------------------------------------------

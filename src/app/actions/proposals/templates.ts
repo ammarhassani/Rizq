@@ -62,10 +62,13 @@ export async function saveTemplateFromProposal(
   if (!userResult.user) return { ok: false, code: "unauthorized" };
   const userId = userResult.user.id;
 
-  // Load the owner's proposal (scope_json, specialty_id, tone_preference)
+  // Load the owner's proposal. NOTE: `proposals` has NO tone_preference column
+  // (only proposal_templates does) — selecting it returned a PostgREST error
+  // that made this whole action fail (the untyped client hid it from typecheck).
+  // derivePricingJson defaults the tone to 'balanced' when absent.
   const { data: proposal, error: propErr } = await supabase
     .from("proposals")
-    .select("scope_json, specialty_id, tone_preference")
+    .select("scope_json, specialty_id")
     .eq("id", input.proposal_id)
     .eq("user_id", userId)
     .single();
@@ -74,7 +77,7 @@ export async function saveTemplateFromProposal(
 
   const pricingJson = derivePricingJson({
     scope_json: (proposal.scope_json as Record<string, unknown>) ?? {},
-    tone_preference: proposal.tone_preference as string | null,
+    tone_preference: null,
   });
 
   // If set_default, unset all other defaults first
