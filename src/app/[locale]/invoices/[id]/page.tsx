@@ -12,6 +12,7 @@ import { SiteNav } from "@/components/nav/SiteNav";
 import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions";
 import type { InvoiceArtifactData } from "@/lib/invoices/artifact";
+import { daysOverdue } from "@/lib/invoices/overdue";
 
 type Params = { locale: string; id: string };
 
@@ -81,6 +82,13 @@ export default async function InvoiceDetailPage({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const clientName = (invoice.clients as any)?.name ?? null;
+
+  // Show the AI payment-reminder button only when the reminder action will
+  // actually fire: status is sent/viewed/overdue AND ≥7 days past due
+  // (matches the gate in generatePaymentReminderAction).
+  const looksOverdue =
+    (status === "sent" || status === "viewed" || status === "overdue") &&
+    daysOverdue(invoice.due_date as string | null, new Date()) >= 7;
 
   return (
     <div className="relative min-h-screen flex flex-col bg-paper">
@@ -166,6 +174,7 @@ export default async function InvoiceDetailPage({
             status={status}
             publicShare={(invoice.public_share as boolean | null) ?? false}
             shareToken={(invoice.share_token as string | null) ?? null}
+            looksOverdue={looksOverdue}
           />
         </div>
       </main>

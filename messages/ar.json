@@ -882,6 +882,21 @@
       "paid": "مدفوعة",
       "overdue": "متأخرة",
       "cancelled": "ملغاة"
+    },
+    "ai": {
+      "generateDescription": "صياغة الوصف بالذكاء الاصطناعي",
+      "generatingDescription": "جارٍ الصياغة…",
+      "generateReminder": "صياغة تذكير بالدفع",
+      "generatingReminder": "جارٍ الصياغة…",
+      "reminderNotOverdue": "التذكير متاح فقط للفواتير المتأخرة ٧ أيام أو أكثر.",
+      "draftLabel": "رِزق — مسودة جاهزة للتحرير (لن تُرسَل تلقائيًا)",
+      "descriptionLabel": "رِزق — وصف مُقترح (راجعه وعدّله قبل الحفظ)",
+      "copy": "نسخ",
+      "copied": "تم النسخ!",
+      "aiError": "تعذّر توليد المحتوى. حاول مرة أخرى.",
+      "descriptionApplied": "تم تطبيق الوصف على الفاتورة.",
+      "reminderReady": "مسودة التذكير جاهزة. راجعها قبل الإرسال.",
+      "sectionTitle": "أدوات الذكاء الاصطناعي"
     }
   },
   "Clients": {

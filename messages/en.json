@@ -882,6 +882,21 @@
       "paid": "Paid",
       "overdue": "Overdue",
       "cancelled": "Cancelled"
+    },
+    "ai": {
+      "generateDescription": "AI description",
+      "generatingDescription": "Generating…",
+      "generateReminder": "Generate payment reminder",
+      "generatingReminder": "Generating…",
+      "reminderNotOverdue": "Reminder is only available for invoices overdue by 7+ days.",
+      "draftLabel": "Rizq — AI draft, editable, not auto-sent",
+      "descriptionLabel": "Rizq — suggested description (review before saving)",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "aiError": "Could not generate content. Please try again.",
+      "descriptionApplied": "Description applied to invoice.",
+      "reminderReady": "Reminder draft ready. Review before sending.",
+      "sectionTitle": "AI Tools"
     }
   },
   "Clients": {

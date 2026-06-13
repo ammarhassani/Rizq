@@ -3,15 +3,18 @@
 /**
  * InvoiceDetailActions — client island for invoice detail page. Phase-4 task P4.4.
  * P4.5: adds Share (ShareInvoiceModal) + Print (PrintButton) actions.
+ * P4.6: adds AI description + AI payment reminder buttons (M6.4).
  * Mirrors GigDetailActions: status transitions, delete with confirm, useTransition.
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2 } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2, Sparkles, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
 import { deleteInvoice } from "@/app/actions/invoices/deleteInvoice";
+import { generateInvoiceDescriptionAction } from "@/app/actions/invoices/aiActions";
+import { generatePaymentReminderAction } from "@/app/actions/invoices/aiActions";
 import { ShareInvoiceModal } from "@/components/invoices/ShareInvoiceModal";
 import { PrintButton } from "@/components/proposals/PrintButton";
 
@@ -23,6 +26,8 @@ type Props = {
   publicShare: boolean;
   /** Current share_token — may be null if never shared */
   shareToken: string | null;
+  /** Pass true when the invoice looks overdue (sent/viewed/overdue) — UI hint only; action re-checks the ≥7-day gate */
+  looksOverdue?: boolean;
 };
 
 // Allowed transitions (mirrors markInvoiceStatus server action)
@@ -41,8 +46,10 @@ export function InvoiceDetailActions({
   status,
   publicShare,
   shareToken,
+  looksOverdue = false,
 }: Props) {
   const t = useTranslations("Invoices.detail");
+  const tAi = useTranslations("Invoices.ai");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -51,6 +58,18 @@ export function InvoiceDetailActions({
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  // AI description state
+  const [isGeneratingDescription, startGenerateDescTransition] = useTransition();
+  const [descriptionDraft, setDescriptionDraft] = useState<{ ar: string; en: string } | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
+  const [descCopied, setDescCopied] = useState(false);
+
+  // AI reminder state
+  const [isGeneratingReminder, startGenerateReminderTransition] = useTransition();
+  const [reminderDraft, setReminderDraft] = useState<string | null>(null);
+  const [reminderError, setReminderError] = useState<string | null>(null);
+  const [reminderCopied, setReminderCopied] = useState(false);
 
   const [isMarkingSent, startMarkSentTransition] = useTransition();
   const [isMarkingViewed, startMarkViewedTransition] = useTransition();
@@ -102,6 +121,43 @@ export function InvoiceDetailActions({
       if (result.ok) {
         router.push("/invoices" as "/invoices");
       }
+    });
+  }
+
+  // AI handlers
+  function handleGenerateDescription() {
+    setDescriptionError(null);
+    setDescriptionDraft(null);
+    startGenerateDescTransition(async () => {
+      const result = await generateInvoiceDescriptionAction({ invoice_id: invoiceId });
+      if (result.ok) {
+        setDescriptionDraft({ ar: result.ar, en: result.en });
+        router.refresh();
+      } else {
+        setDescriptionError(tAi("aiError"));
+      }
+    });
+  }
+
+  function handleGenerateReminder() {
+    setReminderError(null);
+    setReminderDraft(null);
+    startGenerateReminderTransition(async () => {
+      const result = await generatePaymentReminderAction({ invoice_id: invoiceId });
+      if (result.ok) {
+        setReminderDraft(result.draft);
+      } else if (result.code === "not_overdue") {
+        setReminderError(tAi("reminderNotOverdue"));
+      } else {
+        setReminderError(tAi("aiError"));
+      }
+    });
+  }
+
+  function copyToClipboard(text: string, onCopied: (v: boolean) => void) {
+    void navigator.clipboard.writeText(text).then(() => {
+      onCopied(true);
+      setTimeout(() => onCopied(false), 2000);
     });
   }
 
@@ -225,6 +281,97 @@ export function InvoiceDetailActions({
 
           {/* Print to PDF */}
           <PrintButton label={t("print")} locale={locale} />
+        </div>
+
+        {/* ── P4.6: AI Tools ── */}
+        <div className="mt-4 pt-4 border-t border-rizq-gold/15">
+          <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-3">
+            {tAi("sectionTitle")}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {/* AI Description */}
+            <button
+              type="button"
+              onClick={handleGenerateDescription}
+              disabled={isGeneratingDescription}
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/40 bg-rizq-cream/80 text-rizq-ink-soft px-5 py-2.5 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all disabled:opacity-70 ${font}`}
+            >
+              {isGeneratingDescription ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Sparkles size={14} />
+              )}
+              {isGeneratingDescription ? tAi("generatingDescription") : tAi("generateDescription")}
+            </button>
+
+            {/* AI Payment Reminder — show when invoice looks overdue */}
+            {looksOverdue && (
+              <button
+                type="button"
+                onClick={handleGenerateReminder}
+                disabled={isGeneratingReminder}
+                className={`inline-flex items-center gap-2 rounded-full border border-amber-300/60 text-amber-700 px-5 py-2.5 text-sm font-medium hover:bg-amber-50 transition-all disabled:opacity-70 ${font}`}
+              >
+                {isGeneratingReminder ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Sparkles size={14} />
+                )}
+                {isGeneratingReminder ? tAi("generatingReminder") : tAi("generateReminder")}
+              </button>
+            )}
+          </div>
+
+          {/* Description draft output */}
+          {descriptionError && (
+            <p className={`mt-3 text-sm text-red-700 ${font}`}>{descriptionError}</p>
+          )}
+          {descriptionDraft && (
+            <div className={`mt-3 rounded-2xl border border-rizq-gold/25 bg-white/60 p-4 space-y-2 ${font}`} dir={dir}>
+              <p className="text-xs font-medium text-rizq-green/80 tracking-wide">
+                {tAi("descriptionLabel")}
+              </p>
+              <p className="text-sm text-rizq-ink leading-relaxed">{isAr ? descriptionDraft.ar : descriptionDraft.en}</p>
+              {isAr && descriptionDraft.en && (
+                <p className="text-xs text-rizq-ink-soft/70 font-sans" dir="ltr">{descriptionDraft.en}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => copyToClipboard(isAr ? descriptionDraft.ar : descriptionDraft.en, setDescCopied)}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-rizq-cream px-3 py-1.5 text-xs font-medium text-rizq-ink-soft hover:text-rizq-green hover:border-rizq-green/40 transition-all ${font}`}
+              >
+                <Copy size={12} />
+                {descCopied ? tAi("copied") : tAi("copy")}
+              </button>
+            </div>
+          )}
+
+          {/* Reminder draft output */}
+          {reminderError && (
+            <p className={`mt-3 text-sm text-amber-700 ${font}`}>{reminderError}</p>
+          )}
+          {reminderDraft && (
+            <div className={`mt-3 rounded-2xl border border-amber-200/60 bg-amber-50/40 p-4 space-y-2 ${font}`} dir={dir}>
+              <p className="text-xs font-medium text-amber-700/80 tracking-wide">
+                {tAi("draftLabel")}
+              </p>
+              <textarea
+                readOnly
+                value={reminderDraft}
+                rows={4}
+                className={`w-full rounded-xl border border-amber-200/50 bg-white/70 px-3 py-2.5 text-sm text-rizq-ink resize-none focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 ${font}`}
+                dir={dir}
+              />
+              <button
+                type="button"
+                onClick={() => copyToClipboard(reminderDraft, setReminderCopied)}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-amber-300/50 bg-white/70 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50 transition-all ${font}`}
+              >
+                <Copy size={12} />
+                {reminderCopied ? tAi("copied") : tAi("copy")}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
