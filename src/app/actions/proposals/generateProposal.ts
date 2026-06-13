@@ -1,0 +1,336 @@
+"use server";
+
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { extractScope, aggregateConfidence } from "@/lib/ai/scope";
+import { resolvePrice } from "@/lib/pricing/resolve";
+import {
+  computeProposalPrice,
+} from "@/lib/pricing/proposalPricing";
+import { buildArtifactData } from "@/lib/proposals/artifact";
+import { selectFollowUps, type FollowUpTemplate } from "@/lib/proposals/followUp";
+import { loadRefContext } from "@/lib/proposals/refContext";
+
+// ---------------------------------------------------------------------------
+// Input schema
+// ---------------------------------------------------------------------------
+
+const InputSchema = z.object({
+  brief_text: z.string().min(10),
+  client_name: z.string().optional(),
+  city_slug: z.string().min(1).max(64),
+  experience_tier_slug: z.string().min(1).max(64),
+});
+
+// ---------------------------------------------------------------------------
+// Return type (discriminated union)
+// ---------------------------------------------------------------------------
+
+export type GenerateProposalResult =
+  | {
+      ok: true;
+      proposal_id: string;
+      follow_ups: FollowUpTemplate[];
+      price: { min: number; anchor: number; max: number };
+      confidence: number;
+    }
+  | {
+      ok: false;
+      code:
+        | "unauthorized"
+        | "invalid"
+        | "extraction_failed"
+        | "insufficient_data"
+        | "quota_exhausted"
+        | "error";
+    };
+
+// ---------------------------------------------------------------------------
+// project_size derivation from scope (spec M1.7 note)
+// ---------------------------------------------------------------------------
+
+type ProjectSize = "small" | "medium" | "large" | "enterprise";
+
+function deriveProjectSize(
+  deliverableCount: number | null,
+  complexitySignals: string[]
+): ProjectSize | undefined {
+  // Use complexity_signals length as proxy when count is unavailable.
+  const complexity = complexitySignals.length;
+
+  if (deliverableCount !== null) {
+    if (deliverableCount <= 2 && complexity <= 2) return "small";
+    if (deliverableCount <= 5 && complexity <= 4) return "medium";
+    if (deliverableCount <= 15) return "large";
+    return "enterprise";
+  }
+
+  // Fallback: complexity signal count heuristic
+  if (complexity <= 1) return "small";
+  if (complexity <= 3) return "medium";
+  if (complexity <= 6) return "large";
+  if (complexity > 6) return "enterprise";
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
+// Brief language detection (ar / en / mixed → locale for citation)
+// ---------------------------------------------------------------------------
+
+function detectBriefLanguage(text: string): "ar" | "en" | "mixed" {
+  const arabicChars = (text.match(/[؀-ۿ]/g) ?? []).length;
+  const latinChars = (text.match(/[a-zA-Z]/g) ?? []).length;
+  if (arabicChars === 0 && latinChars === 0) return "ar";
+  if (arabicChars === 0) return "en";
+  if (latinChars === 0) return "ar";
+  const ratio = arabicChars / (arabicChars + latinChars);
+  if (ratio > 0.7) return "ar";
+  if (ratio < 0.3) return "en";
+  return "mixed";
+}
+
+// ---------------------------------------------------------------------------
+// Server action
+// ---------------------------------------------------------------------------
+
+export async function generateProposal(
+  rawInput: unknown
+): Promise<GenerateProposalResult> {
+  // 1. Validate input
+  const parsed = InputSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+  const input = parsed.data;
+
+  const supabase = await createClient();
+
+  // 2. Auth guard
+  const { data: userResult } = await supabase.auth.getUser();
+  if (!userResult.user) return { ok: false, code: "unauthorized" };
+  const userId = userResult.user.id;
+
+  // 3. Load ref context + build ctx lines for scope extraction
+  const refCtx = await loadRefContext();
+  if (!refCtx) {
+    console.error("[generateProposal] ref data unavailable");
+    return { ok: false, code: "error" };
+  }
+
+  // 4. Extract scope via AI
+  const extraction = await extractScope(input.brief_text, refCtx.ctx);
+  if (!extraction) {
+    // UI shows manual fallback form
+    return { ok: false, code: "extraction_failed" };
+  }
+  const { scope, model, promptHash, confidence, raw } = extraction;
+
+  // 5. Validate city/tier slugs; specialty comes from scope (already validated by AI)
+  const specialtySlug = scope.specialty;
+  const citySlug = input.city_slug;
+  const tierSlug = input.experience_tier_slug;
+
+  const specialtyId = refCtx.specialtyIdBySlug.get(specialtySlug);
+  const cityId = refCtx.cityIdBySlug.get(citySlug);
+  const tierId = refCtx.tierIdBySlug.get(tierSlug);
+
+  if (!cityId || !tierId) {
+    return { ok: false, code: "invalid" };
+  }
+  if (!specialtyId) {
+    // Specialty extracted by AI but not in our active list
+    return { ok: false, code: "invalid" };
+  }
+
+  // 6. Resolve market price band
+  const projectSize = deriveProjectSize(
+    scope.deliverable_count,
+    scope.complexity_signals
+  );
+  const resolveResult = await resolvePrice({
+    specialty_slug: specialtySlug,
+    city_slug: citySlug,
+    experience_tier_slug: tierSlug,
+    project_size: projectSize ?? null,
+  });
+
+  if (resolveResult.status !== "ok") {
+    return { ok: false, code: "insufficient_data" };
+  }
+
+  // 7. Fetch past proposal anchors for personal weight
+  const { data: pastRows } = await supabase
+    .from("proposals")
+    .select("price_anchor")
+    .eq("user_id", userId)
+    .in("status", ["final", "sent", "viewed", "accepted"]);
+
+  const pastAnchors = (pastRows ?? []).map((r) =>
+    Number(r.price_anchor)
+  );
+
+  // 8. Compute proposal price (market band + modifiers + personal history)
+  const proposalPrice = computeProposalPrice(
+    { min: resolveResult.min, anchor: resolveResult.anchor, max: resolveResult.max },
+    {
+      urgency: scope.urgency,
+      client_type: scope.client_type,
+      ip_transfer: scope.ip_transfer,
+    },
+    pastAnchors
+  );
+
+  // 9. Pick provenance citation by language
+  const briefLang = detectBriefLanguage(input.brief_text);
+  const provenanceCitation =
+    briefLang === "en"
+      ? resolveResult.provenance_citation_en
+      : resolveResult.provenance_citation_ar;
+
+  // 10. Load user profile for freelancer name/email
+  const { data: userProfile } = await supabase
+    .from("users")
+    .select("name, email")
+    .eq("id", userId)
+    .single();
+
+  const freelancerName =
+    (userProfile?.name as string | null) ??
+    userResult.user.email ??
+    "مستقل / Freelancer";
+  const contactEmail =
+    (userProfile?.email as string | null) ?? userResult.user.email ?? null;
+
+  // 11. Build artifact
+  const artifactData = buildArtifactData({
+    locale: briefLang === "en" ? "en" : "ar",
+    proposalId: "pending", // placeholder; will update after insert
+    freelancerName,
+    brandNameAr: null,
+    taglineAr: null,
+    logoUrl: null,
+    brandColors: null,
+    contact: { email: contactEmail, phone: null, whatsapp: null },
+    clientName: input.client_name ?? null,
+    deliverables: scope.deliverables,
+    projectDescriptionAr: null,
+    revisions: scope.revisions,
+    priceMin: proposalPrice.min,
+    priceAnchor: proposalPrice.anchor,
+    priceMax: proposalPrice.max,
+    provenanceCitation,
+    depositPct: 50,
+    ipTerms:
+      scope.ip_transfer === "full_transfer"
+        ? "full_transfer"
+        : scope.ip_transfer === "license"
+          ? "license"
+          : "full_transfer",
+    startDate: null,
+    deliveryDate: null,
+    validityDays: 30,
+  });
+
+  // 12. Insert proposal — catch errcode 53400 for quota
+  const { data: insertData, error: insertError } = await supabase
+    .from("proposals")
+    .insert({
+      user_id: userId,
+      brief_text: input.brief_text,
+      brief_language: briefLang,
+      scope_json: scope,
+      extraction_model: model,
+      extraction_prompt_hash: promptHash,
+      extraction_confidence: confidence,
+      extraction_raw_response: raw as Record<string, unknown>,
+      specialty_id: specialtyId,
+      city_id: cityId,
+      experience_tier_id: tierId,
+      price_min: proposalPrice.min,
+      price_anchor: proposalPrice.anchor,
+      price_max: proposalPrice.max,
+      sample_size: resolveResult.sample_size,
+      dominant_provenance: resolveResult.dominant_provenance,
+      provenance_citation: provenanceCitation,
+      urgency_modifier: proposalPrice.modifiers.urgency,
+      client_type_modifier: proposalPrice.modifiers.client_type,
+      complexity_modifier: proposalPrice.modifiers.complexity,
+      ip_modifier: proposalPrice.modifiers.ip,
+      personal_weight: proposalPrice.personal_weight,
+      artifact_json: artifactData,
+      client_name: input.client_name ?? null,
+      status: "draft",
+      version: 1,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !insertData) {
+    if (insertError?.code === "53400") {
+      return { ok: false, code: "quota_exhausted" };
+    }
+    console.error("[generateProposal] insert failed", {
+      code: insertError?.code,
+      message: insertError?.message,
+    });
+    return { ok: false, code: "error" };
+  }
+
+  const proposalId = insertData.id as string;
+
+  // Update artifact_json with the real proposal ID
+  const artifactWithId = buildArtifactData({
+    locale: briefLang === "en" ? "en" : "ar",
+    proposalId,
+    freelancerName,
+    brandNameAr: null,
+    taglineAr: null,
+    logoUrl: null,
+    brandColors: null,
+    contact: { email: contactEmail, phone: null, whatsapp: null },
+    clientName: input.client_name ?? null,
+    deliverables: scope.deliverables,
+    projectDescriptionAr: null,
+    revisions: scope.revisions,
+    priceMin: proposalPrice.min,
+    priceAnchor: proposalPrice.anchor,
+    priceMax: proposalPrice.max,
+    provenanceCitation,
+    depositPct: 50,
+    ipTerms:
+      scope.ip_transfer === "full_transfer"
+        ? "full_transfer"
+        : scope.ip_transfer === "license"
+          ? "license"
+          : "full_transfer",
+    startDate: null,
+    deliveryDate: null,
+    validityDays: 30,
+  });
+
+  await supabase
+    .from("proposals")
+    .update({ artifact_json: artifactWithId, updated_at: new Date().toISOString() })
+    .eq("id", proposalId);
+
+  // 13. Load enabled follow-up question templates
+  const { data: templateRows } = await supabase
+    .from("follow_up_question_templates")
+    .select("*")
+    .eq("enabled", true)
+    .order("priority");
+
+  const templates = (templateRows ?? []) as FollowUpTemplate[];
+  const followUps = selectFollowUps(scope.field_confidence, templates);
+
+  // 14. Return success
+  return {
+    ok: true,
+    proposal_id: proposalId,
+    follow_ups: followUps,
+    price: {
+      min: proposalPrice.min,
+      anchor: proposalPrice.anchor,
+      max: proposalPrice.max,
+    },
+    confidence: aggregateConfidence(scope.field_confidence),
+  };
+}
