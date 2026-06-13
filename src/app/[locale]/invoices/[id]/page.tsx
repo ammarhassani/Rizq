@@ -43,7 +43,7 @@ export default async function InvoiceDetailPage({
   const { data: invoice, error: invoiceErr } = await supabase
     .from("invoices")
     .select(
-      "id, invoice_number, status, total_sar, due_date, created_at, artifact_json, client_id, clients(name)"
+      "id, invoice_number, status, total_sar, due_date, created_at, artifact_json, client_id, public_share, share_token, clients(name)"
     )
     .eq("id", id)
     .eq("user_id", userData.user.id)
@@ -164,6 +164,8 @@ export default async function InvoiceDetailPage({
             locale={locale as "ar" | "en"}
             invoiceId={invoice.id as string}
             status={status}
+            publicShare={(invoice.public_share as boolean | null) ?? false}
+            shareToken={(invoice.share_token as string | null) ?? null}
           />
         </div>
       </main>

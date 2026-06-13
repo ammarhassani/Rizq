@@ -2,20 +2,27 @@
 
 /**
  * InvoiceDetailActions — client island for invoice detail page. Phase-4 task P4.4.
+ * P4.5: adds Share (ShareInvoiceModal) + Print (PrintButton) actions.
  * Mirrors GigDetailActions: status transitions, delete with confirm, useTransition.
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
 import { deleteInvoice } from "@/app/actions/invoices/deleteInvoice";
+import { ShareInvoiceModal } from "@/components/invoices/ShareInvoiceModal";
+import { PrintButton } from "@/components/proposals/PrintButton";
 
 type Props = {
   locale: "ar" | "en";
   invoiceId: string;
   status: string;
+  /** Current public_share state — so modal initialises correctly */
+  publicShare: boolean;
+  /** Current share_token — may be null if never shared */
+  shareToken: string | null;
 };
 
 // Allowed transitions (mirrors markInvoiceStatus server action)
@@ -28,14 +35,22 @@ const TRANSITIONS: Record<string, string[]> = {
   cancelled: [],
 };
 
-export function InvoiceDetailActions({ locale, invoiceId, status }: Props) {
+export function InvoiceDetailActions({
+  locale,
+  invoiceId,
+  status,
+  publicShare,
+  shareToken,
+}: Props) {
   const t = useTranslations("Invoices.detail");
-  const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
 
+  const router = useRouter();
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const [isMarkingSent, startMarkSentTransition] = useTransition();
   const [isMarkingViewed, startMarkViewedTransition] = useTransition();
@@ -90,9 +105,8 @@ export function InvoiceDetailActions({ locale, invoiceId, status }: Props) {
     });
   }
 
-  if (allowed.length === 0 && status !== "paid" && status !== "cancelled") {
-    return null;
-  }
+  // Note: we no longer early-return when allowed is empty — Share + Print
+  // should always be available regardless of status.
 
   return (
     <div className="space-y-4">
@@ -197,9 +211,37 @@ export function InvoiceDetailActions({ locale, invoiceId, status }: Props) {
           )}
         </div>
 
-        {/* ── Placeholder slot for P4.5 share + P4.6 AI actions ── */}
-        {/* share + AI actions added in P4.5/P4.6 */}
+        {/* ── P4.5: Share + Print ── */}
+        <div className="mt-4 pt-4 border-t border-rizq-gold/15 flex flex-wrap gap-3">
+          {/* Share invoice */}
+          <button
+            type="button"
+            onClick={() => setShowShareModal(true)}
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-5 py-2.5 text-sm font-medium hover:bg-rizq-green/10 transition-all ${font}`}
+          >
+            <Share2 size={14} />
+            {t("share")}
+          </button>
+
+          {/* Print to PDF */}
+          <PrintButton label={t("print")} locale={locale} />
+        </div>
       </div>
+
+      {/* Share modal */}
+      {showShareModal && (
+        <ShareInvoiceModal
+          locale={locale}
+          invoiceId={invoiceId}
+          initialShared={publicShare}
+          initialToken={shareToken}
+          status={status}
+          onClose={() => {
+            setShowShareModal(false);
+            router.refresh();
+          }}
+        />
+      )}
 
       {/* Delete confirm */}
       {showDeleteConfirm && (
