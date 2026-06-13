@@ -15,7 +15,9 @@ import { createClient } from "@/lib/supabase/server";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
+import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
+import type { Scope } from "@/lib/ai/scope";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -96,6 +98,7 @@ export default async function ProposalDetailPage({
     )
     .eq("id", id)
     .single();
+  // Note: client_name and scope_json are already included above for EditProposalForm.
 
   if (proposalErr || !proposal) notFound();
 
@@ -119,6 +122,9 @@ export default async function ProposalDetailPage({
     new Date(proposal.expires_at as string) < new Date();
 
   const artifactData = proposal.artifact_json as ArtifactData | null;
+  const scopeJson = proposal.scope_json as Scope | null;
+  const canEdit =
+    proposal.status === "final" || proposal.status === "sent";
 
   return (
     <div className="relative min-h-screen flex flex-col bg-paper">
@@ -174,7 +180,7 @@ export default async function ProposalDetailPage({
         )}
 
         {/* Actions */}
-        <div className="mt-6">
+        <div className="mt-6 space-y-4">
           <ProposalDetailActions
             locale={locale as "ar" | "en"}
             proposalId={id}
@@ -182,6 +188,22 @@ export default async function ProposalDetailPage({
             publicShare={proposal.public_share as boolean ?? false}
             shareToken={proposal.share_token as string | null}
           />
+
+          {/* Edit affordance — only for final / sent proposals */}
+          {canEdit && (
+            <EditProposalForm
+              locale={locale as "ar" | "en"}
+              proposalId={id}
+              initialDescription={
+                ((scopeJson?.extras as Record<string, unknown> | undefined)
+                  ?.["description"] as string | null) ?? ""
+              }
+              initialDeliverables={scopeJson?.deliverables ?? []}
+              initialAnchor={Number(proposal.price_anchor)}
+              priceMin={Number(proposal.price_min)}
+              priceMax={Number(proposal.price_max)}
+            />
+          )}
         </div>
 
         {/* Version history */}

@@ -650,6 +650,16 @@
       "declineConfirm": "تأكيد الرفض",
       "cancel": "إلغاء",
       "saveAsTemplate": "حفظ كقالب",
+      "edit": {
+        "edit": "تعديل",
+        "deliverables": "المخرجات (سطر لكل مخرج)",
+        "description": "وصف المشروع",
+        "recommendedPrice": "السعر المقترح",
+        "priceRange": "ضمن النطاق {min} – {max} ريال",
+        "saveChanges": "حفظ التعديلات",
+        "cancel": "إلغاء",
+        "savedAs": "تم الحفظ كنسخة {n}"
+      },
       "shareModal": {
         "title": "مشاركة العرض",
         "enableShare": "تفعيل المشاركة",

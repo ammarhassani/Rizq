@@ -650,6 +650,16 @@
       "declineConfirm": "Confirm decline",
       "cancel": "Cancel",
       "saveAsTemplate": "Save as template",
+      "edit": {
+        "edit": "Edit / تعديل",
+        "deliverables": "Deliverables (one per line)",
+        "description": "Description",
+        "recommendedPrice": "Recommended price",
+        "priceRange": "within {min} – {max} SAR",
+        "saveChanges": "Save changes",
+        "cancel": "Cancel",
+        "savedAs": "Saved as v{n}"
+      },
       "shareModal": {
         "title": "Share proposal",
         "enableShare": "Enable sharing",
