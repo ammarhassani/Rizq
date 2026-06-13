@@ -2,18 +2,27 @@
 
 /**
  * GigDetailActions — client island for gig detail page. Phase-3 task 3.7.
+ * P4.7: added Generate Invoice CTA + linked-invoice chip.
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Edit2, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Edit2, Trash2, CheckCircle, AlertCircle, FileText, ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import { markGigStatus, deleteGig } from "@/app/actions/gigs/gigs";
+import { createInvoiceFromGig } from "@/app/actions/invoices/createInvoiceFromGig";
 import { track } from "@/lib/analytics/track";
 import { GigForm } from "./GigForm";
 import type { GigRow } from "./GigCard";
 
 type ClientOption = { id: string; name: string };
+
+/** Minimal invoice info for the linked-invoice chip */
+export type LinkedInvoice = {
+  id: string;
+  invoice_number: string;
+  status: string;
+};
 
 type Props = {
   locale: "ar" | "en";
@@ -24,10 +33,22 @@ type Props = {
     payment_notes?: string | null;
   };
   clients?: ClientOption[];
+  /** If the gig already has a linked invoice, pass it here. */
+  linkedInvoice?: LinkedInvoice | null;
 };
 
-export function GigDetailActions({ locale, gig, clients = [] }: Props) {
+const INVOICE_STATUS_AR: Record<string, string> = {
+  draft: "مسودة", sent: "مُرسَلة", viewed: "مُطَّلَع عليها",
+  paid: "مدفوعة", overdue: "متأخرة", cancelled: "ملغاة",
+};
+const INVOICE_STATUS_EN: Record<string, string> = {
+  draft: "Draft", sent: "Sent", viewed: "Viewed",
+  paid: "Paid", overdue: "Overdue", cancelled: "Cancelled",
+};
+
+export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = null }: Props) {
   const t = useTranslations("Income.detail");
+  const tInv = useTranslations("Invoices.cta");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -35,10 +56,34 @@ export function GigDetailActions({ locale, gig, clients = [] }: Props) {
 
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [invoiceError, setInvoiceError] = useState<string | null>(null);
 
   const [isMarkingPaid, startMarkPaidTransition] = useTransition();
   const [isMarkingOverdue, startMarkOverdueTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
+  const [isGeneratingInvoice, startInvoiceTransition] = useTransition();
+
+  /** Show the "Generate invoice" button only when gig is delivered/paid AND no invoice yet */
+  const canGenerateInvoice =
+    !linkedInvoice &&
+    (gig.status === "delivered" || gig.status === "paid");
+
+  function handleGenerateInvoice() {
+    setInvoiceError(null);
+    startInvoiceTransition(async () => {
+      const result = await createInvoiceFromGig({ gig_id: gig.id });
+      if (!result.ok) {
+        if (result.code === "quota_exhausted") {
+          setInvoiceError(isAr ? "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي." : "Free invoice limit reached. Upgrade to Pro.");
+        } else {
+          setInvoiceError(isAr ? "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى." : "Could not create invoice. Try again.");
+        }
+        return;
+      }
+      track("invoice_generated_from_gig", { locale, gig_id: gig.id, invoice_id: result.invoice_id });
+      router.push(`/invoices/${result.invoice_id}` as `/invoices/${string}`);
+    });
+  }
 
   function handleMarkPaid() {
     startMarkPaidTransition(async () => {
@@ -94,6 +139,28 @@ export function GigDetailActions({ locale, gig, clients = [] }: Props) {
 
   return (
     <div className="space-y-4">
+      {/* Linked invoice chip — shown when gig already has an invoice */}
+      {linkedInvoice && (
+        <div dir={dir} className={`rounded-2xl border border-rizq-green/20 bg-rizq-green/5 p-4 ${font}`}>
+          <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-2">
+            {isAr ? "الفاتورة المرتبطة" : "Linked invoice"}
+          </p>
+          <Link
+            href={`/invoices/${linkedInvoice.id}` as `/invoices/${string}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/30 bg-white/70 text-rizq-green px-4 py-2 text-sm font-medium hover:bg-rizq-green/10 transition-all ${font}`}
+          >
+            <FileText size={14} />
+            <span className="tabular">{linkedInvoice.invoice_number}</span>
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rizq-green/10 text-rizq-green ${font}`}>
+              {isAr
+                ? INVOICE_STATUS_AR[linkedInvoice.status] ?? linkedInvoice.status
+                : INVOICE_STATUS_EN[linkedInvoice.status] ?? linkedInvoice.status}
+            </span>
+            <ExternalLink size={12} className="opacity-60" />
+          </Link>
+        </div>
+      )}
+
       <div dir={dir} className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 ${font}`}>
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-4">
           {isAr ? "الإجراءات" : "Actions"}
@@ -108,6 +175,22 @@ export function GigDetailActions({ locale, gig, clients = [] }: Props) {
             <Edit2 size={14} />
             {t("edit")}
           </button>
+
+          {/* Generate invoice — only when delivered/paid + no existing invoice */}
+          {canGenerateInvoice && (
+            <button
+              type="button"
+              onClick={handleGenerateInvoice}
+              disabled={isGeneratingInvoice}
+              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-2.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+            >
+              {isGeneratingInvoice ? (
+                <><Loader2 size={14} className="animate-spin" /> {tInv("generating")}</>
+              ) : (
+                <><FileText size={14} /> {tInv("generateFromGig")}</>
+              )}
+            </button>
+          )}
 
           {/* Mark Paid */}
           {gig.status !== "paid" && gig.status !== "cancelled" && (
@@ -169,6 +252,13 @@ export function GigDetailActions({ locale, gig, clients = [] }: Props) {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Invoice generation error */}
+      {invoiceError && (
+        <p role="alert" className={`text-sm text-red-700 px-1 ${font}`}>
+          {invoiceError}
+        </p>
       )}
     </div>
   );

@@ -9,13 +9,14 @@
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Share2, CheckCircle, XCircle, BookmarkPlus, PlusCircle } from "lucide-react";
+import { Loader2, Share2, CheckCircle, XCircle, BookmarkPlus, PlusCircle, FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
 import { markStatus } from "@/app/actions/proposals/markStatus";
 import { saveTemplateFromProposal } from "@/app/actions/proposals/templates";
 import { createGigFromProposal } from "@/app/actions/gigs/createGigFromProposal";
+import { createInvoiceFromProposal } from "@/app/actions/invoices/createInvoiceFromProposal";
 import { track } from "@/lib/analytics/track";
 import { ShareModal } from "./ShareModal";
 
@@ -44,6 +45,7 @@ export function ProposalDetailActions({
 }: Props) {
   const t = useTranslations("Proposals.detail");
   const tTemplates = useTranslations("Proposals.templates");
+  const tInv = useTranslations("Invoices.cta");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -64,11 +66,15 @@ export function ProposalDetailActions({
   // Create-gig CTA state
   const [createGigError, setCreateGigError] = useState<string | null>(null);
 
+  // Create-invoice CTA state
+  const [createInvoiceError, setCreateInvoiceError] = useState<string | null>(null);
+
   // Transitions
   const [isFinalizing, startFinalizeTransition] = useTransition();
   const [isMarkingStatus, startMarkStatusTransition] = useTransition();
   const [isSavingTemplate, startSaveTemplateTransition] = useTransition();
   const [isCreatingGig, startCreateGigTransition] = useTransition();
+  const [isCreatingInvoice, startCreateInvoiceTransition] = useTransition();
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -156,11 +162,33 @@ export function ProposalDetailActions({
     });
   }
 
+  function handleCreateInvoice() {
+    setCreateInvoiceError(null);
+    startCreateInvoiceTransition(async () => {
+      const result = await createInvoiceFromProposal({ proposal_id: proposalId });
+      if (!result.ok) {
+        if (result.code === "quota_exhausted") {
+          setCreateInvoiceError(isAr ? "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي." : "Free invoice limit reached. Upgrade to Pro.");
+        } else if (result.code === "not_accepted") {
+          setCreateInvoiceError(isAr ? "يمكن إصدار الفاتورة فقط للعروض المقبولة." : "Invoice can only be created for accepted proposals.");
+        } else {
+          setCreateInvoiceError(isAr ? "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى." : "Could not create invoice. Try again.");
+        }
+        return;
+      }
+      track("invoice_generated_from_proposal", { locale, proposal_id: proposalId, invoice_id: result.invoice_id });
+      router.push(`/invoices/${result.invoice_id}` as `/invoices/${string}`);
+    });
+  }
+
   // Whether this status can transition to accepted/declined
   const canMarkOutcome = ["sent", "viewed", "final"].includes(status);
 
   // Whether the "Create gig" CTA should be shown (accepted, or sent/viewed for convenience)
   const showCreateGigCta = ["accepted", "sent", "viewed", "final"].includes(status);
+
+  // Whether the "Create invoice" CTA should be shown — only for accepted proposals
+  const showCreateInvoiceCta = status === "accepted";
 
   // ---------------------------------------------------------------------------
   // Render
@@ -219,6 +247,22 @@ export function ProposalDetailActions({
                 <><Loader2 size={14} className="animate-spin" /> {t("creatingGig")}</>
               ) : (
                 <><PlusCircle size={14} /> {t("createGig")}</>
+              )}
+            </button>
+          )}
+
+          {/* Generate invoice from proposal — only when accepted */}
+          {showCreateInvoiceCta && (
+            <button
+              type="button"
+              onClick={handleCreateInvoice}
+              disabled={isCreatingInvoice}
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-6 py-3 text-sm font-medium hover:bg-rizq-green/8 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+            >
+              {isCreatingInvoice ? (
+                <><Loader2 size={14} className="animate-spin" /> {tInv("generating")}</>
+              ) : (
+                <><FileText size={14} /> {tInv("generateFromProposal")}</>
               )}
             </button>
           )}
@@ -324,6 +368,13 @@ export function ProposalDetailActions({
       {createGigError && (
         <p role="alert" className={`text-sm text-red-700 px-1 ${font}`}>
           {createGigError}
+        </p>
+      )}
+
+      {/* Create invoice error */}
+      {createInvoiceError && (
+        <p role="alert" className={`text-sm text-red-700 px-1 ${font}`}>
+          {createInvoiceError}
         </p>
       )}
 

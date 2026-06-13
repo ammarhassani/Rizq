@@ -897,6 +897,18 @@
       "descriptionApplied": "تم تطبيق الوصف على الفاتورة.",
       "reminderReady": "مسودة التذكير جاهزة. راجعها قبل الإرسال.",
       "sectionTitle": "أدوات الذكاء الاصطناعي"
+    },
+    "cta": {
+      "generateFromGig": "إصدار فاتورة",
+      "generateFromProposal": "إصدار فاتورة",
+      "viewInvoice": "عرض الفاتورة",
+      "generating": "جارٍ الإنشاء…",
+      "status_draft": "مسودة",
+      "status_sent": "مُرسَلة",
+      "status_viewed": "مُطَّلَع عليها",
+      "status_paid": "مدفوعة",
+      "status_overdue": "متأخرة",
+      "status_cancelled": "ملغاة"
     }
   },
   "Clients": {
@@ -929,6 +941,8 @@
       "aiInsightLabel": "تحليل رِزق —",
       "contact": "التواصل",
       "gigs": "سجل المشاريع",
+      "invoiceHistory": "سجل الفواتير",
+      "invoiceHistoryEmpty": "لا توجد فواتير لهذا العميل حتى الآن.",
       "proposals": "العروض المُرسَلة",
       "notes": "الملاحظات",
       "timeline": "سجل النشاط",

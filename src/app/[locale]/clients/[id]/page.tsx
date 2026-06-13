@@ -11,6 +11,7 @@ import { SiteNav } from "@/components/nav/SiteNav";
 import { ClientDetailActions } from "@/components/clients/ClientDetailActions";
 import { ClientContactLinks } from "@/components/clients/ClientContactLinks";
 import { ClientGigHistory } from "@/components/clients/ClientGigHistory";
+import { ClientInvoiceHistory } from "@/components/clients/ClientInvoiceHistory";
 import { ClientTimeline } from "@/components/clients/ClientTimeline";
 
 type Params = { locale: string; id: string };
@@ -107,6 +108,14 @@ export default async function ClientDetailPage({ params }: { params: Promise<Par
     .from("proposals")
     .select("id, status, price_anchor, created_at, client_name")
     .eq("client_id", id)
+    .order("created_at", { ascending: false });
+
+  // Fetch invoices for this client (owner-scoped via RLS + explicit user_id)
+  const { data: invoices } = await supabase
+    .from("invoices")
+    .select("id, invoice_number, total_sar, status, due_date, created_at")
+    .eq("client_id", id)
+    .eq("user_id", userData.user.id)
     .order("created_at", { ascending: false });
 
   // Fetch timeline
@@ -235,6 +244,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<Par
         <ClientGigHistory
           locale={locale as "ar" | "en"}
           gigs={(gigs ?? []) as Array<{ id: string; title: string; amount_sar: number; status: string; delivery_date: string | null; created_at: string }>}
+        />
+
+        {/* Invoice history */}
+        <ClientInvoiceHistory
+          locale={locale as "ar" | "en"}
+          invoices={(invoices ?? []) as Array<{ id: string; invoice_number: string; total_sar: number; status: string; due_date: string | null; created_at: string }>}
         />
 
         {/* Proposals sent */}

@@ -897,6 +897,18 @@
       "descriptionApplied": "Description applied to invoice.",
       "reminderReady": "Reminder draft ready. Review before sending.",
       "sectionTitle": "AI Tools"
+    },
+    "cta": {
+      "generateFromGig": "Generate invoice",
+      "generateFromProposal": "Generate invoice",
+      "viewInvoice": "View invoice",
+      "generating": "Generating…",
+      "status_draft": "Draft",
+      "status_sent": "Sent",
+      "status_viewed": "Viewed",
+      "status_paid": "Paid",
+      "status_overdue": "Overdue",
+      "status_cancelled": "Cancelled"
     }
   },
   "Clients": {
@@ -929,6 +941,8 @@
       "aiInsightLabel": "Rizq Analysis —",
       "contact": "Contact",
       "gigs": "Project history",
+      "invoiceHistory": "Invoice history",
+      "invoiceHistoryEmpty": "No invoices for this client yet.",
       "proposals": "Proposals sent",
       "notes": "Notes",
       "timeline": "Activity",

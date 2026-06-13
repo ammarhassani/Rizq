@@ -10,6 +10,7 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { GigDetailActions } from "@/components/income/GigDetailActions";
+import type { LinkedInvoice } from "@/components/income/GigDetailActions";
 
 type Params = { locale: string; id: string };
 
@@ -91,7 +92,7 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
   const isAr = locale === "ar";
   const dir = isAr ? "rtl" : "ltr";
 
-  // Fetch gig (RLS owner-only)
+  // Fetch gig (RLS owner-only) — include invoice_id back-link
   const { data: gig, error: gigErr } = await supabase
     .from("gigs")
     .select("*, clients(id, name)")
@@ -99,6 +100,25 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
     .single();
 
   if (gigErr || !gig) notFound();
+
+  // If the gig already has a linked invoice, fetch its number + status for the chip
+  let linkedInvoice: LinkedInvoice | null = null;
+  const gigInvoiceId = (gig.invoice_id as string | null) ?? null;
+  if (gigInvoiceId) {
+    const { data: invRow } = await supabase
+      .from("invoices")
+      .select("id, invoice_number, status")
+      .eq("id", gigInvoiceId)
+      .eq("user_id", userData.user.id)
+      .single();
+    if (invRow) {
+      linkedInvoice = {
+        id: invRow.id as string,
+        invoice_number: invRow.invoice_number as string,
+        status: invRow.status as string,
+      };
+    }
+  }
 
   // Fetch user's clients for the edit form picker
   const { data: clients } = await supabase
@@ -311,6 +331,7 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
               payment_notes: gig.payment_notes ?? null,
             }}
             clients={clientOptions}
+            linkedInvoice={linkedInvoice}
           />
         </div>
       </main>
