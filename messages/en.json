@@ -109,6 +109,7 @@
   "Nav": {
     "tool": "Pricing tool",
     "dashboard": "Account",
+    "invoices": "Invoices",
     "login": "Sign in",
     "signup": "Sign up",
     "openMenu": "Open menu",
@@ -789,6 +790,80 @@
       "forecastNarrativeLabel": "Rizq Analysis",
       "upgradeHint": "Income forecasting is a Pro feature. Upgrade to unlock it.",
       "anomalyBanner": "Alert: unusual price for this category."
+    }
+  },
+  "Invoices": {
+    "list": {
+      "eyebrow": "Invoice Book",
+      "title": "Your invoices.",
+      "subtitle": "Every invoice, every client, every payment in one place.",
+      "summaryIssued": "Issued this month",
+      "summaryPaid": "Collected",
+      "summaryOverdue": "Overdue",
+      "filterAll": "All",
+      "filterDraft": "Draft",
+      "filterSent": "Sent",
+      "filterPaid": "Paid",
+      "filterOverdue": "Overdue",
+      "noResults": "No results.",
+      "newInvoice": "New invoice",
+      "markPaid": "Mark paid",
+      "emptyTitle": "No invoices yet.",
+      "emptyBody": "Create your first invoice and start tracking payments.",
+      "emptyCta": "Create first invoice"
+    },
+    "form": {
+      "addTitle": "New invoice",
+      "optional": "optional",
+      "clientLabel": "Client",
+      "clientNone": "No client",
+      "lineItemsLabel": "Line items",
+      "itemDescPlaceholder": "Service or product description",
+      "itemQtyPlaceholder": "Qty",
+      "addItem": "Add item",
+      "vatLabel": "VAT",
+      "subtotalLabel": "Subtotal",
+      "totalLabel": "Total",
+      "paymentMethodLabel": "Payment method",
+      "paymentDetailsLabel": "Payment details",
+      "paymentDetailsPlaceholder": "e.g. IBAN, wallet number…",
+      "dueDateLabel": "Due date",
+      "save": "Create invoice",
+      "saving": "Saving…",
+      "errors": {
+        "itemRequired": "Add at least one item with a description and price.",
+        "quotaExhausted": "Free limit reached. Upgrade to Pro to create more invoices.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
+    "detail": {
+      "markSent": "Mark as sent",
+      "markViewed": "Mark as viewed",
+      "markPaid": "Mark as paid",
+      "markOverdue": "Mark overdue",
+      "markCancelled": "Cancel invoice",
+      "delete": "Delete invoice",
+      "deleteConfirm": "Permanently delete this invoice? This cannot be undone.",
+      "deleteConfirmBtn": "Confirm delete",
+      "deleting": "Deleting…",
+      "cancel": "Cancel"
+    },
+    "artifact": {
+      "invoiceTitle": "Invoice",
+      "billTo": "Bill to",
+      "subtotal": "Subtotal",
+      "vat": "VAT",
+      "total": "Total",
+      "payment": "Payment",
+      "methodology": "How is this price calculated?"
+    },
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "viewed": "Viewed",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
     }
   },
   "Clients": {

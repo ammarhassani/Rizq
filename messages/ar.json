@@ -109,6 +109,7 @@
   "Nav": {
     "tool": "أداة التسعير",
     "dashboard": "حسابك",
+    "invoices": "الفواتير",
     "login": "تسجيل الدخول",
     "signup": "أنشئ حساب",
     "openMenu": "افتح القائمة",
@@ -789,6 +790,80 @@
       "forecastNarrativeLabel": "تحليل رِزق",
       "upgradeHint": "الإسقاط المالي ميزة احترافية. ترقَّ للاحترافي لتفعيلها.",
       "anomalyBanner": "تنبيه: سعر غير معتاد لهذا التصنيف."
+    }
+  },
+  "Invoices": {
+    "list": {
+      "eyebrow": "دفتر الفواتير",
+      "title": "فواتيرك.",
+      "subtitle": "كل فاتورة، كل عميل، كل دفعة في مكان واحد.",
+      "summaryIssued": "صادرة هذا الشهر",
+      "summaryPaid": "مُحصَّل",
+      "summaryOverdue": "متأخرة",
+      "filterAll": "الكل",
+      "filterDraft": "مسودة",
+      "filterSent": "مُرسَلة",
+      "filterPaid": "مدفوعة",
+      "filterOverdue": "متأخرة",
+      "noResults": "لا توجد نتائج.",
+      "newInvoice": "فاتورة جديدة",
+      "markPaid": "اقبض",
+      "emptyTitle": "ما عندك فواتير حتى الآن.",
+      "emptyBody": "أنشئ أول فاتورة وابدأ في تتبع مدفوعاتك.",
+      "emptyCta": "أنشئ أول فاتورة"
+    },
+    "form": {
+      "addTitle": "فاتورة جديدة",
+      "optional": "اختياري",
+      "clientLabel": "العميل",
+      "clientNone": "بدون عميل",
+      "lineItemsLabel": "البنود",
+      "itemDescPlaceholder": "وصف الخدمة أو المنتج",
+      "itemQtyPlaceholder": "الكمية",
+      "addItem": "إضافة بند",
+      "vatLabel": "ضريبة القيمة المضافة",
+      "subtotalLabel": "المجموع الفرعي",
+      "totalLabel": "الإجمالي",
+      "paymentMethodLabel": "طريقة الدفع",
+      "paymentDetailsLabel": "تفاصيل الدفع",
+      "paymentDetailsPlaceholder": "مثال: رقم الآيبان، رقم المحفظة…",
+      "dueDateLabel": "تاريخ الاستحقاق",
+      "save": "إنشاء الفاتورة",
+      "saving": "جارٍ الحفظ…",
+      "errors": {
+        "itemRequired": "أضف بندًا واحدًا على الأقل بوصف وسعر.",
+        "quotaExhausted": "وصلت للحد المجاني. ترقَّ للاحترافي لإنشاء المزيد من الفواتير.",
+        "generic": "حدث خطأ. حاول مرة أخرى."
+      }
+    },
+    "detail": {
+      "markSent": "تعيين كمُرسَلة",
+      "markViewed": "تعيين كمُطَّلَع عليها",
+      "markPaid": "تعيين كمدفوعة",
+      "markOverdue": "تعيين كمتأخرة",
+      "markCancelled": "إلغاء الفاتورة",
+      "delete": "حذف الفاتورة",
+      "deleteConfirm": "هل تريد حذف هذه الفاتورة نهائيًا؟ لا يمكن التراجع.",
+      "deleteConfirmBtn": "تأكيد الحذف",
+      "deleting": "جارٍ الحذف…",
+      "cancel": "إلغاء"
+    },
+    "artifact": {
+      "invoiceTitle": "فاتورة",
+      "billTo": "إلى",
+      "subtotal": "المجموع الفرعي",
+      "vat": "ضريبة القيمة المضافة",
+      "total": "الإجمالي",
+      "payment": "معلومات الدفع",
+      "methodology": "كيف نحسب هذا السعر؟"
+    },
+    "status": {
+      "draft": "مسودة",
+      "sent": "مُرسَلة",
+      "viewed": "مُطَّلَع عليها",
+      "paid": "مدفوعة",
+      "overdue": "متأخرة",
+      "cancelled": "ملغاة"
     }
   },
   "Clients": {
