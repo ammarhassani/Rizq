@@ -19,6 +19,7 @@ import type { PricingJson } from "@/lib/proposals/templateHelpers";
 const InputSchema = z.object({
   brief_text: z.string().min(10),
   client_name: z.string().optional(),
+  client_id: z.string().uuid().optional(),
   city_slug: z.string().min(1).max(64),
   experience_tier_slug: z.string().min(1).max(64),
   template_id: z.string().uuid().optional(),
@@ -111,7 +112,28 @@ export async function generateProposal(
   if (!userResult.user) return { ok: false, code: "unauthorized" };
   const userId = userResult.user.id;
 
-  // 2b. Load template defaults when template_id is provided
+  // 2b. Resolve client_id → client_name when client_id is provided (M2→M1 wiring)
+  let resolvedClientId: string | null = input.client_id ?? null;
+  let resolvedClientName: string | null = input.client_name ?? null;
+
+  if (input.client_id) {
+    const { data: clientRow } = await supabase
+      .from("clients")
+      .select("id, name")
+      .eq("id", input.client_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (clientRow) {
+      resolvedClientId = clientRow.id as string;
+      resolvedClientName = clientRow.name as string;
+    } else {
+      // client_id supplied but not owned by user — ignore silently, fall back to free-text
+      resolvedClientId = null;
+    }
+  }
+
+  // 2d. Load template defaults when template_id is provided
   let templateDefaults: PricingJson | null = null;
   if (input.template_id) {
     const { data: tplRow } = await supabase
@@ -236,7 +258,7 @@ export async function generateProposal(
     logoUrl: null,
     brandColors: null,
     contact: { email: contactEmail, phone: null, whatsapp: null },
-    clientName: input.client_name ?? null,
+    clientName: resolvedClientName,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
     revisions: resolvedRevisions,
@@ -278,7 +300,8 @@ export async function generateProposal(
       ip_modifier: proposalPrice.modifiers.ip,
       personal_weight: proposalPrice.personal_weight,
       artifact_json: artifactData,
-      client_name: input.client_name ?? null,
+      client_name: resolvedClientName,
+      client_id: resolvedClientId,
       template_id: input.template_id ?? null,
       status: "draft",
       version: 1,
@@ -309,7 +332,7 @@ export async function generateProposal(
     logoUrl: null,
     brandColors: null,
     contact: { email: contactEmail, phone: null, whatsapp: null },
-    clientName: input.client_name ?? null,
+    clientName: resolvedClientName,
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
     revisions: resolvedRevisions,

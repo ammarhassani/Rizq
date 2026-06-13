@@ -546,6 +546,8 @@
       "briefPlaceholder": "Paste the client's message here…",
       "clientNameLabel": "Client name",
       "clientNamePlaceholder": "e.g. Nukhba Co.",
+      "pickClient": "Pick a client from your book",
+      "newClient": "New client",
       "optional": "optional",
       "cityLabel": "City",
       "cityPlaceholder": "Pick your city",
@@ -650,6 +652,8 @@
       "declineConfirm": "Confirm decline",
       "cancel": "Cancel",
       "saveAsTemplate": "Save as template",
+      "createGig": "Create gig from this proposal",
+      "creatingGig": "Creating…",
       "edit": {
         "edit": "Edit / تعديل",
         "deliverables": "Deliverables (one per line)",

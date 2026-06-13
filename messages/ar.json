@@ -546,6 +546,8 @@
       "briefPlaceholder": "ألصق رسالة العميل هنا…",
       "clientNameLabel": "اسم العميل",
       "clientNamePlaceholder": "مثال: شركة نخبة",
+      "pickClient": "اختر عميلاً من دفترك",
+      "newClient": "عميل جديد",
       "optional": "اختياري",
       "cityLabel": "المدينة",
       "cityPlaceholder": "اختر مدينتك",
@@ -650,6 +652,8 @@
       "declineConfirm": "تأكيد الرفض",
       "cancel": "إلغاء",
       "saveAsTemplate": "حفظ كقالب",
+      "createGig": "أنشئ مشروعاً من هذا العرض",
+      "creatingGig": "جارٍ الإنشاء…",
       "edit": {
         "edit": "تعديل",
         "deliverables": "المخرجات (سطر لكل مخرج)",

@@ -2,11 +2,12 @@
 
 import { useState, useMemo, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { GigCard, type GigRow } from "./GigCard";
 import { markGigStatus } from "@/app/actions/gigs/gigs";
 import { forecastIncomeAction } from "@/app/actions/gigs/incomeAi";
+import { exportIncomeCsv } from "@/app/actions/gigs/exportIncomeCsv";
 
 type FilterChip = "all" | "paid" | "pending" | "this_month" | "last_month" | "this_year";
 type SortKey = "delivery_date" | "amount" | "status";
@@ -58,6 +59,10 @@ export function IncomeListClient({ gigs, locale }: Props) {
   const [, startTransition] = useTransition();
 
   const [forecast, setForecast] = useState<ForecastState>({ status: "idle" });
+
+  // CSV export state
+  const [csvState, setCsvState] = useState<"idle" | "loading" | "upgrade" | "error">("idle");
+  const [, startCsvTransition] = useTransition();
 
   const filtered = useMemo(() => {
     let list = [...gigs];
@@ -128,6 +133,36 @@ export function IncomeListClient({ gigs, locale }: Props) {
     });
   }
 
+  function handleExportCsv() {
+    setCsvState("loading");
+    startCsvTransition(async () => {
+      try {
+        const result = await exportIncomeCsv();
+        if (!result.ok) {
+          if (result.code === "upgrade") {
+            setCsvState("upgrade");
+          } else {
+            setCsvState("error");
+          }
+          return;
+        }
+        // Trigger browser download
+        const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = result.filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(url);
+        setCsvState("idle");
+      } catch {
+        setCsvState("error");
+      }
+    });
+  }
+
   function handleGenerateForecast() {
     setForecast({ status: "loading" });
     startTransition(async () => {
@@ -190,6 +225,32 @@ export function IncomeListClient({ gigs, locale }: Props) {
             <option key={s.key} value={s.key}>{s.label}</option>
           ))}
         </select>
+      </div>
+
+      {/* ── CSV Export (Pro) ──────────────────────────────────────────────── */}
+      <div dir={dir} className={`flex flex-wrap items-center gap-3 ${font}`}>
+        <button
+          type="button"
+          onClick={handleExportCsv}
+          disabled={csvState === "loading"}
+          className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2 text-sm font-medium text-rizq-ink-soft hover:border-rizq-green/40 hover:text-rizq-green transition-all disabled:opacity-60 ${font}`}
+        >
+          {csvState === "loading" ? (
+            <><Loader2 size={14} className="animate-spin" /> {isAr ? "جارٍ التصدير…" : "Exporting…"}</>
+          ) : (
+            <><Download size={14} /> {isAr ? "تصدير CSV (احترافي)" : "Export CSV (Pro)"}</>
+          )}
+        </button>
+        {csvState === "upgrade" && (
+          <p className={`text-sm text-amber-700 ${font}`}>
+            {tAi("upgradeHint")}
+          </p>
+        )}
+        {csvState === "error" && (
+          <p className={`text-sm text-red-700 ${font}`}>
+            {isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again."}
+          </p>
+        )}
       </div>
 
       {/* ── AI Forecast section ─────────────────────────────────────────── */}

@@ -44,10 +44,10 @@ export async function setProposalShare(
   const { data: userResult } = await supabase.auth.getUser();
   if (!userResult.user) return { ok: false, code: "unauthorized" };
 
-  // Load the existing proposal to check share_token + status.
+  // Load the existing proposal to check share_token + status + client linkage.
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, share_token, status, public_share")
+    .select("id, share_token, status, public_share, client_id, price_anchor, artifact_json")
     .eq("id", proposal_id)
     .single();
 
@@ -88,6 +88,43 @@ export async function setProposalShare(
   if (updateErr) {
     console.error("[setProposalShare] update failed", updateErr);
     return { ok: false, code: "error" };
+  }
+
+  // M1→M2: When sharing is enabled, insert 'proposal_sent' timeline event
+  // and bump last_contacted_at (best-effort — don't fail if this errors)
+  const userId = userResult.user.id;
+  const clientId = proposal.client_id as string | null;
+  if (share && clientId) {
+    const artifactJson = proposal.artifact_json as Record<string, unknown> | null;
+    const proposalTitle =
+      (artifactJson?.title as string | null) ??
+      (artifactJson?.clientName as string | null) ??
+      proposal_id;
+
+    try {
+      await supabase.from("client_timeline").insert({
+        client_id: clientId,
+        user_id: userId,
+        event_type: "proposal_sent",
+        event_data: {
+          proposal_id,
+          title: proposalTitle,
+          price_anchor: proposal.price_anchor ?? null,
+        },
+      });
+
+      // Bump last_contacted_at
+      await supabase
+        .from("clients")
+        .update({
+          last_contacted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", clientId)
+        .eq("user_id", userId);
+    } catch (err) {
+      console.warn("[setProposalShare] client_timeline insert failed", err);
+    }
   }
 
   return share ? { ok: true, token } : { ok: true };

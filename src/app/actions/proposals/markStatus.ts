@@ -57,7 +57,7 @@ export async function markStatus(
   // Verify proposal ownership (RLS also enforces this)
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, scope_comparison_json")
+    .select("id, scope_comparison_json, client_id, price_anchor, artifact_json")
     .eq("id", proposal_id)
     .eq("user_id", userId)
     .single();
@@ -93,6 +93,39 @@ export async function markStatus(
       message: updateErr.message,
     });
     return { ok: false, code: "error" };
+  }
+
+  // M1→M2: Insert client_timeline event when proposal has a client_id (best-effort)
+  const clientId = proposal.client_id as string | null;
+  if (clientId) {
+    const eventTypeMap: Record<TransitionStatus, string> = {
+      accepted: "proposal_accepted",
+      declined: "proposal_declined",
+      viewed: "proposal_viewed",
+      sent: "proposal_sent",
+    };
+
+    // Derive a title from artifact_json or fall back
+    const artifactJson = proposal.artifact_json as Record<string, unknown> | null;
+    const proposalTitle =
+      (artifactJson?.title as string | null) ??
+      (artifactJson?.clientName as string | null) ??
+      proposal_id;
+
+    try {
+      await supabase.from("client_timeline").insert({
+        client_id: clientId,
+        user_id: userId,
+        event_type: eventTypeMap[status],
+        event_data: {
+          proposal_id,
+          title: proposalTitle,
+          price_anchor: proposal.price_anchor ?? null,
+        },
+      });
+    } catch (err) {
+      console.warn("[markStatus] client_timeline insert failed", err);
+    }
   }
 
   return { ok: true };

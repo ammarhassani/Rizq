@@ -9,12 +9,13 @@
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Share2, CheckCircle, XCircle, BookmarkPlus } from "lucide-react";
+import { Loader2, Share2, CheckCircle, XCircle, BookmarkPlus, PlusCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
 import { markStatus } from "@/app/actions/proposals/markStatus";
 import { saveTemplateFromProposal } from "@/app/actions/proposals/templates";
+import { createGigFromProposal } from "@/app/actions/gigs/createGigFromProposal";
 import { track } from "@/lib/analytics/track";
 import { ShareModal } from "./ShareModal";
 
@@ -60,10 +61,14 @@ export function ProposalDetailActions({
   const [templateName, setTemplateName] = useState("");
   const [templateSaved, setTemplateSaved] = useState(false);
 
+  // Create-gig CTA state
+  const [createGigError, setCreateGigError] = useState<string | null>(null);
+
   // Transitions
   const [isFinalizing, startFinalizeTransition] = useTransition();
   const [isMarkingStatus, startMarkStatusTransition] = useTransition();
   const [isSavingTemplate, startSaveTemplateTransition] = useTransition();
+  const [isCreatingGig, startCreateGigTransition] = useTransition();
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -134,8 +139,28 @@ export function ProposalDetailActions({
     });
   }
 
+  function handleCreateGig() {
+    setCreateGigError(null);
+    startCreateGigTransition(async () => {
+      const result = await createGigFromProposal({ proposal_id: proposalId });
+      if (!result.ok) {
+        if (result.code === "quota_exhausted") {
+          setCreateGigError(isAr ? "وصلت للحد المجاني للمشاريع. ترقَّ للاحترافي." : "Free gig limit reached. Upgrade to Pro.");
+        } else {
+          setCreateGigError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
+        }
+        return;
+      }
+      track("gig_created_from_proposal", { locale, proposal_id: proposalId, gig_id: result.gig_id });
+      router.push(`/${locale}/income/${result.gig_id}` as Parameters<typeof router.push>[0]);
+    });
+  }
+
   // Whether this status can transition to accepted/declined
   const canMarkOutcome = ["sent", "viewed", "final"].includes(status);
+
+  // Whether the "Create gig" CTA should be shown (accepted, or sent/viewed for convenience)
+  const showCreateGigCta = ["accepted", "sent", "viewed", "final"].includes(status);
 
   // ---------------------------------------------------------------------------
   // Render
@@ -181,6 +206,22 @@ export function ProposalDetailActions({
             <Share2 size={14} />
             {t("share")}
           </button>
+
+          {/* Create gig from proposal — shown when status is accepted/sent/viewed/final */}
+          {showCreateGigCta && (
+            <button
+              type="button"
+              onClick={handleCreateGig}
+              disabled={isCreatingGig}
+              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+            >
+              {isCreatingGig ? (
+                <><Loader2 size={14} className="animate-spin" /> {t("creatingGig")}</>
+              ) : (
+                <><PlusCircle size={14} /> {t("createGig")}</>
+              )}
+            </button>
+          )}
 
           {/* Save as template */}
           {!templateSaved ? (
@@ -278,6 +319,13 @@ export function ProposalDetailActions({
           </div>
         )}
       </div>
+
+      {/* Create gig error */}
+      {createGigError && (
+        <p role="alert" className={`text-sm text-red-700 px-1 ${font}`}>
+          {createGigError}
+        </p>
+      )}
 
       {/* Template name prompt */}
       {showTemplateSave && (

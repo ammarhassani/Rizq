@@ -34,6 +34,8 @@ type Option = { slug: string; label: string; hint?: string };
 
 type TemplateOption = { id: string; name_ar: string; name_en: string | null };
 
+type ClientOption = { id: string; name: string };
+
 type Props = {
   locale: "ar" | "en";
   specialties: Option[];
@@ -41,6 +43,7 @@ type Props = {
   tiers: Option[];
   defaultCitySlug: string;
   templates?: TemplateOption[];
+  clients?: ClientOption[];
 };
 
 type ViewKind =
@@ -81,7 +84,7 @@ function CopyButton({ text, label, copiedLabel, font }: { text: string; label: s
 // Main component
 // ---------------------------------------------------------------------------
 
-export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, templates = [] }: Props) {
+export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, templates = [], clients = [] }: Props) {
   const t = useTranslations("Proposals.new");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -90,6 +93,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   // Form state
   const [briefText, setBriefText] = useState("");
   const [clientName, setClientName] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [citySlug, setCitySlug] = useState(defaultCitySlug);
   const [tierSlug, setTierSlug] = useState("mid");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
@@ -122,7 +126,11 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
     startFlowTransition(async () => {
       const result = await generateProposal({
         brief_text: briefText.trim(),
-        client_name: clientName.trim() || undefined,
+        // When a known client is selected, pass client_id (client_name resolved server-side)
+        // When free-text name is given without a client_id, pass client_name only
+        ...(selectedClientId
+          ? { client_id: selectedClientId }
+          : { client_name: clientName.trim() || undefined }),
         city_slug: citySlug,
         experience_tier_slug: tierSlug,
         template_id: selectedTemplateId || undefined,
@@ -448,6 +456,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
               onClick={() => {
                 setBriefText("");
                 setClientName("");
+                setSelectedClientId("");
                 setCitySlug(defaultCitySlug);
                 setTierSlug("mid");
                 setSelectedTemplateId("");
@@ -501,6 +510,38 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         </div>
       )}
 
+      {/* Client picker — shown when the owner has saved clients */}
+      {clients.length > 0 && (
+        <div>
+          <label
+            htmlFor="client-picker"
+            className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
+          >
+            {t("pickClient")}
+            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+          </label>
+          <select
+            id="client-picker"
+            value={selectedClientId}
+            onChange={(e) => {
+              setSelectedClientId(e.target.value);
+              // When switching to "new client", clear the free-text name so
+              // user can type a fresh one; when selecting a known client clear
+              // any pre-typed free-text name.
+              setClientName("");
+            }}
+            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
+          >
+            <option value="">{t("newClient")}</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Brief textarea */}
       <div>
         <label
@@ -519,24 +560,26 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         />
       </div>
 
-      {/* Client name (optional) */}
-      <div>
-        <label
-          htmlFor="client-name"
-          className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
-        >
-          {t("clientNameLabel")}
-          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-        </label>
-        <input
-          id="client-name"
-          type="text"
-          value={clientName}
-          onChange={(e) => setClientName(e.target.value)}
-          placeholder={t("clientNamePlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
-        />
-      </div>
+      {/* Client name (optional free-text) — hidden when a known client is selected */}
+      {!selectedClientId && (
+        <div>
+          <label
+            htmlFor="client-name"
+            className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
+          >
+            {t("clientNameLabel")}
+            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+          </label>
+          <input
+            id="client-name"
+            type="text"
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            placeholder={t("clientNamePlaceholder")}
+            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
+          />
+        </div>
+      )}
 
       {/* City select */}
       <SelectField

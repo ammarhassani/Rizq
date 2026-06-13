@@ -66,13 +66,23 @@ export default async function ProposalNewPage({
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const isAr = locale === "ar";
 
-  // Load ref data + templates in parallel
-  const [cities, tiers, templatesResult] = await Promise.all([
+  // Load ref data + templates + clients in parallel
+  const [cities, tiers, templatesResult, clientsRaw] = await Promise.all([
     getCities(),
     getExperienceTiers(),
     listTemplates(),
+    supabase
+      .from("clients")
+      .select("id, name")
+      .eq("user_id", userData.user.id)
+      .eq("is_active", true)
+      .order("name", { ascending: true }),
   ]);
   const userTemplates = templatesResult.ok ? templatesResult.templates : [];
+  const userClients = (clientsRaw.data ?? []).map((c) => ({
+    id: c.id as string,
+    name: c.name as string,
+  }));
 
   // Load user profile for default city
   const { data: userProfile } = await supabase
@@ -148,6 +158,7 @@ export default async function ProposalNewPage({
             name_ar: t.name_ar,
             name_en: t.name_en,
           }))}
+          clients={userClients}
         />
       </main>
     </div>
