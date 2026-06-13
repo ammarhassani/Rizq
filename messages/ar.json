@@ -1058,5 +1058,81 @@
       "loading": "جارٍ المعالجة…",
       "personaNeeds3Gigs": "يتطلب توليد الملف ٣ مشاريع على الأقل مع هذا العميل."
     }
+  },
+  "Calendar": {
+    "eyebrow": "التقويم",
+    "title": "جدولك.",
+    "subtitle": "كل موعد، كل تسليم، كل فاتورة في مكان واحد.",
+    "viewMonth": "شهري",
+    "viewWeek": "أسبوعي",
+    "viewAgenda": "قائمة",
+    "today": "اليوم",
+    "prevMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "toggleHijri": "التاريخ الهجري",
+    "weekdays": {
+      "sun": "الأحد",
+      "mon": "الإثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت"
+    },
+    "weekdaysShort": {
+      "sun": "أحد",
+      "mon": "إثنين",
+      "tue": "ثلاثاء",
+      "wed": "أربعاء",
+      "thu": "خميس",
+      "fri": "جمعة",
+      "sat": "سبت"
+    },
+    "sourceFilters": {
+      "all": "الكل",
+      "proposal": "عروض",
+      "gig": "مشاريع",
+      "invoice": "فواتير",
+      "client": "عملاء"
+    },
+    "eventTypes": {
+      "proposal": "عرض",
+      "gig": "مشروع",
+      "invoice": "فاتورة",
+      "client": "متابعة عميل"
+    },
+    "agendaGroups": {
+      "overdue": "متأخر",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "thisWeek": "هذا الأسبوع",
+      "nextWeek": "الأسبوع القادم",
+      "later": "لاحقًا"
+    },
+    "insight": {
+      "label": "تحليل رِزق —",
+      "eventsThisWeek": "لديك {n} موعد هذا الأسبوع",
+      "eventsThisWeekPlural": "لديك {n} مواعيد هذا الأسبوع",
+      "overdueInvoices": "فاتورة متأخرة — راجعها قبل فوات الأوان.",
+      "overdueInvoicesPlural": "{n} فواتير متأخرة — راجعها قبل فوات الأوان.",
+      "busiestDay": "أكثر يوم مشغول: {day}",
+      "clearWeek": "أسبوع هادئ — وقت مثالي لإرسال عروض جديدة."
+    },
+    "emptyDay": "لا مواعيد في هذا اليوم.",
+    "emptyAgenda": "لا مواعيد قادمة.",
+    "emptyMonth": "لا أحداث هذا الشهر.",
+    "sarLabel": "ريال",
+    "statusBadge": {
+      "pending": "قيد الانتظار",
+      "paid": "مدفوع",
+      "overdue": "متأخر",
+      "active": "نشط",
+      "sent": "مُرسَل",
+      "draft": "مسودة",
+      "in_progress": "قيد التنفيذ",
+      "delivered": "مُسلَّم",
+      "cancelled": "ملغي",
+      "final": "معتمد"
+    }
   }
 }

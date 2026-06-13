@@ -1058,5 +1058,81 @@
       "loading": "Processing…",
       "personaNeeds3Gigs": "Generating a persona requires at least 3 gigs with this client."
     }
+  },
+  "Calendar": {
+    "eyebrow": "Calendar",
+    "title": "Your schedule.",
+    "subtitle": "Every deadline, delivery, and invoice in one place.",
+    "viewMonth": "Month",
+    "viewWeek": "Week",
+    "viewAgenda": "Agenda",
+    "today": "Today",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "toggleHijri": "Hijri date",
+    "weekdays": {
+      "sun": "Sunday",
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday"
+    },
+    "weekdaysShort": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "sourceFilters": {
+      "all": "All",
+      "proposal": "Proposals",
+      "gig": "Gigs",
+      "invoice": "Invoices",
+      "client": "Clients"
+    },
+    "eventTypes": {
+      "proposal": "Proposal",
+      "gig": "Gig",
+      "invoice": "Invoice",
+      "client": "Client follow-up"
+    },
+    "agendaGroups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This Week",
+      "nextWeek": "Next Week",
+      "later": "Later"
+    },
+    "insight": {
+      "label": "Rizq Analysis —",
+      "eventsThisWeek": "You have {n} event this week",
+      "eventsThisWeekPlural": "You have {n} events this week",
+      "overdueInvoices": "1 overdue invoice — review it before it's too late.",
+      "overdueInvoicesPlural": "{n} overdue invoices — review them before it's too late.",
+      "busiestDay": "Busiest day: {day}",
+      "clearWeek": "A quiet week — great time to send new proposals."
+    },
+    "emptyDay": "No events on this day.",
+    "emptyAgenda": "No upcoming events.",
+    "emptyMonth": "No events this month.",
+    "sarLabel": "SAR",
+    "statusBadge": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "active": "Active",
+      "sent": "Sent",
+      "draft": "Draft",
+      "in_progress": "In progress",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "final": "Final"
+    }
   }
 }
