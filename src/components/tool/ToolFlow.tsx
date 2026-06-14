@@ -182,6 +182,7 @@ export function ToolFlow({
         provenanceLabel={PROVENANCE_LABEL[r.dominant_provenance][locale === "ar" ? "ar" : "en"]}
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
+        provenanceKind={r.dominant_provenance}
         canShare={canShare}
         isAuthed={isAuthed}
         onReset={reset}

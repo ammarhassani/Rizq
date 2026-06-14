@@ -7,6 +7,23 @@ import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { toggleShare } from "@/app/actions/tool/calculate";
 import { track } from "@/lib/analytics/track";
+import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
+
+/** Maps dominant provenance kind to the corresponding methodology section anchor. */
+function methodologyFragment(kind: BenchmarkProvenance | undefined): string {
+  switch (kind) {
+    case "reasoned":
+    case "founder":
+      return "#reasoned-priors";
+    case "published_ref":
+      return "#published-references";
+    case "ingested":
+    case "partner":
+      return "#open-data";
+    default:
+      return "#weighted-percentile";
+  }
+}
 
 type Props = {
   locale: "ar" | "en";
@@ -21,6 +38,8 @@ type Props = {
   provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
   provenanceCitation?: string;  // pre-localized full citation sentence
   confidenceScore?: number;     // 0..1
+  /** Raw dominant provenance kind — used to deep-link the methodology page */
+  provenanceKind?: BenchmarkProvenance;
   // Whether the user is authenticated and can toggle share (anon = readonly)
   canShare: boolean;
   // Whether public_share is already on (e.g. when revisiting the result)
@@ -43,6 +62,7 @@ export function ResultCard({
   provenanceLabel,
   provenanceCitation,
   confidenceScore,
+  provenanceKind,
   canShare,
   initiallyShared = false,
   isAuthed,
@@ -50,6 +70,7 @@ export function ResultCard({
 }: Props) {
   const t = useTranslations("Tool.result");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
+  const methodologyHref = `/methodology${methodologyFragment(provenanceKind)}`;
 
   const [isShared, setIsShared] = useState(initiallyShared);
   const [shareUrl, setShareUrl] = useState<string | null>(
@@ -177,7 +198,7 @@ export function ResultCard({
           </p>
         )}
         <Link
-          href="/methodology"
+          href={methodologyHref as "/methodology"}
           className={`sm:col-span-2 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
         >
           <span>{t("methodologyLink")}</span>

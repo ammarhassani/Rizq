@@ -167,6 +167,8 @@
     "eyebrow": "How we calculate",
     "title": "Rizq pricing methodology",
     "intro": "I'm Ammar, the founder. This page explains where the numbers you see come from, how we compute them, and when we refuse to answer. The goal: use Rizq knowing exactly what we built it on — never trust us blindly.",
+    "tocLabel": "Sections",
+    "lastUpdated": "Last updated",
     "s1Title": "1 · Where data comes from",
     "s1Body": "Three primary sources: (a) Saudi freelancers who submitted real project prices with optional proof, (b) public data from Saudi platforms and government tenders, (c) Saudi-issued labor and wage indices. Every record carries its source, date, and a trust weight. We don't blend them into a single faceless number.",
     "s2Title": "2 · How the range is built",
@@ -183,7 +185,15 @@
     "s7Body": "Every contribution is hand-reviewed before it enters the public dataset. We reject incomplete or unrealistic records. This is slow — but it's the only way to protect the quality of every number after yours.",
     "s8Title": "8 · A question or correction?",
     "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest — email me. Rizq gets sharper with every note.",
-    "contact": "Reach me directly: {email}"
+    "contact": "Reach me directly: {email}",
+    "Faq": {
+      "heading": "Ask about our methodology",
+      "subheading": "Questions about how prices are calculated? Our AI answers from the published methodology only.",
+      "placeholder": "e.g. How do you compute the median?",
+      "askButton": "Ask",
+      "aiLabel": "AI answer from published methodology",
+      "aiDisclaimer": "This is an automated answer based solely on Rizq's published methodology — not professional advice."
+    }
   },
   "Auth": {
     "shared": {
