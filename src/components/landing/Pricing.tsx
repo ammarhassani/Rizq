@@ -31,14 +31,14 @@ export async function Pricing({ locale }: Props) {
       aria-labelledby="pricing-heading"
       className="relative border-t border-rizq-gold/20"
     >
-      <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section intro */}
         <Reveal>
-          <div className="max-w-3xl mb-16 sm:mb-20">
-            <p className="eyebrow mb-6">{t("eyebrow")}</p>
+          <div className="max-w-3xl mb-12 sm:mb-16">
+            <p className="eyebrow mb-4">{t("eyebrow")}</p>
             <h2
               id="pricing-heading"
-              className={`display-2 text-rizq-ink mb-6 ${font}`}
+              className={`display-2 text-rizq-ink mb-5 ${font}`}
             >
               {t("heading")}
             </h2>

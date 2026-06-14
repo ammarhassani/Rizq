@@ -24,18 +24,21 @@ export function FeatureDemos({ locale }: Props) {
       key: "rate",
       titleKey: "demos.rateTitle",
       captionKey: "demos.rateCaption",
+      windowKey: "demos.windowRate",
       node: <DemoRate locale={locale} />,
     },
     {
       key: "invoice",
       titleKey: "demos.invoiceTitle",
       captionKey: "demos.invoiceCaption",
+      windowKey: "demos.windowInvoice",
       node: <DemoInvoice locale={locale} />,
     },
     {
       key: "tone",
       titleKey: "demos.toneTitle",
       captionKey: "demos.toneCaption",
+      windowKey: "demos.windowTone",
       node: <DemoTone locale={locale} />,
     },
   ] as const;
@@ -45,11 +48,11 @@ export function FeatureDemos({ locale }: Props) {
       aria-labelledby="demos-heading"
       className="relative border-t border-rizq-gold/20 bg-paper"
     >
-      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section header */}
         <Reveal>
-          <div className="mb-14 sm:mb-18">
-            <p className={`eyebrow mb-5 ${font}`}>{t("demos.eyebrow")}</p>
+          <div className="mb-10 sm:mb-14">
+            <p className={`eyebrow mb-4 ${font}`}>{t("demos.eyebrow")}</p>
             <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10">
               <h2
                 id="demos-heading"
@@ -58,7 +61,7 @@ export function FeatureDemos({ locale }: Props) {
                 {t("demos.heading")}
               </h2>
               <p
-                className={`col-span-12 md:col-span-5 md:col-start-8 mt-5 md:mt-0 text-lg text-rizq-ink-soft leading-relaxed self-end ${font}`}
+                className={`col-span-12 md:col-span-5 md:col-start-8 mt-4 md:mt-0 text-base sm:text-lg text-rizq-ink-soft leading-relaxed self-end ${font}`}
               >
                 {t("demos.sub")}
               </p>
@@ -67,12 +70,17 @@ export function FeatureDemos({ locale }: Props) {
         </Reveal>
 
         {/* Demo grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {demos.map((demo, i) => (
-            <Reveal key={demo.key} delay={i * 0.1}>
+            <Reveal
+              key={demo.key}
+              delay={i * 0.1}
+              className={demo.key === "tone" ? "md:col-span-2 lg:col-span-1" : ""}
+            >
               <DemoCard
                 title={t(demo.titleKey)}
                 caption={t(demo.captionKey)}
+                windowLabel={t(demo.windowKey)}
                 isAr={isAr}
               >
                 {demo.node}

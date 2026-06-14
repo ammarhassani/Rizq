@@ -42,11 +42,11 @@ export async function AiFeatures({ locale }: Props) {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section header */}
         <Reveal>
-          <div className="mb-14 sm:mb-18">
-            <p className={`eyebrow mb-5 text-rizq-gold-dark ${font}`} style={{ color: "var(--color-rizq-gold)" }}>
+          <div className="mb-10 sm:mb-14">
+            <p className={`eyebrow mb-4 text-rizq-gold-dark ${font}`} style={{ color: "var(--color-rizq-gold)" }}>
               {t("aiFeatures.eyebrow")}
             </p>
             <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10">
@@ -101,7 +101,7 @@ export async function AiFeatures({ locale }: Props) {
 
         {/* Honesty label band */}
         <Reveal delay={0.36}>
-          <div className="mt-12 sm:mt-14 flex items-start gap-4 rounded-xl border border-rizq-gold/20 bg-rizq-gold/5 px-5 sm:px-6 py-4">
+          <div className="mt-10 sm:mt-12 flex items-start gap-4 rounded-xl border border-rizq-gold/20 bg-rizq-gold/5 px-5 sm:px-6 py-4">
             <span
               className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-rizq-gold/30 bg-rizq-gold/15 text-rizq-gold text-xs font-bold"
               aria-hidden

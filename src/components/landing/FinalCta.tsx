@@ -38,7 +38,7 @@ export async function FinalCta({ locale }: Props) {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-24 sm:py-32 lg:py-40 flex flex-col items-center text-center">
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-24 lg:py-28 flex flex-col items-center text-center">
         <Reveal asMount>
           <h2
             id="final-cta-heading"

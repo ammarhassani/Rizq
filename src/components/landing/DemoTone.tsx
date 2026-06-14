@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { Quote } from "lucide-react";
 
 type Props = { locale: "ar" | "en" };
 
@@ -54,30 +55,44 @@ export function DemoTone({ locale }: Props) {
         })}
       </div>
 
-      {/* Sample proposal sentence */}
-      <div className="min-h-[5.5rem] rounded-2xl border border-rizq-gold/20 bg-rizq-cream/50 p-4">
-        {reduce ? (
-          <p
-            className={`text-sm leading-relaxed text-rizq-ink ${font}`}
-            aria-live="polite"
-          >
-            “{sample}”
-          </p>
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={tone}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      {/* Proposal snippet card — mirrors the artifact's accented section shell */}
+      <div className="relative overflow-hidden rounded-2xl border border-rizq-gold/20 border-s-[3px] border-s-rizq-green bg-white p-5">
+        {/* watermark quote glyph */}
+        <Quote
+          size={56}
+          strokeWidth={1}
+          aria-hidden
+          className="pointer-events-none absolute -top-2 end-2 text-rizq-gold/10 rtl:-scale-x-100"
+        />
+
+        <p className={`mb-2 text-[0.65rem] tracking-[0.16em] uppercase text-rizq-gold-deep ${font}`}>
+          {t("demos.toneSnippetLabel")}
+        </p>
+
+        <div className="relative min-h-[5.5rem]">
+          {reduce ? (
+            <p
               className={`text-sm leading-relaxed text-rizq-ink ${font}`}
               aria-live="polite"
             >
-              “{sample}”
-            </motion.p>
-          </AnimatePresence>
-        )}
+              {sample}
+            </p>
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={tone}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className={`text-sm leading-relaxed text-rizq-ink ${font}`}
+                aria-live="polite"
+              >
+                {sample}
+              </motion.p>
+            </AnimatePresence>
+          )}
+        </div>
       </div>
     </div>
   );

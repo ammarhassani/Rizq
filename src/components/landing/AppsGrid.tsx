@@ -32,11 +32,11 @@ export async function AppsGrid({ locale }: Props) {
         }}
       />
 
-      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section intro */}
         <Reveal>
-          <div className="mb-14 sm:mb-18">
-            <p className={`eyebrow mb-5 ${font}`}>{t("apps.eyebrow")}</p>
+          <div className="mb-10 sm:mb-14">
+            <p className={`eyebrow mb-4 ${font}`}>{t("apps.eyebrow")}</p>
             <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10">
               <h2
                 id="apps-heading"

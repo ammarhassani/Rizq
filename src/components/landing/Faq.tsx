@@ -30,9 +30,9 @@ export async function Faq({ locale }: Props) {
       aria-labelledby="faq-heading"
       className="relative border-t border-rizq-gold/20"
     >
-      <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         <Reveal>
-          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-12 sm:mb-16">
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-10 sm:mb-14">
             <div className="col-span-12 lg:col-span-5">
               <p className="eyebrow mb-6">{t("eyebrow")}</p>
               <h2

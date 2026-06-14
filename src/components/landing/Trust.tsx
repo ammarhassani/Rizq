@@ -24,12 +24,12 @@ export async function Trust({ locale }: Props) {
       aria-labelledby="trust-heading"
       className="relative border-t border-rizq-gold/20 bg-paper"
     >
-      <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-28 lg:py-32">
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section header + seal side by side on large screens */}
         <Reveal>
-          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-14 sm:mb-18 items-center">
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-10 sm:mb-14 items-center">
             <div className="col-span-12 lg:col-span-8">
-              <p className={`eyebrow mb-5 ${font}`}>{t("trust.eyebrow")}</p>
+              <p className={`eyebrow mb-4 ${font}`}>{t("trust.eyebrow")}</p>
               <h2
                 id="trust-heading"
                 className={`display-2 text-rizq-ink ${font}`}
@@ -45,7 +45,7 @@ export async function Trust({ locale }: Props) {
         </Reveal>
 
         {/* Three pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-8 lg:gap-10">
           {pillars.map(({ titleKey, bodyKey }, i) => {
             const Icon = PILLAR_ICONS[i];
             return (
@@ -79,7 +79,7 @@ export async function Trust({ locale }: Props) {
 
         {/* Methodology CTA */}
         <Reveal delay={0.32}>
-          <div className="mt-14 sm:mt-16">
+          <div className="mt-10 sm:mt-12">
             <Link
               href="/methodology"
               className={`inline-flex items-center gap-2 text-sm font-medium text-rizq-green hover:text-rizq-green-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 rounded-sm ${font}`}

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Check } from "lucide-react";
 
 type Props = { locale: "ar" | "en" };
 
@@ -12,14 +11,17 @@ const ORDER: Status[] = ["draft", "sent", "paid"];
 
 // Representative invoice (demo only, no backend).
 const INVOICE_NO = "INV-2026-014";
+const BRAND_AR = "استوديو نون";
+const BRAND_EN = "Noon Studio";
 const CLIENT_AR = "شركة نخبة";
 const CLIENT_EN = "Nukhba Co.";
-const TOTAL = 4800;
+const SUBTOTAL = 4800;
 
+// Mirror InvoiceArtifact's status badge palette (GigCard-derived).
 const STATUS_STYLES: Record<Status, string> = {
   draft: "border-rizq-ink/15 bg-rizq-ink/8 text-rizq-ink-soft",
-  sent: "border-blue-500/30 bg-blue-500/10 text-blue-700",
-  paid: "border-rizq-green/30 bg-rizq-green/10 text-rizq-green",
+  sent: "border-blue-500/30 bg-blue-50 text-blue-700",
+  paid: "border-emerald-500/30 bg-emerald-50 text-emerald-700",
 };
 
 const STATUS_LABEL_KEY: Record<Status, string> = {
@@ -41,75 +43,125 @@ export function DemoInvoice({ locale }: Props) {
   const nf = new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
     maximumFractionDigits: 0,
   });
-  const currency = isAr ? "ريال" : "SAR";
+  const currency = isAr ? "ر.س" : "SAR";
+  const brand = isAr ? BRAND_AR : BRAND_EN;
   const client = isAr ? CLIENT_AR : CLIENT_EN;
 
+  const atEnd = index === ORDER.length - 1;
   const advance = () => setIndex((i) => (i + 1) % ORDER.length);
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Mini invoice card */}
-      <div className="rounded-2xl border border-rizq-gold/20 bg-rizq-cream/50 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold tracking-wide text-rizq-ink-soft tabular">
-              {INVOICE_NO}
+      {/* Mini invoice — mirrors InvoiceArtifact's structure */}
+      <div className="overflow-hidden rounded-2xl border border-rizq-gold/20 bg-white">
+        {/* Brand header with accent + status badge */}
+        <div
+          className="flex items-center justify-between gap-3 border-s-[3px] border-rizq-green bg-rizq-cream/40 px-4 py-3"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span
+              aria-hidden
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rizq-green font-arabic text-base font-bold text-rizq-cream"
+            >
+              {brand.charAt(0)}
             </span>
-            <span className={`text-sm font-medium text-rizq-ink ${font}`}>
-              {client}
-            </span>
+            <div className="min-w-0">
+              <p className={`truncate text-sm font-bold text-rizq-green leading-tight ${font}`}>
+                {brand}
+              </p>
+              <p className="text-[0.65rem] tabular text-rizq-ink-soft/70">{INVOICE_NO}</p>
+            </div>
           </div>
 
-          {/* Status badge — color AND label change together */}
+          {/* Status badge — color AND label flip together */}
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[status]} ${font}`}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.7rem] font-semibold ${STATUS_STYLES[status]} ${font}`}
           >
-            {/* Check appears at paid. Animation gated behind reduced-motion. */}
-            <AnimatePresence>
-              {isPaid &&
-                (reduce ? (
-                  <Check size={13} strokeWidth={2.5} aria-hidden />
-                ) : (
-                  <motion.span
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                    className="inline-flex"
-                  >
-                    <Check size={13} strokeWidth={2.5} aria-hidden />
-                  </motion.span>
-                ))}
-            </AnimatePresence>
+            <CheckDraw show={isPaid} reduce={!!reduce} />
             <span>{t(STATUS_LABEL_KEY[status])}</span>
           </span>
         </div>
 
+        {/* Bill-to + line item */}
+        <div className="px-4 py-3">
+          <p className={`text-[0.65rem] tracking-[0.16em] uppercase text-rizq-gold-deep ${font}`}>
+            {t("demos.invoiceClientLabel")}
+          </p>
+          <p className={`text-sm font-semibold text-rizq-ink ${font}`}>{client}</p>
+
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-rizq-gold/15 pt-3">
+            <span className={`text-xs text-rizq-ink-soft leading-snug ${font}`}>
+              {t("demos.invoiceLineLabel")}
+            </span>
+            <span className="shrink-0 text-xs font-medium text-rizq-ink tabular">
+              {nf.format(SUBTOTAL)} {currency}
+            </span>
+          </div>
+        </div>
+
         {/* Total */}
-        <div className="mt-5 flex items-baseline justify-between">
-          <span className={`text-xs text-rizq-ink-soft ${font}`}>
-            {isAr ? "الإجمالي" : "Total"}
+        <div className="flex items-baseline justify-between border-t border-rizq-gold/20 bg-rizq-cream/30 px-4 py-3">
+          <span className={`text-xs font-semibold text-rizq-ink ${font}`}>
+            {t("demos.invoiceTotalLabel")}
           </span>
-          <span className="text-2xl font-bold text-rizq-ink tabular">
-            {nf.format(TOTAL)}{" "}
-            <span className={`text-sm font-medium text-rizq-ink-soft ${font}`}>
+          <span className="tabular font-sans text-xl font-bold text-rizq-green leading-none">
+            {nf.format(SUBTOTAL)}
+            <span className={`ms-1.5 text-xs font-normal text-rizq-ink-soft ${font}`}>
               {currency}
             </span>
           </span>
         </div>
       </div>
 
-      {/* Advance button */}
+      {/* Advance / restart control */}
       <button
         type="button"
         onClick={advance}
         className={`inline-flex items-center justify-center gap-2 rounded-xl border border-rizq-green/25 bg-rizq-green/8 px-4 py-2.5 text-sm font-semibold text-rizq-green transition-colors hover:bg-rizq-green/14 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 min-h-[44px] ${font}`}
       >
-        <span>{t("demos.invoiceAdvance")}</span>
-        <span className="rtl:rotate-180" aria-hidden>
-          →
+        <span>{atEnd ? t("demos.invoiceReset") : t("demos.invoiceAdvance")}</span>
+        <span className={atEnd ? "" : "rtl:rotate-180"} aria-hidden>
+          {atEnd ? "↺" : "→"}
         </span>
       </button>
     </div>
+  );
+}
+
+/**
+ * Animated checkmark that draws its stroke on "paid". Under reduced motion it
+ * renders the final check with no draw animation. Uses a small inline SVG so
+ * we control the path-draw precisely.
+ */
+function CheckDraw({ show, reduce }: { show: boolean; reduce: boolean }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.svg
+          key="check"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          initial={reduce ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={reduce ? { opacity: 0 } : { scale: 0.6, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="inline-flex"
+        >
+          <motion.path
+            d="M4 12.5 L9.5 18 L20 6.5"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={reduce ? false : { pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+          />
+        </motion.svg>
+      )}
+    </AnimatePresence>
   );
 }
