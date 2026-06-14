@@ -19,6 +19,9 @@ import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
 
+// editProposal runs an AI change-summary; give the Server Action headroom.
+export const maxDuration = 60;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

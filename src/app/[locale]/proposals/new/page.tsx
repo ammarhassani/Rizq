@@ -18,6 +18,11 @@ import { listTemplates } from "@/app/actions/proposals/templates";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
 
+// Studio's generateProposal Server Action runs the heaviest AI call (scope
+// extraction: large few-shot prompt + complex schema). Give it room so Vercel
+// doesn't kill the function before the 20s AI abort.
+export const maxDuration = 60;
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
