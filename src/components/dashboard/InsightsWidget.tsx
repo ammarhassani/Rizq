@@ -28,6 +28,7 @@ export function InsightsWidget({ locale }: Props) {
 
   const [status, setStatus] = useState<"loading" | "ok" | "error" | "empty">("loading");
   const [insights, setInsights] = useState<InsightItem[]>([]);
+  const [source, setSource] = useState<"ai" | "summary">("ai");
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [cached, setCached] = useState(false);
   const [votes, setVotes] = useState<Record<number, "up" | "down">>({});
@@ -48,6 +49,7 @@ export function InsightsWidget({ locale }: Props) {
         return;
       }
       setInsights(res.insights as InsightItem[]);
+      setSource(res.source ?? "ai");
       setGeneratedAt(res.generated_at);
       setCached(res.cached);
       setStatus("ok");
@@ -143,24 +145,32 @@ export function InsightsWidget({ locale }: Props) {
             </p>
             <div className={`mt-2 flex items-center justify-between gap-2 ${font}`}>
               <p className={`text-xs opacity-60 ${font}`}>
-                {isAr ? "هذا تحليل آلي، ليس استشارة مهنية" : "AI-generated, not professional advice"}
+                {source === "ai"
+                  ? isAr
+                    ? "هذا تحليل آلي، ليس استشارة مهنية"
+                    : "AI-generated, not professional advice"
+                  : isAr
+                    ? "ملخص محسوب من بياناتك"
+                    : "Summary computed from your data"}
               </p>
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => handleVote(i, "up")}
-                  className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-emerald-600" : "text-current opacity-40 hover:opacity-70"}`}
-                  aria-label="useful"
-                >
-                  <ThumbsUp className="h-3 w-3" />
-                </button>
-                <button
-                  onClick={() => handleVote(i, "down")}
-                  className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-red-600" : "text-current opacity-40 hover:opacity-70"}`}
-                  aria-label="not useful"
-                >
-                  <ThumbsDown className="h-3 w-3" />
-                </button>
-              </div>
+              {source === "ai" && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => handleVote(i, "up")}
+                    className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-emerald-600" : "text-current opacity-40 hover:opacity-70"}`}
+                    aria-label="useful"
+                  >
+                    <ThumbsUp className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => handleVote(i, "down")}
+                    className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-red-600" : "text-current opacity-40 hover:opacity-70"}`}
+                    aria-label="not useful"
+                  >
+                    <ThumbsDown className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}

@@ -8,3 +8,12 @@ export const deepseek = createDeepSeek({
 
 /** Default model for reasoned priors + extraction (DeepSeek V3). */
 export const REASONING_MODEL = "deepseek-chat";
+
+/**
+ * Whether the DeepSeek API key is present in this runtime. AI-backed features
+ * check this to degrade gracefully (e.g. a computed fallback) instead of erroring
+ * when the key isn't configured in the serving environment.
+ */
+export function isAIConfigured(): boolean {
+  return (process.env.DEEPSEEK_API_KEY ?? "").trim().length > 0;
+}

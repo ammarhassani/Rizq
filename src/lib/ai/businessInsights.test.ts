@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBusinessInsightsPrompt } from "./businessInsights";
+import { buildBusinessInsightsPrompt, buildDeterministicInsights } from "./businessInsights";
 import type { BusinessInsightsCtx } from "./businessInsights";
 
 const baseCtx: BusinessInsightsCtx = {
@@ -73,5 +73,47 @@ describe("buildBusinessInsightsPrompt", () => {
     const prompt = buildBusinessInsightsPrompt(empty);
     expect(prompt).toContain("لا توجد عروض");
     expect(prompt).toContain("لا يوجد عملاء");
+  });
+});
+
+describe("buildDeterministicInsights (AI fallback)", () => {
+  it("derives facts from the data: income, deadlines, top client, proposals", () => {
+    const insights = buildDeterministicInsights(baseCtx);
+    expect(insights.length).toBeGreaterThan(0);
+    expect(insights.length).toBeLessThanOrEqual(4);
+
+    const income = insights.find((i) => i.kind === "income");
+    expect(income?.ar).toContain("15,000"); // latest month total, grouped
+
+    const client = insights.find((i) => i.kind === "client");
+    expect(client?.ar).toContain("شركة نور"); // highest total_value_sar
+    expect(client?.en).toContain("35,000");
+
+    const proposal = insights.find((i) => i.kind === "proposal");
+    expect(proposal?.ar).toContain("2"); // 2 proposals in 30d
+  });
+
+  it("every insight carries both ar and en (no fabricated empties)", () => {
+    for (const i of buildDeterministicInsights(baseCtx)) {
+      expect(i.ar.trim().length).toBeGreaterThan(0);
+      expect(i.en.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("returns an empty array when there is no data (no throws)", () => {
+    const empty: BusinessInsightsCtx = { proposals: [], gigs: [], clients: [], income: [], deadlines: [] };
+    expect(buildDeterministicInsights(empty)).toEqual([]);
+  });
+
+  it("flags overdue invoices when present", () => {
+    const ctx: BusinessInsightsCtx = {
+      ...baseCtx,
+      deadlines: [
+        { type: "invoice", title: "ف-1", date: "2026-06-01", status: "overdue" },
+        { type: "invoice", title: "ف-2", date: "2026-06-25", status: "sent" },
+      ],
+    };
+    const deadline = buildDeterministicInsights(ctx).find((i) => i.kind === "deadline");
+    expect(deadline?.en).toContain("overdue");
   });
 });

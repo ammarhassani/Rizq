@@ -24,6 +24,78 @@ const BusinessInsightsSchema = z.object({
 });
 
 export type BusinessInsightsResult = z.infer<typeof BusinessInsightsSchema>;
+export type InsightItem = BusinessInsightsResult["insights"][number];
+
+/** Plain integer formatting (Western digits) for embedding in insight strings. */
+function fmtNum(n: number): string {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Math.round(n));
+}
+
+/**
+ * Deterministic, non-AI insights computed directly from the freelancer's data.
+ * Used as a graceful fallback when the AI provider is unavailable, so the
+ * dashboard card always shows something useful and truthful. These are plain
+ * facts from the user's own data — labeled as a summary, never as AI analysis.
+ * Pure + side-effect free (testable).
+ */
+export function buildDeterministicInsights(ctx: BusinessInsightsCtx): InsightItem[] {
+  const out: InsightItem[] = [];
+
+  // Latest month income.
+  if (ctx.income.length > 0) {
+    const m = ctx.income[0];
+    out.push({
+      kind: "income",
+      ar: `دخل شهر ${m.month}: ${fmtNum(m.total_sar)} ريال (مدفوع ${fmtNum(m.paid_sar)}، قيد التحصيل ${fmtNum(m.pending_sar)}).`,
+      en: `${m.month} income: ${fmtNum(m.total_sar)} SAR (paid ${fmtNum(m.paid_sar)}, outstanding ${fmtNum(m.pending_sar)}).`,
+    });
+  }
+
+  // Upcoming / overdue invoice deadlines.
+  if (ctx.deadlines.length > 0) {
+    const overdue = ctx.deadlines.filter((d) => d.status === "overdue").length;
+    const n = ctx.deadlines.length;
+    out.push({
+      kind: "deadline",
+      ar:
+        overdue > 0
+          ? `لديك ${fmtNum(overdue)} فاتورة متأخرة و${fmtNum(n)} فاتورة مستحقة قريبًا. تابع التحصيل.`
+          : `لديك ${fmtNum(n)} فاتورة مستحقة خلال الفترة القادمة.`,
+      en:
+        overdue > 0
+          ? `You have ${fmtNum(overdue)} overdue invoice(s) and ${fmtNum(n)} due soon. Follow up on collection.`
+          : `You have ${fmtNum(n)} invoice(s) due in the coming period.`,
+    });
+  }
+
+  // Top client by lifetime value.
+  const topClient = [...ctx.clients].sort((a, b) => b.total_value_sar - a.total_value_sar)[0];
+  if (topClient && topClient.total_value_sar > 0) {
+    out.push({
+      kind: "client",
+      ar: `أعلى عميل من حيث القيمة: ${topClient.name} (${fmtNum(topClient.total_value_sar)} ريال عبر ${fmtNum(topClient.total_gigs)} مشروع).`,
+      en: `Top client by value: ${topClient.name} (${fmtNum(topClient.total_value_sar)} SAR across ${fmtNum(topClient.total_gigs)} project(s)).`,
+    });
+  }
+
+  // Recent proposal pipeline.
+  if (ctx.proposals.length > 0) {
+    const sum = ctx.proposals.reduce((s, p) => s + (p.amount ?? 0), 0);
+    out.push({
+      kind: "proposal",
+      ar:
+        sum > 0
+          ? `لديك ${fmtNum(ctx.proposals.length)} عرض في آخر 30 يومًا بإجمالي ${fmtNum(sum)} ريال.`
+          : `لديك ${fmtNum(ctx.proposals.length)} عرض في آخر 30 يومًا.`,
+      en:
+        sum > 0
+          ? `${fmtNum(ctx.proposals.length)} proposal(s) in the last 30 days totaling ${fmtNum(sum)} SAR.`
+          : `${fmtNum(ctx.proposals.length)} proposal(s) in the last 30 days.`,
+    });
+  }
+
+  return out.slice(0, 4);
+}
 
 /**
  * Builds the prompt for business insights. Pure function — testable without AI mocking.

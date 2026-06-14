@@ -1,8 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { isAIConfigured } from "@/lib/ai/client";
 import { getUpcomingInvoiceDueDates } from "@/lib/invoices/queries";
-import { generateBusinessInsights } from "@/lib/ai/businessInsights";
+import { generateBusinessInsights, buildDeterministicInsights } from "@/lib/ai/businessInsights";
 import type { BusinessInsightsCtx } from "@/lib/ai/businessInsights";
 
 type InsightItem = {
@@ -17,6 +18,8 @@ type InsightsOkResult = {
   generated_at: string;
   cached: boolean;
   empty?: boolean;
+  /** "ai" = DeepSeek analysis; "summary" = deterministic facts computed from data. */
+  source: "ai" | "summary";
 };
 
 type InsightsErrResult = {
@@ -54,6 +57,7 @@ export async function getBusinessInsightsAction(opts?: {
           generated_at: cache.generated_at as string,
           cached: true,
           empty: insights.length === 0,
+          source: "ai",
         };
       }
     }
@@ -158,34 +162,52 @@ export async function getBusinessInsightsAction(opts?: {
       generated_at: now.toISOString(),
       valid_until: new Date(now.getTime() + 60 * 60 * 1000).toISOString(),
     });
-    return { ok: true, insights: [], generated_at: now.toISOString(), cached: false, empty: true };
+    return { ok: true, insights: [], generated_at: now.toISOString(), cached: false, empty: true, source: "summary" };
   }
 
   const ctx: BusinessInsightsCtx = { proposals, gigs, clients, income, deadlines };
-  const result = await generateBusinessInsights(ctx);
 
-  if (!result) {
-    return { ok: false, code: "ai_error" };
+  // Prefer DeepSeek analysis; fall back to a deterministic, data-derived summary
+  // when the provider is unconfigured or the call fails, so the card never breaks.
+  let insights: InsightItem[] | null = null;
+  let source: "ai" | "summary" = "summary";
+
+  if (isAIConfigured()) {
+    const result = await generateBusinessInsights(ctx);
+    if (result) {
+      insights = result.insights as InsightItem[];
+      source = "ai";
+    } else {
+      console.error("[getBusinessInsightsAction] AI returned no result — falling back to summary");
+    }
+  } else {
+    console.warn("[getBusinessInsightsAction] DEEPSEEK_API_KEY not set — using deterministic summary");
   }
 
-  const insights = result.insights as InsightItem[];
+  if (!insights) {
+    insights = buildDeterministicInsights(ctx) as InsightItem[];
+    source = "summary";
+  }
+
   const generatedAt = now.toISOString();
-  const validUntil = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
 
-  // Upsert cache
-  const { error: upsertErr } = await supabase.from("dashboard_insights_cache").upsert({
-    user_id: userId,
-    insights,
-    generated_at: generatedAt,
-    valid_until: validUntil,
-    feedback: null,
-  });
-
-  if (upsertErr) {
-    console.error("[getBusinessInsightsAction] cache upsert failed", upsertErr.message);
+  // Cache AI results only (the deterministic summary is cheap and should reflect
+  // live data on each load).
+  if (source === "ai") {
+    const validUntil = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+    const { error: upsertErr } = await supabase.from("dashboard_insights_cache").upsert({
+      user_id: userId,
+      insights,
+      generated_at: generatedAt,
+      valid_until: validUntil,
+      feedback: null,
+    });
+    if (upsertErr) {
+      console.error("[getBusinessInsightsAction] cache upsert failed", upsertErr.message);
+    }
   }
 
-  return { ok: true, insights, generated_at: generatedAt, cached: false };
+  return { ok: true, insights, generated_at: generatedAt, cached: false, source };
 }
 
 export async function submitInsightFeedbackAction(opts: {
