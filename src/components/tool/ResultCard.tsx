@@ -2,10 +2,28 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Copy, Globe, HandCoins, Lock, RotateCcw } from "lucide-react";
+import { Check, Copy, Globe, HandCoins, Lock, RotateCcw, FileText } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { toggleShare } from "@/app/actions/tool/calculate";
+import { track } from "@/lib/analytics/track";
+import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
+
+/** Maps dominant provenance kind to the corresponding methodology section anchor. */
+function methodologyFragment(kind: BenchmarkProvenance | undefined): string {
+  switch (kind) {
+    case "reasoned":
+    case "founder":
+      return "#reasoned-priors";
+    case "published_ref":
+      return "#published-references";
+    case "ingested":
+    case "partner":
+      return "#open-data";
+    default:
+      return "#weighted-percentile";
+  }
+}
 
 type Props = {
   locale: "ar" | "en";
@@ -17,10 +35,17 @@ type Props = {
   fallback_used: boolean;
   fallback_kind: "none" | "region" | "specialty";
   comparison_percent_below: number;
+  provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
+  provenanceCitation?: string;  // pre-localized full citation sentence
+  confidenceScore?: number;     // 0..1
+  /** Raw dominant provenance kind — used to deep-link the methodology page */
+  provenanceKind?: BenchmarkProvenance;
   // Whether the user is authenticated and can toggle share (anon = readonly)
   canShare: boolean;
   // Whether public_share is already on (e.g. when revisiting the result)
   initiallyShared?: boolean;
+  // Whether the viewer is authenticated — used to route the proposal CTA
+  isAuthed: boolean;
   onReset: () => void;
 };
 
@@ -34,12 +59,18 @@ export function ResultCard({
   fallback_used,
   fallback_kind,
   comparison_percent_below,
+  provenanceLabel,
+  provenanceCitation,
+  confidenceScore,
+  provenanceKind,
   canShare,
   initiallyShared = false,
+  isAuthed,
   onReset,
 }: Props) {
   const t = useTranslations("Tool.result");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
+  const methodologyHref = `/methodology${methodologyFragment(provenanceKind)}`;
 
   const [isShared, setIsShared] = useState(initiallyShared);
   const [shareUrl, setShareUrl] = useState<string | null>(
@@ -149,8 +180,25 @@ export function ResultCard({
               : t("fallbackSpecialty")}
           </p>
         )}
+        {provenanceLabel && (
+          <p className={`sm:col-span-2 flex flex-wrap items-center gap-2 text-sm text-rizq-ink ${font}`}>
+            <span className="inline-flex items-center gap-1 rounded-full border border-rizq-green/30 bg-rizq-green/10 px-2.5 py-0.5 text-xs text-rizq-green">
+              {provenanceLabel}
+            </span>
+            {typeof confidenceScore === "number" && (
+              <span className="text-xs text-rizq-ink-soft/70">
+                {t("confidenceLabel")}: {numberFmt.format(Math.round(confidenceScore * 100))}%
+              </span>
+            )}
+          </p>
+        )}
+        {provenanceCitation && (
+          <p className={`sm:col-span-2 text-xs text-rizq-ink-soft italic ${font}`}>
+            {provenanceCitation}
+          </p>
+        )}
         <Link
-          href="/methodology"
+          href={methodologyHref as "/methodology"}
           className={`sm:col-span-2 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
         >
           <span>{t("methodologyLink")}</span>
@@ -229,6 +277,26 @@ export function ResultCard({
           </Link>
         </div>
       )}
+
+      {/* Proposal CTA — prominent, shown to all users.
+          Authed → /proposals/new; anon → /signup?next=/proposals/new */}
+      <div className="mt-6 pt-5 border-t border-rizq-gold/15">
+        <Link
+          href={
+            isAuthed
+              ? "/proposals/new"
+              : `/signup?next=/proposals/new`
+          }
+          onClick={() => track("proposal_cta_clicked", { authed: isAuthed })}
+          className={`group inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
+        >
+          <FileText size={14} strokeWidth={1.8} />
+          <span>{t("createProposal")}</span>
+          <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
+            →
+          </span>
+        </Link>
+      </div>
     </article>
   );
 }

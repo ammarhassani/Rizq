@@ -1,421 +1,267 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { hasLocale } from "next-intl";
+/**
+ * /[locale]/dashboard — M0 Dashboard home. Phase-5 tasks P5.2 + P5.3.
+ * Server component. Auth-gated. Loads widget data in parallel.
+ */
 import { notFound, redirect } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
 import { SiteNav } from "@/components/nav/SiteNav";
-import { VerifyBanner } from "@/components/auth/VerifyBanner";
-import { QuotaBadge } from "@/components/tool/QuotaBadge";
-import { getQuotaState } from "@/lib/pricing/quota";
-import { Reveal } from "@/components/motion/Reveal";
-import { ArrowRight, Globe, History, HandCoins, ShieldCheck } from "lucide-react";
+import { getUpcomingInvoiceDueDates } from "@/lib/invoices/queries";
+import { resolvePrice } from "@/lib/pricing/resolve";
+import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { RecentProposalsWidget } from "@/components/dashboard/RecentProposalsWidget";
+import { UpcomingDeadlinesWidget } from "@/components/dashboard/UpcomingDeadlinesWidget";
+import { ActiveClientsWidget } from "@/components/dashboard/ActiveClientsWidget";
+import { MonthlyIncomeWidget } from "@/components/dashboard/MonthlyIncomeWidget";
+import { QuickPricingWidget } from "@/components/dashboard/QuickPricingWidget";
+import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
+import type { UpcomingInvoice } from "@/lib/invoices/queries";
 
-type HistoryRow = {
-  id: string;
-  result_median: number | null;
-  result_sample_size: number | null;
-  public_share: boolean;
-  created_at: string;
-  specialty: { name_ar: string; name_en: string; slug: string } | null;
-  city: { name_ar: string; name_en: string; slug: string } | null;
-  experience_tier: { name_ar: string; name_en: string; slug: string } | null;
-};
+type Params = { locale: string };
 
-type SubmissionRow = {
-  id: string;
-  status: "pending" | "approved" | "rejected" | "needs_info";
-  price_sar: string | number;
-  submitted_at: string;
-  moderator_notes: string | null;
-  specialty: { name_ar: string; name_en: string; slug: string } | null;
-  city: { name_ar: string; name_en: string; slug: string } | null;
-};
+export async function generateMetadata({ params }: { params: Promise<Params> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Dashboard" });
+  return { title: `${t("dashboardTitle")} — رِزق` };
+}
 
-export default async function DashboardPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function DashboardPage({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/login`);
-
-  const [profileRes, quota, historyRes, submissionsRes] = await Promise.all([
-    supabase
-      .from("users")
-      .select("name, email, preferred_language, role, bonus_quota, onboarded_at")
-      .eq("id", user.id)
-      .single(),
-    getQuotaState(),
-    supabase
-      .from("queries")
-      .select(`
-        id, result_median, result_sample_size, public_share, created_at,
-        specialty:specialties (slug, name_ar, name_en),
-        city:cities (slug, name_ar, name_en),
-        experience_tier:experience_tiers (slug, name_ar, name_en)
-      `)
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(10),
-    supabase
-      .from("pricing_submissions")
-      .select(`
-        id, status, price_sar, submitted_at, moderator_notes,
-        specialty:specialties (slug, name_ar, name_en),
-        city:cities (slug, name_ar, name_en)
-      `)
-      .eq("user_id", user.id)
-      .order("submitted_at", { ascending: false })
-      .limit(5),
-  ]);
-
-  const profile = profileRes.data;
-  // Gate first-time users into onboarding. Backfill in the migration set
-  // onboarded_at = created_at for existing users, so only brand-new signups
-  // see this redirect.
-  if (profile && profile.onboarded_at === null) {
-    redirect(`/${locale}/onboarding`);
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) {
+    const loginPath = getPathname({ href: "/login", locale: locale as "ar" | "en" });
+    redirect(loginPath);
   }
-  const history = (historyRes.data ?? []) as unknown as HistoryRow[];
-  const submissions = (submissionsRes.data ?? []) as unknown as SubmissionRow[];
-  const isAdmin = profile?.role === "admin";
 
-  const displayName = profile?.name || user.email?.split("@")[0] || "";
-  const t = await getTranslations({ locale, namespace: "Dashboard" });
-  const tTool = await getTranslations({ locale, namespace: "Tool" });
-  const tContribute = await getTranslations({ locale, namespace: "ContributeCTA" });
-  const tMySubs = await getTranslations({ locale, namespace: "MySubmissions" });
-  const font = locale === "ar" ? "font-arabic" : "font-sans";
+  const userId = userData.user.id;
+  const isAr = locale === "ar";
+  const font = isAr ? "font-arabic" : "font-sans";
+  const dir = isAr ? "rtl" : "ltr";
 
-  const emailConfirmed =
-    user.email_confirmed_at !== null && user.email_confirmed_at !== undefined;
+  // Fetch user profile: name + onboarding specialty/city/tier IDs (M8 columns).
+  // NOTE: users has no *_slug columns — quick pricing resolves slugs from the
+  // ref tables below using these FK ids.
+  const { data: profile } = await supabase
+    .from("users")
+    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id")
+    .eq("id", userId)
+    .maybeSingle();
 
-  const mode = (quota.ok ? quota.mode : "free") as
-    | "anon"
-    | "free"
-    | "pro"
-    | "admin";
-  const remaining = quota.ok ? quota.remaining : 0;
-  const limit = 3 + (profile?.bonus_quota ?? 0);
-  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  });
-  const dateFmt = new Intl.DateTimeFormat(
-    locale === "ar" ? "ar-SA" : "en-US",
-    { day: "numeric", month: "short" }
-  );
+  const userName =
+    (profile?.full_name_ar as string | null) ??
+    (profile?.name as string | null) ??
+    userData.user.email?.split("@")[0] ??
+    null;
+
+  // --- Parallel data fetches, each wrapped in try/catch ---
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+  const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
+
+  // Proposals (last 30d, last 5). proposals has no title/final_price_sar columns —
+  // use client_name (typed) as the label and price_anchor as the amount.
+  type ProposalRow = {
+    id: string;
+    client_name: string | null;
+    status: string;
+    price_anchor: number | null;
+    created_at: string | null;
+    clients: { name: string } | null;
+  };
+  let proposals: ProposalRow[] = [];
+  {
+    const { data, error } = await supabase
+      .from("proposals")
+      .select("id, client_name, status, price_anchor, created_at, clients(name)")
+      .eq("user_id", userId)
+      .gte("created_at", thirtyDaysAgo)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    if (error) console.error("[dashboard] proposals query failed", error.message);
+    proposals = (data ?? []) as unknown as ProposalRow[];
+  }
+
+  // Upcoming invoice deadlines (next 7 items)
+  let invoiceDeadlines: UpcomingInvoice[] = [];
+  try {
+    invoiceDeadlines = await getUpcomingInvoiceDueDates(supabase, userId, { limit: 7 });
+  } catch { /* widget shows error state */ }
+
+  // Clients
+  type ClientRow = {
+    id: string;
+    name: string;
+    total_gigs: number | null;
+    total_value_sar: number | null;
+    last_contacted_at: string | null;
+  };
+  let clients: ClientRow[] = [];
+  try {
+    const { data } = await supabase
+      .from("clients")
+      .select("id, name, total_gigs, total_value_sar, last_contacted_at")
+      .eq("user_id", userId)
+      .order("last_contacted_at", { ascending: false })
+      .limit(10);
+    clients = (data ?? []) as ClientRow[];
+  } catch { /* widget shows error state */ }
+
+  // Monthly income (current + previous month)
+  type MonthlyRow = {
+    month: string | null;
+    total_sar: number | null;
+    paid_sar: number | null;
+    pending_sar: number | null;
+  };
+  let currentMonth: MonthlyRow | null = null;
+  let prevMonth: MonthlyRow | null = null;
+  try {
+    const { data } = await supabase
+      .from("monthly_income")
+      .select("month, total_sar, paid_sar, pending_sar")
+      .gte("month", prevMonthStart)
+      .lte("month", prevMonthEnd)
+      .order("month", { ascending: false })
+      .limit(2);
+    const rows = (data ?? []) as MonthlyRow[];
+    currentMonth = rows.find((r) => {
+      if (!r.month) return false;
+      const d = new Date(r.month);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }) ?? null;
+    prevMonth = rows.find((r) => {
+      if (!r.month) return false;
+      const d = new Date(r.month);
+      const p = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      return d.getFullYear() === p.getFullYear() && d.getMonth() === p.getMonth();
+    }) ?? null;
+  } catch { /* widget shows 0 state */ }
+
+  // Quick pricing — resolve slugs from the user's onboarding FK ids (if set),
+  // then call resolvePrice. Most users haven't set these yet → widget shows CTA.
+  let quickPricingAnchor: number | null = null;
+  let quickPricingSpecialty: string | null = null;
+  const specialtyId = (profile?.primary_specialty_id as string | null) ?? null;
+  const cityId = (profile?.city_id as string | null) ?? null;
+  const tierId = (profile?.experience_tier_id as string | null) ?? null;
+  if (specialtyId && cityId && tierId) {
+    try {
+      const [specRes, cityRes, tierRes] = await Promise.all([
+        supabase.from("specialties").select("slug, name_ar, name_en").eq("id", specialtyId).maybeSingle(),
+        supabase.from("cities").select("slug").eq("id", cityId).maybeSingle(),
+        supabase.from("experience_tiers").select("slug").eq("id", tierId).maybeSingle(),
+      ]);
+      const sSlug = specRes.data?.slug as string | undefined;
+      const cSlug = cityRes.data?.slug as string | undefined;
+      const tSlug = tierRes.data?.slug as string | undefined;
+      if (sSlug && cSlug && tSlug) {
+        const res = await resolvePrice({
+          specialty_slug: sSlug,
+          city_slug: cSlug,
+          experience_tier_slug: tSlug,
+        });
+        if (res.status === "ok") {
+          quickPricingAnchor = res.anchor;
+          quickPricingSpecialty =
+            (isAr ? (specRes.data?.name_ar as string | null) : (specRes.data?.name_en as string | null)) ?? sSlug;
+        }
+      }
+    } catch { /* skip gracefully */ }
+  }
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col bg-paper">
+      {/* Dot-grid background */}
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.45] pointer-events-none"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
+          backgroundImage: "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
           backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
         }}
       />
+      <SiteNav locale={locale as "ar" | "en"} />
+      <main
+        className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
+        dir={dir}
+      >
+        {/* Page header */}
+        <div className="mb-8 sm:mb-10">
+          <p className="eyebrow mb-3">{isAr ? "لوحة التحكم" : "Dashboard"}</p>
+          <h1 className={`display-2 text-rizq-ink ${font}`}>
+            {userName
+              ? (isAr ? `أهلًا، ${userName}` : `Welcome, ${userName}`)
+              : (isAr ? "أهلًا بك في رِزق" : "Welcome to Rizq")}
+          </h1>
+        </div>
 
-      <SiteNav locale={locale} />
-
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
-        <Reveal asMount>
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-            <div>
-              <p className="eyebrow mb-4">
-                {locale === "ar" ? "حسابك" : "Your account"}
-              </p>
-              <h1 className={`display-2 text-rizq-ink ${font}`}>
-                {displayName
-                  ? t("welcome", { name: displayName })
-                  : t("welcomeGuest")}
-              </h1>
-            </div>
-            <div className="shrink-0 pt-2">
-              <QuotaBadge
-                locale={locale}
-                mode={mode}
-                remaining={remaining}
-                limit={limit}
-              />
-            </div>
+        {/* Widget grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          {/* InsightsWidget: full-width hero, client island */}
+          <div className="col-span-full">
+            <InsightsWidget locale={locale as "ar" | "en"} />
           </div>
-        </Reveal>
 
-        {!emailConfirmed && user.email && (
-          <Reveal asMount delay={0.12}>
-            <div className="mt-10 max-w-3xl">
-              <VerifyBanner locale={locale} email={user.email} />
-            </div>
-          </Reveal>
-        )}
+          {/* Recent Proposals */}
+          <RecentProposalsWidget
+            proposals={proposals.map((p) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const linked = ((p.clients as any)?.name as string | null) ?? null;
+              return {
+                id: p.id,
+                title: p.client_name ?? linked,
+                client_name: linked,
+                status: p.status,
+                final_price_sar: p.price_anchor,
+                created_at: p.created_at,
+              };
+            })}
+            locale={locale as "ar" | "en"}
+          />
 
-        {/* Primary CTA — Open the tool */}
-        <Reveal asMount delay={0.2}>
-          <div className="mt-12 sm:mt-16 grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-            <Link
-              href="/tool"
-              className="group lg:col-span-2 block relative overflow-hidden rounded-3xl border border-rizq-green/25 bg-gradient-to-br from-rizq-green/8 via-rizq-cream to-rizq-gold/8 px-7 py-8 sm:px-10 sm:py-10 hover:border-rizq-green/45 hover:-translate-y-0.5 transition-all"
-            >
-              <div className="flex items-center justify-between gap-6">
-                <div className="flex-1">
-                  <p className="eyebrow mb-3">{tTool("eyebrow")}</p>
-                  <h2 className={`text-2xl sm:text-3xl font-semibold text-rizq-ink leading-snug ${font}`}>
-                    {tTool("title")}
-                  </h2>
-                  <p className={`mt-2 text-sm sm:text-base text-rizq-ink-soft ${font}`}>
-                    {t("openTool")}
-                  </p>
-                </div>
-                <span className="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-rizq-green text-rizq-cream shrink-0 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
-                  <ArrowRight size={22} strokeWidth={1.8} className="rtl:rotate-180" />
-                </span>
-              </div>
-            </Link>
+          {/* Upcoming Deadlines */}
+          <UpcomingDeadlinesWidget
+            invoices={invoiceDeadlines}
+            locale={locale as "ar" | "en"}
+          />
 
-            {/* Secondary CTA — Contribute data */}
-            <Link
-              href="/submit"
-              className="group block rounded-3xl border border-rizq-gold/25 bg-rizq-cream/70 px-6 py-7 hover:border-rizq-gold-dark/40 hover:-translate-y-0.5 transition-all"
-            >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rizq-gold/30 bg-rizq-cream text-rizq-gold-dark mb-4">
-                <HandCoins size={18} strokeWidth={1.6} />
-              </span>
-              <h3 className={`text-lg font-semibold text-rizq-ink mb-2 ${font}`}>
-                {tContribute("title")}
-              </h3>
-              <p className={`text-sm text-rizq-ink-soft mb-4 leading-relaxed ${font}`}>
-                {tContribute("subtitle")}
-              </p>
-              <span className={`inline-flex items-center gap-2 text-sm text-rizq-green font-medium ${font}`}>
-                <span>{tContribute("cta")}</span>
-                <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
-                  →
-                </span>
-              </span>
-            </Link>
+          {/* Active Clients */}
+          <ActiveClientsWidget
+            clients={clients}
+            locale={locale as "ar" | "en"}
+          />
+
+          {/* Monthly Income */}
+          <MonthlyIncomeWidget
+            current={currentMonth}
+            previous={prevMonth}
+            locale={locale as "ar" | "en"}
+          />
+
+          {/* Quick Pricing */}
+          <QuickPricingWidget
+            anchor={quickPricingAnchor}
+            specialty={quickPricingSpecialty}
+            locale={locale as "ar" | "en"}
+          />
+
+          {/* Quick Actions — full width */}
+          <div className="col-span-full">
+            <QuickActionsWidget locale={locale as "ar" | "en"} />
           </div>
-        </Reveal>
-
-        {/* Admin link — visible only to admins */}
-        {isAdmin && (
-          <Reveal asMount delay={0.28}>
-            <div className="mt-6">
-              <Link
-                href="/admin"
-                className={`inline-flex items-center gap-2 text-sm text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
-              >
-                <ShieldCheck size={14} strokeWidth={1.8} />
-                <span>{locale === "ar" ? "لوحة المراجع" : "Review panel"}</span>
-                <span className="inline-block rtl:rotate-180">→</span>
-              </Link>
-            </div>
-          </Reveal>
-        )}
-
-        {/* Query history */}
-        <Reveal asMount delay={0.32}>
-          <section className="mt-16 max-w-4xl">
-            <div className="flex items-center gap-3 mb-6">
-              <History size={16} className="text-rizq-gold-dark" strokeWidth={1.6} />
-              <h2 className={`text-lg font-semibold text-rizq-ink ${font}`}>
-                {t("historyHeading")}
-              </h2>
-            </div>
-
-            {history.length === 0 ? (
-              <p className={`text-sm text-rizq-ink-soft/70 ${font}`}>
-                {t("historyEmpty")}
-              </p>
-            ) : (
-              <ul className="divide-y divide-rizq-gold/15 border-y border-rizq-gold/15">
-                {history.map((row) => {
-                  const sName = row.specialty
-                    ? row.specialty[locale === "ar" ? "name_ar" : "name_en"]
-                    : "—";
-                  const cName = row.city
-                    ? row.city[locale === "ar" ? "name_ar" : "name_en"]
-                    : "—";
-                  const tName = row.experience_tier
-                    ? row.experience_tier[locale === "ar" ? "name_ar" : "name_en"]
-                    : "—";
-                  const median = row.result_median !== null
-                    ? Math.round(Number(row.result_median))
-                    : null;
-
-                  // Prefill URL: /tool?specialty=...&city=...&tier=...
-                  const rerunParams = new URLSearchParams();
-                  if (row.specialty) rerunParams.set("specialty", row.specialty.slug);
-                  if (row.city) rerunParams.set("city", row.city.slug);
-                  if (row.experience_tier)
-                    rerunParams.set("tier", row.experience_tier.slug);
-                  const rerunHref = `/tool?${rerunParams.toString()}`;
-
-                  return (
-                    <li
-                      key={row.id}
-                      className="group py-4 sm:py-5 flex items-center justify-between gap-4 hover:bg-rizq-gold/[0.04] -mx-2 px-2 rounded-lg transition-colors"
-                    >
-                      <Link
-                        href={rerunHref}
-                        className="min-w-0 flex-1 outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 rounded-md"
-                      >
-                        <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
-                          {sName}{" "}
-                          <span className="text-rizq-ink-soft/70">·</span>{" "}
-                          {cName}{" "}
-                          <span className="text-rizq-ink-soft/70">·</span>{" "}
-                          {tName}
-                        </p>
-                        <p className={`mt-1 text-xs text-rizq-ink-soft ${font}`}>
-                          {dateFmt.format(new Date(row.created_at))}
-                          {row.public_share && (
-                            <span className="ms-3 inline-flex items-center gap-1 text-rizq-green">
-                              <Globe size={11} strokeWidth={2} />
-                              {t("historyShare")}
-                            </span>
-                          )}
-                        </p>
-                      </Link>
-                      <div className="flex items-center gap-4 shrink-0">
-                        {median !== null && (
-                          <span className="hidden sm:flex flex-col items-end">
-                            <span className="font-sans tabular text-lg font-medium text-rizq-green leading-none">
-                              {fmt.format(median)}
-                            </span>
-                            <span className={`text-[10px] tracking-wider uppercase text-rizq-ink-soft/60 mt-0.5 ${font}`}>
-                              {tTool("result.currency")}
-                            </span>
-                          </span>
-                        )}
-                        <Link
-                          href={rerunHref}
-                          className={`text-xs text-rizq-green hover:text-rizq-green-dark transition-colors opacity-70 group-hover:opacity-100 ${font}`}
-                        >
-                          {t("historyRerun")}
-                        </Link>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-        </Reveal>
-
-        {/* My submissions */}
-        <Reveal asMount delay={0.4}>
-          <section className="mt-16 max-w-4xl">
-            <div className="flex items-center justify-between gap-3 mb-6">
-              <div className="flex items-center gap-3">
-                <HandCoins size={16} className="text-rizq-gold-dark" strokeWidth={1.6} />
-                <h2 className={`text-lg font-semibold text-rizq-ink ${font}`}>
-                  {tMySubs("heading")}
-                </h2>
-              </div>
-              <Link
-                href="/submit"
-                className={`text-xs text-rizq-green hover:text-rizq-green-dark transition-colors ${font}`}
-              >
-                {tContribute("cta")} →
-              </Link>
-            </div>
-
-            {submissions.length === 0 ? (
-              <p className={`text-sm text-rizq-ink-soft/70 ${font}`}>
-                {tMySubs("empty")}
-              </p>
-            ) : (
-              <ul className="divide-y divide-rizq-gold/15 border-y border-rizq-gold/15">
-                {submissions.map((s) => {
-                  const sName = s.specialty
-                    ? s.specialty[locale === "ar" ? "name_ar" : "name_en"]
-                    : "—";
-                  const cName = s.city
-                    ? s.city[locale === "ar" ? "name_ar" : "name_en"]
-                    : "—";
-                  const statusKey = s.status as
-                    | "pending"
-                    | "approved"
-                    | "rejected"
-                    | "needs_info";
-                  const statusTone =
-                    statusKey === "approved"
-                      ? "text-rizq-green"
-                      : statusKey === "rejected"
-                        ? "text-red-700"
-                        : statusKey === "needs_info"
-                          ? "text-amber-700"
-                          : "text-rizq-ink-soft";
-                  const needsAction = statusKey === "needs_info";
-
-                  return (
-                    <li key={s.id} className="py-4 sm:py-5">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <p className={`text-sm sm:text-base font-medium text-rizq-ink ${font} truncate`}>
-                            {sName}{" "}
-                            <span className="text-rizq-ink-soft/70">·</span>{" "}
-                            {cName}
-                          </p>
-                          <p className={`mt-1 text-xs text-rizq-ink-soft ${font}`}>
-                            {dateFmt.format(new Date(s.submitted_at))}
-                            <span className={`ms-3 ${statusTone}`}>
-                              {tMySubs(`status.${statusKey}`)}
-                            </span>
-                          </p>
-                        </div>
-                        <span className="hidden sm:inline-flex flex-col items-end shrink-0">
-                          <span className="font-sans tabular text-lg font-medium text-rizq-ink leading-none">
-                            {fmt.format(Number(s.price_sar))}
-                          </span>
-                          <span className={`text-[10px] tracking-wider uppercase text-rizq-ink-soft/60 mt-0.5 ${font}`}>
-                            {tTool("result.currency")}
-                          </span>
-                        </span>
-                      </div>
-
-                      {/* Moderator request + Update CTA */}
-                      {needsAction && (
-                        <div className="mt-3 ms-0 sm:ms-0 rounded-2xl border border-amber-300/40 bg-amber-50/60 px-4 py-3">
-                          {s.moderator_notes && (
-                            <>
-                              <p className={`text-[10px] tracking-[0.18em] uppercase text-amber-800 mb-1 ${font}`}>
-                                {tMySubs("moderatorNoteLabel")}
-                              </p>
-                              <p className={`text-sm text-rizq-ink-soft leading-relaxed mb-3 ${font}`}>
-                                {s.moderator_notes}
-                              </p>
-                            </>
-                          )}
-                          <Link
-                            href={`/submit?resubmit=${s.id}`}
-                            className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-4 py-2 text-sm font-medium hover:bg-rizq-green-dark transition-colors ${font}`}
-                          >
-                            <span>{tMySubs("updateCta")}</span>
-                            <span className="inline-block rtl:rotate-180">→</span>
-                          </Link>
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
-        </Reveal>
+        </div>
       </main>
     </div>
   );
 }
+

@@ -109,6 +109,7 @@ export default async function ToolPage({
           cities={cityOptions}
           tiers={tierOptions}
           canShare={isAuth}
+          isAuthed={isAuth}
         />
 
         {/* If quota was already exhausted server-side, the ToolFlow's quota

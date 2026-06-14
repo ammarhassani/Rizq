@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { calculateBenchmark, type CalculateResult } from "@/lib/pricing/calculate";
+import { resolvePrice, type ResolveResult } from "@/lib/pricing/resolve";
 import { getQuotaState } from "@/lib/pricing/quota";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
@@ -25,8 +25,8 @@ export type ToolActionResult =
       query_id: string;
       // null when result is insufficient_data
       result:
-        | (Extract<CalculateResult, { status: "ok" }> & { id: string })
-        | Extract<CalculateResult, { status: "insufficient_data" }>;
+        | (Extract<ResolveResult, { status: "ok" }> & { id: string })
+        | Extract<ResolveResult, { status: "insufficient_data" }>;
       quota: {
         mode: "anon" | "free" | "pro" | "admin";
         remaining: number | "unlimited";
@@ -63,7 +63,7 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
   }
 
   // Calculate
-  const result = await calculateBenchmark(parsed.data);
+  const result = await resolvePrice(parsed.data);
 
   if (result.status === "invalid_input") {
     return { ok: false, code: "invalid" };
@@ -122,7 +122,9 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
       p_session_id: quota.session_id,
       p_project_size: parsed.data.project_size ?? null,
       p_result_min: result.min,
-      p_result_median: result.median,
+      // queries.result_median stores the resolver's anchor (p50, rounded to the
+      // nearest 50 SAR then clamped into [min,max]). The column name is legacy.
+      p_result_median: result.anchor,
       p_result_max: result.max,
       p_result_sample_size: result.sample_size,
       p_result_fallback_used: result.fallback_used,
@@ -154,19 +156,12 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
       ? ("unlimited" as const)
       : Math.max(0, quota.remaining - 1);
 
-  if (result.status === "ok") {
-    return {
-      ok: true,
-      query_id: inserted.id,
-      result: { ...result, id: inserted.id },
-      quota: { mode: quota.mode, remaining },
-    };
-  }
-
+  // invalid_input and insufficient_data already returned earlier, so result is
+  // always status "ok" here — attach the inserted query id for sharing.
   return {
     ok: true,
     query_id: inserted.id,
-    result,
+    result: { ...result, id: inserted.id },
     quota: { mode: quota.mode, remaining },
   };
 }
