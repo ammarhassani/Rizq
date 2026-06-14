@@ -5,7 +5,9 @@ import { routing } from "@/i18n/routing";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { Hero } from "@/components/landing/Hero";
 import { AppsGrid } from "@/components/landing/AppsGrid";
+import { IntegrationsFlow } from "@/components/landing/IntegrationsFlow";
 import { AiFeatures } from "@/components/landing/AiFeatures";
+import { FeatureDemos } from "@/components/landing/FeatureDemos";
 import { Trust } from "@/components/landing/Trust";
 import { Pricing } from "@/components/landing/Pricing";
 import { FounderNote } from "@/components/landing/FounderNote";
@@ -37,14 +39,14 @@ export default async function LandingPage({
         {/* 2. Apps grid — all 13 modules, flat Odoo-style marketplace */}
         <AppsGrid locale={locale} />
 
-        {/* 3. IntegrationsFlow — Phase 3 motion section (added next phase) */}
-        {/* <IntegrationsFlow locale={locale} /> */}
+        {/* 3. IntegrationsFlow — "كل شيء متصل" RTL scroll-draw flow */}
+        <IntegrationsFlow locale={locale} />
 
         {/* 4. AI Features band — تحليل رِزق with honesty label */}
         <AiFeatures locale={locale} />
 
-        {/* 5. FeatureDemos — Phase 3 interactive demos (added next phase) */}
-        {/* <FeatureDemos locale={locale} /> */}
+        {/* 5. FeatureDemos — three interactive client-side mini demos */}
+        <FeatureDemos locale={locale} />
 
         {/* 6. Trust pillars — methodology, halal, data-ownership */}
         <Trust locale={locale} />
