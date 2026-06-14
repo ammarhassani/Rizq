@@ -107,7 +107,7 @@ export async function markInvoiceStatus(
   const { data: invoice, error: fetchErr } = await supabase
     .from("invoices")
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .eq("id", invoice_id)
     .eq("user_id", userId)
@@ -206,6 +206,7 @@ export async function markInvoiceStatus(
     status: targetStatus,
     description: invoice.description as string | null,
     items: invoice.items,
+    fees: invoice.fees,
     subtotal_sar: Number(invoice.subtotal_sar),
     vat_pct: Number(invoice.vat_pct),
     vat_sar: Number(invoice.vat_sar),

@@ -30,6 +30,7 @@ function baseInput(overrides?: Partial<InvoiceArtifactInput>): InvoiceArtifactIn
       { description: "تصميم شعار", quantity: 1, unit_price_sar: 2000, total_sar: 2000 },
       { description: "بطاقة أعمال", quantity: 2, unit_price_sar: 500,  total_sar: 1000 },
     ],
+    fees: [],
     description: "تصميم هوية بصرية كاملة",
     subtotalSar: 3000,
     vatPct: 15,
@@ -216,6 +217,28 @@ describe("totals section", () => {
     expect(s.content["vat_pct"]).toBe(0);
     expect(s.content["vat_sar"]).toBe(0);
     expect(s.content["total_sar"]).toBe(500);
+  });
+
+  it("surfaces fees + their subtotal in the totals content", () => {
+    const { sections } = buildInvoiceArtifact(
+      baseInput({
+        fees: [
+          { name: "رسوم استعجال", category: null, amount_sar: 200 },
+          { name: "توصيل", category: "لوجستيات", amount_sar: 50 },
+        ],
+      })
+    );
+    const s = sections.find((s) => s.id === "totals")!;
+    expect(s.content["fees_sar"]).toBe(250);
+    expect(Array.isArray(s.content["fees"])).toBe(true);
+    expect((s.content["fees"] as unknown[]).length).toBe(2);
+  });
+
+  it("empty fees → fees_sar 0 and an empty array", () => {
+    const { sections } = buildInvoiceArtifact(baseInput());
+    const s = sections.find((s) => s.id === "totals")!;
+    expect(s.content["fees_sar"]).toBe(0);
+    expect(s.content["fees"]).toEqual([]);
   });
 });
 

@@ -9,7 +9,7 @@
  * registry, per-section content builders, and a dispatcher map.
  */
 
-import type { InvoiceLineItem } from "./items";
+import type { InvoiceLineItem, InvoiceFee } from "./items";
 
 // ---------------------------------------------------------------------------
 // Section registry
@@ -92,6 +92,8 @@ export type InvoiceArtifactInput = {
 
   // line items
   items: InvoiceLineItem[];
+  /** Categorized fixed fees added onto the invoice (part of the taxable supply). */
+  fees: InvoiceFee[];
   /** Overall project description (optional narrative above the line items). */
   description: string | null;
 
@@ -158,8 +160,14 @@ function buildLineItems(input: InvoiceArtifactInput): Record<string, unknown> {
 
 function buildTotals(input: InvoiceArtifactInput): Record<string, unknown> {
   // النتائج المالية — الأرقام بدون تنسيق (التنسيق يتم في React بالأرقام الجدولية)
+  const feesSar = input.fees.reduce(
+    (sum, f) => sum + (Number.isFinite(f.amount_sar) ? f.amount_sar : 0),
+    0
+  );
   return {
     subtotal_sar: input.subtotalSar,
+    fees: input.fees,
+    fees_sar: Math.round(feesSar * 100) / 100,
     vat_pct: input.vatPct,
     vat_sar: input.vatSar,
     total_sar: input.totalSar,

@@ -13,7 +13,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { computeTotals } from "@/lib/invoices/items";
-import type { InvoiceLineItem } from "@/lib/invoices/items";
+import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
 
@@ -28,30 +28,29 @@ const LineItemSchema = z.object({
   total_sar: z.number().nonnegative(),
 });
 
+const FeeSchema = z.object({
+  name: z.string().min(1),
+  category: z.string().nullable().optional(),
+  amount_sar: z.number().nonnegative(),
+});
+
 const PaymentMethodEnum = z.enum(["bank_transfer", "stc_pay", "cash", "other"]);
 
-const InputSchema = z
-  .object({
-    // optional linkage
-    client_id: z.string().uuid().optional(),
-    gig_id: z.string().uuid().optional(),
-    proposal_id: z.string().uuid().optional(),
-    // content — either items array OR subtotal+description
-    items: z.array(LineItemSchema).min(1).optional(),
-    subtotal_sar: z.number().nonnegative().optional(),
-    description: z.string().optional(),
-    vat_pct: z.number().nonnegative().default(0),
-    // payment
-    payment_method: PaymentMethodEnum.default("bank_transfer"),
-    payment_details: z.string().optional(),
-    due_date: z.string().optional(), // ISO date yyyy-mm-dd
-  })
-  .refine(
-    (d) =>
-      (d.items !== undefined && d.items.length > 0) ||
-      d.subtotal_sar !== undefined,
-    { message: "Provide either items (≥1) or subtotal_sar" }
-  );
+// Client + at least one line item are REQUIRED (founder directive). VAT is
+// fixed at 15% (toggle on) or 0% (off) at the UI; the schema just bounds it.
+const InputSchema = z.object({
+  client_id: z.string().uuid(),
+  gig_id: z.string().uuid().optional(),
+  proposal_id: z.string().uuid().optional(),
+  items: z.array(LineItemSchema).min(1),
+  fees: z.array(FeeSchema).default([]),
+  description: z.string().optional(),
+  vat_pct: z.number().nonnegative().max(100).default(0),
+  // payment
+  payment_method: PaymentMethodEnum.default("bank_transfer"),
+  payment_details: z.string().optional(),
+  due_date: z.string().optional(), // ISO date yyyy-mm-dd
+});
 
 // ---------------------------------------------------------------------------
 // Return type
@@ -86,16 +85,17 @@ export async function createInvoice(
   if (!userResult.user) return { ok: false, code: "unauthorized" };
   const userId = userResult.user.id;
 
-  // Verify optional client_id ownership (ignore silently if not owned)
-  let resolvedClientId: string | null = data.client_id ?? null;
-  if (resolvedClientId) {
+  // Client is REQUIRED. Verify ownership — fail loud if it isn't the user's
+  // (don't silently drop it; a clientless invoice would violate the contract).
+  const resolvedClientId: string = data.client_id;
+  {
     const { data: clientCheck } = await supabase
       .from("clients")
       .select("id")
       .eq("id", resolvedClientId)
       .eq("user_id", userId)
       .single();
-    if (!clientCheck) resolvedClientId = null;
+    if (!clientCheck) return { ok: false, code: "invalid" };
   }
 
   // Verify optional gig_id ownership (ignore silently if not owned)
@@ -122,26 +122,15 @@ export async function createInvoice(
     if (!proposalCheck) resolvedProposalId = null;
   }
 
-  // Compute subtotal and build items array
-  let items: InvoiceLineItem[];
-  let subtotalSar: number;
-
-  if (data.items && data.items.length > 0) {
-    items = data.items as InvoiceLineItem[];
-    const totals = computeTotals(items, data.vat_pct);
-    subtotalSar = totals.subtotal_sar;
-  } else {
-    subtotalSar = data.subtotal_sar ?? 0;
-    const desc = data.description ?? "خدمة";
-    items = [
-      {
-        description: desc,
-        quantity: 1,
-        unit_price_sar: subtotalSar,
-        total_sar: subtotalSar,
-      },
-    ];
-  }
+  // Compute the items subtotal (authoritative — the DB trigger then adds fees
+  // into the VAT base and the grand total).
+  const items: InvoiceLineItem[] = data.items as InvoiceLineItem[];
+  const fees: InvoiceFee[] = data.fees.map((f) => ({
+    name: f.name,
+    category: f.category ?? null,
+    amount_sar: f.amount_sar,
+  }));
+  const subtotalSar = computeTotals(items, data.vat_pct).subtotal_sar;
 
   // Resolve due_date — use provided or default to today + 15 days
   let dueDate: string;
@@ -163,6 +152,7 @@ export async function createInvoice(
       proposal_id: resolvedProposalId,
       description: data.description ?? null,
       items,
+      fees,
       subtotal_sar: subtotalSar,
       vat_pct: data.vat_pct,
       payment_method: data.payment_method,
@@ -171,7 +161,7 @@ export async function createInvoice(
       status: "draft",
     })
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -195,6 +185,7 @@ export async function createInvoice(
     status: invoiceData.status as string,
     description: invoiceData.description as string | null,
     items: invoiceData.items,
+    fees: invoiceData.fees,
     subtotal_sar: Number(invoiceData.subtotal_sar),
     vat_pct: Number(invoiceData.vat_pct),
     vat_sar: Number(invoiceData.vat_sar),

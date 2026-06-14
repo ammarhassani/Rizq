@@ -12,7 +12,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildInvoiceArtifact } from "@/lib/invoices/artifact";
 import type { InvoiceArtifactData, InvoiceArtifactInput } from "@/lib/invoices/artifact";
-import type { InvoiceLineItem } from "@/lib/invoices/items";
+import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 
 // ---------------------------------------------------------------------------
@@ -26,6 +26,7 @@ export type InvoiceRowForArtifact = {
   status: string;
   description: string | null;
   items: unknown;              // jsonb — cast below
+  fees: unknown;               // jsonb — cast below
   subtotal_sar: number;
   vat_pct: number;
   vat_sar: number;
@@ -127,6 +128,19 @@ export async function buildInvoiceArtifactInputFromRow({
     ];
   }
 
+  // 4. Resolve fees (jsonb → InvoiceFee[]). Absent/malformed → [].
+  const rawFees = invoice.fees;
+  const fees: InvoiceFee[] = Array.isArray(rawFees)
+    ? (rawFees as Array<Record<string, unknown>>)
+        .filter((f) => f && typeof f === "object")
+        .map((f) => ({
+          name: String(f["name"] ?? ""),
+          category: (f["category"] as string | null) ?? null,
+          amount_sar: Number(f["amount_sar"]) || 0,
+        }))
+        .filter((f) => f.name.length > 0)
+    : [];
+
   const vatPct = Number(invoice.vat_pct) || 0;
   const vatSar = Number(invoice.vat_sar) || 0;
   const totalSar = Number(invoice.total_sar) || 0;
@@ -151,6 +165,7 @@ export async function buildInvoiceArtifactInputFromRow({
     clientCompany,
 
     items,
+    fees,
     description: invoice.description ?? null,
 
     subtotalSar: subtotal,

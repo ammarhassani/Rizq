@@ -80,7 +80,7 @@ export async function generateInvoiceDescriptionAction(
   const { data: invoice, error: fetchErr } = await supabase
     .from("invoices")
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id, gig_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id, gig_id"
     )
     .eq("id", invoice_id)
     .eq("user_id", userId)
@@ -148,7 +148,7 @@ export async function generateInvoiceDescriptionAction(
     .eq("id", invoice_id)
     .eq("user_id", userId)
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -164,6 +164,7 @@ export async function generateInvoiceDescriptionAction(
     status: updatedInvoice.status as string,
     description: updatedInvoice.description as string | null,
     items: updatedInvoice.items,
+    fees: updatedInvoice.fees,
     subtotal_sar: Number(updatedInvoice.subtotal_sar),
     vat_pct: Number(updatedInvoice.vat_pct),
     vat_sar: Number(updatedInvoice.vat_sar),

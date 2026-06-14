@@ -1,22 +1,38 @@
 "use client";
 
 /**
- * InvoiceForm — Create/edit invoice form. Phase-4 task P4.4.
- * Mirrors GigForm in structure: ≤30s fast-add, status pills, client picker.
+ * InvoiceForm — create an invoice.
+ *
+ * Founder rules:
+ *  - Client is REQUIRED (ClientPicker, with a full "+ Add client" popped form).
+ *  - At least one item is REQUIRED. Items are selected from the catalog via
+ *    ItemPicker; an unlisted item opens the full "+ Add item" popped dialog.
+ *  - "Tax & Fees": VAT is fixed — a 15% toggle (on → 15%, off → 0%). Fees are
+ *    categorized fixed presets added via FeePicker; a new fee opens the full
+ *    "+ Add fee" popped dialog. VAT applies to items + fees (mirrors the DB
+ *    trigger and computeInvoiceTotals).
  */
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createInvoice } from "@/app/actions/invoices/createInvoice";
-import { lineItemTotal } from "@/lib/invoices/items";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { computeInvoiceTotals, lineItemTotal } from "@/lib/invoices/items";
+import type { InvoiceFee } from "@/lib/invoices/items";
+import { Loader2, Trash2, Check } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { ClientPicker } from "@/components/clients/ClientPicker";
+import { ItemPicker } from "@/components/items/ItemPicker";
+import { FeePicker } from "@/components/fees/FeePicker";
+import type { CreatedItem } from "@/app/actions/items/items";
+import type { CreatedFeePreset } from "@/app/actions/fees/fees";
+
+const VAT_RATE = 15;
 
 type ClientOption = { id: string; name: string };
 
 type LineItemDraft = {
+  item_id: string | null;
   description: string;
   quantity: string;
   unit_price_sar: string;
@@ -32,6 +48,8 @@ type InvoiceFormInitial = {
 type Props = {
   locale: "ar" | "en";
   clients?: ClientOption[];
+  catalogItems?: CreatedItem[];
+  feePresets?: CreatedFeePreset[];
   initial?: InvoiceFormInitial;
 };
 
@@ -62,7 +80,13 @@ function parseNum(s: string): number {
   return isNaN(n) ? 0 : n;
 }
 
-export function InvoiceForm({ locale, clients = [], initial }: Props) {
+export function InvoiceForm({
+  locale,
+  clients = [],
+  catalogItems = [],
+  feePresets = [],
+  initial,
+}: Props) {
   const t = useTranslations("Invoices.form");
   const router = useRouter();
   const isAr = locale === "ar";
@@ -73,30 +97,34 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  // Line items — initialise from pre-fill if available
+  // Line items — seed a single line from gig pre-fill when present.
   const [items, setItems] = useState<LineItemDraft[]>(() => {
     if (initial?.title && initial?.amount_sar != null) {
       return [
         {
+          item_id: null,
           description: initial.title,
           quantity: "1",
           unit_price_sar: String(initial.amount_sar),
         },
       ];
     }
-    return [{ description: "", quantity: "1", unit_price_sar: "" }];
+    return [];
   });
 
-  const [vatPct, setVatPct] = useState("0");
+  const [fees, setFees] = useState<InvoiceFee[]>([]);
+  const [vatOn, setVatOn] = useState(false);
   const [clientId, setClientId] = useState<string>(initial?.client_id ?? "");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [paymentDetails, setPaymentDetails] = useState("");
   const [dueDate, setDueDate] = useState(defaultDueDate());
 
+  const vatPct = vatOn ? VAT_RATE : 0;
+
   const inputClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`;
   const labelClass = `block text-sm font-medium text-rizq-ink mb-2 ${font}`;
 
-  // Computed totals (client-side preview)
+  // Parsed items + totals preview (mirrors the DB trigger via computeInvoiceTotals).
   const parsedItems = items.map((item) => ({
     description: item.description,
     quantity: parseNum(item.quantity),
@@ -104,24 +132,7 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
     total_sar: lineItemTotal(parseNum(item.quantity), parseNum(item.unit_price_sar)),
   }));
 
-  const subtotal = parsedItems.reduce((sum, it) => sum + it.total_sar, 0);
-  const vatPctNum = parseNum(vatPct);
-  const vatSar = Math.round(subtotal * vatPctNum / 100 * 100) / 100;
-  const total = subtotal + vatSar;
-
-  function addItem() {
-    setItems((prev) => [...prev, { description: "", quantity: "1", unit_price_sar: "" }]);
-  }
-
-  function removeItem(idx: number) {
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-  }
-
-  function updateItem(idx: number, field: keyof LineItemDraft, value: string) {
-    setItems((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item))
-    );
-  }
+  const totals = computeInvoiceTotals(parsedItems, fees, vatPct);
 
   function fmtMoney(n: number): string {
     return new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
@@ -130,15 +141,51 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
     }).format(n);
   }
 
+  const currency = isAr ? "ر.س" : "SAR";
+
+  // ── Item line handlers ─────────────────────────────────────────────────────
+  function addItemFromCatalog(item: CreatedItem) {
+    setItems((prev) => [
+      ...prev,
+      {
+        item_id: item.id,
+        description: item.name,
+        quantity: "1",
+        unit_price_sar: String(item.unit_price_sar),
+      },
+    ]);
+  }
+
+  function removeItem(idx: number) {
+    setItems((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function updateItem(idx: number, field: "quantity" | "unit_price_sar", value: string) {
+    setItems((prev) => prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item)));
+  }
+
+  // ── Fee handlers ───────────────────────────────────────────────────────────
+  function addFee(fee: InvoiceFee) {
+    setFees((prev) => [...prev, fee]);
+  }
+
+  function removeFee(idx: number) {
+    setFees((prev) => prev.filter((_, i) => i !== idx));
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Validate: at least one item with description + positive price
+    if (!clientId) {
+      setError(t("errors.clientRequired"));
+      return;
+    }
+
     const validItems = parsedItems.filter(
-      (it) => it.description.trim() && it.unit_price_sar > 0
+      (it) => it.description.trim() && it.quantity > 0 && it.unit_price_sar > 0
     );
     if (validItems.length === 0) {
-      setError(t("errors.itemRequired"));
+      setError(t("errors.itemsRequired"));
       return;
     }
 
@@ -146,9 +193,10 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
 
     startTransition(async () => {
       const result = await createInvoice({
+        client_id: clientId,
         items: validItems,
-        vat_pct: vatPctNum,
-        client_id: clientId || undefined,
+        fees,
+        vat_pct: vatPct,
         gig_id: initial?.gig_id,
         payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
         payment_details: paymentDetails.trim() || undefined,
@@ -165,6 +213,7 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
       }
 
       router.push(`/invoices/${result.invoice_id}` as `/invoices/${string}`);
+      router.refresh();
     });
   }
 
@@ -178,246 +227,317 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
         locale={locale}
         reason="invoices"
       />
-    <form
-      onSubmit={handleSubmit}
-      dir={dir}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-6 animate-fade-in ${font}`}
-      noValidate
-    >
-      <div>
-        <p className="eyebrow mb-1 text-rizq-green">{t("addTitle")}</p>
-      </div>
-
-      {/* Client picker */}
-      <div>
-        <label className={labelClass}>
-          {t("clientLabel")}{" "}
-          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-        </label>
-        <ClientPicker
-          value={clientId}
-          onChange={setClientId}
-          clients={clients}
-          locale={locale}
-          noneLabel={t("clientNone")}
-        />
-      </div>
-
-      {/* Line items */}
-      <div>
-        <label className={labelClass}>{t("lineItemsLabel")}</label>
-        <div className="space-y-3">
-          {items.map((item, idx) => (
-            <div
-              key={idx}
-              className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-start"
-              dir={dir}
-            >
-              {/* Description */}
-              <input
-                type="text"
-                value={item.description}
-                onChange={(e) => updateItem(idx, "description", e.target.value)}
-                placeholder={t("itemDescPlaceholder")}
-                className={`${inputClass} col-span-4 sm:col-span-1`}
-              />
-              {/* Qty */}
-              <input
-                type="number"
-                inputMode="decimal"
-                min="0.01"
-                step="any"
-                value={item.quantity}
-                onChange={(e) => updateItem(idx, "quantity", e.target.value)}
-                placeholder={t("itemQtyPlaceholder")}
-                className={`w-20 rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-3 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors text-center tabular font-sans`}
-                dir="ltr"
-              />
-              {/* Unit price */}
-              <div className="relative">
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="any"
-                  value={item.unit_price_sar}
-                  onChange={(e) => updateItem(idx, "unit_price_sar", e.target.value)}
-                  placeholder="0"
-                  className={`w-32 rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-3 pe-10 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular font-sans`}
-                  dir="ltr"
-                />
-                <span className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 pointer-events-none ${font}`}>
-                  {isAr ? "ر.س" : "SAR"}
-                </span>
-              </div>
-              {/* Remove button */}
-              {items.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeItem(idx)}
-                  className="p-3 text-rizq-ink-soft/50 hover:text-red-600 transition-colors"
-                  aria-label={isAr ? "حذف البند" : "Remove item"}
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
-            </div>
-          ))}
+      <form
+        onSubmit={handleSubmit}
+        dir={dir}
+        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-7 animate-fade-in ${font}`}
+        noValidate
+      >
+        <div>
+          <p className="eyebrow mb-1 text-rizq-green">{t("addTitle")}</p>
         </div>
 
-        {/* Add item */}
-        <button
-          type="button"
-          onClick={addItem}
-          className={`mt-3 inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2 text-sm text-rizq-ink-soft hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
-        >
-          <Plus size={14} />
-          {t("addItem")}
-        </button>
-      </div>
-
-      {/* VAT */}
-      <div>
-        <label className={labelClass}>
-          {t("vatLabel")}{" "}
-          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-        </label>
-        <div className="relative w-40">
-          <input
-            type="number"
-            inputMode="decimal"
-            min="0"
-            max="100"
-            step="any"
-            value={vatPct}
-            onChange={(e) => setVatPct(e.target.value)}
-            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 pe-10 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular font-sans`}
-            dir="ltr"
+        {/* Client (required) */}
+        <div>
+          <label className={labelClass}>
+            {t("clientLabel")} <span className="text-red-500">*</span>
+          </label>
+          <ClientPicker
+            value={clientId}
+            onChange={setClientId}
+            clients={clients}
+            locale={locale}
+            noneLabel={t("clientPlaceholder")}
           />
-          <span className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-sm text-rizq-ink-soft/60 pointer-events-none`}>
-            %
-          </span>
         </div>
-      </div>
 
-      {/* Totals preview */}
-      {subtotal > 0 && (
-        <div
-          dir={dir}
-          className={`rounded-2xl border border-rizq-gold/20 bg-white/50 p-5 space-y-2 ${font}`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-rizq-ink-soft">{t("subtotalLabel")}</span>
-            <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-              {fmtMoney(subtotal)}{" "}
-              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>
-                {isAr ? "ر.س" : "SAR"}
-              </span>
-            </span>
-          </div>
-          {vatPctNum > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-rizq-ink-soft">
-                {t("vatLabel")} ({vatPctNum}%)
-              </span>
-              <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-                {fmtMoney(vatSar)}{" "}
-                <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>
-                  {isAr ? "ر.س" : "SAR"}
-                </span>
-              </span>
+        {/* Items (required, from catalog) */}
+        <div>
+          <label className={labelClass}>
+            {t("itemsLabel")} <span className="text-red-500">*</span>
+          </label>
+
+          {items.length > 0 && (
+            <div className="mb-3 space-y-2">
+              {items.map((item, idx) => {
+                const lineTotal = lineItemTotal(
+                  parseNum(item.quantity),
+                  parseNum(item.unit_price_sar)
+                );
+                return (
+                  <div
+                    key={idx}
+                    className="rounded-2xl border border-rizq-gold/25 bg-white/50 p-3 sm:p-4"
+                    dir={dir}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className={`text-sm font-medium text-rizq-ink leading-snug ${font}`}>
+                        {item.description}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(idx)}
+                        className="shrink-0 p-1.5 text-rizq-ink-soft/50 hover:text-red-600 transition-colors"
+                        aria-label={isAr ? "حذف البند" : "Remove item"}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-end gap-3">
+                      {/* Qty */}
+                      <div>
+                        <label className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
+                          {t("qtyLabel")}
+                        </label>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          min="0.01"
+                          step="any"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(idx, "quantity", e.target.value)}
+                          className="w-20 rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-2 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors text-center tabular font-sans"
+                          dir="ltr"
+                        />
+                      </div>
+                      {/* Unit price */}
+                      <div>
+                        <label className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
+                          {t("unitPriceLabel")}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            step="any"
+                            value={item.unit_price_sar}
+                            onChange={(e) => updateItem(idx, "unit_price_sar", e.target.value)}
+                            placeholder="0"
+                            className="w-32 rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-2 pe-10 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular font-sans"
+                            dir="ltr"
+                          />
+                          <span className={`pointer-events-none absolute ${isAr ? "left-2.5" : "right-2.5"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
+                            {currency}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Line total */}
+                      <div className="ms-auto text-end">
+                        <p className={`text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>{t("lineTotalLabel")}</p>
+                        <p className="tabular font-sans text-base font-semibold text-rizq-ink">
+                          {fmtMoney(lineTotal)}{" "}
+                          <span className={`text-xs font-normal text-rizq-ink-soft/60 ${font}`}>
+                            {currency}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
-          <div className="border-t border-rizq-gold/20 pt-2 flex items-center justify-between">
-            <span className={`text-base font-semibold text-rizq-ink ${font}`}>
-              {t("totalLabel")}
-            </span>
-            <span className="tabular font-sans text-xl font-bold text-rizq-green">
-              {fmtMoney(total)}{" "}
-              <span className={`text-sm font-normal text-rizq-ink-soft ${font}`}>
-                {isAr ? "ر.س" : "SAR"}
+
+          {/* Catalog picker (+ Add item popped dialog for unlisted) */}
+          <ItemPicker locale={locale} items={catalogItems} onPick={addItemFromCatalog} />
+          <p className={`mt-1.5 text-xs text-rizq-ink-soft/60 ${font}`}>{t("itemsHint")}</p>
+        </div>
+
+        {/* Tax & Fees */}
+        <div className="rounded-2xl border border-rizq-gold/20 bg-rizq-cream/40 p-5 space-y-5">
+          <p className={`text-sm font-semibold text-rizq-ink ${font}`}>{t("taxAndFeesLabel")}</p>
+
+          {/* VAT toggle — fixed 15% */}
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("vatToggleLabel")}</p>
+              <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>{t("vatToggleHint")}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={vatOn}
+              aria-label={t("vatToggleLabel")}
+              onClick={() => setVatOn((v) => !v)}
+              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
+                vatOn ? "bg-rizq-green" : "bg-rizq-ink/15"
+              }`}
+            >
+              <span
+                className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow transition-transform ${
+                  vatOn
+                    ? isAr
+                      ? "-translate-x-6"
+                      : "translate-x-6"
+                    : isAr
+                    ? "-translate-x-1"
+                    : "translate-x-1"
+                }`}
+              >
+                {vatOn && <Check size={12} className="text-rizq-green" strokeWidth={3} />}
               </span>
-            </span>
+            </button>
+          </div>
+
+          {/* Fees */}
+          <div>
+            <p className={`text-sm font-medium text-rizq-ink mb-2 ${font}`}>{t("feesLabel")}</p>
+
+            {fees.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {fees.map((fee, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/25 bg-white/50 px-3.5 py-2.5"
+                    dir={dir}
+                  >
+                    <div className="min-w-0">
+                      <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{fee.name}</p>
+                      {fee.category && (
+                        <p className={`text-xs text-rizq-ink-soft/60 truncate ${font}`}>{fee.category}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="tabular font-sans text-sm font-medium text-rizq-ink">
+                        {fmtMoney(fee.amount_sar)}{" "}
+                        <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{currency}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFee(idx)}
+                        className="p-1.5 text-rizq-ink-soft/50 hover:text-red-600 transition-colors"
+                        aria-label={isAr ? "حذف الرسوم" : "Remove fee"}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <FeePicker locale={locale} presets={feePresets} onPick={addFee} />
           </div>
         </div>
-      )}
 
-      {/* Payment method pills */}
-      <div>
-        <label className={labelClass}>{t("paymentMethodLabel")}</label>
-        <div dir={dir} className="flex flex-wrap gap-2">
-          {PAYMENT_METHODS.map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setPaymentMethod(m)}
-              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
-                paymentMethod === m
-                  ? "bg-rizq-green/15 border border-rizq-green/40 text-rizq-green"
-                  : "border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/30"
-              } ${font}`}
-            >
-              {paymentMethodLabels[m]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Payment details */}
-      <div>
-        <label className={labelClass}>
-          {t("paymentDetailsLabel")}{" "}
-          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-        </label>
-        <textarea
-          value={paymentDetails}
-          onChange={(e) => setPaymentDetails(e.target.value)}
-          rows={2}
-          placeholder={t("paymentDetailsPlaceholder")}
-          className={`${inputClass} resize-none`}
-        />
-      </div>
-
-      {/* Due date */}
-      <div>
-        <label className={labelClass}>{t("dueDateLabel")}</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className={`${inputClass} font-sans`}
-          dir="ltr"
-        />
-      </div>
-
-      {/* Error */}
-      {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
-          {error}
-        </p>
-      )}
-
-      {/* Submit */}
-      <button
-        type="submit"
-        disabled={isPending}
-        className={`group w-full inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-base font-medium tracking-wide hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
-      >
-        {isPending ? (
-          <>
-            <Loader2 size={18} className="animate-spin" strokeWidth={2.2} />
-            <span>{t("saving")}</span>
-          </>
-        ) : (
-          <>
-            <span>{t("save")}</span>
-            <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
-              →
-            </span>
-          </>
+        {/* Totals preview */}
+        {(totals.subtotal_sar > 0 || totals.fees_sar > 0) && (
+          <div
+            dir={dir}
+            className={`rounded-2xl border border-rizq-gold/20 bg-white/50 p-5 space-y-2 ${font}`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-rizq-ink-soft">{t("subtotalLabel")}</span>
+              <span className="tabular font-sans text-sm font-medium text-rizq-ink">
+                {fmtMoney(totals.subtotal_sar)}{" "}
+                <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{currency}</span>
+              </span>
+            </div>
+            {totals.fees_sar > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-rizq-ink-soft">{t("feesLabel")}</span>
+                <span className="tabular font-sans text-sm font-medium text-rizq-ink">
+                  {fmtMoney(totals.fees_sar)}{" "}
+                  <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{currency}</span>
+                </span>
+              </div>
+            )}
+            {vatPct > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-rizq-ink-soft">
+                  {t("vatLabel")} ({vatPct}%)
+                </span>
+                <span className="tabular font-sans text-sm font-medium text-rizq-ink">
+                  {fmtMoney(totals.vat_sar)}{" "}
+                  <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{currency}</span>
+                </span>
+              </div>
+            )}
+            <div className="border-t border-rizq-gold/20 pt-2 flex items-center justify-between">
+              <span className={`text-base font-semibold text-rizq-ink ${font}`}>{t("totalLabel")}</span>
+              <span className="tabular font-sans text-xl font-bold text-rizq-green">
+                {fmtMoney(totals.total_sar)}{" "}
+                <span className={`text-sm font-normal text-rizq-ink-soft ${font}`}>{currency}</span>
+              </span>
+            </div>
+          </div>
         )}
-      </button>
-    </form>
+
+        {/* Payment method pills */}
+        <div>
+          <label className={labelClass}>{t("paymentMethodLabel")}</label>
+          <div dir={dir} className="flex flex-wrap gap-2">
+            {PAYMENT_METHODS.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setPaymentMethod(m)}
+                className={`rounded-full px-3.5 py-2 text-sm font-medium transition-all ${
+                  paymentMethod === m
+                    ? "bg-rizq-green/15 border border-rizq-green/40 text-rizq-green"
+                    : "border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/30"
+                } ${font}`}
+              >
+                {paymentMethodLabels[m]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Payment details */}
+        <div>
+          <label className={labelClass}>
+            {t("paymentDetailsLabel")}{" "}
+            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+          </label>
+          <textarea
+            value={paymentDetails}
+            onChange={(e) => setPaymentDetails(e.target.value)}
+            rows={2}
+            placeholder={t("paymentDetailsPlaceholder")}
+            className={`${inputClass} resize-none`}
+          />
+        </div>
+
+        {/* Due date */}
+        <div>
+          <label className={labelClass}>{t("dueDateLabel")}</label>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className={`${inputClass} font-sans`}
+            dir="ltr"
+          />
+        </div>
+
+        {error && (
+          <p role="alert" className={`text-sm text-red-700 ${font}`}>
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`group w-full inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-base font-medium tracking-wide hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+        >
+          {isPending ? (
+            <>
+              <Loader2 size={18} className="animate-spin" strokeWidth={2.2} />
+              <span>{t("saving")}</span>
+            </>
+          ) : (
+            <>
+              <span>{t("save")}</span>
+              <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
+                →
+              </span>
+            </>
+          )}
+        </button>
+      </form>
     </>
   );
 }

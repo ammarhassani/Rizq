@@ -100,7 +100,7 @@ export async function createInvoiceFromProposal(
       status: "draft",
     })
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -124,6 +124,7 @@ export async function createInvoiceFromProposal(
     status: invoiceData.status as string,
     description: invoiceData.description as string | null,
     items: invoiceData.items,
+    fees: invoiceData.fees,
     subtotal_sar: Number(invoiceData.subtotal_sar),
     vat_pct: Number(invoiceData.vat_pct),
     vat_sar: Number(invoiceData.vat_sar),

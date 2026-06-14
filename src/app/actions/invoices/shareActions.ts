@@ -110,7 +110,7 @@ export async function setInvoiceShare(
     const { data: freshRow } = await supabase
       .from("invoices")
       .select(
-        "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+        "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
       )
       .eq("id", invoice_id)
       .eq("user_id", userId)
@@ -123,6 +123,7 @@ export async function setInvoiceShare(
         status: freshRow.status as string,
         description: (freshRow.description as string | null) ?? null,
         items: freshRow.items,
+        fees: freshRow.fees,
         subtotal_sar: Number(freshRow.subtotal_sar),
         vat_pct: Number(freshRow.vat_pct),
         vat_sar: Number(freshRow.vat_sar),

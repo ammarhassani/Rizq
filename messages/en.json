@@ -752,6 +752,22 @@
       "phonePlaceholder": "+966 5X XXX XXXX",
       "add": "Add client",
       "cancel": "Cancel"
+    },
+    "itemPicker": {
+      "placeholder": "Select an item…",
+      "searchPlaceholder": "Search your items…",
+      "noResults": "No item by that name",
+      "footerAdd": "Add a new item"
+    },
+    "feePicker": {
+      "placeholder": "Add a fee…",
+      "searchPlaceholder": "Search fees…",
+      "noResults": "No fee by that name",
+      "footerAdd": "Add a new fee"
+    },
+    "addClient": {
+      "title": "New client",
+      "subtitle": "Enter the client's full details."
     }
   },
   "MySubmissions": {
@@ -1114,8 +1130,20 @@
       "errors": {
         "itemRequired": "Add at least one item with a description and price.",
         "quotaExhausted": "Free limit reached. Upgrade to Pro to create more invoices.",
-        "generic": "Something went wrong. Try again."
-      }
+        "generic": "Something went wrong. Try again.",
+        "clientRequired": "Select a client for this invoice.",
+        "itemsRequired": "Add at least one item from the list."
+      },
+      "clientPlaceholder": "Select a client",
+      "itemsLabel": "Items",
+      "itemsHint": "Pick from your products and services, or add a new one.",
+      "qtyLabel": "Qty",
+      "unitPriceLabel": "Unit price",
+      "lineTotalLabel": "Total",
+      "taxAndFeesLabel": "Tax & Fees",
+      "vatToggleLabel": "VAT (15%)",
+      "vatToggleHint": "Applied to items and fees.",
+      "feesLabel": "Fees"
     },
     "detail": {
       "markSent": "Mark as sent",
@@ -1831,5 +1859,49 @@
     "deleteErrorGeneric": "Something went wrong. Please try again.",
     "dialogClose": "Close",
     "dialogCancel": "Cancel"
+  },
+  "Items": {
+    "form": {
+      "nameLabel": "Item name",
+      "namePlaceholder": "e.g. Brand identity design",
+      "unitPriceLabel": "Unit price",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "e.g. Design",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "A short description",
+      "optional": "optional",
+      "save": "Save item",
+      "saving": "Saving…",
+      "errors": {
+        "nameRequired": "Enter the item name.",
+        "priceRequired": "Enter a valid price greater than zero.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
+    "dialog": {
+      "title": "New item",
+      "subtitle": "Add a product or service to your catalog."
+    }
+  },
+  "Fees": {
+    "form": {
+      "nameLabel": "Fee name",
+      "namePlaceholder": "e.g. Rush fee",
+      "amountLabel": "Amount",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "e.g. Add-ons",
+      "optional": "optional",
+      "save": "Save fee",
+      "saving": "Saving…",
+      "errors": {
+        "nameRequired": "Enter the fee name.",
+        "amountRequired": "Enter a valid amount greater than zero.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
+    "dialog": {
+      "title": "New fee",
+      "subtitle": "Add a reusable fixed fee."
+    }
   }
 }

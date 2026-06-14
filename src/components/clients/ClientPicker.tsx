@@ -4,7 +4,8 @@
  * ClientPicker — the reusable client-linkage field.
  *
  * Composes the searchable Combobox (options = the passed clients) with a footer
- * "+ Add client" action that opens QuickAddClientDialog. On create, the new
+ * "+ Add client" action that opens AddClientDialog (the full client module in a
+ * popped dialog — no partial data). On create, the new
  * client is appended to the in-memory option list AND auto-selected (parent
  * onChange fires with the new id). Drop-in replacement for the plain <select>
  * client picker: same value semantics (empty string = none / "بدون عميل").
@@ -15,9 +16,9 @@ import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { Combobox, type ComboboxOption } from "@/components/ui/Combobox";
 import {
-  QuickAddClientDialog,
+  AddClientDialog,
   type CreatedClient,
-} from "@/components/clients/QuickAddClientDialog";
+} from "@/components/clients/AddClientDialog";
 import { cn } from "@/lib/utils";
 
 type ClientOption = { id: string; name: string };
@@ -95,7 +96,7 @@ export function ClientPicker({
         }
       />
 
-      <QuickAddClientDialog
+      <AddClientDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onCreated={handleCreated}

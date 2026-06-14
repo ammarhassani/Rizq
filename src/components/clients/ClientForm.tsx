@@ -32,13 +32,21 @@ type Props = {
   mode: "create" | "edit";
   initialData?: ClientFormData;
   onSuccess?: () => void;
+  /**
+   * When provided (create mode), the newly-created client is returned here
+   * instead of navigating to its page — used when the full form is embedded in
+   * a popped dialog (e.g. the invoice builder's "+ Add client").
+   */
+  onCreated?: (client: { id: string; name: string }) => void;
+  /** Drop the outer card chrome + header when rendered inside a dialog. */
+  embedded?: boolean;
 };
 
 const CLIENT_TYPES = ["individual", "smb", "corporate", "government", "agency"] as const;
 const CLIENT_SOURCES = ["referral", "platform", "social_media", "direct", "other"] as const;
 const RATINGS = [1, 2, 3, 4, 5] as const;
 
-export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
+export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, embedded = false }: Props) {
   const t = useTranslations("Clients.form");
   const router = useRouter();
   const isAr = locale === "ar";
@@ -108,7 +116,13 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
         }
 
         track("client_created", { locale });
-        router.push(`/clients/${result.id}` as `/clients/${string}`);
+        // Embedded in a dialog → return the new client to the caller; otherwise
+        // navigate to its detail page as before.
+        if (onCreated) {
+          onCreated({ id: result.id, name: name.trim() });
+        } else {
+          router.push(`/clients/${result.id}` as `/clients/${string}`);
+        }
       } else {
         if (!initialData?.id) return;
         const result = await updateClient({
@@ -153,13 +167,20 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
       />
     <form
       onSubmit={handleSubmit}
+      method="post"
       dir={dir}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-5 animate-fade-in ${font}`}
+      className={
+        embedded
+          ? `space-y-5 ${font}`
+          : `rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-5 animate-fade-in ${font}`
+      }
       noValidate
     >
-      <div>
-        <p className="eyebrow mb-1 text-rizq-green">{mode === "create" ? t("addTitle") : t("editTitle")}</p>
-      </div>
+      {!embedded && (
+        <div>
+          <p className="eyebrow mb-1 text-rizq-green">{mode === "create" ? t("addTitle") : t("editTitle")}</p>
+        </div>
+      )}
 
       {/* Name (required) */}
       <div>

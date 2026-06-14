@@ -41,6 +41,7 @@ const T = {
     colUnitPrice: "سعر الوحدة",
     colTotal: "الإجمالي",
     subtotal: "المجموع الفرعي",
+    fees: "الرسوم",
     vat: "ضريبة القيمة المضافة",
     total: "الإجمالي",
     currency: "ر.س",
@@ -87,6 +88,7 @@ const T = {
     colUnitPrice: "Unit price",
     colTotal: "Total",
     subtotal: "Subtotal",
+    fees: "Fees",
     vat: "VAT",
     total: "Total",
     currency: "SAR",
@@ -483,6 +485,15 @@ function TotalsSection({
   const vatPct = num(c["vat_pct"] as number | undefined);
   const vatSar = num(c["vat_sar"] as number | undefined);
   const total = num(c["total_sar"] as number | undefined);
+  const fees = Array.isArray(c["fees"])
+    ? (c["fees"] as unknown[])
+        .filter((f): f is Record<string, unknown> => typeof f === "object" && f !== null)
+        .map((f) => ({
+          name: str(f["name"]),
+          amount_sar: num(f["amount_sar"]),
+        }))
+        .filter((f) => f.name.length > 0)
+    : [];
 
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const dir = locale === "ar" ? "rtl" : "ltr";
@@ -498,6 +509,17 @@ function TotalsSection({
             <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
           </span>
         </div>
+
+        {/* Fee rows — each categorized fixed fee, by name */}
+        {fees.map((f, i) => (
+          <div key={i} className="flex items-center justify-between gap-4">
+            <span className={`text-sm text-rizq-ink-soft ${font}`}>{f.name}</span>
+            <span className="tabular font-sans text-sm font-medium text-rizq-ink">
+              {fmtMoney(f.amount_sar, locale)}{" "}
+              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
+            </span>
+          </div>
+        ))}
 
         {/* VAT row — only when vatPct > 0 */}
         {vatPct > 0 && (

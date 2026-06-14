@@ -31,6 +31,24 @@ export type InvoiceTotals = {
   total_sar: number;
 };
 
+/**
+ * A categorized fixed fee added onto an invoice (stored in invoices.fees jsonb).
+ * `amount_sar` is a flat amount, not a rate. Fees are part of the taxable supply.
+ */
+export type InvoiceFee = {
+  name: string;
+  category: string | null;
+  amount_sar: number;
+};
+
+/** Output of `computeInvoiceTotals` — items subtotal + fees, then VAT on both. */
+export type InvoiceTotalsWithFees = {
+  subtotal_sar: number; // items only (Σ line totals)
+  fees_sar: number;     // Σ fee amounts
+  vat_sar: number;      // round((subtotal + fees) * vatPct / 100, 2)
+  total_sar: number;    // subtotal + fees + vat
+};
+
 // ---------------------------------------------------------------------------
 // Internal helper
 // ---------------------------------------------------------------------------
@@ -90,4 +108,38 @@ export function computeTotals(
   const total_sar = subtotal + vat_sar;
 
   return { subtotal_sar: subtotal, vat_sar, total_sar };
+}
+
+/** Σ of fee amounts, rounded to 2 dp. Negative/NaN amounts treated as 0. */
+export function feesSubtotal(fees: InvoiceFee[]): number {
+  return round2(fees.reduce((sum, f) => sum + safeNum(f.amount_sar), 0));
+}
+
+/**
+ * Compute totals for an invoice with both line items AND fees.
+ *
+ * Mirrors private.invoice_compute_before (migration
+ * 20260614111456_items_catalog_fee_presets_and_invoice_fees.sql):
+ *  - subtotal = Σ item.total_sar
+ *  - fees     = Σ fee.amount_sar
+ *  - vat_sar  = round((subtotal + fees) * vatPct / 100, 2)   ← VAT on items+fees
+ *  - total    = subtotal + fees + vat_sar
+ *
+ * In Rizq, VAT is fixed at 15% (toggle on) or 0% (toggle off) at the UI layer,
+ * but this fn accepts any vatPct so it stays a faithful mirror of the trigger.
+ */
+export function computeInvoiceTotals(
+  items: InvoiceLineItem[],
+  fees: InvoiceFee[],
+  vatPct: number
+): InvoiceTotalsWithFees {
+  const safePct = safeNum(vatPct);
+  const subtotal = round2(
+    items.reduce((sum, item) => sum + safeNum(item.total_sar), 0)
+  );
+  const fees_sar = feesSubtotal(fees);
+  const vat_sar = round2((subtotal + fees_sar) * safePct / 100);
+  const total_sar = subtotal + fees_sar + vat_sar;
+
+  return { subtotal_sar: subtotal, fees_sar, vat_sar, total_sar };
 }

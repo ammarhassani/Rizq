@@ -45,7 +45,7 @@ export default async function InvoicesNewPage({
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const userId = userData.user.id;
 
-  // Fetch user's clients for the picker
+  // Fetch user's clients for the picker (RLS scopes to the owner)
   const { data: clients } = await supabase
     .from("clients")
     .select("id, name")
@@ -56,6 +56,38 @@ export default async function InvoicesNewPage({
     id: c.id,
     name: c.name,
   }));
+
+  // Fetch the catalog items + fee presets for the invoice builder pickers.
+  const { data: catalog } = await supabase
+    .from("items")
+    .select("id, name, description, unit_price_sar, category")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  const catalogItems = (catalog ?? []).map(
+    (it: { id: string; name: string; description: string | null; unit_price_sar: number; category: string | null }) => ({
+      id: it.id,
+      name: it.name,
+      description: it.description ?? null,
+      unit_price_sar: Number(it.unit_price_sar),
+      category: it.category ?? null,
+    })
+  );
+
+  const { data: presets } = await supabase
+    .from("fee_presets")
+    .select("id, name, category, amount_sar")
+    .eq("is_active", true)
+    .order("name", { ascending: true });
+
+  const feePresets = (presets ?? []).map(
+    (p: { id: string; name: string; category: string | null; amount_sar: number }) => ({
+      id: p.id,
+      name: p.name,
+      category: p.category ?? null,
+      amount_sar: Number(p.amount_sar),
+    })
+  );
 
   // Pre-fill from gig if ?gig= is present (owner-scoped)
   let gigPrefill: { title?: string; client_id?: string | null; amount_sar?: number; gig_id?: string } | undefined;
@@ -91,6 +123,8 @@ export default async function InvoicesNewPage({
         <InvoiceForm
           locale={locale as "ar" | "en"}
           clients={clientOptions}
+          catalogItems={catalogItems}
+          feePresets={feePresets}
           initial={gigPrefill}
         />
       </div>

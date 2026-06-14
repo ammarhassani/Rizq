@@ -752,6 +752,22 @@
       "phonePlaceholder": "+966 5X XXX XXXX",
       "add": "إضافة العميل",
       "cancel": "إلغاء"
+    },
+    "itemPicker": {
+      "placeholder": "اختر بندًا…",
+      "searchPlaceholder": "ابحث في منتجاتك…",
+      "noResults": "لا يوجد بند بهذا الاسم",
+      "footerAdd": "إضافة بند جديد"
+    },
+    "feePicker": {
+      "placeholder": "أضف رسومًا…",
+      "searchPlaceholder": "ابحث في الرسوم…",
+      "noResults": "لا توجد رسوم بهذا الاسم",
+      "footerAdd": "إضافة رسوم جديدة"
+    },
+    "addClient": {
+      "title": "عميل جديد",
+      "subtitle": "أدخل بيانات العميل كاملة."
     }
   },
   "MySubmissions": {
@@ -1114,8 +1130,20 @@
       "errors": {
         "itemRequired": "أضف بندًا واحدًا على الأقل بوصف وسعر.",
         "quotaExhausted": "وصلت للحد المجاني. ترقَّ للاحترافي لإنشاء المزيد من الفواتير.",
-        "generic": "حدث خطأ. حاول مرة أخرى."
-      }
+        "generic": "حدث خطأ. حاول مرة أخرى.",
+        "clientRequired": "اختر العميل لهذه الفاتورة.",
+        "itemsRequired": "أضف بندًا واحدًا على الأقل من القائمة."
+      },
+      "clientPlaceholder": "اختر عميلاً",
+      "itemsLabel": "البنود",
+      "itemsHint": "اختر من قائمة منتجاتك وخدماتك، أو أضف بندًا جديدًا.",
+      "qtyLabel": "الكمية",
+      "unitPriceLabel": "سعر الوحدة",
+      "lineTotalLabel": "الإجمالي",
+      "taxAndFeesLabel": "الضريبة والرسوم",
+      "vatToggleLabel": "ضريبة القيمة المضافة (15%)",
+      "vatToggleHint": "تُطبَّق على البنود والرسوم.",
+      "feesLabel": "الرسوم"
     },
     "detail": {
       "markSent": "تعيين كمُرسَلة",
@@ -1831,5 +1859,49 @@
     "deleteErrorGeneric": "حدث خطأ. حاول مرة أخرى.",
     "dialogClose": "إغلاق",
     "dialogCancel": "إلغاء"
+  },
+  "Items": {
+    "form": {
+      "nameLabel": "اسم البند",
+      "namePlaceholder": "مثال: تصميم هوية بصرية",
+      "unitPriceLabel": "سعر الوحدة",
+      "categoryLabel": "التصنيف",
+      "categoryPlaceholder": "مثال: تصميم",
+      "descriptionLabel": "الوصف",
+      "descriptionPlaceholder": "وصف مختصر للبند",
+      "optional": "اختياري",
+      "save": "حفظ البند",
+      "saving": "جارٍ الحفظ…",
+      "errors": {
+        "nameRequired": "أدخل اسم البند.",
+        "priceRequired": "أدخل سعرًا صحيحًا أكبر من صفر.",
+        "generic": "حدث خطأ. حاول مرة أخرى."
+      }
+    },
+    "dialog": {
+      "title": "بند جديد",
+      "subtitle": "أضف منتجًا أو خدمة إلى قائمتك."
+    }
+  },
+  "Fees": {
+    "form": {
+      "nameLabel": "اسم الرسوم",
+      "namePlaceholder": "مثال: رسوم استعجال",
+      "amountLabel": "المبلغ",
+      "categoryLabel": "التصنيف",
+      "categoryPlaceholder": "مثال: خدمات إضافية",
+      "optional": "اختياري",
+      "save": "حفظ الرسوم",
+      "saving": "جارٍ الحفظ…",
+      "errors": {
+        "nameRequired": "أدخل اسم الرسوم.",
+        "amountRequired": "أدخل مبلغًا صحيحًا أكبر من صفر.",
+        "generic": "حدث خطأ. حاول مرة أخرى."
+      }
+    },
+    "dialog": {
+      "title": "رسوم جديدة",
+      "subtitle": "أضف رسومًا ثابتة قابلة لإعادة الاستخدام."
+    }
   }
 }

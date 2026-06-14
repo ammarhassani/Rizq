@@ -15,7 +15,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { computeTotals } from "@/lib/invoices/items";
-import type { InvoiceLineItem } from "@/lib/invoices/items";
+import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
 
@@ -30,14 +30,21 @@ const LineItemSchema = z.object({
   total_sar: z.number().nonnegative(),
 });
 
+const FeeSchema = z.object({
+  name: z.string().min(1),
+  category: z.string().nullable().optional(),
+  amount_sar: z.number().nonnegative(),
+});
+
 const PaymentMethodEnum = z.enum(["bank_transfer", "stc_pay", "cash", "other"]);
 
 const InputSchema = z.object({
   invoice_id: z.string().uuid(),
   // editable fields — all optional; only provided fields are updated
   items: z.array(LineItemSchema).min(1).optional(),
+  fees: z.array(FeeSchema).optional(),
   description: z.string().optional(),
-  vat_pct: z.number().nonnegative().optional(),
+  vat_pct: z.number().nonnegative().max(100).optional(),
   payment_method: PaymentMethodEnum.optional(),
   payment_details: z.string().nullable().optional(),
   due_date: z.string().nullable().optional(), // ISO date yyyy-mm-dd or null
@@ -121,6 +128,15 @@ export async function updateInvoice(
     // via the DB trigger; we still set it so TypeScript artifact stays in sync.
   }
 
+  if (editable.fees !== undefined) {
+    // Normalize to the stored shape; the DB trigger recomputes vat/total.
+    updatePayload["fees"] = editable.fees.map((f) => ({
+      name: f.name,
+      category: f.category ?? null,
+      amount_sar: f.amount_sar,
+    })) satisfies InvoiceFee[];
+  }
+
   if (editable.description !== undefined) {
     updatePayload["description"] = editable.description;
   }
@@ -152,7 +168,7 @@ export async function updateInvoice(
     .eq("id", invoice_id)
     .eq("user_id", userId)
     .select(
-      "id, invoice_number, status, description, items, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -171,6 +187,7 @@ export async function updateInvoice(
     status: updatedData.status as string,
     description: updatedData.description as string | null,
     items: updatedData.items,
+    fees: updatedData.fees,
     subtotal_sar: Number(updatedData.subtotal_sar),
     vat_pct: Number(updatedData.vat_pct),
     vat_sar: Number(updatedData.vat_sar),

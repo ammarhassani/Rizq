@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { lineItemTotal, computeTotals, type InvoiceLineItem } from "./items";
+import {
+  lineItemTotal,
+  computeTotals,
+  computeInvoiceTotals,
+  feesSubtotal,
+  type InvoiceLineItem,
+  type InvoiceFee,
+} from "./items";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -190,5 +197,64 @@ describe("computeTotals — negative/NaN guards", () => {
     const result = computeTotals(items, NaN);
     expect(result.vat_sar).toBe(0);
     expect(result.total_sar).toBe(1000);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// feesSubtotal + computeInvoiceTotals (VAT base = items + fees) — mirrors the
+// DB trigger private.invoice_compute_before.
+// ---------------------------------------------------------------------------
+
+describe("feesSubtotal", () => {
+  it("sums fee amounts, rounding to 2dp", () => {
+    const fees: InvoiceFee[] = [
+      { name: "استعجال", category: null, amount_sar: 150.005 },
+      { name: "توصيل", category: "لوجستيات", amount_sar: 50 },
+    ];
+    expect(feesSubtotal(fees)).toBe(200.01);
+  });
+
+  it("treats negative/NaN fee amounts as 0", () => {
+    const fees: InvoiceFee[] = [
+      { name: "a", category: null, amount_sar: -100 },
+      { name: "b", category: null, amount_sar: NaN },
+      { name: "c", category: null, amount_sar: 80 },
+    ];
+    expect(feesSubtotal(fees)).toBe(80);
+  });
+
+  it("empty fees → 0", () => {
+    expect(feesSubtotal([])).toBe(0);
+  });
+});
+
+describe("computeInvoiceTotals", () => {
+  it("applies VAT to items + fees, not items alone", () => {
+    const items: InvoiceLineItem[] = [item("خدمة", 1, 1000)];
+    const fees: InvoiceFee[] = [{ name: "رسوم استعجال", category: null, amount_sar: 200 }];
+    const r = computeInvoiceTotals(items, fees, 15);
+    // base = 1000 + 200 = 1200; vat = 180; total = 1380
+    expect(r.subtotal_sar).toBe(1000);
+    expect(r.fees_sar).toBe(200);
+    expect(r.vat_sar).toBe(180);
+    expect(r.total_sar).toBe(1380);
+  });
+
+  it("0% VAT → fees still added to the total", () => {
+    const items: InvoiceLineItem[] = [item("خدمة", 2, 500)];
+    const fees: InvoiceFee[] = [{ name: "توصيل", category: null, amount_sar: 75 }];
+    const r = computeInvoiceTotals(items, fees, 0);
+    expect(r.subtotal_sar).toBe(1000);
+    expect(r.fees_sar).toBe(75);
+    expect(r.vat_sar).toBe(0);
+    expect(r.total_sar).toBe(1075);
+  });
+
+  it("no fees behaves like a plain VAT calc", () => {
+    const items: InvoiceLineItem[] = [item("خدمة", 1, 1000)];
+    const r = computeInvoiceTotals(items, [], 15);
+    expect(r.fees_sar).toBe(0);
+    expect(r.vat_sar).toBe(150);
+    expect(r.total_sar).toBe(1150);
   });
 });
