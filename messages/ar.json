@@ -112,11 +112,36 @@
     "calendar": "التقويم",
     "hadaf": "هدف",
     "invoices": "الفواتير",
+    "documents": "الوثائق",
     "rateCalculator": "حاسبة المعدل",
     "login": "تسجيل الدخول",
     "signup": "أنشئ حساب",
     "openMenu": "افتح القائمة",
     "closeMenu": "أغلق القائمة"
+  },
+  "Documents": {
+    "pageTitle": "خزنة الوثائق",
+    "pageSubtitle": "وثائقك الرسمية في مكان واحد. آمنة، مصنّفة، مع تنبيهات الانتهاء.",
+    "myDocuments": "وثائقي",
+    "uploadDocument": "رفع وثيقة",
+    "uploadNew": "رفع وثيقة جديدة",
+    "noDocumentsTitle": "لا توجد وثائق بعد",
+    "noDocumentsBody": "ارفع أول وثيقة — شهادة ضريبية، عقد، سجل تجاري...",
+    "backToDocuments": "الوثائق",
+    "categories": {
+      "freelance_doc": "وثيقة عمل حر",
+      "commercial_reg": "سجل تجاري",
+      "tax_cert": "شهادة ضريبية",
+      "contract": "عقد",
+      "portfolio": "أعمال",
+      "nda": "اتفاقية عدم إفصاح",
+      "other": "أخرى"
+    },
+    "shareTitle": "مشاركة الوثيقة",
+    "shareNotice": "تمت مشاركة هذه الوثيقة معك عبر رِزق. الرابط مؤقت وسينتهي قريبًا.",
+    "downloadFile": "تحميل الملف",
+    "downloadError": "تعذّر تحضير رابط التحميل.",
+    "attribution": "مُنشأ بواسطة رِزق — سعّر بثقة، اقبض رزقك"
   },
   "Legal": {
     "lastUpdated": "آخر تحديث: مايو 2026",

@@ -112,11 +112,36 @@
     "calendar": "Calendar",
     "hadaf": "Hadaf",
     "invoices": "Invoices",
+    "documents": "Documents",
     "rateCalculator": "Rate calculator",
     "login": "Sign in",
     "signup": "Sign up",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
+  },
+  "Documents": {
+    "pageTitle": "Document Vault",
+    "pageSubtitle": "Your official documents in one place. Secure, categorized, with expiry alerts.",
+    "myDocuments": "My documents",
+    "uploadDocument": "Upload document",
+    "uploadNew": "Upload a new document",
+    "noDocumentsTitle": "No documents yet",
+    "noDocumentsBody": "Upload your first document — tax certificate, contract, commercial registration...",
+    "backToDocuments": "Documents",
+    "categories": {
+      "freelance_doc": "Freelance document",
+      "commercial_reg": "Commercial registration",
+      "tax_cert": "Tax certificate",
+      "contract": "Contract",
+      "portfolio": "Portfolio",
+      "nda": "NDA",
+      "other": "Other"
+    },
+    "shareTitle": "Share document",
+    "shareNotice": "This document was shared with you via Rizq. The link is temporary and will expire soon.",
+    "downloadFile": "Download file",
+    "downloadError": "Could not prepare download link.",
+    "attribution": "Shared via Rizq — Price with confidence, earn your rizq"
   },
   "Legal": {
     "lastUpdated": "Last updated: May 2026",
