@@ -1551,6 +1551,84 @@
     "expand": "Expand",
     "navLink": "Hadaf"
   },
+  "AppShell": {
+    "groups": {
+      "home": "Home",
+      "work": "Work",
+      "money": "Money",
+      "tools": "Tools",
+      "account": "Account"
+    },
+    "apps": {
+      "dashboard": {
+        "name": "Dashboard",
+        "tagline": "Your at-a-glance overview"
+      },
+      "proposals": {
+        "name": "Proposals",
+        "tagline": "Your Rizq-stamped proposals"
+      },
+      "clients": {
+        "name": "Clients",
+        "tagline": "Your client book and follow-ups"
+      },
+      "calendar": {
+        "name": "Calendar",
+        "tagline": "Every deadline in one place"
+      },
+      "income": {
+        "name": "Income Ledger",
+        "tagline": "Track your gigs and payments"
+      },
+      "invoices": {
+        "name": "Invoices",
+        "tagline": "Issue and track your invoices"
+      },
+      "rate-calculator": {
+        "name": "Rate Calculator",
+        "tagline": "Find your target rate"
+      },
+      "tool": {
+        "name": "Pricing Tool",
+        "tagline": "Price with confidence"
+      },
+      "hadaf": {
+        "name": "Hadaf",
+        "tagline": "Track your Hadaf eligibility"
+      },
+      "documents": {
+        "name": "Documents",
+        "tagline": "Your official docs, secured"
+      },
+      "methodology": {
+        "name": "Methodology",
+        "tagline": "How Rizq numbers are built"
+      },
+      "settings": {
+        "name": "Settings",
+        "tagline": "Manage your account and data"
+      },
+      "upgrade": {
+        "name": "Upgrade",
+        "tagline": "Unlock Pro features"
+      }
+    },
+    "launcher": {
+      "title": "Rizq Apps",
+      "subtitle": "All tools in the Saudi Freelancer OS"
+    },
+    "topbar": {
+      "apps": "Open app launcher",
+      "upgrade": "Upgrade",
+      "menu": "User menu",
+      "openSidebar": "Open sidebar"
+    },
+    "userMenu": {
+      "settings": "Settings",
+      "viewSite": "View site",
+      "signedInAs": "User menu"
+    }
+  },
   "Settings": {
     "pageTitle": "Settings",
     "eyebrow": "Your account",
