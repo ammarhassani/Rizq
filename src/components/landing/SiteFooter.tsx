@@ -42,7 +42,7 @@ export async function SiteFooter({ locale }: Props) {
 
           {/* Apps column */}
           <div>
-            <p className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-dark mb-4 ${font}`}>
+            <p className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-deep mb-4 ${font}`}>
               {tLanding("footerApps")}
             </p>
             <ul className="flex flex-col gap-2.5">
@@ -61,7 +61,7 @@ export async function SiteFooter({ locale }: Props) {
 
           {/* Contact column */}
           <div>
-            <p className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-dark mb-4 ${font}`}>
+            <p className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-deep mb-4 ${font}`}>
               {t("contactLabel")}
             </p>
             <a

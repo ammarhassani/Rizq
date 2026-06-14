@@ -11,6 +11,10 @@
   --color-rizq-gold: #c8a951;
   --color-rizq-gold-light: #e6c77a;
   --color-rizq-gold-dark: #9e8a3d;
+  /* WCAG AA text token: ~5.6:1 on white/cream — use for SMALL gold text
+     (eyebrows, labels). Reserve the brighter gold/gold-dark for large display
+     text + decorative rules where contrast minimums don't apply. */
+  --color-rizq-gold-deep: #6b5a23;
   --color-rizq-cream: #faf5ec;
   --color-rizq-cream-dark: #e8e0cc;
   --color-rizq-ink: #1a1a1a;
@@ -217,8 +221,9 @@
   font-size: 0.75rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-rizq-gold-dark);
-  font-weight: 500;
+  /* Deep gold for WCAG AA (small text needs >=4.5:1); gold-dark failed at ~2.8:1. */
+  color: var(--color-rizq-gold-deep);
+  font-weight: 600;
 }
 
 /* Numeric marker for sectioned content (٠١, ٠٢, ٠٣). Light gold, large. */
@@ -229,4 +234,26 @@
   opacity: 0.55;
   font-size: clamp(2.25rem, 4vw, 3.5rem);
   line-height: 1;
+}
+
+/* ── WCAG 2.1 — reduced motion ─────────────────────────────────────────────
+   Neutralize CSS-driven motion (the shimmer skeleton, fade/slide keyframes,
+   and any decorative transitions) for users who ask for reduced motion.
+   Framer Motion is JS-driven and unaffected here; those components already
+   honor useReducedMotion() and render their resting state. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  [style*="shimmer"],
+  [class*="shimmer"] {
+    animation: none !important;
+    background-position: 0 0 !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

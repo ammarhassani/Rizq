@@ -116,7 +116,7 @@ export function DemoRate({ locale }: Props) {
       {/* Realistic / ambitious hint from the real output */}
       <p
         className={`flex items-start gap-2 text-sm leading-relaxed ${font} ${
-          realistic ? "text-rizq-green" : "text-rizq-gold-dark"
+          realistic ? "text-rizq-green" : "text-rizq-gold-deep"
         }`}
         aria-live="polite"
       >

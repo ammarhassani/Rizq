@@ -112,7 +112,7 @@ export async function Pricing({ locale }: Props) {
                 {t("pro.name")}
               </h3>
               <span
-                className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-dark ${font}`}
+                className={`text-xs tracking-[0.18em] uppercase text-rizq-gold-deep ${font}`}
               >
                 {t("pro.badge")}
               </span>
@@ -159,7 +159,7 @@ export async function Pricing({ locale }: Props) {
         </div>
 
         <Reveal delay={0.2}>
-          <p className={`mt-14 text-xs tracking-[0.18em] uppercase text-rizq-gold-dark/80 ${font}`}>
+          <p className={`mt-14 text-xs tracking-[0.18em] uppercase text-rizq-gold-deep/80 ${font}`}>
             {t("halalNote")}
           </p>
         </Reveal>
