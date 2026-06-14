@@ -730,7 +730,25 @@
   },
   "Common": {
     "backToDashboard": "Back to account",
-    "back": "Back"
+    "back": "Back",
+    "clientPicker": {
+      "none": "No client",
+      "searchPlaceholder": "Search for a client…",
+      "noResults": "No client by that name"
+    },
+    "quickAddClient": {
+      "footerAdd": "Add client",
+      "title": "Quick add client",
+      "subtitle": "Add a new client without leaving this page.",
+      "nameLabel": "Client name",
+      "namePlaceholder": "e.g. Mohammed Al-Otaibi",
+      "companyLabel": "Company",
+      "companyPlaceholder": "Company name",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+966 5X XXX XXXX",
+      "add": "Add client",
+      "cancel": "Cancel"
+    }
   },
   "MySubmissions": {
     "heading": "Your contributions",

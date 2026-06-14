@@ -24,6 +24,7 @@ import { ProposalArtifact } from "./ProposalArtifact";
 import { ToneBar } from "./ToneBar";
 import { ScopeInsight } from "./ScopeInsight";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { ClientPicker } from "@/components/clients/ClientPicker";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
@@ -504,37 +505,29 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         </div>
       )}
 
-      {/* Client picker — shown when the owner has saved clients */}
-      {clients.length > 0 && (
-        <div>
-          <label
-            htmlFor="client-picker"
-            className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
-          >
-            {t("pickClient")}
-            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-          </label>
-          <select
-            id="client-picker"
-            value={selectedClientId}
-            onChange={(e) => {
-              setSelectedClientId(e.target.value);
-              // When switching to "new client", clear the free-text name so
-              // user can type a fresh one; when selecting a known client clear
-              // any pre-typed free-text name.
-              setClientName("");
-            }}
-            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-          >
-            <option value="">{t("newClient")}</option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      {/* Client picker — combobox + quick-add */}
+      <div>
+        <label
+          htmlFor="client-picker"
+          className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
+        >
+          {t("pickClient")}
+          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+        </label>
+        <ClientPicker
+          id="client-picker"
+          value={selectedClientId}
+          onChange={(v) => {
+            setSelectedClientId(v);
+            // When switching to "new client" (cleared), the free-text name field
+            // re-appears; when selecting a known client clear any pre-typed name.
+            setClientName("");
+          }}
+          clients={clients}
+          locale={locale}
+          noneLabel={t("newClient")}
+        />
+      </div>
 
       {/* Brief textarea */}
       <div>

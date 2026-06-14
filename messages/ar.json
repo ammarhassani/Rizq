@@ -730,7 +730,25 @@
   },
   "Common": {
     "backToDashboard": "العودة للحساب",
-    "back": "رجوع"
+    "back": "رجوع",
+    "clientPicker": {
+      "none": "بدون عميل",
+      "searchPlaceholder": "ابحث عن عميل…",
+      "noResults": "لا يوجد عميل بهذا الاسم"
+    },
+    "quickAddClient": {
+      "footerAdd": "إضافة عميل",
+      "title": "إضافة عميل سريع",
+      "subtitle": "أضف عميلاً جديدًا دون مغادرة هذه الصفحة.",
+      "nameLabel": "اسم العميل",
+      "namePlaceholder": "مثال: محمد العتيبي",
+      "companyLabel": "الشركة",
+      "companyPlaceholder": "اسم الشركة",
+      "phoneLabel": "الجوال",
+      "phonePlaceholder": "+966 5X XXX XXXX",
+      "add": "إضافة العميل",
+      "cancel": "إلغاء"
+    }
   },
   "MySubmissions": {
     "heading": "مساهماتك",

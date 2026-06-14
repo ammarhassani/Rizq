@@ -12,6 +12,7 @@ import { createInvoice } from "@/app/actions/invoices/createInvoice";
 import { lineItemTotal } from "@/lib/invoices/items";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { ClientPicker } from "@/components/clients/ClientPicker";
 
 type ClientOption = { id: string; name: string };
 
@@ -188,26 +189,19 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
       </div>
 
       {/* Client picker */}
-      {clients.length > 0 && (
-        <div>
-          <label className={labelClass}>
-            {t("clientLabel")}{" "}
-            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-          </label>
-          <select
-            value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
-            className={`${inputClass} appearance-none`}
-          >
-            <option value="">{t("clientNone")}</option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div>
+        <label className={labelClass}>
+          {t("clientLabel")}{" "}
+          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+        </label>
+        <ClientPicker
+          value={clientId}
+          onChange={setClientId}
+          clients={clients}
+          locale={locale}
+          noneLabel={t("clientNone")}
+        />
+      </div>
 
       {/* Line items */}
       <div>
