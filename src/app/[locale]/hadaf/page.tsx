@@ -8,7 +8,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { getHadafStatusAction } from "@/app/actions/hadaf/status";
 import { HadafStreakBar } from "@/components/hadaf/HadafStreakBar";
 import { HadafActionPlanClient } from "@/components/hadaf/HadafActionPlanClient";
@@ -72,39 +72,21 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
   // ── Error / no rules state ────────────────────────────────────────────────
   if (!result.ok) {
     return (
-      <div className="relative min-h-screen flex flex-col bg-paper">
-        <SiteNav locale={locale as "ar" | "en"} />
-        <main className={`relative z-10 flex-1 mx-auto w-full max-w-2xl px-6 py-16 ${font}`} dir={dir}>
+      <AppShell locale={locale as "ar" | "en"} title={isAr ? "هدف" : "HADAF"}>
+        <div className={`mx-auto w-full max-w-2xl px-6 py-16 ${font}`} dir={dir}>
           <p className="text-sm text-rizq-ink-soft">{t("loadError")}</p>
-        </main>
-      </div>
+        </div>
+      </AppShell>
     );
   }
 
   const { status, rules, disclaimer, ai_action_plan_ar, ai_action_plan_en } = result;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
-      {/* Dot-grid background */}
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "أهلية هدف" : "HADAF Eligibility"}>
       <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-
-      <SiteNav locale={locale as "ar" | "en"} />
-
-      <main
         dir={dir}
-        className={`relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 pb-28 ${font}`}
+        className={`mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 pb-28 ${font}`}
       >
         {/* Page header */}
         <div className="mb-8">
@@ -355,7 +337,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
         <p className={`text-xs text-rizq-ink-soft/50 text-center mb-8 ${font}`}>
           {t("notGovNote")}
         </p>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

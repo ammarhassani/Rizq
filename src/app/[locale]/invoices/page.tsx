@@ -8,7 +8,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { InvoiceListClient } from "@/components/invoices/InvoiceListClient";
 import { isOverdue } from "@/lib/invoices/overdue";
 import type { InvoiceRow } from "@/components/invoices/InvoiceCard";
@@ -82,24 +82,9 @@ export default async function InvoicesPage({ params }: { params: Promise<Params>
   const summary = { issuedTotal, paidTotal, overdueTotal, overdueCount };
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
-      {/* Dot-grid background — mirrors income page */}
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "الفواتير" : "Invoices"}>
       <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-      <SiteNav locale={locale as "ar" | "en"} />
-      <main
-        className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
+        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
         dir={dir}
       >
         {/* Page header */}
@@ -146,7 +131,7 @@ export default async function InvoicesPage({ params }: { params: Promise<Params>
             locale={locale as "ar" | "en"}
           />
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

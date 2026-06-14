@@ -8,7 +8,7 @@ import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { DocumentDetailClient } from "@/components/documents/DocumentDetailClient";
 
 type Params = { locale: string; id: string };
@@ -56,20 +56,9 @@ export default async function DocumentDetailPage({ params }: { params: Promise<P
   const catLabel = catMeta ? (isAr ? catMeta.name_ar : catMeta.name_en) : null;
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
+    <AppShell locale={locale as "ar" | "en"} title={doc.title_ar as string}>
       <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage: "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-      <SiteNav locale={locale as "ar" | "en"} />
-      <main
-        className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
+        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
         dir={dir}
       >
         <Link
@@ -110,7 +99,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<P
           locale={locale as "ar" | "en"}
           categories={categories}
         />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

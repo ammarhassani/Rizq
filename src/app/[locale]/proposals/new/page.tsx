@@ -15,7 +15,7 @@ import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCities, getExperienceTiers } from "@/lib/pricing/refDataDb";
 import { listTemplates } from "@/app/actions/proposals/templates";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
 
 // ---------------------------------------------------------------------------
@@ -118,25 +118,8 @@ export default async function ProposalNewPage({
   }));
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
-      {/* Dot grid background */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-
-      <SiteNav locale={locale as "ar" | "en"} />
-
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض جديد" : "New Proposal"}>
+      <div className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
         {/* Header */}
         <div className="mb-8 sm:mb-12">
           <p className="eyebrow mb-3">{t("eyebrow")}</p>
@@ -160,8 +143,8 @@ export default async function ProposalNewPage({
           }))}
           clients={userClients}
         />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

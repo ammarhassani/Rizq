@@ -11,7 +11,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { UpgradePlans } from "@/components/upgrade/UpgradePlans";
 import { getMyTierAction } from "@/app/actions/billing/upgrade";
 
@@ -57,25 +57,8 @@ export default async function UpgradePage({
   const font = isAr ? "font-arabic" : "font-sans";
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
-      {/* Dot-grid background */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-
-      <SiteNav locale={locale as "ar" | "en"} />
-
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "ترقية الحساب" : "Upgrade"}>
+      <div className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
         {/* Header */}
         <div className={`mb-10 sm:mb-14 ${isAr ? "text-right" : "text-left"}`}>
           <p className="eyebrow mb-3 text-rizq-green">{t("pageEyebrow")}</p>
@@ -91,7 +74,7 @@ export default async function UpgradePage({
           isPro={tierResult.isPro}
           pro_until={tierResult.pro_until}
         />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

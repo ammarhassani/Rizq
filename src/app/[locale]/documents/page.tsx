@@ -8,7 +8,7 @@ import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { DocumentCard, type DocumentRow } from "@/components/documents/DocumentCard";
 
 type Params = { locale: string };
@@ -60,20 +60,9 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
   const docs = (docsRaw ?? []) as DocumentRow[];
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "خزنة الوثائق" : "Document Vault"}>
       <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage: "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-      <SiteNav locale={locale as "ar" | "en"} />
-      <main
-        className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
+        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
         dir={dir}
       >
         {/* Header */}
@@ -124,18 +113,18 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
             ))}
           </div>
         )}
-      </main>
 
-      {/* FAB */}
-      {docs.length > 0 && (
-        <Link
-          href="/documents/new"
-          className={`fixed bottom-6 end-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-rizq-green text-rizq-cream shadow-lg hover:bg-rizq-green-dark hover:scale-105 transition-all ${font}`}
-          aria-label={isAr ? "رفع وثيقة" : "Upload document"}
-        >
-          <span className="text-2xl leading-none">+</span>
-        </Link>
-      )}
-    </div>
+        {/* FAB */}
+        {docs.length > 0 && (
+          <Link
+            href="/documents/new"
+            className={`fixed bottom-6 end-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-rizq-green text-rizq-cream shadow-lg hover:bg-rizq-green-dark hover:scale-105 transition-all ${font}`}
+            aria-label={isAr ? "رفع وثيقة" : "Upload document"}
+          >
+            <span className="text-2xl leading-none">+</span>
+          </Link>
+        )}
+      </div>
+    </AppShell>
   );
 }

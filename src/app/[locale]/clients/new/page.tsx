@@ -7,7 +7,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { ClientForm } from "@/components/clients/ClientForm";
 
 type Params = { locale: string };
@@ -34,20 +34,9 @@ export default async function ClientNewPage({ params }: { params: Promise<Params
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عميل جديد" : "New Client"}>
       <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage: "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-      <SiteNav locale={locale as "ar" | "en"} />
-      <main
-        className="relative z-10 flex-1 mx-auto w-full max-w-2xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
+        className="mx-auto w-full max-w-2xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
         dir={isAr ? "rtl" : "ltr"}
       >
         <Link
@@ -58,7 +47,7 @@ export default async function ClientNewPage({ params }: { params: Promise<Params
           {isAr ? "دفتر العملاء" : "Client Book"}
         </Link>
         <ClientForm locale={locale as "ar" | "en"} mode="create" />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
