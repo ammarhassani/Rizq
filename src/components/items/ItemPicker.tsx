@@ -4,7 +4,7 @@
  * ItemPicker — "add a line from the catalog" control for the invoice builder.
  *
  * A searchable Combobox of the freelancer's catalog items (label = name, hint =
- * unit price) plus a "+ Add item" footer that opens AddItemDialog (the full
+ * unit price) plus a "+ Add item" footer that opens ItemDialog (the full
  * item module, popped). Selecting an item — existing OR just-created — fires
  * onPick(item); the control then resets so the next item can be added. This is
  * a transient "adder", not a bound select, so its own value clears after each
@@ -15,7 +15,7 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { Combobox, type ComboboxOption } from "@/components/ui/Combobox";
-import { AddItemDialog } from "@/components/items/AddItemDialog";
+import { ItemDialog } from "@/components/items/ItemDialog";
 import type { CreatedItem } from "@/app/actions/items/items";
 import { cn } from "@/lib/utils";
 
@@ -64,7 +64,7 @@ export function ItemPicker({ locale, items, onPick, id }: Props) {
     // Transient adder: value is never retained.
   }
 
-  function handleCreated(item: CreatedItem) {
+  function handleSaved(item: CreatedItem) {
     setLocalItems((prev) => (prev.some((i) => i.id === item.id) ? prev : [item, ...prev]));
     onPick(item);
   }
@@ -95,10 +95,10 @@ export function ItemPicker({ locale, items, onPick, id }: Props) {
         }
       />
 
-      <AddItemDialog
+      <ItemDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onCreated={handleCreated}
+        onSaved={handleSaved}
         locale={locale}
       />
     </>

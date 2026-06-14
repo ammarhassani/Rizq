@@ -3,7 +3,7 @@
 /**
  * FeeForm — create a categorized fixed-fee preset.
  *
- * Full form, no partial data. Used embedded in AddFeeDialog (the invoice
+ * Full form, no partial data. Used embedded in FeeDialog (the invoice
  * builder's "+ Add fee", same popped-window workflow as items). On create it
  * saves a reusable preset and returns it so the caller can add it onto the
  * current invoice.
@@ -12,13 +12,17 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { createFeePreset, type CreatedFeePreset } from "@/app/actions/fees/fees";
+import { createFeePreset, updateFeePreset, type CreatedFeePreset } from "@/app/actions/fees/fees";
 import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 
 type Props = {
   locale: "ar" | "en";
-  onCreated?: (preset: CreatedFeePreset) => void;
+  /** "create" (default) inserts a new preset; "edit" updates initialData.id. */
+  mode?: "create" | "edit";
+  initialData?: CreatedFeePreset;
+  /** Returns the saved preset to the caller (fires on both create and edit). */
+  onSaved?: (preset: CreatedFeePreset) => void;
   embedded?: boolean;
 };
 
@@ -27,7 +31,7 @@ function parseNum(s: string): number {
   return isNaN(n) ? 0 : n;
 }
 
-export function FeeForm({ locale, onCreated, embedded = false }: Props) {
+export function FeeForm({ locale, mode = "create", initialData, onSaved, embedded = false }: Props) {
   const t = useTranslations("Fees.form");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -36,9 +40,11 @@ export function FeeForm({ locale, onCreated, embedded = false }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [amount, setAmount] = useState("");
+  const [name, setName] = useState(initialData?.name ?? "");
+  const [category, setCategory] = useState(initialData?.category ?? "");
+  const [amount, setAmount] = useState(
+    initialData?.amount_sar != null ? String(initialData.amount_sar) : ""
+  );
 
   const inputClass = cn(
     "w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink transition-colors",
@@ -63,6 +69,24 @@ export function FeeForm({ locale, onCreated, embedded = false }: Props) {
     setError(null);
 
     startTransition(async () => {
+      if (mode === "edit" && initialData) {
+        const result = await updateFeePreset({
+          id: initialData.id,
+          patch: {
+            name: trimmedName,
+            category: category.trim() || null,
+            amount_sar: amt,
+          },
+        });
+        if (!result.ok) {
+          setError(t("errors.generic"));
+          return;
+        }
+        track("fee_preset_updated", { locale });
+        onSaved?.(result.preset);
+        return;
+      }
+
       const result = await createFeePreset({
         name: trimmedName,
         category: category.trim() || undefined,
@@ -75,7 +99,7 @@ export function FeeForm({ locale, onCreated, embedded = false }: Props) {
       }
 
       track("fee_preset_created", { locale });
-      onCreated?.(result.preset);
+      onSaved?.(result.preset);
     });
   }
 
@@ -161,7 +185,7 @@ export function FeeForm({ locale, onCreated, embedded = false }: Props) {
             <span>{t("saving")}</span>
           </>
         ) : (
-          <span>{t("save")}</span>
+          <span>{mode === "edit" ? t("saveChanges") : t("save")}</span>
         )}
       </button>
     </form>

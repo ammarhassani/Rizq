@@ -4,7 +4,7 @@
  * FeePicker — "add a fee" control for the invoice builder.
  *
  * A searchable Combobox of the freelancer's fee presets (label = name, hint =
- * amount · category) plus a "+ Add fee" footer that opens AddFeeDialog (the
+ * amount · category) plus a "+ Add fee" footer that opens FeeDialog (the
  * full fee module, popped). Selecting a preset — existing OR just-created —
  * fires onPick({ name, category, amount_sar }); the control then resets. A
  * transient adder, not a bound select.
@@ -14,7 +14,7 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { Combobox, type ComboboxOption } from "@/components/ui/Combobox";
-import { AddFeeDialog } from "@/components/fees/AddFeeDialog";
+import { FeeDialog } from "@/components/fees/FeeDialog";
 import type { CreatedFeePreset } from "@/app/actions/fees/fees";
 import type { InvoiceFee } from "@/lib/invoices/items";
 import { cn } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function FeePicker({ locale, presets, onPick, id }: Props) {
     }
   }
 
-  function handleCreated(preset: CreatedFeePreset) {
+  function handleSaved(preset: CreatedFeePreset) {
     setLocalPresets((prev) => (prev.some((p) => p.id === preset.id) ? prev : [preset, ...prev]));
     onPick({ name: preset.name, category: preset.category, amount_sar: preset.amount_sar });
   }
@@ -96,10 +96,10 @@ export function FeePicker({ locale, presets, onPick, id }: Props) {
         }
       />
 
-      <AddFeeDialog
+      <FeeDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onCreated={handleCreated}
+        onSaved={handleSaved}
         locale={locale}
       />
     </>

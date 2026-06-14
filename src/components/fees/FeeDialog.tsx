@@ -1,36 +1,38 @@
 "use client";
 
 /**
- * AddItemDialog — the full item module, popped in a dialog.
+ * FeeDialog — the full fee module, popped in a dialog (create OR edit).
  *
- * Used by the invoice builder when the freelancer wants to sell an item that
- * isn't in their catalog yet: same popped-window workflow as adding a client.
- * The new item is saved to the catalog AND returned to the caller so it can be
- * selected onto the current invoice immediately. No partial data.
+ * create: used by the invoice builder ("+ Add fee") and the catalog page.
+ * edit:   used by the catalog page to update an existing fee preset.
+ * Renders the complete FeeForm — no partial data.
  */
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { ItemForm } from "@/components/items/ItemForm";
-import type { CreatedItem } from "@/app/actions/items/items";
+import { FeeForm } from "@/components/fees/FeeForm";
+import type { CreatedFeePreset } from "@/app/actions/fees/fees";
 import { cn } from "@/lib/utils";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated: (item: CreatedItem) => void;
+  onSaved: (preset: CreatedFeePreset) => void;
   locale: "ar" | "en";
+  mode?: "create" | "edit";
+  initialData?: CreatedFeePreset;
 };
 
-export function AddItemDialog({ open, onOpenChange, onCreated, locale }: Props) {
-  const t = useTranslations("Items.dialog");
+export function FeeDialog({ open, onOpenChange, onSaved, locale, mode = "create", initialData }: Props) {
+  const t = useTranslations("Fees.dialog");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
+  const isEdit = mode === "edit";
 
-  function handleCreated(item: CreatedItem) {
-    onCreated(item);
+  function handleSaved(preset: CreatedFeePreset) {
+    onSaved(preset);
     onOpenChange(false);
   }
 
@@ -49,19 +51,21 @@ export function AddItemDialog({ open, onOpenChange, onCreated, locale }: Props) 
         >
           <div className="border-b border-rizq-gold/20 px-6 pt-6 pb-4 sm:px-8">
             <DialogPrimitive.Title className={cn("text-lg font-semibold text-rizq-ink leading-snug", font)}>
-              {t("title")}
+              {isEdit ? t("editTitle") : t("title")}
             </DialogPrimitive.Title>
             <DialogPrimitive.Description className={cn("mt-1 text-sm text-rizq-ink-soft/70", font)}>
-              {t("subtitle")}
+              {isEdit ? t("editSubtitle") : t("subtitle")}
             </DialogPrimitive.Description>
           </div>
 
           <div className="overflow-y-auto px-6 py-5 sm:px-8">
-            <ItemForm
-              key={open ? "open" : "closed"}
+            <FeeForm
+              key={open ? `${mode}-${initialData?.id ?? "new"}` : "closed"}
               locale={locale}
+              mode={mode}
+              initialData={initialData}
               embedded
-              onCreated={handleCreated}
+              onSaved={handleSaved}
             />
           </div>
         </DialogPrimitive.Popup>

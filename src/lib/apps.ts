@@ -10,6 +10,7 @@ import {
   CalendarDays,
   TrendingUp,
   ReceiptText,
+  Package,
   Calculator,
   Tag,
   Target,
@@ -74,6 +75,13 @@ export const APPS: AppDef[] = [
     id: "invoices",
     href: "/invoices",
     icon: ReceiptText, // ReceiptText confirmed in lucide-react
+    group: "money",
+    sidebar: true,
+  },
+  {
+    id: "catalog",
+    href: "/catalog",
+    icon: Package, // Package confirmed in lucide-react — products/services + fees
     group: "money",
     sidebar: true,
   },

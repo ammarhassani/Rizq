@@ -1661,6 +1661,10 @@
       "upgrade": {
         "name": "Upgrade",
         "tagline": "Unlock Pro features"
+      },
+      "catalog": {
+        "name": "Catalog",
+        "tagline": "Your products, services, and fees"
       }
     },
     "launcher": {
@@ -1876,11 +1880,14 @@
         "nameRequired": "Enter the item name.",
         "priceRequired": "Enter a valid price greater than zero.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "saveChanges": "Save changes"
     },
     "dialog": {
       "title": "New item",
-      "subtitle": "Add a product or service to your catalog."
+      "subtitle": "Add a product or service to your catalog.",
+      "editTitle": "Edit item",
+      "editSubtitle": "Update this product or service."
     }
   },
   "Fees": {
@@ -1897,11 +1904,37 @@
         "nameRequired": "Enter the fee name.",
         "amountRequired": "Enter a valid amount greater than zero.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "saveChanges": "Save changes"
     },
     "dialog": {
       "title": "New fee",
-      "subtitle": "Add a reusable fixed fee."
+      "subtitle": "Add a reusable fixed fee.",
+      "editTitle": "Edit fee",
+      "editSubtitle": "Update this fee."
     }
+  },
+  "Catalog": {
+    "title": "Catalog",
+    "subtitle": "Your products, services, and saved fees, ready to drop into any invoice.",
+    "tabItems": "Products & Services",
+    "tabFees": "Tax & Fees",
+    "itemsHeading": "The products and services you sell",
+    "addItem": "Add product or service",
+    "itemsEmptyTitle": "No products or services yet",
+    "itemsEmptyBody": "Add your products and services to pick them quickly when building invoices.",
+    "feesHeading": "Reusable fixed fees",
+    "addFee": "Add fee",
+    "feesEmptyTitle": "No saved fees yet",
+    "feesEmptyBody": "Add categorized fixed fees to drop onto your invoices quickly.",
+    "edit": "Edit",
+    "archive": "Archive",
+    "archiveItemTitle": "Archive this item?",
+    "archiveItemBody": "{name} will be hidden from your catalog. Past invoices are unaffected.",
+    "archiveFeeTitle": "Archive this fee?",
+    "archiveFeeBody": "{name} will be hidden from your fees. Past invoices are unaffected.",
+    "archiveConfirm": "Archive",
+    "archiveCancel": "Cancel",
+    "archiving": "Archiving…"
   }
 }

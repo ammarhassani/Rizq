@@ -3,7 +3,7 @@
 /**
  * ItemForm — create a catalog item (product/service).
  *
- * Full form, no partial data. Used standalone and embedded in AddItemDialog
+ * Full form, no partial data. Used standalone and embedded in ItemDialog
  * (the invoice builder's "+ Add item" for an unlisted item). On create it
  * returns the full CreatedItem so the caller can select it onto the invoice.
  */
@@ -11,14 +11,18 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { createItem, type CreatedItem } from "@/app/actions/items/items";
+import { createItem, updateItem, type CreatedItem } from "@/app/actions/items/items";
 import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 
 type Props = {
   locale: "ar" | "en";
-  /** Returns the created item to the caller (used when embedded in a dialog). */
-  onCreated?: (item: CreatedItem) => void;
+  /** "create" (default) inserts a new item; "edit" updates initialData.id. */
+  mode?: "create" | "edit";
+  /** Existing item to edit (required when mode="edit"). */
+  initialData?: CreatedItem;
+  /** Returns the saved item to the caller (fires on both create and edit). */
+  onSaved?: (item: CreatedItem) => void;
   /** Drop the outer card chrome when rendered inside a dialog. */
   embedded?: boolean;
 };
@@ -28,7 +32,7 @@ function parseNum(s: string): number {
   return isNaN(n) ? 0 : n;
 }
 
-export function ItemForm({ locale, onCreated, embedded = false }: Props) {
+export function ItemForm({ locale, mode = "create", initialData, onSaved, embedded = false }: Props) {
   const t = useTranslations("Items.form");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -37,10 +41,12 @@ export function ItemForm({ locale, onCreated, embedded = false }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [category, setCategory] = useState("");
+  const [name, setName] = useState(initialData?.name ?? "");
+  const [description, setDescription] = useState(initialData?.description ?? "");
+  const [unitPrice, setUnitPrice] = useState(
+    initialData?.unit_price_sar != null ? String(initialData.unit_price_sar) : ""
+  );
+  const [category, setCategory] = useState(initialData?.category ?? "");
 
   const inputClass = cn(
     "w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink transition-colors",
@@ -65,6 +71,25 @@ export function ItemForm({ locale, onCreated, embedded = false }: Props) {
     setError(null);
 
     startTransition(async () => {
+      if (mode === "edit" && initialData) {
+        const result = await updateItem({
+          id: initialData.id,
+          patch: {
+            name: trimmedName,
+            description: description.trim() || null,
+            unit_price_sar: price,
+            category: category.trim() || null,
+          },
+        });
+        if (!result.ok) {
+          setError(t("errors.generic"));
+          return;
+        }
+        track("item_updated", { locale });
+        onSaved?.(result.item);
+        return;
+      }
+
       const result = await createItem({
         name: trimmedName,
         description: description.trim() || undefined,
@@ -78,7 +103,7 @@ export function ItemForm({ locale, onCreated, embedded = false }: Props) {
       }
 
       track("item_created", { locale });
-      onCreated?.(result.item);
+      onSaved?.(result.item);
     });
   }
 
@@ -179,7 +204,7 @@ export function ItemForm({ locale, onCreated, embedded = false }: Props) {
             <span>{t("saving")}</span>
           </>
         ) : (
-          <span>{t("save")}</span>
+          <span>{mode === "edit" ? t("saveChanges") : t("save")}</span>
         )}
       </button>
     </form>
