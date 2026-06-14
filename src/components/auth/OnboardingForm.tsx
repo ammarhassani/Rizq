@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Loader2 } from "lucide-react";
 import { CITIES, SPECIALTIES } from "@/lib/refData";
+import { Combobox } from "@/components/ui/Combobox";
 import { saveOnboarding, skipOnboarding } from "@/app/actions/profile/saveOnboarding";
 
 type Props = { locale: "ar" | "en" };
@@ -12,6 +13,7 @@ type Props = { locale: "ar" | "en" };
 export function OnboardingForm({ locale }: Props) {
   const t = useTranslations("Onboarding");
   const tShared = useTranslations("Auth.shared");
+  const tCommon = useTranslations("Common");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   const [language, setLanguage] = useState<"ar" | "en">(locale);
@@ -87,19 +89,17 @@ export function OnboardingForm({ locale }: Props) {
         >
           {t("cityLabel")}
         </label>
-        <select
+        <Combobox
           id="city-select"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-        >
-          <option value="">{t("cityPlaceholder")}</option>
-          {CITIES.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c[locale]}
-            </option>
-          ))}
-        </select>
+          locale={locale}
+          value={city || null}
+          onChange={(v) => setCity(v ?? "")}
+          options={CITIES.map((c) => ({ value: c.slug, label: c[locale] }))}
+          placeholder={t("cityPlaceholder")}
+          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+          emptyText={tCommon("combobox.noResults")}
+          allowClear
+        />
       </div>
 
       {/* Specialty */}
@@ -110,19 +110,17 @@ export function OnboardingForm({ locale }: Props) {
         >
           {t("specialtyLabel")}
         </label>
-        <select
+        <Combobox
           id="specialty-select"
-          value={specialty}
-          onChange={(e) => setSpecialty(e.target.value)}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-        >
-          <option value="">{t("specialtyPlaceholder")}</option>
-          {SPECIALTIES.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s[locale]}
-            </option>
-          ))}
-        </select>
+          locale={locale}
+          value={specialty || null}
+          onChange={(v) => setSpecialty(v ?? "")}
+          options={SPECIALTIES.map((s) => ({ value: s.slug, label: s[locale] }))}
+          placeholder={t("specialtyPlaceholder")}
+          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+          emptyText={tCommon("combobox.noResults")}
+          allowClear
+        />
       </div>
 
       {error && (

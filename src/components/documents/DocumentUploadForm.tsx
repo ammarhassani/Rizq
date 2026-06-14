@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import { uploadDocument, suggestCategoryAction, suggestExpiryAction } from "@/app/actions/documents/documentActions";
 import { Loader2, Sparkles, CheckCircle } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { Combobox } from "@/components/ui/Combobox";
 
 type CategoryOption = { id: string; name_ar: string; name_en: string };
 
@@ -163,16 +164,19 @@ export function DocumentUploadForm({ locale, categories }: Props) {
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
           {isAr ? "التصنيف" : "Category"}
         </label>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
-        >
-          <option value="">{isAr ? "— اختر —" : "— Select —"}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{isAr ? c.name_ar : c.name_en}</option>
-          ))}
-        </select>
+        <Combobox
+          locale={locale}
+          value={category || null}
+          onChange={(v) => setCategory(v ?? "")}
+          options={categories.map((c) => ({
+            value: c.id,
+            label: isAr ? c.name_ar : c.name_en,
+          }))}
+          placeholder={isAr ? "— اختر —" : "— Select —"}
+          searchPlaceholder={isAr ? "ابحث…" : "Search…"}
+          emptyText={isAr ? "لا توجد نتائج" : "No results"}
+          allowClear
+        />
         {/* AI category suggestion chip */}
         {categoryAI && !categoryAI.accepted && (
           <div className={`mt-2 flex items-center gap-2 ${font}`}>

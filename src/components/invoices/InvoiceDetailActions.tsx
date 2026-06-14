@@ -120,6 +120,7 @@ export function InvoiceDetailActions({
       const result = await deleteInvoice({ invoice_id: invoiceId });
       if (result.ok) {
         router.push("/invoices" as "/invoices");
+        router.refresh();
       }
     });
   }

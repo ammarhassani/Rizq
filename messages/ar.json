@@ -736,6 +736,10 @@
       "searchPlaceholder": "ابحث عن عميل…",
       "noResults": "لا يوجد عميل بهذا الاسم"
     },
+    "combobox": {
+      "searchPlaceholder": "ابحث…",
+      "noResults": "لا توجد نتائج"
+    },
     "quickAddClient": {
       "footerAdd": "إضافة عميل",
       "title": "إضافة عميل سريع",

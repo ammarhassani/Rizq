@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
@@ -10,6 +10,7 @@ import { useRouter, Link } from "@/i18n/navigation";
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
 import { submitPricing } from "@/app/actions/submit/submitPricing";
 import { resubmitPricing } from "@/app/actions/submit/resubmitPricing";
+import { Combobox } from "@/components/ui/Combobox";
 
 type Option = { slug: string; label: string };
 
@@ -92,6 +93,7 @@ export function SubmitForm({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     reset,
@@ -299,7 +301,8 @@ export function SubmitForm({
         label={t("specialtyLabel")}
         placeholder={t("specialtyLabel")}
         options={specialties}
-        register={register("specialty_slug")}
+        control={control}
+        name="specialty_slug"
         error={errors.specialty_slug?.message}
       />
       <SelectField
@@ -308,7 +311,8 @@ export function SubmitForm({
         label={t("cityLabel")}
         placeholder={t("cityLabel")}
         options={cities}
-        register={register("city_slug")}
+        control={control}
+        name="city_slug"
         error={errors.city_slug?.message}
       />
       <SelectField
@@ -317,7 +321,8 @@ export function SubmitForm({
         label={t("tierLabel")}
         placeholder={t("tierLabel")}
         options={tiers}
-        register={register("experience_tier_slug")}
+        control={control}
+        name="experience_tier_slug"
         error={errors.experience_tier_slug?.message}
       />
 
@@ -349,7 +354,8 @@ export function SubmitForm({
         id="project_size"
         label={t("projectSizeLabel")}
         placeholder={t("projectSizeAny")}
-        register={register("project_size")}
+        control={control}
+        name="project_size"
         options={[
           { slug: "small", label: t("projectSizeSmall") },
           { slug: "medium", label: t("projectSizeMedium") },
@@ -374,7 +380,8 @@ export function SubmitForm({
         id="client_type"
         label={t("clientTypeLabel")}
         placeholder={t("clientTypeAny")}
-        register={register("client_type")}
+        control={control}
+        name="client_type"
         options={[
           { slug: "individual", label: t("clientTypeIndividual") },
           { slug: "smb", label: t("clientTypeSmb") },
@@ -479,7 +486,8 @@ function SelectField({
   label,
   placeholder,
   options,
-  register,
+  control,
+  name,
   error,
 }: {
   locale: "ar" | "en";
@@ -487,28 +495,30 @@ function SelectField({
   label: string;
   placeholder: string;
   options: Option[];
-  register: ReturnType<typeof useForm<FormValues>>["register"] extends infer R
-    ? R extends (...args: never[]) => infer Ret
-      ? Ret
-      : never
-    : never;
+  control: Control<FormValues>;
+  name: "specialty_slug" | "city_slug" | "experience_tier_slug" | "project_size" | "client_type";
   error?: string;
 }) {
-  const font = locale === "ar" ? "font-arabic" : "font-sans";
+  const tCommon = useTranslations("Common");
   return (
     <FieldShell locale={locale} id={id} label={label} error={error}>
-      <select
-        id={id}
-        {...register}
-        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o.slug} value={o.slug}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <Combobox
+            id={id}
+            locale={locale}
+            value={(field.value as string) || null}
+            onChange={(v) => field.onChange(v ?? "")}
+            options={options.map((o) => ({ value: o.slug, label: o.label }))}
+            placeholder={placeholder}
+            searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+            emptyText={tCommon("combobox.noResults")}
+            allowClear
+          />
+        )}
+      />
     </FieldShell>
   );
 }

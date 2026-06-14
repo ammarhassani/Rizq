@@ -16,6 +16,7 @@ import {
   getRatePositioningAction,
   saveRateDefaultsAction,
 } from "@/app/actions/rate/getRatePositioning";
+import { Combobox } from "@/components/ui/Combobox";
 import type { RateCalculatorOutput, MarketBand } from "@/lib/rate/calculate";
 import type { RatePositioning } from "@/lib/ai/ratePositioning";
 import type {
@@ -56,6 +57,7 @@ export function RateCalculatorClient({
   avg3moIncome,
 }: Props) {
   const t = useTranslations("RateCalculator");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
@@ -175,7 +177,6 @@ export function RateCalculatorClient({
 
   const inputClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream px-4 py-3 text-sm text-rizq-ink placeholder:text-rizq-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-rizq-green/30 tabular-nums ${font}`;
   const labelClass = `block text-xs font-medium text-rizq-ink-soft mb-1.5 ${font}`;
-  const selectClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream px-4 py-3 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 appearance-none ${font}`;
 
   return (
     <div className="space-y-6">
@@ -251,51 +252,54 @@ export function RateCalculatorClient({
         {/* Specialty select */}
         <div>
           <label className={labelClass}>{t("specialtyLabel")}</label>
-          <select
-            value={specialtyId}
-            onChange={(e) => setSpecialtyId(e.target.value)}
-            className={selectClass}
-          >
-            <option value="">{t("specialtyPlaceholder")}</option>
-            {specialties.map((s) => (
-              <option key={s.id} value={s.id}>
-                {isAr ? s.name_ar : s.name_en}
-              </option>
-            ))}
-          </select>
+          <Combobox
+            locale={locale}
+            value={specialtyId || null}
+            onChange={(v) => setSpecialtyId(v ?? "")}
+            options={specialties.map((s) => ({
+              value: s.id,
+              label: isAr ? s.name_ar : s.name_en,
+            }))}
+            placeholder={t("specialtyPlaceholder")}
+            searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+            emptyText={tCommon("combobox.noResults")}
+            allowClear
+          />
         </div>
 
         {/* City + Tier selects */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>{t("cityLabel")}</label>
-            <select
-              value={cityId}
-              onChange={(e) => setCityId(e.target.value)}
-              className={selectClass}
-            >
-              <option value="">{t("cityPlaceholder")}</option>
-              {cities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {isAr ? c.name_ar : c.name_en}
-                </option>
-              ))}
-            </select>
+            <Combobox
+              locale={locale}
+              value={cityId || null}
+              onChange={(v) => setCityId(v ?? "")}
+              options={cities.map((c) => ({
+                value: c.id,
+                label: isAr ? c.name_ar : c.name_en,
+              }))}
+              placeholder={t("cityPlaceholder")}
+              searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+              emptyText={tCommon("combobox.noResults")}
+              allowClear
+            />
           </div>
           <div>
             <label className={labelClass}>{t("tierLabel")}</label>
-            <select
-              value={tierId}
-              onChange={(e) => setTierId(e.target.value)}
-              className={selectClass}
-            >
-              <option value="">{t("tierPlaceholder")}</option>
-              {tiers.map((tr) => (
-                <option key={tr.id} value={tr.id}>
-                  {isAr ? tr.name_ar : tr.name_en}
-                </option>
-              ))}
-            </select>
+            <Combobox
+              locale={locale}
+              value={tierId || null}
+              onChange={(v) => setTierId(v ?? "")}
+              options={tiers.map((tr) => ({
+                value: tr.id,
+                label: isAr ? tr.name_ar : tr.name_en,
+              }))}
+              placeholder={t("tierPlaceholder")}
+              searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+              emptyText={tCommon("combobox.noResults")}
+              allowClear
+            />
           </div>
         </div>
 

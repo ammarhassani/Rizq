@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { calculate, type ToolActionResult } from "@/app/actions/tool/calculate";
 import { PROVENANCE_LABEL } from "@/lib/pricing/provenance";
 import { track } from "@/lib/analytics/track";
+import { Combobox } from "@/components/ui/Combobox";
 import { ResultCard } from "./ResultCard";
 import { ResultSkeleton } from "./ResultSkeleton";
 import { InsufficientCard } from "./InsufficientCard";
@@ -291,6 +292,7 @@ function SelectField({
   onChange: (v: string) => void;
   options: Option[];
 }) {
+  const tCommon = useTranslations("Common");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   return (
     <div>
@@ -300,20 +302,16 @@ function SelectField({
       >
         {label}
       </label>
-      <select
+      <Combobox
         id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o.slug} value={o.slug}>
-            {o.label}
-            {o.hint ? ` · ${o.hint}` : ""}
-          </option>
-        ))}
-      </select>
+        locale={locale}
+        value={value || null}
+        onChange={(v) => onChange(v ?? "")}
+        options={options.map((o) => ({ value: o.slug, label: o.label, hint: o.hint }))}
+        placeholder={placeholder}
+        searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+        emptyText={tCommon("combobox.noResults")}
+      />
     </div>
   );
 }

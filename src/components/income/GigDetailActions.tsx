@@ -111,6 +111,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       if (result.ok) {
         track("gig_deleted", { locale });
         router.push("/income" as "/income");
+        router.refresh();
       }
     });
   }

@@ -87,6 +87,7 @@ export function ClientDetailActions({
       if (result.ok) {
         track("client_archived", { locale });
         router.push("/clients" as "/clients");
+        router.refresh();
       }
     });
   }

@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { CITIES } from "@/lib/refData";
+import { Combobox } from "@/components/ui/Combobox";
 import type { StepProps } from "./types";
 
 export function StepLocation({ locale, profile, onNext, onBack, onSkip }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.location");
   const tv2 = useTranslations("Onboarding.v2");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
@@ -53,19 +55,17 @@ export function StepLocation({ locale, profile, onNext, onBack, onSkip }: StepPr
         >
           {t("cityLabel")}
         </label>
-        <select
+        <Combobox
           id="city-select-v2"
-          value={citySlug}
-          onChange={(e) => setCitySlug(e.target.value)}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`}
-        >
-          <option value="">{t("cityPlaceholder")}</option>
-          {CITIES.map((c) => (
-            <option key={c.slug} value={c.slug}>
-              {c[locale]}
-            </option>
-          ))}
-        </select>
+          locale={locale}
+          value={citySlug || null}
+          onChange={(v) => setCitySlug(v ?? "")}
+          options={CITIES.map((c) => ({ value: c.slug, label: c[locale] }))}
+          placeholder={t("cityPlaceholder")}
+          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+          emptyText={tCommon("combobox.noResults")}
+          allowClear
+        />
       </div>
 
       {error && (

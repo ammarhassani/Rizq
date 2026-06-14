@@ -65,6 +65,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
       const res = await deleteDocument({ id: doc.id });
       if (res.ok) {
         router.push("/documents");
+        router.refresh();
       } else {
         setError(isAr ? "تعذّر الحذف" : "Could not delete");
         setConfirmDelete(false);

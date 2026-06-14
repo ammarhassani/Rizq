@@ -736,6 +736,10 @@
       "searchPlaceholder": "Search for a client…",
       "noResults": "No client by that name"
     },
+    "combobox": {
+      "searchPlaceholder": "Search…",
+      "noResults": "No results"
+    },
     "quickAddClient": {
       "footerAdd": "Add client",
       "title": "Quick add client",

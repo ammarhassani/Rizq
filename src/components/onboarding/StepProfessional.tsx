@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { SPECIALTIES } from "@/lib/refData";
+import { Combobox } from "@/components/ui/Combobox";
 import type { StepProps } from "./types";
 
 const EXPERIENCE_TIERS_AR = [
@@ -24,6 +25,7 @@ const EXPERIENCE_TIERS_EN = [
 export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.professional");
   const tv2 = useTranslations("Onboarding.v2");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
@@ -79,35 +81,31 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
       {/* Primary specialty */}
       <div>
         <label className={labelCls}>{t("primarySpecialty")}</label>
-        <select
-          value={primarySpecialtySlug}
-          onChange={(e) => setPrimarySpecialtySlug(e.target.value)}
-          className={inputCls}
-        >
-          <option value="">{t("primarySpecialtyPlaceholder")}</option>
-          {SPECIALTIES.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s[locale]}
-            </option>
-          ))}
-        </select>
+        <Combobox
+          locale={locale}
+          value={primarySpecialtySlug || null}
+          onChange={(v) => setPrimarySpecialtySlug(v ?? "")}
+          options={SPECIALTIES.map((s) => ({ value: s.slug, label: s[locale] }))}
+          placeholder={t("primarySpecialtyPlaceholder")}
+          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+          emptyText={tCommon("combobox.noResults")}
+          allowClear
+        />
       </div>
 
       {/* Experience tier */}
       <div>
         <label className={labelCls}>{t("experienceTier")}</label>
-        <select
-          value={tierValue}
-          onChange={(e) => setTierValue(e.target.value)}
-          className={inputCls}
-        >
-          <option value="">{t("experienceTierPlaceholder")}</option>
-          {tiers.map((tier) => (
-            <option key={tier.value} value={tier.value}>
-              {tier.label}
-            </option>
-          ))}
-        </select>
+        <Combobox
+          locale={locale}
+          value={tierValue || null}
+          onChange={(v) => setTierValue(v ?? "")}
+          options={tiers.map((tier) => ({ value: tier.value, label: tier.label }))}
+          placeholder={t("experienceTierPlaceholder")}
+          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+          emptyText={tCommon("combobox.noResults")}
+          allowClear
+        />
       </div>
 
       {/* Years experience */}

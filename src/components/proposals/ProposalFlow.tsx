@@ -25,6 +25,7 @@ import { ToneBar } from "./ToneBar";
 import { ScopeInsight } from "./ScopeInsight";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { ClientPicker } from "@/components/clients/ClientPicker";
+import { Combobox } from "@/components/ui/Combobox";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
@@ -88,6 +89,7 @@ function CopyButton({ text, label, copiedLabel, font }: { text: string; label: s
 
 export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, templates = [], clients = [] }: Props) {
   const t = useTranslations("Proposals.new");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -489,19 +491,20 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
           >
             {t("templatePicker")}
           </label>
-          <select
+          <Combobox
             id="template"
-            value={selectedTemplateId}
-            onChange={(e) => setSelectedTemplateId(e.target.value)}
-            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-          >
-            <option value="">{t("templatePickerNone")}</option>
-            {templates.map((tpl) => (
-              <option key={tpl.id} value={tpl.id}>
-                {isAr ? tpl.name_ar : (tpl.name_en ?? tpl.name_ar)}
-              </option>
-            ))}
-          </select>
+            locale={locale}
+            value={selectedTemplateId || null}
+            onChange={(v) => setSelectedTemplateId(v ?? "")}
+            options={templates.map((tpl) => ({
+              value: tpl.id,
+              label: isAr ? tpl.name_ar : (tpl.name_en ?? tpl.name_ar),
+            }))}
+            placeholder={t("templatePickerNone")}
+            searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+            emptyText={tCommon("combobox.noResults")}
+            allowClear
+          />
         </div>
       )}
 
@@ -642,6 +645,7 @@ function SelectField({
   onChange: (v: string) => void;
   options: Option[];
 }) {
+  const tCommon = useTranslations("Common");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   return (
     <div>
@@ -651,20 +655,16 @@ function SelectField({
       >
         {label}
       </label>
-      <select
+      <Combobox
         id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors appearance-none ${font}`}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o.slug} value={o.slug}>
-            {o.label}
-            {o.hint ? ` · ${o.hint}` : ""}
-          </option>
-        ))}
-      </select>
+        locale={locale}
+        value={value || null}
+        onChange={(v) => onChange(v ?? "")}
+        options={options.map((o) => ({ value: o.slug, label: o.label, hint: o.hint }))}
+        placeholder={placeholder}
+        searchPlaceholder={tCommon("combobox.searchPlaceholder")}
+        emptyText={tCommon("combobox.noResults")}
+      />
     </div>
   );
 }
