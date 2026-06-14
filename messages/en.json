@@ -5,13 +5,13 @@
   },
   "Hero": {
     "wordmark": "Rizq",
-    "eyebrow": "For Saudi freelancers",
+    "eyebrow": "The Saudi Freelancer OS",
     "tagline": "Price with confidence. Earn your rizq.",
-    "subtitle": "The first Saudi-market pricing benchmark built on real local data. Know your fair rate before you send the next proposal.",
-    "ctaPrimary": "Try the tool free",
-    "ctaSecondary": "How Rizq works",
+    "subtitle": "The all-in-one OS for Saudi freelancers — from pricing to invoicing",
+    "ctaPrimary": "Start free",
+    "ctaSecondary": "Explore the apps",
     "trustBadge": "Made in Saudi",
-    "comingSoon": "Live now — start free"
+    "comingSoon": "Live now — 13 tools"
   },
   "HowItWorks": {
     "eyebrow": "How it works",
@@ -1628,6 +1628,52 @@
       "viewSite": "View site",
       "signedInAs": "User menu"
     }
+  },
+  "Landing": {
+    "hero": {
+      "eyebrow": "The Saudi Freelancer OS",
+      "tagline": "Price with confidence. Earn your rizq.",
+      "subtitle": "The all-in-one OS for Saudi freelancers — from pricing to invoicing",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "Explore the apps",
+      "liveChip": "Live now — 13 tools"
+    },
+    "apps": {
+      "eyebrow": "Everything in one place",
+      "heading": "A complete OS for Saudi freelancers.",
+      "sub": "13 tools from pricing to invoicing. Start free, upgrade when you're ready."
+    },
+    "aiFeatures": {
+      "eyebrow": "Rizq AI",
+      "heading": "AI that works for you — honestly labeled.",
+      "sub": "Every AI output is clearly labeled as an estimate. You always know what's data and what's analysis.",
+      "f1Title": "Data-backed pricing",
+      "f1Body": "Price ranges built on real Saudi market data — sample size and confidence shown on every result.",
+      "f2Title": "Proposal generation",
+      "f2Body": "Paste the client's message — Rizq extracts the scope, prices it, and writes the full proposal.",
+      "f3Title": "Income forecasting",
+      "f3Body": "Smart financial projections to help you plan your monthly target and manage cash flow with confidence.",
+      "f4Title": "Payment reminders",
+      "f4Body": "Rizq flags overdue invoices and helps you draft a professional reminder — you decide when and how to send it.",
+      "honesty": "Every AI output is labeled — you always know it's an estimate, not a fact."
+    },
+    "trust": {
+      "eyebrow": "Transparency first",
+      "heading": "Built on trust, not claims.",
+      "p1Title": "Open methodology",
+      "p1Body": "Every number carries its source and confidence score. We never hide thin data behind a polished interface.",
+      "p2Title": "Halal by design",
+      "p2Body": "No riba in any payment flow. A clear monthly service subscription — no hidden fees, no interest.",
+      "p3Title": "Your data, your rights",
+      "p3Body": "Export all your data anytime, delete it in one click, and we never sell it. Compliant with Saudi PDPL.",
+      "methodologyCta": "See our methodology"
+    },
+    "finalCta": {
+      "heading": "Start earning your rizq today.",
+      "sub": "Free to start. No credit card. 3 queries per month on the free plan.",
+      "cta": "Start free"
+    },
+    "footerApps": "Tools"
   },
   "Settings": {
     "pageTitle": "Settings",

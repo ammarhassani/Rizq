@@ -4,11 +4,19 @@ import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { Hero } from "@/components/landing/Hero";
-import { HowItWorks } from "@/components/landing/HowItWorks";
+import { AppsGrid } from "@/components/landing/AppsGrid";
+import { AiFeatures } from "@/components/landing/AiFeatures";
+import { Trust } from "@/components/landing/Trust";
 import { Pricing } from "@/components/landing/Pricing";
-import { Faq } from "@/components/landing/Faq";
 import { FounderNote } from "@/components/landing/FounderNote";
+import { Faq } from "@/components/landing/Faq";
+import { FinalCta } from "@/components/landing/FinalCta";
 import { SiteFooter } from "@/components/landing/SiteFooter";
+
+// HowItWorks is intentionally dropped: AppsGrid covers the "what is Rizq" purpose
+// with a concrete, scannable module list; AiFeatures covers the "how" for AI-powered
+// features. Keeping HowItWorks would duplicate the AppsGrid story without adding
+// new information for a visitor who can now see the 13 modules directly.
 
 export default async function LandingPage({
   params,
@@ -23,11 +31,35 @@ export default async function LandingPage({
     <>
       <SiteNav locale={locale} />
       <main>
+        {/* 1. Hero — رِزق glyph LCP, primary + secondary CTAs */}
         <Hero locale={locale} />
-        <HowItWorks locale={locale} />
+
+        {/* 2. Apps grid — all 13 modules, flat Odoo-style marketplace */}
+        <AppsGrid locale={locale} />
+
+        {/* 3. IntegrationsFlow — Phase 3 motion section (added next phase) */}
+        {/* <IntegrationsFlow locale={locale} /> */}
+
+        {/* 4. AI Features band — تحليل رِزق with honesty label */}
+        <AiFeatures locale={locale} />
+
+        {/* 5. FeatureDemos — Phase 3 interactive demos (added next phase) */}
+        {/* <FeatureDemos locale={locale} /> */}
+
+        {/* 6. Trust pillars — methodology, halal, data-ownership */}
+        <Trust locale={locale} />
+
+        {/* 7. Pricing plans */}
         <Pricing locale={locale} />
-        <Faq locale={locale} />
+
+        {/* 8. Founder note */}
         <FounderNote locale={locale} />
+
+        {/* 9. FAQ */}
+        <Faq locale={locale} />
+
+        {/* 10. Final CTA — conversion band replaces waitlist */}
+        <FinalCta locale={locale} />
       </main>
       <SiteFooter locale={locale} />
     </>

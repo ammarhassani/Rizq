@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowDown, BadgeCheck } from "lucide-react";
+import { Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
 
@@ -90,8 +90,8 @@ export async function Hero({ locale }: Props) {
             <Reveal asMount delay={0.58}>
               <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
                 <Link
-                  href="/tool"
-                  className={`group inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-sm sm:text-base font-medium tracking-wide shadow-[0_2px_0_0_var(--color-rizq-green-dark)] hover:bg-rizq-green-dark transition-all hover:shadow-[0_4px_16px_-4px_rgba(26,95,63,0.45)] hover:-translate-y-0.5 ${font}`}
+                  href="/signup"
+                  className={`group inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-sm sm:text-base font-medium tracking-wide shadow-[0_2px_0_0_var(--color-rizq-green-dark)] hover:bg-rizq-green-dark transition-all hover:shadow-[0_4px_16px_-4px_rgba(26,95,63,0.45)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 ${font}`}
                 >
                   <span>{t("ctaPrimary")}</span>
                   <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
@@ -100,26 +100,24 @@ export async function Hero({ locale }: Props) {
                 </Link>
 
                 <a
-                  href="#how-it-works"
-                  className={`group inline-flex items-center justify-center gap-2 px-2 py-4 text-sm sm:text-base text-rizq-ink-soft hover:text-rizq-green transition-colors ${font}`}
+                  href="#apps"
+                  className={`group inline-flex items-center justify-center gap-2 px-2 py-4 text-sm sm:text-base text-rizq-ink-soft hover:text-rizq-green transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 rounded-sm ${font}`}
                 >
                   <span>{t("ctaSecondary")}</span>
-                  <ArrowDown
-                    size={16}
-                    className="transition-transform group-hover:translate-y-0.5"
-                    strokeWidth={1.6}
-                  />
+                  <span className="transition-transform group-hover:translate-y-0.5">↓</span>
                 </a>
               </div>
             </Reveal>
 
+            {/* Live chip — replaces beta/coming-soon badge */}
             <Reveal asMount delay={0.78} direction="side">
               <div className="mt-16 sm:mt-20 inline-flex items-center gap-3 self-start text-xs">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-rizq-gold/40 bg-rizq-cream/60">
-                  <BadgeCheck
-                    size={14}
-                    className="text-rizq-gold-dark"
-                    strokeWidth={1.6}
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-rizq-green/30 bg-rizq-green/8">
+                  <Zap
+                    size={13}
+                    className="text-rizq-green"
+                    strokeWidth={1.8}
+                    aria-hidden
                   />
                 </span>
                 <span
@@ -127,9 +125,9 @@ export async function Hero({ locale }: Props) {
                 >
                   {t("trustBadge")}
                 </span>
-                <span className="block h-px w-10 bg-rizq-gold/40" />
+                <span className="block h-px w-10 bg-rizq-gold/40" aria-hidden />
                 <span
-                  className={`text-rizq-ink-soft/70 ${font}`}
+                  className={`text-rizq-green font-medium ${font}`}
                 >
                   {t("comingSoon")}
                 </span>
