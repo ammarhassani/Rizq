@@ -22,6 +22,8 @@ export type InvoiceLineItem = {
   quantity: number;
   unit_price_sar: number;
   total_sar: number;
+  /** Optional link to the catalog item this line came from (for sales history). */
+  item_id?: string | null;
 };
 
 /** Output of `computeTotals`. All values rounded to 2 dp, matching the DB trigger. */

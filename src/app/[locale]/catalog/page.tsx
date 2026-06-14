@@ -36,35 +36,36 @@ export default async function CatalogPage({ params }: { params: Promise<Params> 
 
   const t = await getTranslations({ locale, namespace: "Catalog" });
 
-  // Active catalog items + fee presets (RLS scopes both to the owner).
+  // Catalog items + fee presets, active AND archived (RLS scopes to the owner).
+  // CatalogManager filters by status client-side.
   const { data: itemRows } = await supabase
     .from("items")
-    .select("id, name, description, unit_price_sar, category")
-    .eq("is_active", true)
+    .select("id, name, description, unit_price_sar, category, is_active")
     .order("name", { ascending: true });
 
   const items = (itemRows ?? []).map(
-    (it: { id: string; name: string; description: string | null; unit_price_sar: number; category: string | null }) => ({
+    (it: { id: string; name: string; description: string | null; unit_price_sar: number; category: string | null; is_active: boolean }) => ({
       id: it.id,
       name: it.name,
       description: it.description ?? null,
       unit_price_sar: Number(it.unit_price_sar),
       category: it.category ?? null,
+      is_active: it.is_active,
     })
   );
 
   const { data: presetRows } = await supabase
     .from("fee_presets")
-    .select("id, name, category, amount_sar")
-    .eq("is_active", true)
+    .select("id, name, category, amount_sar, is_active")
     .order("name", { ascending: true });
 
   const feePresets = (presetRows ?? []).map(
-    (p: { id: string; name: string; category: string | null; amount_sar: number }) => ({
+    (p: { id: string; name: string; category: string | null; amount_sar: number; is_active: boolean }) => ({
       id: p.id,
       name: p.name,
       category: p.category ?? null,
       amount_sar: Number(p.amount_sar),
+      is_active: p.is_active,
     })
   );
 

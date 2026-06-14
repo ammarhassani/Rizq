@@ -26,6 +26,7 @@ const LineItemSchema = z.object({
   quantity: z.number().positive(),
   unit_price_sar: z.number().nonnegative(),
   total_sar: z.number().nonnegative(),
+  item_id: z.string().uuid().nullable().optional(),
 });
 
 const FeeSchema = z.object({

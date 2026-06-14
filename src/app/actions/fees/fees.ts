@@ -113,16 +113,19 @@ export async function updateFeePreset(input: unknown): Promise<FeePresetActionRe
   return { ok: true, preset: rowToPreset(data) };
 }
 
-// ─── archiveFeePreset (soft-delete) ──────────────────────────────────────────
-
-const ArchiveFeePresetSchema = z.object({ id: z.string().uuid() });
-
 export type SimpleFeeResult =
   | { ok: true }
   | { ok: false; code: "unauthorized" | "invalid" | "error"; message?: string };
 
-export async function archiveFeePreset(input: unknown): Promise<SimpleFeeResult> {
-  const parsed = ArchiveFeePresetSchema.safeParse(input);
+// ─── setFeePresetsActive (archive / restore, single or bulk) ─────────────────
+
+const SetFeePresetsActiveSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(500),
+  active: z.boolean(),
+});
+
+export async function setFeePresetsActive(input: unknown): Promise<SimpleFeeResult> {
+  const parsed = SetFeePresetsActiveSchema.safeParse(input);
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const supabase = await createSupabaseClient();
@@ -131,17 +134,92 @@ export async function archiveFeePreset(input: unknown): Promise<SimpleFeeResult>
 
   const { error } = await supabase
     .from("fee_presets")
-    .update({ is_active: false, updated_at: new Date().toISOString() })
-    .eq("id", parsed.data.id)
+    .update({ is_active: parsed.data.active, updated_at: new Date().toISOString() })
+    .in("id", parsed.data.ids)
     .eq("user_id", userData.user.id);
 
   if (error) {
-    console.error("[archiveFeePreset] failed", { code: error.code, message: error.message });
+    console.error("[setFeePresetsActive] failed", { code: error.code, message: error.message });
     return { ok: false, code: "error", message: error.message };
   }
 
   revalidatePath("/[locale]/catalog", "page");
+  revalidatePath("/[locale]/invoices/new", "page");
   return { ok: true };
+}
+
+// ─── deleteFeePresets (hard delete, single or bulk) ──────────────────────────
+
+const DeleteFeePresetsSchema = z.object({ ids: z.array(z.string().uuid()).min(1).max(500) });
+
+export async function deleteFeePresets(input: unknown): Promise<SimpleFeeResult> {
+  const parsed = DeleteFeePresetsSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+
+  const supabase = await createSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { ok: false, code: "unauthorized" };
+
+  const { error } = await supabase
+    .from("fee_presets")
+    .delete()
+    .in("id", parsed.data.ids)
+    .eq("user_id", userData.user.id);
+
+  if (error) {
+    console.error("[deleteFeePresets] failed", { code: error.code, message: error.message });
+    return { ok: false, code: "error", message: error.message };
+  }
+
+  revalidatePath("/[locale]/catalog", "page");
+  revalidatePath("/[locale]/invoices/new", "page");
+  return { ok: true };
+}
+
+// ─── importFeePresets (bulk insert from CSV) ─────────────────────────────────
+
+const ImportFeePresetsSchema = z.object({
+  rows: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(255),
+        category: z.string().max(100).optional(),
+        amount_sar: z.number().nonnegative(),
+      })
+    )
+    .min(1)
+    .max(1000),
+});
+
+export type ImportFeePresetsResult =
+  | { ok: true; inserted: number }
+  | { ok: false; code: "unauthorized" | "invalid" | "error"; message?: string };
+
+export async function importFeePresets(input: unknown): Promise<ImportFeePresetsResult> {
+  const parsed = ImportFeePresetsSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+
+  const supabase = await createSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { ok: false, code: "unauthorized" };
+  const userId = userData.user.id;
+
+  const rows = parsed.data.rows.map((r) => ({
+    user_id: userId,
+    name: r.name.trim(),
+    category: r.category?.trim() || null,
+    amount_sar: r.amount_sar,
+  }));
+
+  const { data, error } = await supabase.from("fee_presets").insert(rows).select("id");
+  if (error) {
+    console.error("[importFeePresets] failed", { code: error.code, message: error.message });
+    return { ok: false, code: "error", message: error.message };
+  }
+
+  revalidatePath("/[locale]/catalog", "page");
+  revalidatePath("/[locale]/invoices/new", "page");
+  return { ok: true, inserted: data?.length ?? 0 };
 }
 
 // ─── helper ──────────────────────────────────────────────────────────────────

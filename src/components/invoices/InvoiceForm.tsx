@@ -126,6 +126,7 @@ export function InvoiceForm({
 
   // Parsed items + totals preview (mirrors the DB trigger via computeInvoiceTotals).
   const parsedItems = items.map((item) => ({
+    item_id: item.item_id,
     description: item.description,
     quantity: parseNum(item.quantity),
     unit_price_sar: parseNum(item.unit_price_sar),
