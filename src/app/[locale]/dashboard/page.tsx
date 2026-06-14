@@ -20,6 +20,10 @@ import { QuickPricingWidget } from "@/components/dashboard/QuickPricingWidget";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
 import type { UpcomingInvoice } from "@/lib/invoices/queries";
 
+// Give the insights Server Action room to reach DeepSeek without Vercel killing
+// the function early (default is short on some plans; the AI abort is 20s).
+export const maxDuration = 30;
+
 type Params = { locale: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {

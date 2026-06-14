@@ -1,9 +1,13 @@
 import "server-only";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 
-/** Server-only DeepSeek provider (Vercel AI SDK). Never import in client code. */
+/**
+ * Server-only DeepSeek provider (Vercel AI SDK). Never import in client code.
+ * The key is trimmed: a trailing space/newline pasted into the Vercel env value
+ * is a common, silent cause of 401s (the header becomes "Bearer <key>\n").
+ */
 export const deepseek = createDeepSeek({
-  apiKey: process.env.DEEPSEEK_API_KEY ?? "",
+  apiKey: (process.env.DEEPSEEK_API_KEY ?? "").trim(),
 });
 
 /** Default model for reasoned priors + extraction (DeepSeek V3). */
