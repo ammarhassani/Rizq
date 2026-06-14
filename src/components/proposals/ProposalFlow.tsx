@@ -23,6 +23,7 @@ import { FollowUpCards } from "./FollowUpCards";
 import { ProposalArtifact } from "./ProposalArtifact";
 import { ToneBar } from "./ToneBar";
 import { ScopeInsight } from "./ScopeInsight";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
@@ -251,30 +252,23 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
     return <ArtifactSkeleton locale={locale} activeStep={0} />;
   }
 
-  // QUOTA EXHAUSTED
+  // QUOTA EXHAUSTED — show the reusable upgrade modal + fallback form
   if (view.kind === "quota_exhausted") {
     return (
-      <div
-        dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 text-center animate-fade-in ${font}`}
-      >
-        <p className="eyebrow mb-3 text-rizq-gold-dark">{t("quota.exhaustedEyebrow")}</p>
-        <h2 className="text-xl font-semibold text-rizq-ink mb-2">{t("quota.exhaustedTitle")}</h2>
-        <p className="text-sm text-rizq-ink-soft mb-5">{t("quota.exhaustedBody")}</p>
-        <a
-          href={`/${locale}/upgrade`}
-          className={`inline-flex items-center rounded-full bg-rizq-green text-rizq-cream px-7 py-3.5 text-sm font-medium hover:bg-rizq-green-dark transition-all ${font}`}
-        >
-          {t("quota.exhaustedCta")}
-        </a>
-        <button
-          type="button"
-          onClick={() => setView({ kind: "form" })}
-          className="block mx-auto mt-3 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors"
-        >
-          {t("back")}
-        </button>
-      </div>
+      <>
+        <UpgradeModal
+          open
+          onClose={() => setView({ kind: "form" })}
+          locale={locale}
+          reason="proposals"
+        />
+        {/* Invisible placeholder so layout doesn't collapse behind the modal */}
+        <div
+          dir={dir}
+          className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 text-center ${font}`}
+          aria-hidden="true"
+        />
+      </>
     );
   }
 

@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { createClient, updateClient } from "@/app/actions/clients/clients";
 import { track } from "@/lib/analytics/track";
 import { Loader2 } from "lucide-react";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 type ClientFormData = {
   id?: string;
@@ -45,6 +46,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
   const dir = isAr ? "rtl" : "ltr";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const [name, setName] = useState(initialData?.name ?? "");
   const [nameEn, setNameEn] = useState(initialData?.name_en ?? "");
@@ -98,7 +100,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
 
         if (!result.ok) {
           if (result.code === "quota_exhausted") {
-            setError(t("errors.quotaExhausted"));
+            setShowUpgradeModal(true);
           } else {
             setError(t("errors.generic"));
           }
@@ -142,6 +144,13 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
   }
 
   return (
+    <>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        locale={locale}
+        reason="clients"
+      />
     <form
       onSubmit={handleSubmit}
       dir={dir}
@@ -279,5 +288,6 @@ export function ClientForm({ locale, mode, initialData, onSuccess }: Props) {
         )}
       </button>
     </form>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useTransition, useRef } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { uploadDocument, suggestCategoryAction, suggestExpiryAction } from "@/app/actions/documents/documentActions";
 import { Loader2, Sparkles, CheckCircle } from "lucide-react";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 type CategoryOption = { id: string; name_ar: string; name_en: string };
 
@@ -21,6 +22,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -99,7 +101,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       const res = await uploadDocument(fd);
       if (!res.ok) {
         if (res.code === "quota_exhausted") {
-          setError(isAr ? "وصلت للحد الأقصى من الوثائق. ترقَّ لتضيف المزيد." : "Document quota reached. Upgrade to add more.");
+          setShowUpgradeModal(true);
         } else {
           setError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
         }
@@ -115,6 +117,13 @@ export function DocumentUploadForm({ locale, categories }: Props) {
   };
 
   return (
+    <>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        locale={locale}
+        reason="documents"
+      />
     <form onSubmit={onSubmit} dir={dir} className={`space-y-5 ${font}`}>
       {/* File picker */}
       <div>
@@ -285,5 +294,6 @@ export function DocumentUploadForm({ locale, categories }: Props) {
         {isAr ? "رفع الوثيقة" : "Upload document"}
       </button>
     </form>
+    </>
   );
 }

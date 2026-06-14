@@ -11,6 +11,7 @@ import { useRouter } from "@/i18n/navigation";
 import { createInvoice } from "@/app/actions/invoices/createInvoice";
 import { lineItemTotal } from "@/lib/invoices/items";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 type ClientOption = { id: string; name: string };
 
@@ -69,6 +70,7 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
 
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Line items — initialise from pre-fill if available
   const [items, setItems] = useState<LineItemDraft[]>(() => {
@@ -154,7 +156,7 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
 
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
-          setError(t("errors.quotaExhausted"));
+          setShowUpgradeModal(true);
         } else {
           setError(t("errors.generic"));
         }
@@ -168,6 +170,13 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
   const paymentMethodLabels = isAr ? PAYMENT_METHOD_LABELS_AR : PAYMENT_METHOD_LABELS_EN;
 
   return (
+    <>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        locale={locale}
+        reason="invoices"
+      />
     <form
       onSubmit={handleSubmit}
       dir={dir}
@@ -415,5 +424,6 @@ export function InvoiceForm({ locale, clients = [], initial }: Props) {
         )}
       </button>
     </form>
+    </>
   );
 }

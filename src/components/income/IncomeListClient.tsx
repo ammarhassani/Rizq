@@ -8,6 +8,7 @@ import { GigCard, type GigRow } from "./GigCard";
 import { markGigStatus } from "@/app/actions/gigs/gigs";
 import { forecastIncomeAction } from "@/app/actions/gigs/incomeAi";
 import { exportIncomeCsv } from "@/app/actions/gigs/exportIncomeCsv";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 type FilterChip = "all" | "paid" | "pending" | "this_month" | "last_month" | "this_year";
 type SortKey = "delivery_date" | "amount" | "status";
@@ -62,6 +63,8 @@ export function IncomeListClient({ gigs, locale }: Props) {
 
   // CSV export state
   const [csvState, setCsvState] = useState<"idle" | "loading" | "upgrade" | "error">("idle");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<"ai_feature" | "gigs">("ai_feature");
   const [, startCsvTransition] = useTransition();
 
   const filtered = useMemo(() => {
@@ -141,6 +144,8 @@ export function IncomeListClient({ gigs, locale }: Props) {
         if (!result.ok) {
           if (result.code === "upgrade") {
             setCsvState("upgrade");
+            setUpgradeReason("ai_feature");
+            setShowUpgradeModal(true);
           } else {
             setCsvState("error");
           }
@@ -171,6 +176,8 @@ export function IncomeListClient({ gigs, locale }: Props) {
         if (!result.ok) {
           if (result.code === "upgrade") {
             setForecast({ status: "upgrade" });
+            setUpgradeReason("ai_feature");
+            setShowUpgradeModal(true);
           } else {
             setForecast({ status: "error" });
           }
@@ -194,6 +201,13 @@ export function IncomeListClient({ gigs, locale }: Props) {
   }
 
   return (
+    <>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        locale={locale}
+        reason={upgradeReason}
+      />
     <div className="space-y-4">
       {/* Filter chips */}
       <div dir={dir} className="flex flex-wrap gap-2">
@@ -387,5 +401,6 @@ export function IncomeListClient({ gigs, locale }: Props) {
         </Link>
       </div>
     </div>
+    </>
   );
 }

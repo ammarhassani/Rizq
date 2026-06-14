@@ -10,6 +10,7 @@ import {
 } from "@/app/actions/gigs/incomeAi";
 import { track } from "@/lib/analytics/track";
 import { Loader2 } from "lucide-react";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 type ClientOption = { id: string; name: string };
 
@@ -64,6 +65,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
   const dir = isAr ? "rtl" : "ltr";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -140,7 +142,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
 
         if (!result.ok) {
           if (result.code === "quota_exhausted") {
-            setError(t("errors.quotaExhausted"));
+            setShowUpgradeModal(true);
           } else {
             setError(t("errors.generic"));
           }
@@ -190,6 +192,13 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
   }
 
   return (
+    <>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        locale={locale}
+        reason="gigs"
+      />
     <form
       onSubmit={handleSubmit}
       dir={dir}
@@ -387,5 +396,6 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         )}
       </button>
     </form>
+    </>
   );
 }
