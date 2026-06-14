@@ -101,6 +101,12 @@ export function AuthNavSlot({ locale, hideLogout = false }: Props) {
       >
         <span>{t("rateCalculator")}</span>
       </Link>
+      <Link
+        href="/settings"
+        className={`hidden sm:inline-flex items-center rounded-full px-3 py-1.5 text-xs sm:text-sm text-rizq-ink hover:text-rizq-green transition-colors ${font}`}
+      >
+        <span>{t("settings")}</span>
+      </Link>
       {!hideLogout && (
         <span className="hidden sm:inline-flex">
           <LogoutButton locale={locale} />
