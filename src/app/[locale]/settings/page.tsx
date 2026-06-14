@@ -71,11 +71,8 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
       : t("tierFree");
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "الإعدادات" : "Settings"}>
-      <div
-        className="mx-auto w-full max-w-2xl px-6 sm:px-10 py-12 sm:py-16 pb-28"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "الإعدادات" : "Settings"} maxWidth="form">
+      <div dir={dir}>
         {/* Back link */}
         <Link
           href="/dashboard"

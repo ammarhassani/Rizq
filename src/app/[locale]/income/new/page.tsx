@@ -47,11 +47,8 @@ export default async function IncomeNewPage({ params }: { params: Promise<Params
   }));
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "سجّل مشروع" : "Log a Gig"}>
-      <div
-        className="mx-auto w-full max-w-2xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={isAr ? "rtl" : "ltr"}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "سجّل مشروع" : "Log a Gig"} maxWidth="form">
+      <div dir={isAr ? "rtl" : "ltr"}>
         <Link
           href="/income"
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}

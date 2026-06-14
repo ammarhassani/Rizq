@@ -4,14 +4,55 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useLinkStatus } from "next/link";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { PanelLeftClose, PanelLeftOpen, ChevronRight } from "lucide-react";
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronRight,
+  Loader2,
+  type LucideIcon,
+} from "lucide-react";
 import { APPS, type AppGroup } from "@/lib/apps";
+
+/**
+ * Renders the leading glyph for a sidebar item: the app icon normally, or a
+ * spinner while THIS link's navigation is pending (Next 16 useLinkStatus).
+ * Must be a child of the next-intl <Link> (which renders next/link) so the
+ * pending context is available.
+ */
+function SidebarItemIcon({
+  Icon,
+  active,
+}: {
+  Icon: LucideIcon;
+  active: boolean;
+}) {
+  const { pending } = useLinkStatus();
+  if (pending) {
+    return (
+      <Loader2
+        size={18}
+        strokeWidth={2.2}
+        aria-hidden
+        className="shrink-0 animate-spin"
+      />
+    );
+  }
+  return (
+    <Icon
+      size={18}
+      strokeWidth={active ? 2.2 : 1.6}
+      aria-hidden
+      className="shrink-0 transition-transform duration-150 group-hover:scale-110 group-active:scale-95"
+    />
+  );
+}
 
 const STORAGE_KEY = "rizq.sidebar.collapsed";
 
@@ -68,7 +109,8 @@ function SidebarNav({
                   aria-label={t(`apps.${app.id}.name`)}
                   aria-current={active ? "page" : undefined}
                   className={[
-                    "group relative flex items-center gap-3 rounded-xl px-2.5 transition-all min-h-[44px]",
+                    "group relative flex items-center gap-3 rounded-xl px-2.5 min-h-[44px]",
+                    "transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.98]",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
                     active
                       ? "bg-rizq-green text-rizq-cream shadow-sm"
@@ -78,12 +120,7 @@ function SidebarNav({
                     .filter(Boolean)
                     .join(" ")}
                 >
-                  <Icon
-                    size={18}
-                    strokeWidth={active ? 2.2 : 1.6}
-                    aria-hidden
-                    className="shrink-0"
-                  />
+                  <SidebarItemIcon Icon={Icon} active={active} />
                   {!collapsed && (
                     <span className={`text-sm truncate ${font}`}>
                       {t(`apps.${app.id}.name`)}

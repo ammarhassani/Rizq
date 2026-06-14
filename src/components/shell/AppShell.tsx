@@ -6,22 +6,36 @@
  * topbar + dot-grid chrome. Pages still do their own auth-gating; this is
  * a light parallel read for display data only (graceful null on failure).
  *
- * Usage in app pages:
- *   <AppShell locale={locale} title="دفتر الدخل">
- *     <main className="mx-auto w-full max-w-3xl px-6 sm:px-10 py-12">…</main>
+ * Usage in app pages — the shell now owns the centered content column
+ * (comfortable padding + max-width). Pages render plain content and pick a
+ * width preset; no per-page container/padding boilerplate needed:
+ *   <AppShell locale={locale} title="دفتر الدخل" maxWidth="wide">
+ *     <div dir={dir}>…</div>
  *   </AppShell>
  */
 import { createClient } from "@/lib/supabase/server";
 import { AppShellClient } from "./AppShellClient";
 
+/**
+ * Content max-width preset for the shell's centered content column.
+ *   - "wide" (max-w-5xl)  → list / grid / overview pages (dashboard, proposals,
+ *     clients, income, invoices, calendar, documents).
+ *   - "reading" (max-w-3xl) → reading / form / detail pages.
+ *   - "form" (max-w-2xl)  → narrow single-column forms (rate calculator).
+ * Default is "wide" — most app pages are dashboards/lists.
+ */
+export type AppShellWidth = "wide" | "reading" | "form";
+
 export type AppShellProps = {
   locale: "ar" | "en";
   /** Compact label shown in the top bar next to the hamburger. Not an h1. */
   title?: string;
+  /** Content column max-width preset. Defaults to "wide". */
+  maxWidth?: AppShellWidth;
   children: React.ReactNode;
 };
 
-export async function AppShell({ locale, title, children }: AppShellProps) {
+export async function AppShell({ locale, title, maxWidth = "wide", children }: AppShellProps) {
   // Light profile fetch — fail gracefully so auth-gated pages still work even
   // if this read errors. Pages do their own redirect(loginPath) guard.
   let name: string | null = null;
@@ -54,6 +68,7 @@ export async function AppShell({ locale, title, children }: AppShellProps) {
     <AppShellClient
       locale={locale}
       title={title}
+      maxWidth={maxWidth}
       name={name}
       email={email}
       role={role}

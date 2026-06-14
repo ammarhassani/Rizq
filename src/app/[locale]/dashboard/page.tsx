@@ -181,13 +181,10 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   const shellTitle = isAr ? t2("apps.dashboard.name") : t2("apps.dashboard.name");
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={shellTitle}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={shellTitle} maxWidth="wide">
+      <div dir={dir}>
         {/* Page header */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{isAr ? "لوحة التحكم" : "Dashboard"}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>
             {userName

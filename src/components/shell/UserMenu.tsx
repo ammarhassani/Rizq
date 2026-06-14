@@ -114,7 +114,7 @@ export function UserMenu({ locale, name, email }: Props) {
             </Link>
 
             <Link
-              href="/"
+              href="/site"
               role="menuitem"
               onClick={() => setOpen(false)}
               className={[

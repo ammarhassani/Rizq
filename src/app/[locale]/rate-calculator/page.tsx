@@ -151,11 +151,8 @@ export default async function RateCalculatorPage({ params }: { params: Promise<P
   };
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "حاسبة السعر" : "Rate Calculator"}>
-      <div
-        className={`mx-auto w-full max-w-2xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 ${font}`}
-        dir={isAr ? "rtl" : "ltr"}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "حاسبة السعر" : "Rate Calculator"} maxWidth="form">
+      <div className={font} dir={isAr ? "rtl" : "ltr"}>
         <Link
           href="/dashboard"
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}

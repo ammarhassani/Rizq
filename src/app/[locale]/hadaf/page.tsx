@@ -12,6 +12,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { getHadafStatusAction } from "@/app/actions/hadaf/status";
 import { HadafStreakBar } from "@/components/hadaf/HadafStreakBar";
 import { HadafActionPlanClient } from "@/components/hadaf/HadafActionPlanClient";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { CheckCircle2, XCircle, ExternalLink, AlertTriangle } from "lucide-react";
 
 type Params = { locale: string };
@@ -72,8 +73,8 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
   // ── Error / no rules state ────────────────────────────────────────────────
   if (!result.ok) {
     return (
-      <AppShell locale={locale as "ar" | "en"} title={isAr ? "هدف" : "HADAF"}>
-        <div className={`mx-auto w-full max-w-2xl px-6 py-16 ${font}`} dir={dir}>
+      <AppShell locale={locale as "ar" | "en"} title={isAr ? "هدف" : "HADAF"} maxWidth="reading">
+        <div className={font} dir={dir}>
           <p className="text-sm text-rizq-ink-soft">{t("loadError")}</p>
         </div>
       </AppShell>
@@ -83,13 +84,10 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
   const { status, rules, disclaimer, ai_action_plan_ar, ai_action_plan_en } = result;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "أهلية هدف" : "HADAF Eligibility"}>
-      <div
-        dir={dir}
-        className={`mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 pb-28 ${font}`}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "أهلية هدف" : "HADAF Eligibility"} maxWidth="reading">
+      <div dir={dir} className={font}>
         {/* Page header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{t("eyebrow")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>{t("pageTitle")}</h1>
           <p className={`mt-2 text-base text-rizq-ink-soft max-w-xl ${font}`}>
@@ -163,7 +161,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                   {t("estimatedSubsidyLabel")}
                 </p>
                 <p className="tabular font-sans text-2xl font-bold text-emerald-700">
-                  {fmtSAR(status.estimated_subsidy, locale as "ar" | "en")}{" "}
+                  <AnimatedNumber value={status.estimated_subsidy} locale={locale as "ar" | "en"} duration={0.9} />{" "}
                   <span className={`text-sm font-normal ${font}`}>
                     {isAr ? "ريال/شهر" : "SAR/month"}
                   </span>

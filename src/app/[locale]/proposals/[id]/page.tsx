@@ -127,11 +127,8 @@ export default async function ProposalDetailPage({
     proposal.status === "final" || proposal.status === "sent";
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={isAr ? "rtl" : "ltr"}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="reading">
+      <div dir={isAr ? "rtl" : "ltr"}>
         {/* Back link */}
         <Link
           href="/proposals"

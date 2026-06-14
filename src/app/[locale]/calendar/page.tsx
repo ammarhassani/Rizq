@@ -134,13 +134,10 @@ export default async function CalendarPage({ params }: { params: Promise<Params>
   const prefs = parsePrefs(prefsRaw as CalendarPreferencesRow | null);
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "التقويم" : "Calendar"}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "التقويم" : "Calendar"} maxWidth="wide">
+      <div dir={dir}>
         {/* Page header */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{t("eyebrow")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
           <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>{t("subtitle")}</p>

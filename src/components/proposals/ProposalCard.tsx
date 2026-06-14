@@ -158,7 +158,7 @@ export function ProposalCard({ proposal, locale }: Props) {
   return (
     <Link
       href={`/proposals/${proposal.id}` as `/proposals/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         {/* Left: title + client */}

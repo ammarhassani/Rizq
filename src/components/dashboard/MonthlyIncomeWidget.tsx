@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { Wallet, Plus } from "lucide-react";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 
 type MonthlyRow = {
   month: string | null;
@@ -32,7 +33,7 @@ export function MonthlyIncomeWidget({ current, previous, locale }: Props) {
       : null;
 
   return (
-    <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-white/70 p-5 sm:p-6 flex flex-col gap-4">
+    <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-white/70 p-5 sm:p-6 flex flex-col gap-4 transition-[box-shadow,border-color] duration-200 hover:border-rizq-green/25 hover:shadow-sm">
       <div className={`flex items-center justify-between ${font}`}>
         <div className="flex items-center gap-2">
           <Wallet className="h-4 w-4 text-rizq-green opacity-70" />
@@ -63,7 +64,7 @@ export function MonthlyIncomeWidget({ current, previous, locale }: Props) {
           <div className="flex items-end justify-between gap-2">
             <div>
               <p className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
-                {fmt(totalSar, locale)}
+                <AnimatedNumber value={totalSar} locale={locale} duration={0.9} />
               </p>
               <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{isAr ? "ريال هذا الشهر" : "SAR this month"}</p>
             </div>

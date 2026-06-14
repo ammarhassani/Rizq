@@ -56,7 +56,7 @@ export function ClientCard({ client, locale }: Props) {
   return (
     <Link
       href={`/clients/${client.id}` as `/clients/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 flex items-start gap-3">

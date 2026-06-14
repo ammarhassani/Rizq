@@ -10,6 +10,7 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { IncomeListClient } from "@/components/income/IncomeListClient";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import type { GigRow } from "@/components/income/GigCard";
 
 type Params = { locale: string };
@@ -130,13 +131,10 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
   const pendingCount = currentMonthRow?.pending_count ?? 0;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "دفتر الدخل" : "Income Ledger"}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "دفتر الدخل" : "Income Ledger"} maxWidth="wide">
+      <div dir={dir}>
         {/* Page header */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{t("eyebrow")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
           <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>{t("subtitle")}</p>
@@ -148,7 +146,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
             <div>
               <p className="text-xs text-rizq-ink-soft/60 uppercase tracking-wide mb-1">{currentMonthLabel}</p>
               <p className="tabular font-sans text-3xl font-bold text-rizq-green leading-none">
-                {fmtPrice(totalSar, locale as "ar" | "en")}
+                <AnimatedNumber value={totalSar} locale={locale as "ar" | "en"} duration={0.9} />
               </p>
               <p className={`mt-1.5 text-sm text-rizq-ink-soft ${font}`}>
                 {t("summaryLine", { total: fmtPrice(totalSar, locale as "ar" | "en"), n: String(gigCount), pending: String(pendingCount) })}

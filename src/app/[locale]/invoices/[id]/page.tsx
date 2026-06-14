@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import type { InvoiceArtifactData } from "@/lib/invoices/artifact";
 import { daysOverdue } from "@/lib/invoices/overdue";
 
@@ -91,11 +92,8 @@ export default async function InvoiceDetailPage({
     daysOverdue(invoice.due_date as string | null, new Date()) >= 7;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={invoice.invoice_number as string}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={invoice.invoice_number as string} maxWidth="reading">
+      <div dir={dir}>
         {/* Back link */}
         <Link
           href="/invoices"
@@ -120,9 +118,7 @@ export default async function InvoiceDetailPage({
           </div>
           <div className="flex items-center gap-3">
             <span className="tabular font-sans text-lg font-bold text-rizq-green">
-              {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
-                maximumFractionDigits: 0,
-              }).format(Number(invoice.total_sar))}
+              <AnimatedNumber value={Number(invoice.total_sar)} locale={locale as "ar" | "en"} duration={0.9} />
               <span className={`ms-1 text-sm font-normal text-rizq-ink-soft/60 ${font}`}>
                 {isAr ? "ر.س" : "SAR"}
               </span>

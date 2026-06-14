@@ -118,10 +118,10 @@ export default async function ProposalNewPage({
   }));
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض جديد" : "New Proposal"}>
-      <div className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض جديد" : "New Proposal"} maxWidth="reading">
+      <div>
         {/* Header */}
-        <div className="mb-8 sm:mb-12">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{t("eyebrow")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
           <p className={`mt-3 text-base sm:text-lg text-rizq-ink-soft max-w-xl ${font}`}>

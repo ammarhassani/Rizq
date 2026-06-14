@@ -128,11 +128,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<Par
   const clientTypeLabel = CLIENT_TYPE_LABELS[isAr ? "ar" : "en"][client.client_type as keyof typeof CLIENT_TYPE_LABELS.ar] ?? client.client_type;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={client.name as string}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={client.name as string} maxWidth="reading">
+      <div dir={dir}>
         {/* Back */}
         <Link
           href="/clients"

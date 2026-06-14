@@ -3,14 +3,25 @@
 import { useState } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
+import { NavProgress } from "./NavProgress";
+import { AppPageReveal } from "@/components/motion/AppPageReveal";
+import type { AppShellWidth } from "./AppShell";
 
 type Props = {
   locale: "ar" | "en";
   title?: string;
+  maxWidth?: AppShellWidth;
   role: string | null;
   name: string | null;
   email: string | null;
   children: React.ReactNode;
+};
+
+/** Tailwind max-width class per content width preset. */
+const MAX_WIDTH_CLASS: Record<AppShellWidth, string> = {
+  wide: "max-w-5xl",
+  reading: "max-w-3xl",
+  form: "max-w-2xl",
 };
 
 /**
@@ -18,9 +29,18 @@ type Props = {
  * between AppTopBar (hamburger) and AppSidebar (Sheet consumer).
  * AppShell (server) renders this with the profile already resolved.
  */
-export function AppShellClient({ locale, title, role, name, email, children }: Props) {
+export function AppShellClient({
+  locale,
+  title,
+  maxWidth = "wide",
+  role,
+  name,
+  email,
+  children,
+}: Props) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const dir = locale === "ar" ? "rtl" : "ltr";
+  const maxWidthClass = MAX_WIDTH_CLASS[maxWidth];
 
   return (
     // RTL: sidebar sits on the inline-end (right). Using flex-row-reverse for ar
@@ -34,6 +54,9 @@ export function AppShellClient({ locale, title, role, name, email, children }: P
         "flex-row",
       ].join(" ")}
     >
+      {/* Top navigation progress bar — instant feedback on every link click */}
+      <NavProgress />
+
       {/* Dot-grid backdrop — owned by the shell, not individual pages */}
       <div
         aria-hidden
@@ -67,7 +90,20 @@ export function AppShellClient({ locale, title, role, name, email, children }: P
           email={email}
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
-        <main className="flex-1">{children}</main>
+        {/* Content column — the shell owns comfortable padding + max-width so
+            pages don't float in a void next to the sidebar. Each page only
+            picks a width preset and renders its content. AppPageReveal gives
+            every navigation a subtle fade+rise entrance (reduced-motion safe). */}
+        <main className="flex-1">
+          <AppPageReveal
+            className={[
+              "mx-auto w-full px-5 sm:px-8 lg:px-10 py-6 sm:py-8 pb-16",
+              maxWidthClass,
+            ].join(" ")}
+          >
+            {children}
+          </AppPageReveal>
+        </main>
       </div>
     </div>
   );

@@ -79,11 +79,8 @@ export default async function InvoicesNewPage({
   }
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "فاتورة جديدة" : "New Invoice"}>
-      <div
-        className="mx-auto w-full max-w-2xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={isAr ? "rtl" : "ltr"}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "فاتورة جديدة" : "New Invoice"} maxWidth="form">
+      <div dir={isAr ? "rtl" : "ltr"}>
         <Link
           href="/invoices"
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}

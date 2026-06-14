@@ -9,6 +9,7 @@ import { useState, useMemo, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { InvoiceCard, type InvoiceRow } from "./InvoiceCard";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
 import { isOverdue } from "@/lib/invoices/overdue";
@@ -80,7 +81,7 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       {/* Month summary card */}
       <div
         className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 ${font}`}
@@ -92,7 +93,7 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
               {t("summaryIssued")}
             </p>
             <p className="tabular font-sans text-xl font-bold text-rizq-ink leading-none">
-              {fmtMoney(summary.issuedTotal, locale)}
+              <AnimatedNumber value={summary.issuedTotal} locale={locale} duration={0.9} />
               <span className={`ms-1.5 text-xs font-normal text-rizq-ink-soft/60 ${font}`}>
                 {isAr ? "ر.س" : "SAR"}
               </span>
@@ -103,7 +104,7 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
               {t("summaryPaid")}
             </p>
             <p className="tabular font-sans text-xl font-bold text-emerald-700 leading-none">
-              {fmtMoney(summary.paidTotal, locale)}
+              <AnimatedNumber value={summary.paidTotal} locale={locale} duration={0.9} />
               <span className={`ms-1.5 text-xs font-normal text-emerald-700/60 ${font}`}>
                 {isAr ? "ر.س" : "SAR"}
               </span>

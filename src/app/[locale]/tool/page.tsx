@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { createClient } from "@/lib/supabase/server";
 import {
   getSpecialties,
@@ -71,26 +71,16 @@ export default async function ToolPage({
   // Passing this to QuotaBadge keeps it in sync with the dashboard.
   const limit = typeof quota.limit === "number" ? quota.limit : 3;
 
+  const isAr = locale === "ar";
+
   return (
-    <div className="relative min-h-screen flex flex-col bg-paper">
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-
-      <SiteNav locale={locale} />
-
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20">
-        <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <AppShell
+      locale={locale}
+      title={isAr ? "أداة التسعير" : "Pricing Tool"}
+      maxWidth="reading"
+    >
+      <div dir={isAr ? "rtl" : "ltr"}>
+        <div className="mb-7 sm:mb-9 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <p className="eyebrow mb-3">{t("eyebrow")}</p>
             <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
@@ -119,8 +109,8 @@ export default async function ToolPage({
             {/* The card itself appears once the user submits — keep this row light */}
           </p>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
 

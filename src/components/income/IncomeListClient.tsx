@@ -208,7 +208,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
         locale={locale}
         reason={upgradeReason}
       />
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       {/* Filter chips */}
       <div dir={dir} className="flex flex-wrap gap-2">
         {chips.map((c) => (

@@ -144,11 +144,8 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
     : PAYMENT_METHOD_EN[gig.payment_method] ?? gig.payment_method;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={gig.title as string}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={gig.title as string} maxWidth="reading">
+      <div dir={dir}>
         {/* Back */}
         <Link
           href="/income"

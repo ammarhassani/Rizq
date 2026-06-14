@@ -56,11 +56,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<P
   const catLabel = catMeta ? (isAr ? catMeta.name_ar : catMeta.name_en) : null;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={doc.title_ar as string}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={doc.title_ar as string} maxWidth="reading">
+      <div dir={dir}>
         <Link
           href="/documents"
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}

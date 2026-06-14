@@ -1627,6 +1627,10 @@
       "settings": "Settings",
       "viewSite": "View site",
       "signedInAs": "User menu"
+    },
+    "loading": {
+      "page": "Loading…",
+      "navigating": "Navigating…"
     }
   },
   "Landing": {

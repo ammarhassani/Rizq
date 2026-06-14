@@ -60,13 +60,10 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
   const docs = (docsRaw ?? []) as DocumentRow[];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "خزنة الوثائق" : "Document Vault"}>
-      <div
-        className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-16 py-12 sm:py-16 lg:py-20 pb-28"
-        dir={dir}
-      >
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "خزنة الوثائق" : "Document Vault"} maxWidth="wide">
+      <div dir={dir}>
         {/* Header */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-6 sm:mb-8">
           <p className="eyebrow mb-3">{isAr ? "خزنة الوثائق" : "Document Vault"}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>
             {isAr ? "وثائقي" : "My documents"}
@@ -101,9 +98,13 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 pb-20">
             {docs.map((doc) => (
-              <Link key={doc.id} href={`/documents/${doc.id}`} className="block">
+              <Link
+                key={doc.id}
+                href={`/documents/${doc.id}`}
+                className="block rounded-2xl transition-transform duration-150 hover:-translate-y-px active:scale-[0.99]"
+              >
                 <DocumentCard
                   doc={doc}
                   locale={locale as "ar" | "en"}
