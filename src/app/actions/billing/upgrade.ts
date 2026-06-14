@@ -138,36 +138,22 @@ export async function grantProAction(
 
   const { supabase } = ctx;
 
-  // Verify target user exists
-  const { data: targetProfile, error: fetchErr } = await supabase
-    .from("users")
-    .select("id, role, pro_until")
-    .eq("id", user_id)
-    .single();
+  // users.role / pro_until are REVOKED from the authenticated role (column
+  // grants), so update via the admin_grant_pro SECURITY DEFINER RPC, which
+  // re-verifies the caller is an admin and extends pro_until server-side.
+  const { data, error } = await supabase.rpc("admin_grant_pro", {
+    p_user_id: user_id,
+    p_months: months,
+  });
 
-  if (fetchErr || !targetProfile) return { ok: false, code: "not_found" };
+  if (error) {
+    if (error.code === "42501") return { ok: false, code: "forbidden" };
+    if (error.code === "P0002") return { ok: false, code: "not_found" };
+    console.error("[grantProAction] admin_grant_pro failed", error.message);
+    return { ok: false, code: "error" };
+  }
 
-  // Compute new pro_until: extend from now (or existing pro_until if future)
-  const existingUntil =
-    targetProfile.pro_until && new Date(targetProfile.pro_until as string) > new Date()
-      ? new Date(targetProfile.pro_until as string)
-      : new Date();
-
-  const newUntil = new Date(existingUntil);
-  newUntil.setMonth(newUntil.getMonth() + months);
-
-  const { error: updateErr } = await supabase
-    .from("users")
-    .update({
-      role: "pro",
-      pro_until: newUntil.toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user_id);
-
-  if (updateErr) return { ok: false, code: "error" };
-
-  return { ok: true, user_id, pro_until: newUntil.toISOString() };
+  return { ok: true, user_id, pro_until: data as unknown as string };
 }
 
 // ─── getMyTierAction ──────────────────────────────────────────────────────────

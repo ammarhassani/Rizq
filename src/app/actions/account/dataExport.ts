@@ -53,13 +53,10 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
 
   try {
     // ── 1. Profile ──
+    // Select * for completeness (PDPL right-of-access) and to avoid
+    // column-name drift — the untyped client silently 400s on a bad column.
     const profileRaw = await safeFetch(() =>
-      supabase
-        .from("users")
-        .select(
-          "id, email, name, role, city, specialty_id, preferred_language, onboarded_at, created_at, updated_at"
-        )
-        .eq("id", uid)
+      supabase.from("users").select("*").eq("id", uid)
     );
     const profile = profileRaw[0] ?? null;
 
@@ -78,9 +75,7 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
     const proposalVersions = await safeFetch(() =>
       supabase
         .from("proposal_versions")
-        .select(
-          "id, proposal_id, version, scope_json, price_min, price_anchor, price_max, change_reason, created_at"
-        )
+        .select("*")
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
     );
@@ -142,7 +137,7 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
       supabase
         .from("documents")
         .select(
-          "id, client_id, title_ar, title_en, description_ar, file_name, file_size, file_type, category, expiry_date, expired, created_at, updated_at"
+          "id, client_id, title_ar, title_en, description_ar, file_name, file_size, file_type, category, category_auto, category_confidence, expiry_date, expiry_detected_by, reminder_days_before, tags, created_at, updated_at"
         )
         .eq("user_id", uid)
         .is("deleted_at", null)
