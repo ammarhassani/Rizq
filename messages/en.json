@@ -855,9 +855,9 @@
       "errors": {
         "briefRequired": "Paste the client's message first.",
         "selectCityTier": "Pick your city and experience level.",
-        "extractionFailedEyebrow": "Couldn't parse message",
-        "extractionFailedTitle": "We couldn't analyze the message automatically.",
-        "extractionFailedBody": "Review the message and make sure it has a clear project description, then try again.",
+        "extractionFailedEyebrow": "Automatic analysis unavailable",
+        "extractionFailedTitle": "We couldn't analyze the message right now.",
+        "extractionFailedBody": "The AI analysis service may be temporarily unavailable. Try again in a moment — or edit the message below and retry.",
         "extractionRetry": "Try again",
         "generic": "Something went wrong. Please try again."
       }

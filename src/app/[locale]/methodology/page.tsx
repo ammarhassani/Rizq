@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { SiteNav } from "@/components/nav/SiteNav";
+import { AppShell } from "@/components/shell/AppShell";
 import { createClient } from "@/lib/supabase/server";
 import {
   Layers,
@@ -121,6 +122,11 @@ export default async function MethodologyPage({
 
   const sections: MethodologySection[] = (rows ?? []) as MethodologySection[];
 
+  // Signed-in users get the unified app shell (sidebar/topbar); public visitors
+  // keep the marketing nav. methodology is both a sidebar module and a public
+  // SEO/trust page, so it adapts to who's viewing.
+  const { data: { user: shellUser } } = await supabase.auth.getUser();
+
   // Build sections text for the FAQ island (title + content concatenated)
   const sectionsTextForFaq = sections
     .map((s) => {
@@ -144,26 +150,8 @@ export default async function MethodologyPage({
     }
   };
 
-  return (
-    <div className="relative min-h-screen flex flex-col bg-paper" dir={isAr ? "rtl" : "ltr"}>
-      {/* Dot-grid background */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.45] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.16) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
-        }}
-      />
-
-      <SiteNav locale={locale as "ar" | "en"} />
-
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-6 sm:px-10 py-12 sm:py-16 lg:py-20">
+  const body = (
+    <div className="mx-auto w-full max-w-3xl px-6 sm:px-10 lg:px-12 py-8 sm:py-10">
         {/* Header */}
         <p className="eyebrow mb-4">{t("eyebrow")}</p>
         <h1 className={`display-2 text-rizq-ink mb-6 ${font}`}>{t("title")}</h1>
@@ -246,7 +234,7 @@ export default async function MethodologyPage({
           <p
             className={`mt-3 text-[11px] tracking-[0.18em] uppercase text-rizq-ink-soft/60 ${font}`}
           >
-            {tLegal("lastUpdated")} · v0.1
+            {tLegal("lastUpdated")}
           </p>
           <Link
             href="/"
@@ -256,7 +244,35 @@ export default async function MethodologyPage({
             <span>{tLegal("backHome")}</span>
           </Link>
         </div>
-      </main>
+    </div>
+  );
+
+  // Signed-in → unified app shell; anon → public marketing nav.
+  if (shellUser) {
+    return (
+      <AppShell locale={locale as "ar" | "en"} title={t("title")}>
+        {body}
+      </AppShell>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen flex flex-col bg-paper" dir={isAr ? "rtl" : "ltr"}>
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-[0.45] pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(200, 169, 81, 0.16) 1px, transparent 1.6px)",
+          backgroundSize: "30px 30px",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+        }}
+      />
+      <SiteNav locale={locale as "ar" | "en"} />
+      <main className="relative z-10 flex-1">{body}</main>
     </div>
   );
 }

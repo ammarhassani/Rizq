@@ -855,9 +855,9 @@
       "errors": {
         "briefRequired": "ألصق رسالة العميل أولًا.",
         "selectCityTier": "اختر المدينة ومستوى الخبرة.",
-        "extractionFailedEyebrow": "تعذّر تحليل الرسالة",
-        "extractionFailedTitle": "لم نستطع تحليل الرسالة تلقائيًا.",
-        "extractionFailedBody": "راجع الرسالة وتأكد أنها تحتوي على وصف واضح للمشروع، ثم حاول مرة أخرى.",
+        "extractionFailedEyebrow": "التحليل التلقائي غير متاح",
+        "extractionFailedTitle": "تعذّر تحليل الرسالة في الوقت الحالي.",
+        "extractionFailedBody": "قد تكون خدمة التحليل الذكي غير متاحة مؤقتًا. حاول مرة أخرى بعد لحظات — أو عدّل الرسالة أدناه وأعد المحاولة.",
         "extractionRetry": "حاول مجددًا",
         "generic": "حدث خطأ. حاول مرة أخرى."
       }

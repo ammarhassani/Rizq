@@ -279,7 +279,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         dir={dir}
         className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 space-y-4 animate-fade-in ${font}`}
       >
-        <p className="eyebrow text-rizq-gold-dark">{t("errors.extractionFailedEyebrow")}</p>
+        <p className="eyebrow">{t("errors.extractionFailedEyebrow")}</p>
         <h2 className="text-lg font-semibold text-rizq-ink">{t("errors.extractionFailedTitle")}</h2>
         <p className="text-sm text-rizq-ink-soft">{t("errors.extractionFailedBody")}</p>
         {/* Show the original brief back so the user can edit and retry */}

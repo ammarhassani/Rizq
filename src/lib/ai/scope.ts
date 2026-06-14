@@ -251,7 +251,11 @@ export async function extractScope(
       model: deepseek(REASONING_MODEL),
       schema: ScopeSchema,
       prompt,
-      abortSignal: AbortSignal.timeout(8_000),
+      // 20s: extraction returns in ~2s with a valid key, but production cold
+      // starts + model load under traffic can be slower. The common failure
+      // mode is a missing/invalid DEEPSEEK_API_KEY (401) — which fails fast and
+      // is surfaced honestly to the user, not blamed on their message.
+      abortSignal: AbortSignal.timeout(20_000),
     });
     const scope = result.object;
     return {

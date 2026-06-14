@@ -158,7 +158,11 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
           void checkGigAnomalyAction({ gig_id: newId }).catch(() => {});
         }
 
+        // Navigate to the ledger AND refresh — without refresh() the client
+        // Router Cache serves a stale /income (missing the just-created gig),
+        // which reads as "nothing happened" and causes duplicate saves.
         router.push("/income" as "/income");
+        router.refresh();
       } else {
         if (!initialData?.id) return;
         const result = await updateGig({
