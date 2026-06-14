@@ -8,6 +8,8 @@ const intlMiddleware = createIntlMiddleware(routing);
 const PROTECTED_PATTERN = /^\/(?:ar|en)\/dashboard(?:\/|$)/;
 const ONBOARDING_PATTERN = /^\/(?:ar|en)\/onboarding(?:\/|$)/;
 const AUTH_PAGES_PATTERN = /^\/(?:ar|en)\/(?:login|signup|forgot-password|reset-password|verify-email)(?:\/|$)/;
+// Bare marketing root, e.g. /ar or /en (with optional trailing slash).
+const ROOT_LANDING_PATTERN = /^\/(?:ar|en)\/?$/;
 
 export default async function proxy(request: NextRequest) {
   // 1. Let next-intl decide locale routing first. It may return a redirect
@@ -34,6 +36,16 @@ export default async function proxy(request: NextRequest) {
   if (AUTH_PAGES_PATTERN.test(pathname) && user) {
     // Exception: reset-password is reachable while signed-in via email link
     if (!/^\/(?:ar|en)\/reset-password/.test(pathname)) {
+      const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
+  }
+
+  // 5. Smart routing: a signed-in user hitting the marketing root goes
+  //    straight into the app. The ?stay escape hatch lets them view the
+  //    marketing site on purpose (e.g. from the in-app user menu).
+  if (ROOT_LANDING_PATTERN.test(pathname) && user) {
+    if (!request.nextUrl.searchParams.has("stay")) {
       const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
       return NextResponse.redirect(dashboardUrl);
     }

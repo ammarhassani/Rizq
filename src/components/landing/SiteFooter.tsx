@@ -69,8 +69,8 @@ export async function SiteFooter({ locale }: Props) {
           <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>
             {t("copyright")}
           </p>
-          <p className={`text-xs tracking-[0.18em] uppercase text-rizq-ink-soft/60 ${font}`}>
-            v0.1 · pre-launch
+          <p className="text-xs tracking-[0.18em] uppercase text-rizq-ink-soft/60 font-sans">
+            rizq.sa
           </p>
         </div>
       </div>

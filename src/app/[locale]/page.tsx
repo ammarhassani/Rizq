@@ -8,7 +8,6 @@ import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Pricing } from "@/components/landing/Pricing";
 import { Faq } from "@/components/landing/Faq";
 import { FounderNote } from "@/components/landing/FounderNote";
-import { Waitlist } from "@/components/landing/Waitlist";
 import { SiteFooter } from "@/components/landing/SiteFooter";
 
 export default async function LandingPage({
@@ -29,7 +28,6 @@ export default async function LandingPage({
         <Pricing locale={locale} />
         <Faq locale={locale} />
         <FounderNote locale={locale} />
-        <Waitlist locale={locale} />
       </main>
       <SiteFooter locale={locale} />
     </>

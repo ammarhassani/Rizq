@@ -16,7 +16,9 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
-    const next = url.searchParams.get("next") ?? "/ar";
+    // Post-auth users land in the app. An explicit `next`/returnTo (e.g. a
+    // deep link the user was sent to login from) is still honored.
+    const next = url.searchParams.get("next") ?? "/ar/dashboard";
     const errorParam = url.searchParams.get("error");
 
     const locale = next.startsWith("/en") ? "en" : "ar";
