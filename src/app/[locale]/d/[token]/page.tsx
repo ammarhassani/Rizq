@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
   const doc = await fetchSharedDocument(token);
   if (!doc) return { title: "رِزق" };
   const title = locale === "ar" ? (doc.title_ar ?? doc.file_name) : (doc.title_en ?? doc.file_name);
-  return { title: `${title} — رِزق` };
+  return { title: `${title} · رِزق` };
 }
 
 export default async function DocumentSharePage({ params }: { params: Promise<Params> }) {
@@ -119,7 +119,7 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
         {/* Rizq attribution */}
         <div className={`mt-6 text-center ${font}`}>
           <Link href="/" className="text-xs text-rizq-ink-soft/50 hover:text-rizq-green transition-colors">
-            {isAr ? "مُنشأ بواسطة رِزق — سعّر بثقة، اقبض رزقك" : "Shared via Rizq — Price with confidence, earn your rizq"}
+            {isAr ? "مُنشأ بواسطة رِزق. سعّر بثقة، اقبض رزقك" : "Shared via Rizq. Price with confidence, earn your rizq"}
           </Link>
         </div>
       </main>

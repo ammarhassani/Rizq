@@ -17,8 +17,8 @@ const EXPERIENCE_TIERS_AR = [
 ];
 const EXPERIENCE_TIERS_EN = [
   { label: "Beginner (under 2 years)", value: "beginner" },
-  { label: "Intermediate (2–5 years)", value: "intermediate" },
-  { label: "Advanced (5–10 years)", value: "advanced" },
+  { label: "Intermediate (2 to 5 years)", value: "intermediate" },
+  { label: "Advanced (5 to 10 years)", value: "advanced" },
   { label: "Expert (10+ years)", value: "expert" },
 ];
 

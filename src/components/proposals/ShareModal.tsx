@@ -98,8 +98,8 @@ export function ShareModal({
 
   const waText = shareUrl
     ? isAr
-      ? `عرض تقديمي احترافي من رِزق — سعّر بثقة.\n${shareUrl}`
-      : `A professional proposal from Rizq — Price with confidence.\n${shareUrl}`
+      ? `عرض تقديمي احترافي من رِزق. سعّر بثقة.\n${shareUrl}`
+      : `A professional proposal from Rizq. Price with confidence.\n${shareUrl}`
     : "";
 
   const waHref = shareUrl

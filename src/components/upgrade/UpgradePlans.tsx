@@ -125,7 +125,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
   // ── Coming-soon panel ────────────────────────────────────────────────────────
 
   if (checkout.status === "coming_soon") {
-    const contactHref = `mailto:${checkout.contact}?subject=${encodeURIComponent(isAr ? "وصول احترافي مبكر — رِزق" : "Early Pro access — Rizq")}`;
+    const contactHref = `mailto:${checkout.contact}?subject=${encodeURIComponent(isAr ? "وصول احترافي مبكر، رِزق" : "Early Pro access, Rizq")}`;
     return (
       <div
         dir={dir}
@@ -211,7 +211,8 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
           <div className="space-y-2">
             {FEATURES.map((f) => {
               const val = t(f.freeKey as Parameters<typeof t>[0]);
-              const isDash = val === "—";
+              // Pro-only rows are not in the free tier: show a Minus + dimmed label.
+              const isDash = !!f.proOnly;
               return (
                 <div key={f.labelKey} className="flex items-start gap-2.5">
                   {isDash ? (
@@ -289,7 +290,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
         </div>
       </div>
 
-      {/* Halal note */}
+      {/* Pricing note */}
       <p className={`text-center text-xs text-rizq-ink-soft/60 ${font}`}>
         {t("halalNote")}
       </p>

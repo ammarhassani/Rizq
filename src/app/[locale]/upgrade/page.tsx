@@ -28,7 +28,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Upgrade" });
-  return { title: `${t("pageTitle")} — رِزق` };
+  return { title: `${t("pageTitle")} · رِزق` };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

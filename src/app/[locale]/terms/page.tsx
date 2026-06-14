@@ -11,7 +11,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Legal.Terms" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 export default async function TermsPage({

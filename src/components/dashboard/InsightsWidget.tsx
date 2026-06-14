@@ -143,7 +143,7 @@ export function InsightsWidget({ locale }: Props) {
             </p>
             <div className={`mt-2 flex items-center justify-between gap-2 ${font}`}>
               <p className={`text-xs opacity-60 ${font}`}>
-                {isAr ? "هذا تحليل آلي — ليس استشارة مهنية" : "AI-generated — not professional advice"}
+                {isAr ? "هذا تحليل آلي، ليس استشارة مهنية" : "AI-generated, not professional advice"}
               </p>
               <div className="flex items-center gap-1 shrink-0">
                 <button

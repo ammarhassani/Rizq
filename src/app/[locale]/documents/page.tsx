@@ -21,7 +21,7 @@ type CategoryRow = {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
-  return { title: locale === "ar" ? "خزنة الوثائق — رِزق" : "Document Vault — Rizq" };
+  return { title: locale === "ar" ? "خزنة الوثائق · رِزق" : "Document Vault · Rizq" };
 }
 
 export default async function DocumentsPage({ params }: { params: Promise<Params> }) {
@@ -86,8 +86,8 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
             </h2>
             <p className={`text-sm text-rizq-ink-soft mb-6 max-w-sm mx-auto ${font}`}>
               {isAr
-                ? "ارفع أول وثيقة — شهادة ضريبية، عقد، سجل تجاري..."
-                : "Upload your first document — tax certificate, contract, commercial registration..."}
+                ? "ارفع أول وثيقة: شهادة ضريبية، عقد، سجل تجاري..."
+                : "Upload your first document: tax certificate, contract, commercial registration..."}
             </p>
             <Link
               href="/documents/new"

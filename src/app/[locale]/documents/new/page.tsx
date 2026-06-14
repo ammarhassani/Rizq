@@ -15,7 +15,7 @@ type Params = { locale: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
-  return { title: locale === "ar" ? "رفع وثيقة — رِزق" : "Upload document — Rizq" };
+  return { title: locale === "ar" ? "رفع وثيقة · رِزق" : "Upload document · Rizq" };
 }
 
 export default async function DocumentNewPage({ params }: { params: Promise<Params> }) {

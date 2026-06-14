@@ -72,7 +72,7 @@ const PAYMENT_METHOD_EN: Record<string, string> = {
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  return { title: "مشروع — رِزق" };
+  return { title: "مشروع · رِزق" };
 }
 
 export default async function GigDetailPage({ params }: { params: Promise<Params> }) {

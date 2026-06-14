@@ -28,7 +28,7 @@ type Props = { locale: "ar" | "en" };
  *   5. WorkflowStory   — "from quote to cash" 5-step narrative
  *   6. AiFeatures      — honesty-labeled AI band
  *   7. FeatureDemos    — three interactive product-glimpse demos
- *   8. Trust           — methodology / halal / data-ownership pillars
+ *   8. Trust           — methodology / pricing / data-ownership pillars
  *   9. Pricing         — free vs pro
  *  10. Faq             — common questions
  *  11. FinalCta        — conversion band

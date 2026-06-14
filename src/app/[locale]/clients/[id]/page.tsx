@@ -67,7 +67,7 @@ const PROPOSAL_STATUS_EN: Record<string, string> = {
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  return { title: "عميل — رِزق" };
+  return { title: "عميل · رِزق" };
 }
 
 export default async function ClientDetailPage({ params }: { params: Promise<Params> }) {

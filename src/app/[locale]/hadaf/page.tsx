@@ -43,7 +43,7 @@ function daysRemainingInMonth(today: Date): number {
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Hadaf" });
-  return { title: `${t("pageTitle")} — رِزق` };
+  return { title: `${t("pageTitle")} · رِزق` };
 }
 
 export default async function HadafPage({ params }: { params: Promise<Params> }) {

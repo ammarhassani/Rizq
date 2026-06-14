@@ -359,8 +359,8 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
     const waUrl = shareUrl
       ? `https://wa.me/?text=${encodeURIComponent(
           isAr
-            ? `عرض تقديمي احترافي من رِزق — سعّر بثقة.\n${shareUrl}`
-            : `A professional proposal from Rizq — Price with confidence.\n${shareUrl}`
+            ? `عرض تقديمي احترافي من رِزق. سعّر بثقة.\n${shareUrl}`
+            : `A professional proposal from Rizq. Price with confidence.\n${shareUrl}`
         )}`
       : null;
 

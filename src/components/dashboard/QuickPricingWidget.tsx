@@ -33,7 +33,7 @@ export function QuickPricingWidget({ anchor, specialty, locale }: Props) {
             <AnimatedNumber value={anchor} locale={locale} duration={0.9} />
           </p>
           <p className={`text-xs text-rizq-ink-soft mt-1 ${font}`}>
-            {isAr ? `وسيط السوق — ${specialty ?? "تخصصك"}` : `Market median — ${specialty ?? "your specialty"}`}
+            {isAr ? `وسيط السوق: ${specialty ?? "تخصصك"}` : `Market median: ${specialty ?? "your specialty"}`}
           </p>
           <Link
             href="/tool"

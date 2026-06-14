@@ -313,7 +313,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
                   </span>
                 </p>
                 <p className="text-xs text-rizq-ink-soft/50">
-                  {fmtPrice(forecast.confidence_low, locale)} – {fmtPrice(forecast.confidence_high, locale)}
+                  {fmtPrice(forecast.confidence_low, locale)} {locale === "ar" ? "إلى" : "to"} {fmtPrice(forecast.confidence_high, locale)}
                 </p>
               </div>
               <div>

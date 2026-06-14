@@ -117,17 +117,17 @@ export async function generateMetadata({
 
   const description =
     locale === "ar"
-      ? `فاتورة${invoiceNumber ? ` رقم ${invoiceNumber}` : ""} — الإجمالي: ${totalSar ? fmt.format(totalSar) + " ريال" : "—"}`
-      : `Invoice${invoiceNumber ? ` #${invoiceNumber}` : ""} — Total: ${totalSar ? fmt.format(totalSar) + " SAR" : "—"}`;
+      ? `فاتورة${invoiceNumber ? ` رقم ${invoiceNumber}` : ""}. الإجمالي: ${totalSar ? fmt.format(totalSar) + " ريال" : "غير محدّد"}`
+      : `Invoice${invoiceNumber ? ` #${invoiceNumber}` : ""}. Total: ${totalSar ? fmt.format(totalSar) + " SAR" : "N/A"}`;
 
-  const title = locale === "ar" ? "فاتورة — رِزق" : "Invoice — Rizq";
+  const title = locale === "ar" ? "فاتورة رِزق" : "Rizq Invoice";
 
   return {
     title,
     description,
     openGraph: {
       title: brandName
-        ? `${brandName} — ${locale === "ar" ? "فاتورة رِزق" : "Rizq Invoice"}`
+        ? `${brandName}, ${locale === "ar" ? "فاتورة رِزق" : "Rizq Invoice"}`
         : title,
       description,
       type: "website",

@@ -33,7 +33,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Proposals.list" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 // ---------------------------------------------------------------------------

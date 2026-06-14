@@ -1,17 +1,17 @@
 {
   "Meta": {
-    "title": "Rizq — The pricing benchmark for Saudi freelancers",
-    "description": "Price with confidence. Earn your rizq. — A real Saudi-market pricing benchmark, built on local data, so you know what to charge before you bid."
+    "title": "Rizq: the pricing benchmark for Saudi freelancers",
+    "description": "Price with confidence. Earn your rizq. A real Saudi-market pricing benchmark, built on local data, so you know what to charge before you bid."
   },
   "Hero": {
     "wordmark": "Rizq",
     "eyebrow": "The Saudi Freelancer OS",
     "tagline": "Price with confidence. Earn your rizq.",
-    "subtitle": "The all-in-one OS for Saudi freelancers — from pricing to invoicing",
+    "subtitle": "The all-in-one OS for Saudi freelancers, from pricing to invoicing",
     "ctaPrimary": "Start free",
     "ctaSecondary": "Explore the apps",
     "trustBadge": "Made in Saudi",
-    "comingSoon": "Live now — 13 tools"
+    "comingSoon": "Live now: 13 tools"
   },
   "HowItWorks": {
     "eyebrow": "How it works",
@@ -52,13 +52,13 @@
       "cta": "Start with Pro",
       "badge": "Most popular"
     },
-    "halalNote": "Halal. No riba. A service subscription only."
+    "halalNote": "No hidden fees. A simple monthly service subscription. Cancel anytime."
   },
   "Faq": {
     "eyebrow": "Frequently asked",
     "heading": "What freelancers ask before they sign up.",
     "q1": "Where does Rizq's data come from?",
-    "a1": "Three independent, transparent sources: AI reasoned estimates (clearly labeled \"Rizq analysis\"), publicly published rate cards and references, and Saudi open government data — plus optional contributions from freelancers themselves. We do not scrape freelance marketplaces. Every number carries its source and a confidence score.",
+    "a1": "Three independent, transparent sources: AI reasoned estimates (clearly labeled \"Rizq analysis\"), publicly published rate cards and references, and Saudi open government data, plus optional contributions from freelancers themselves. We do not scrape freelance marketplaces. Every number carries its source and a confidence score.",
     "q2": "Is the benchmark really accurate?",
     "a2": "We always show the sample size honestly. If it's based on 12 freelancers, we'll tell you. Transparency matters more than claimed precision.",
     "q3": "Why monthly and not annual?",
@@ -66,16 +66,16 @@
     "q4": "Is my data safe?",
     "a4": "Yes. All contributions are anonymized before they enter the public benchmark. We don't expose any freelancer's or client's identity. Compliant with the Saudi PDPL.",
     "q5": "How is Rizq different from Mostaql or Khamsat?",
-    "a5": "Those platforms match freelancers with clients. Rizq tells you the fair price before you bid — on any platform, or for a direct client.",
+    "a5": "Those platforms match freelancers with clients. Rizq tells you the fair price before you bid, on any platform, or for a direct client.",
     "q6": "Will there be a proposal generator?",
-    "a6": "Yes — in v0.2. Right now we're focused on getting the benchmark right first. Join the waitlist to be among the first to know.",
+    "a6": "Yes, in v0.2. Right now we're focused on getting the benchmark right first. Join the waitlist to be among the first to know.",
     "q7": "Does Rizq support Saudi payment methods?",
-    "a7": "Yes. Mada, Visa, Mastercard, and Apple Pay through a Sharia-compliant Saudi payment processor."
+    "a7": "Yes. Mada, Visa, Mastercard, and Apple Pay through a Saudi-licensed payment processor."
   },
   "Founder": {
     "eyebrow": "Who built Rizq",
     "heading": "Built by a Saudi who lived the problem.",
-    "body": "I'm Ammar — a data analyst in banking and a former freelancer. I lived the question of \"am I charging right?\" for years. Rizq is what I wish existed when I started — a real benchmark built on Saudi data, with full transparency on where every number comes from.",
+    "body": "I'm Ammar, a data analyst in banking and a former freelancer. I lived the question of \"am I charging right?\" for years. Rizq is what I wish existed when I started: a real benchmark built on Saudi data, with full transparency on where every number comes from.",
     "name": "Ammar Al-Hassani",
     "role": "Founder, Rizq"
   },
@@ -89,7 +89,7 @@
     "successBody": "We'll be in touch when the beta opens.",
     "errorInvalidEmail": "Enter a valid email address.",
     "errorRequired": "Email is required.",
-    "errorRateLimited": "Easy there — try again in a few minutes.",
+    "errorRateLimited": "Easy there. Try again in a few minutes.",
     "errorGeneric": "Something went wrong. Try again.",
     "errorDuplicate": "This email is already on the list.",
     "privacyNote": "We won't share your email with anyone."
@@ -128,7 +128,7 @@
     "uploadDocument": "Upload document",
     "uploadNew": "Upload a new document",
     "noDocumentsTitle": "No documents yet",
-    "noDocumentsBody": "Upload your first document — tax certificate, contract, commercial registration...",
+    "noDocumentsBody": "Upload your first document: tax certificate, contract, commercial registration...",
     "backToDocuments": "Documents",
     "categories": {
       "freelance_doc": "Freelance document",
@@ -143,7 +143,7 @@
     "shareNotice": "This document was shared with you via Rizq. The link is temporary and will expire soon.",
     "downloadFile": "Download file",
     "downloadError": "Could not prepare download link.",
-    "attribution": "Shared via Rizq — Price with confidence, earn your rizq"
+    "attribution": "Shared via Rizq. Price with confidence, earn your rizq"
   },
   "Legal": {
     "lastUpdated": "Last updated: May 2026",
@@ -152,11 +152,11 @@
       "title": "Terms of Service",
       "intro": "By accessing or using Rizq, you agree to these Terms. Read them carefully.",
       "s1Title": "1. What Rizq provides",
-      "s1Body": "Rizq is a data platform that offers indicative price ranges for freelance services in the Saudi market, based on aggregated and reviewed data. The ranges are market information — they are not professional advice or a guarantee of any actual price.",
+      "s1Body": "Rizq is a data platform that offers indicative price ranges for freelance services in the Saudi market, based on aggregated and reviewed data. The ranges are market information. They are not professional advice or a guarantee of any actual price.",
       "s2Title": "2. Account and acceptable use",
       "s2Body": "You're responsible for the accuracy of your account information and for any activity that happens through it. Do not share your credentials. Automated or abusive use of Rizq is prohibited and may lead to account suspension.",
       "s3Title": "3. Subscriptions and payment",
-      "s3Body": "The free tier allows 3 queries per month. The Pro tier is a monthly subscription, cancellable at any time from your account settings. There is no interest (riba) in any payment flow. Payments are processed by a Saudi-compliant processor.",
+      "s3Body": "The free tier allows 3 queries per month. The Pro tier is a monthly subscription, cancellable at any time from your account settings. There are no hidden fees in any payment flow. Payments are processed by a Saudi-licensed processor.",
       "s4Title": "4. Cancellation and refunds",
       "s4Body": "You can cancel your subscription at any time and retain access until the end of the paid period. Refunds are available within the first 7 days of a subscription, pro-rated to time used.",
       "s5Title": "5. Intellectual property",
@@ -194,25 +194,25 @@
   "Methodology": {
     "eyebrow": "How we calculate",
     "title": "Rizq pricing methodology",
-    "intro": "I'm Ammar, the founder. This page explains where the numbers you see come from, how we compute them, and when we refuse to answer. The goal: use Rizq knowing exactly what we built it on — never trust us blindly.",
+    "intro": "I'm Ammar, the founder. This page explains where the numbers you see come from, how we compute them, and when we refuse to answer. The goal: use Rizq knowing exactly what we built it on. Never trust us blindly.",
     "tocLabel": "Sections",
     "lastUpdated": "Last updated",
     "s1Title": "1 · Where data comes from",
     "s1Body": "Four transparent sources: (a) AI reasoned estimates, clearly labeled \"Rizq analysis\"; (b) publicly published rate cards and references; (c) Saudi open government data; (d) optional submissions from Saudi freelancers who recorded real project prices. We do not scrape freelance marketplaces. Every record carries its source, date, and a trust weight. We don't blend them into a single faceless number.",
     "s2Title": "2 · How the range is built",
-    "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is a real market range — not a softened average.",
+    "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is a real market range, not a softened average.",
     "s3Title": "3 · Why median, not mean",
-    "s3Body": "A mean is pulled around by outliers — one luxury project or one underpriced gig distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
+    "s3Body": "A mean is pulled around by outliers: one luxury project or one underpriced gig distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
     "s4Title": "4 · Sample size and confidence",
-    "s4Body": "Every result shows \"based on N Saudi freelancers\". N matters: 5 records is our floor — under that we say \"insufficient data\" rather than guess. As N grows, the range narrows and confidence rises. We don't hide thin samples behind round numbers.",
+    "s4Body": "Every result shows \"based on N Saudi freelancers\". N matters: 5 records is our floor. Under that we say \"insufficient data\" rather than guess. As N grows, the range narrows and confidence rises. We don't hide thin samples behind round numbers.",
     "s5Title": "5 · What we don't yet model",
-    "s5Body": "Today we don't account for: exact project complexity, individual freelancer reputation, client urgency, or your network signals. These move real prices — but they need a smarter engine, which we're building for the next version. For now: the range is market-wide, not personal.",
+    "s5Body": "Today we don't account for: exact project complexity, individual freelancer reputation, client urgency, or your network signals. These move real prices, but they need a smarter engine, which we're building for the next version. For now: the range is market-wide, not personal.",
     "s6Title": "6 · Data freshness",
     "s6Body": "Records older than 18 months are flagged and down-weighted. The Saudi market moves. \"Market price\" today isn't necessarily \"market price\" last year. The index updates continuously as new submissions come in.",
     "s7Title": "7 · Submission review",
-    "s7Body": "Every contribution is hand-reviewed before it enters the public dataset. We reject incomplete or unrealistic records. This is slow — but it's the only way to protect the quality of every number after yours.",
+    "s7Body": "Every contribution is hand-reviewed before it enters the public dataset. We reject incomplete or unrealistic records. This is slow, but it's the only way to protect the quality of every number after yours.",
     "s8Title": "8 · A question or correction?",
-    "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest — email me. Rizq gets sharper with every note.",
+    "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest, email me. Rizq gets sharper with every note.",
     "contact": "Reach me directly: {email}",
     "Faq": {
       "heading": "Ask about our methodology",
@@ -220,7 +220,7 @@
       "placeholder": "e.g. How do you compute the median?",
       "askButton": "Ask",
       "aiLabel": "AI answer from published methodology",
-      "aiDisclaimer": "This is an automated answer based solely on Rizq's published methodology — not professional advice."
+      "aiDisclaimer": "This is an automated answer based solely on Rizq's published methodology, not professional advice."
     }
   },
   "Auth": {
@@ -255,8 +255,8 @@
         "passwordRequired": "Enter a password.",
         "passwordTooShort": "Password must be at least 8 characters.",
         "emailTaken": "This email is already registered. Sign in instead.",
-        "weakPassword": "Weak password — mix letters, numbers, and symbols.",
-        "rateLimited": "Easy there — try again in a few minutes."
+        "weakPassword": "Weak password. Mix letters, numbers, and symbols.",
+        "rateLimited": "Easy there. Try again in a few minutes."
       }
     },
     "Login": {
@@ -356,9 +356,9 @@
           "fullNameEnPlaceholder": "As on your passport",
           "flNumber": "Freelance document number",
           "flNumberPlaceholder": "FL-XXXXXXXX",
-          "flNumberHint": "Optional — boosts your profile credibility.",
+          "flNumberHint": "Optional. Boosts your profile credibility.",
           "flUploadLabel": "Upload document photo",
-          "flUploadDeferred": "Coming soon — document upload is not available yet.",
+          "flUploadDeferred": "Coming soon. Document upload is not available yet.",
           "commercialReg": "Commercial registration (optional)",
           "commercialRegPlaceholder": "If you have a registered business",
           "vatRegistered": "VAT registered",
@@ -417,7 +417,7 @@
         },
         "portfolio": {
           "title": "Portfolio & Past Work",
-          "description": "Showcase your best work — up to 20 projects.",
+          "description": "Showcase your best work, up to 20 projects.",
           "addSample": "Add a project",
           "sampleTitle": "Project title",
           "sampleTitlePlaceholder": "e.g. Nour Co. brand identity",
@@ -448,10 +448,10 @@
           "contactWhatsapp": "WhatsApp number",
           "contactCity": "Contact city",
           "aiTaglineTitle": "Rizq Tagline Suggestions",
-          "aiTaglineSubtitle": "AI-powered suggestions — pick one or write your own.",
+          "aiTaglineSubtitle": "AI-powered suggestions. Pick one or write your own.",
           "aiTaglineGenerate": "Suggest a tagline",
           "aiTaglineGenerating": "Thinking…",
-          "aiTaglineDisclaimer": "These are Rizq suggestions — review and edit before using.",
+          "aiTaglineDisclaimer": "These are Rizq suggestions. Review and edit before using.",
           "aiTaglineUse": "Use this tagline",
           "aiTaglineError": "Could not generate a tagline. Please try again."
         },
@@ -518,7 +518,7 @@
     "verifyBannerTitle": "Email not verified yet",
     "verifyBannerBody": "Verify your email to activate your account and unlock everything.",
     "verifyBannerCta": "Resend verification link",
-    "verifyBannerSent": "Sent — check your inbox.",
+    "verifyBannerSent": "Sent. Check your inbox.",
     "openTool": "Open the pricing tool",
     "quotaRemaining": "{remaining} of {limit} queries left this month",
     "quotaUnlimited": "Unlimited queries",
@@ -532,7 +532,7 @@
     "insightsEmptyTitle": "Create your first proposal to activate insights",
     "insightsErrorMsg": "Could not load insights. Try again.",
     "insightsRetry": "Retry",
-    "insightsLabel": "AI-generated — not professional advice",
+    "insightsLabel": "AI-generated, not professional advice",
     "insightsLastUpdated": "Last updated: {date}",
     "proposalsTitle": "Recent Proposals",
     "proposalsViewAll": "View all →",
@@ -570,7 +570,7 @@
   "Tool": {
     "eyebrow": "Pricing tool",
     "title": "Find your fair rate.",
-    "subtitle": "Pick the details — we'll give you a range built on real Saudi data.",
+    "subtitle": "Pick the details and we'll give you a range built on real Saudi data.",
     "specialtyLabel": "Specialty",
     "specialtyPlaceholder": "Pick your specialty",
     "cityLabel": "City",
@@ -584,7 +584,7 @@
     "projectSizeLarge": "Large",
     "projectSizeEnterprise": "Enterprise",
     "tierYearsExact": "{min} yr",
-    "tierYearsRange": "{min}–{max} yrs",
+    "tierYearsRange": "{min} to {max} yrs",
     "tierYearsPlus": "{min}+ yrs",
     "submit": "Calculate my price",
     "submitting": "Calculating…",
@@ -618,14 +618,14 @@
     },
     "insufficient": {
       "title": "Not enough data yet.",
-      "body": "We need 3 records to publish a benchmark. Try a different specialty or city — we add data weekly.",
+      "body": "We need 3 records to publish a benchmark. Try a different specialty or city. We add data weekly.",
       "tryAgain": "Try a different combination"
     },
     "quota": {
       "anonRemaining": "You have 1 free query.",
       "freeRemaining": "{remaining} of {limit} queries left this month.",
       "freeExhaustedTitle": "You've used your free queries.",
-      "freeExhaustedBody": "Upgrade to Pro for unlimited queries — 49 SAR / month.",
+      "freeExhaustedBody": "Upgrade to Pro for unlimited queries at 49 SAR / month.",
       "freeExhaustedCta": "Upgrade now",
       "anonExhaustedTitle": "Your free query is used.",
       "anonExhaustedBody": "Create a free account for 3 queries per month.",
@@ -677,7 +677,7 @@
     "anonGate": "To contribute, sign in to your account first.",
     "errors": {
       "required": "Fill in specialty, city, experience, and price.",
-      "priceRange": "Enter a realistic price (1 – 1,000,000 SAR).",
+      "priceRange": "Enter a realistic price (1 to 1,000,000 SAR).",
       "rateLimited": "You've hit the daily limit (5 submissions). Try tomorrow.",
       "uploadFailed": "Upload failed. Try again.",
       "fileTooLarge": "File is over 5MB.",
@@ -725,7 +725,7 @@
   },
   "ContributeCTA": {
     "title": "Contribute a price",
-    "subtitle": "Share a price you were paid — earn +2 queries when approved.",
+    "subtitle": "Share a price you were paid and earn +2 queries when approved.",
     "cta": "Contribute"
   },
   "Common": {
@@ -814,7 +814,7 @@
       "max": "High",
       "citation": "Source",
       "noClient": "Valued client",
-      "noDescription": "—",
+      "noDescription": "",
       "noDeliverables": "Full scope to be defined upon contract signing.",
       "noDates": "To be agreed",
       "triggerDeposit": "Deposit upon project start",
@@ -823,7 +823,7 @@
     "new": {
       "eyebrow": "Proposal studio",
       "title": "Generate your proposal.",
-      "subtitle": "Paste the client's message — Rizq extracts the scope, prices it, and writes the proposal.",
+      "subtitle": "Paste the client's message. Rizq extracts the scope, prices it, and writes the proposal.",
       "briefLabel": "Client message",
       "briefPlaceholder": "Paste the client's message here…",
       "clientNameLabel": "Client name",
@@ -857,12 +857,12 @@
         "generating": "Generating proposal…"
       },
       "followUp": {
-        "done": "Done — generate proposal",
+        "done": "Done. Generate proposal",
         "skipAll": "Skip all",
         "skip": "Skip"
       },
       "tone": {
-        "label": "Rizq Insight — Adjust tone",
+        "label": "Rizq Insight: Adjust tone",
         "formal": "Formal",
         "balanced": "Balanced",
         "friendly": "Friendly",
@@ -879,7 +879,7 @@
         "selectCityTier": "Pick your city and experience level.",
         "extractionFailedEyebrow": "Automatic analysis unavailable",
         "extractionFailedTitle": "We couldn't analyze the message right now.",
-        "extractionFailedBody": "The AI analysis service may be temporarily unavailable. Try again in a moment — or edit the message below and retry.",
+        "extractionFailedBody": "The AI analysis service may be temporarily unavailable. Try again in a moment, or edit the message below and retry.",
         "extractionRetry": "Try again",
         "generic": "Something went wrong. Please try again."
       }
@@ -887,12 +887,12 @@
     "share": {
       "downloadPdf": "Download PDF",
       "contactFreelancer": "Contact freelancer",
-      "generatedBy": "Generated by Rizq — Saudi Freelancer OS",
+      "generatedBy": "Generated by Rizq, the Saudi Freelancer OS",
       "share": "Share",
       "whatsapp": "WhatsApp",
       "notFound": "This proposal doesn't exist or isn't shared publicly.",
       "metaTitle": "Proposal from Rizq",
-      "metaDescription": "A professional proposal generated by Rizq — the Saudi freelancer pricing benchmark."
+      "metaDescription": "A professional proposal generated by Rizq, the Saudi freelancer pricing benchmark."
     },
     "list": {
       "eyebrow": "My proposals",
@@ -941,7 +941,7 @@
         "deliverables": "Deliverables (one per line)",
         "description": "Description",
         "recommendedPrice": "Recommended price",
-        "priceRange": "within {min} – {max} SAR",
+        "priceRange": "within {min} to {max} SAR",
         "saveChanges": "Save changes",
         "cancel": "Cancel",
         "savedAs": "Saved as v{n}"
@@ -1142,10 +1142,10 @@
       "copyLink": "Copy link",
       "copied": "Copied!",
       "downloadPdf": "Download PDF",
-      "downloadPdfNote": "Opens the share page in a new tab — print to PDF from there.",
+      "downloadPdfNote": "Opens the share page in a new tab. Print to PDF from there.",
       "whatsapp": "Share via WhatsApp",
       "contactFreelancer": "Contact freelancer",
-      "generatedBy": "Generated by Rizq — Saudi Freelancer OS"
+      "generatedBy": "Generated by Rizq, the Saudi Freelancer OS"
     },
     "artifact": {
       "invoiceTitle": "Invoice",
@@ -1170,8 +1170,8 @@
       "generateReminder": "Generate payment reminder",
       "generatingReminder": "Generating…",
       "reminderNotOverdue": "Reminder is only available for invoices overdue by 7+ days.",
-      "draftLabel": "Rizq — AI draft, editable, not auto-sent",
-      "descriptionLabel": "Rizq — suggested description (review before saving)",
+      "draftLabel": "Rizq AI draft, editable, not auto-sent",
+      "descriptionLabel": "Rizq suggested description (review before saving)",
       "copy": "Copy",
       "copied": "Copied!",
       "aiError": "Could not generate content. Please try again.",
@@ -1198,7 +1198,7 @@
       "title": "Your clients.",
       "subtitle": "Every client, every conversation, every project in one place.",
       "add": "+ Add client",
-      "emptyTitle": "No clients yet — add your first client.",
+      "emptyTitle": "No clients yet. Add your first client.",
       "emptyBody": "Add a client and start building your Client Book.",
       "emptyCta": "Add first client",
       "searchPlaceholder": "Search by name or company…",
@@ -1219,7 +1219,7 @@
       "totalValue": "Total (SAR)",
       "lastContact": "Last contact",
       "avgPaymentDays": "Avg. payment days",
-      "aiInsightLabel": "Rizq Analysis —",
+      "aiInsightLabel": "Rizq Analysis",
       "contact": "Contact",
       "gigs": "Project history",
       "invoiceHistory": "Invoice history",
@@ -1289,12 +1289,12 @@
       }
     },
     "ai": {
-      "generateInsights": "Rizq Analysis — Generate insights",
+      "generateInsights": "Rizq Analysis: Generate insights",
       "draftFollowup": "Draft follow-up message",
       "generatePersona": "Generate client persona",
       "copy": "Copy",
       "whatsapp": "WhatsApp",
-      "upgradeHint": "This is a Pro feature — upgrade to use it.",
+      "upgradeHint": "This is a Pro feature. Upgrade to use it.",
       "loading": "Processing…",
       "personaNeeds3Gigs": "Generating a persona requires at least 3 gigs with this client."
     }
@@ -1350,13 +1350,13 @@
       "later": "Later"
     },
     "insight": {
-      "label": "Rizq Analysis —",
+      "label": "Rizq Analysis",
       "eventsThisWeek": "You have {n} event this week",
       "eventsThisWeekPlural": "You have {n} events this week",
-      "overdueInvoices": "1 overdue invoice — review it before it's too late.",
-      "overdueInvoicesPlural": "{n} overdue invoices — review them before it's too late.",
+      "overdueInvoices": "1 overdue invoice. Review it before it's too late.",
+      "overdueInvoicesPlural": "{n} overdue invoices. Review them before it's too late.",
       "busiestDay": "Busiest day: {day}",
-      "clearWeek": "A quiet week — great time to send new proposals."
+      "clearWeek": "A quiet week. Great time to send new proposals."
     },
     "emptyDay": "No events on this day.",
     "emptyAgenda": "No upcoming events.",
@@ -1410,8 +1410,8 @@
     "realisticBannerBody": "Your target is within the normal market range. Focus on quality and proposal craft.",
     "notRealisticBannerTitle": "Ambitious target",
     "notRealisticBannerBody": "Your target exceeds 90% of the market. It requires clear differentiation in experience and portfolio.",
-    "marketUnavailable": "Market data not available for this combination yet — rate calculation shown without benchmarking.",
-    "aiAnalysisLabel": "Rizq analysis —",
+    "marketUnavailable": "Market data not available for this combination yet. Rate calculation shown without benchmarking.",
+    "aiAnalysisLabel": "Rizq analysis",
     "aiAnalysisButton": "Rizq analysis",
     "aiAnalysisLoading": "Analyzing…",
     "aiAnalysisError": "Analysis failed. Try again.",
@@ -1441,7 +1441,7 @@
     "proPricePeriodMonthly": "SAR / month",
     "proPricePeriodAnnual": "SAR / year",
     "annualSavings": "2 months free",
-    "halalNote": "No riba — a service subscription only",
+    "halalNote": "No hidden fees. A simple monthly service subscription.",
     "toggleMonthly": "Monthly",
     "toggleAnnual": "Annual",
     "featureProposals": "Proposals",
@@ -1454,13 +1454,13 @@
     "featureClientsFree": "10 total",
     "featureClientsPro": "Unlimited",
     "featureClientAiInsights": "Client AI insights",
-    "featureClientAiInsightsFree": "—",
+    "featureClientAiInsightsFree": "Pro only",
     "featureClientAiInsightsPro": "Included",
     "featureGigs": "Gigs",
     "featureGigsFree": "20 / month",
     "featureGigsPro": "Unlimited",
     "featureIncomeForecast": "Income forecasting (AI)",
-    "featureIncomeForecastFree": "—",
+    "featureIncomeForecastFree": "Pro only",
     "featureIncomeForecastPro": "Included",
     "featureInvoices": "Invoices",
     "featureInvoicesFree": "3 / month",
@@ -1472,18 +1472,18 @@
     "featureDocumentsFree": "10 total",
     "featureDocumentsPro": "50 total",
     "featureCsvExport": "CSV export",
-    "featureCsvExportFree": "—",
+    "featureCsvExportFree": "Pro only",
     "featureCsvExportPro": "Included",
     "featureCustomBranding": "Custom branding",
-    "featureCustomBrandingFree": "—",
+    "featureCustomBrandingFree": "Pro only",
     "featureCustomBrandingPro": "Included",
     "featureCleanPdf": "Clean PDF (no watermark)",
-    "featureCleanPdfFree": "—",
+    "featureCleanPdfFree": "Pro only",
     "featureCleanPdfPro": "Included",
     "ctaUpgrade": "Upgrade to Pro",
     "ctaUpgrading": "Processing…",
     "comingSoonTitle": "Checkout launching soon",
-    "comingSoonBody": "We're in beta — contact us directly for early Pro access.",
+    "comingSoonBody": "We're in beta. Contact us directly for early Pro access.",
     "comingSoonContact": "Email us at {email}",
     "comingSoonCta": "Email us",
     "backToUpgrade": "Back",
@@ -1491,7 +1491,7 @@
       "proposals": {
         "headline": "You've reached your monthly proposal limit",
         "benefit1": "30 proposals/month instead of 2",
-        "benefit2": "Clean PDF — no watermark",
+        "benefit2": "Clean PDF, no watermark",
         "benefit3": "Unlimited tone AI",
         "benefit4": "Link proposals to clients and gigs"
       },
@@ -1512,7 +1512,7 @@
       "invoices": {
         "headline": "You've reached your monthly invoice limit",
         "benefit1": "30 invoices/month instead of 3",
-        "benefit2": "Professional PDF — no watermark",
+        "benefit2": "Professional PDF, no watermark",
         "benefit3": "Link invoices to gigs and clients",
         "benefit4": "Automatic payment-status tracking"
       },
@@ -1537,10 +1537,10 @@
   "Hadaf": {
     "eyebrow": "Hadaf Program",
     "pageTitle": "Hadaf Eligibility",
-    "pageSubtitle": "Track your eligibility for the Hadaf freelance income-support program. Informational only — always verify with official Hadaf terms.",
+    "pageSubtitle": "Track your eligibility for the Hadaf freelance income-support program. Informational only. Always verify with official Hadaf terms.",
     "qualifyingTitle": "Congrats! Month {n} of 3",
     "qualifyingSubtitle": "Keep logging your income to maintain eligibility.",
-    "inProgressTitle": "On track — month {n} of 3",
+    "inProgressTitle": "On track: month {n} of 3",
     "notQualifyingTitle": "Below the target this month",
     "monthsToQualify": "{n} more month(s) needed to qualify",
     "currentMonthLabel": "Your paid income this month",
@@ -1549,9 +1549,9 @@
     "gapToTarget": "You need {gap} SAR more to reach the minimum this month",
     "currentMonthIncome": "Your income {income} SAR ✓ (minimum {target} SAR)",
     "estimatedSubsidyLabel": "Estimated monthly subsidy",
-    "subsidyNote": "Calculated at {pct}% of your qualifying-month average — indicative only",
+    "subsidyNote": "Calculated at {pct}% of your qualifying-month average. Indicative only",
     "streakLabel": "{current} of {required} qualifying months",
-    "streakBrokenNote": "⚠ Streak broken — start fresh this month.",
+    "streakBrokenNote": "⚠ Streak broken. Start fresh this month.",
     "noDataTitle": "No projects logged yet",
     "noDataBody": "Log your monthly income to track your Hadaf program eligibility.",
     "noDataCta": "Log your first project",
@@ -1560,10 +1560,10 @@
     "historyColIncome": "Paid income (SAR)",
     "historyColStatus": "Qualifies",
     "hrdfLinkLabel": "Check at hrdf.org.sa",
-    "notGovNote": "Rizq is not a government entity — this is an informational tracking tool only.",
+    "notGovNote": "Rizq is not a government entity. This is an informational tracking tool only.",
     "loadError": "Could not load Hadaf data. Please try again.",
     "actionPlanTitle": "Plan to improve your status",
-    "actionPlanLabel": "AI-generated analysis — not financial advice",
+    "actionPlanLabel": "AI-generated analysis, not financial advice",
     "actionPlanGenerate": "Suggest an action plan",
     "actionPlanGenerating": "Analyzing…",
     "actionPlanRefresh": "Refresh plan",
@@ -1659,27 +1659,27 @@
     "hero": {
       "eyebrow": "The Saudi Freelancer OS",
       "tagline": "Price with confidence. Earn your rizq.",
-      "subtitle": "The all-in-one OS for Saudi freelancers — from pricing to invoicing",
+      "subtitle": "The all-in-one OS for Saudi freelancers, from pricing to invoicing",
       "ctaPrimary": "Start free",
       "ctaSecondary": "Explore the apps",
-      "liveChip": "Live now — 13 tools",
+      "liveChip": "Live now: 13 tools",
       "chip1": "Real Saudi data",
-      "chip2": "100% halal",
+      "chip2": "No hidden fees",
       "chip3": "Labeled AI",
       "chip4": "Free to start"
     },
     "valueProps": {
       "eyebrow": "Why Rizq?",
       "heading": "One tool instead of ten scattered ones.",
-      "sub": "From the first \"what do I charge?\" to the moment you get paid — Rizq walks every step with you, fully transparent.",
+      "sub": "From the first \"what do I charge?\" to the moment you get paid, Rizq walks every step with you, fully transparent.",
       "v1Title": "From pricing to paid",
-      "v1Body": "Price it, send a proposal, run the project, issue the invoice, and earn your rizq — all in one connected place, no double entry.",
+      "v1Body": "Price it, send a proposal, run the project, issue the invoice, and earn your rizq, all in one connected place, no double entry.",
       "v2Title": "Numbers with a known source",
       "v2Body": "No guesswork. Every price carries its source, sample size, and confidence score. We show thin data as-is instead of hiding it.",
       "v3Title": "Honest AI",
-      "v3Body": "Every AI output is clearly labeled \"Rizq analysis\" — you always know it's an estimate, not an absolute fact.",
-      "v4Title": "Fully halal",
-      "v4Body": "No riba in any payment flow. A clear monthly service subscription — no hidden fees, no annual lock-in."
+      "v3Body": "Every AI output is clearly labeled \"Rizq analysis\", so you always know it's an estimate, not an absolute fact.",
+      "v4Title": "Simple, fair pricing",
+      "v4Body": "A clear monthly service subscription. No hidden fees, no annual lock-in, and you can cancel anytime."
     },
     "stats": {
       "ariaLabel": "Rizq's core numbers",
@@ -1690,14 +1690,14 @@
       "s2Label": "AI features",
       "s3Value": "3",
       "s3Label": "transparent data sources",
-      "s4Value": "100",
-      "s4Suffix": "%",
-      "s4Label": "halal"
+      "s4Value": "2",
+      "s4Suffix": "",
+      "s4Label": "languages: Arabic & English"
     },
     "workflow": {
       "eyebrow": "From quote to cash",
       "heading": "Your project's journey, step by step.",
-      "sub": "Five connected steps. What you enter in one flows automatically into the next — your data moves with you.",
+      "sub": "Five connected steps. What you enter in one flows automatically into the next, so your data moves with you.",
       "step1Title": "Price it",
       "step1Body": "Compute your fair rate from real Saudi market data.",
       "step2Title": "Send a proposal",
@@ -1717,7 +1717,7 @@
     "integrations": {
       "eyebrow": "One connected system",
       "heading": "Everything connected.",
-      "caption": "Everything connected — no double entry. From proposal to dashboard, your data moves with you, step by step.",
+      "caption": "Everything connected, no double entry. From proposal to dashboard, your data moves with you, step by step.",
       "node_proposal": "Proposal",
       "node_gig": "Gig",
       "node_invoice": "Invoice",
@@ -1727,12 +1727,12 @@
     "demos": {
       "eyebrow": "Try it yourself",
       "heading": "Tools that work while you browse.",
-      "sub": "Three live demos — drag, switch, see the result instantly. No sign-up, no waiting. An honest glimpse of the product itself.",
+      "sub": "Three live demos: drag, switch, see the result instantly. No sign-up, no waiting. An honest glimpse of the product itself.",
       "windowRate": "Pricing tool",
       "windowInvoice": "Invoices",
       "windowTone": "Proposal studio",
       "rateTitle": "Price your work from a target income",
-      "rateCaption": "Drag the slider to set your target monthly income — Rizq computes your hourly, daily, and per-project rate instantly, using the same logic as the pricing tool.",
+      "rateCaption": "Drag the slider to set your target monthly income. Rizq computes your hourly, daily, and per-project rate instantly, using the same logic as the pricing tool.",
       "rateTargetLabel": "Target monthly income (SAR)",
       "rateHourly": "Hourly",
       "rateDaily": "Daily",
@@ -1742,8 +1742,8 @@
       "rateRangeMax": "High",
       "rateCurrency": "SAR",
       "ratePercentile": "You're in the top {percent}% of the market",
-      "rateRealistic": "Within the market range — a realistic target.",
-      "rateAmbitious": "Above 90% of the market — an ambitious target that needs differentiation.",
+      "rateRealistic": "Within the market range, a realistic target.",
+      "rateAmbitious": "Above 90% of the market, an ambitious target that needs differentiation.",
       "invoiceTitle": "Track an invoice's status",
       "invoiceCaption": "Press \"Advance\" to move the invoice through its states: draft, then sent, then paid. The status color and label change with each step.",
       "invoiceAdvance": "Advance",
@@ -1755,36 +1755,36 @@
       "statusSent": "Sent",
       "statusPaid": "Paid",
       "toneTitle": "Tune your proposal's tone",
-      "toneCaption": "Pick the tone that fits your client — formal, balanced, or friendly — and watch the proposal sentence rewrite itself.",
+      "toneCaption": "Pick the tone that fits your client (formal, balanced, or friendly) and watch the proposal sentence rewrite itself.",
       "toneSnippetLabel": "Proposal excerpt",
       "toneFormal": "Formal",
       "toneBalanced": "Balanced",
       "toneFriendly": "Friendly",
       "toneSample_formal": "I am pleased to submit my proposal to deliver this project to the highest professional standards and within the agreed timeline.",
-      "toneSample_balanced": "Happy to take on your project — I'll make sure it's delivered to a high standard and right on schedule.",
+      "toneSample_balanced": "Happy to take on your project. I'll make sure it's delivered to a high standard and right on schedule.",
       "toneSample_friendly": "Excited about your project! We'll work through it together, step by step, and I'll get it to you looking great and right on time."
     },
     "aiFeatures": {
       "eyebrow": "Rizq AI",
-      "heading": "AI that works for you — honestly labeled.",
+      "heading": "AI that works for you, honestly labeled.",
       "sub": "Every AI output is clearly labeled as an estimate. You always know what's data and what's analysis.",
       "f1Title": "Data-backed pricing",
-      "f1Body": "Price ranges built on real Saudi market data — sample size and confidence shown on every result.",
+      "f1Body": "Price ranges built on real Saudi market data, with sample size and confidence shown on every result.",
       "f2Title": "Proposal generation",
-      "f2Body": "Paste the client's message — Rizq extracts the scope, prices it, and writes the full proposal.",
+      "f2Body": "Paste the client's message. Rizq extracts the scope, prices it, and writes the full proposal.",
       "f3Title": "Income forecasting",
       "f3Body": "Smart financial projections to help you plan your monthly target and manage cash flow with confidence.",
       "f4Title": "Payment reminders",
-      "f4Body": "Rizq flags overdue invoices and helps you draft a professional reminder — you decide when and how to send it.",
-      "honesty": "Every AI output is labeled — you always know it's an estimate, not a fact."
+      "f4Body": "Rizq flags overdue invoices and helps you draft a professional reminder. You decide when and how to send it.",
+      "honesty": "Every AI output is labeled, so you always know it's an estimate, not a fact."
     },
     "trust": {
       "eyebrow": "Transparency first",
       "heading": "Built on trust, not claims.",
       "p1Title": "Open methodology",
       "p1Body": "Every number carries its source and confidence score. We never hide thin data behind a polished interface.",
-      "p2Title": "Halal by design",
-      "p2Body": "No riba in any payment flow. A clear monthly service subscription — no hidden fees, no interest.",
+      "p2Title": "Transparent pricing",
+      "p2Body": "A clear monthly service subscription. No hidden fees, no surprises, and you can cancel anytime.",
       "p3Title": "Your data, your rights",
       "p3Body": "Export all your data anytime, delete it in one click, and we never sell it. Compliant with Saudi PDPL.",
       "methodologyCta": "See our methodology"
@@ -1810,7 +1810,7 @@
     "editProfileLink": "Edit profile",
     "upgradeLink": "Upgrade to Pro",
     "privacySectionTitle": "Privacy & data (PDPL)",
-    "exportDescription": "Download a copy of everything Rizq holds about you — proposals, clients, gigs, invoices, and documents — as a single JSON file.",
+    "exportDescription": "Download a copy of everything Rizq holds about you (proposals, clients, gigs, invoices, and documents) as a single JSON file.",
     "exportButton": "Export my data",
     "exportLoading": "Exporting…",
     "exportErrorUnauthorized": "You must be signed in to export your data.",

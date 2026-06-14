@@ -17,7 +17,7 @@ type Params = { locale: string };
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Clients.list" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 export default async function ClientsListPage({ params }: { params: Promise<Params> }) {

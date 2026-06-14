@@ -78,7 +78,7 @@ export function SignupForm({ locale }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+    <form method="post" onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       <div>
         <label
           htmlFor="signup-email"

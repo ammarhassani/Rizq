@@ -30,13 +30,13 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
   const isAr = locale === "ar";
 
   const labels = {
-    done: isAr ? "تم — أنشئ العرض" : "Done — Generate proposal",
+    done: isAr ? "تم. أنشئ العرض" : "Done. Generate proposal",
     skipAll: isAr ? "تخطّي الكل" : "Skip all",
     skip: isAr ? "تخطّي" : "Skip",
     heading: isAr ? "أسئلة سريعة لتحسين العرض" : "Quick questions to refine your proposal",
     subheading: isAr
-      ? "اختياري — إجاباتك تجعل السعر والنطاق أدق."
-      : "Optional — your answers make the price and scope more accurate.",
+      ? "اختياري. إجاباتك تجعل السعر والنطاق أدق."
+      : "Optional. Your answers make the price and scope more accurate.",
   };
 
   function toggle(fieldName: string, value: unknown) {

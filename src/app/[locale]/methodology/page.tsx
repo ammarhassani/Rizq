@@ -84,11 +84,11 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Methodology" });
   return {
-    title: `${t("title")} — رِزق`,
+    title: `${t("title")} · رِزق`,
     description:
       locale === "ar"
-        ? "كيف يحسب رِزق أسعار العمل الحر في السعودية — منهجية شفافة مبنية على بيانات حقيقية."
-        : "How Rizq calculates Saudi freelance prices — a transparent methodology built on real data.",
+        ? "كيف يحسب رِزق أسعار العمل الحر في السعودية: منهجية شفافة مبنية على بيانات حقيقية."
+        : "How Rizq calculates Saudi freelance prices: a transparent methodology built on real data.",
   };
 }
 

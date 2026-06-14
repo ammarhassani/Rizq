@@ -65,7 +65,7 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
     >
       {/* Label */}
       <p className="text-xs font-medium text-rizq-gold-dark tracking-wide uppercase">
-        {isAr ? "تحليل رِزق — ضبط النبرة" : "Rizq Insight — Adjust tone"}
+        {isAr ? "تحليل رِزق: ضبط النبرة" : "Rizq Insight: Adjust tone"}
       </p>
 
       {/* Tone buttons */}

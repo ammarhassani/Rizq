@@ -172,7 +172,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
             value: c.id,
             label: isAr ? c.name_ar : c.name_en,
           }))}
-          placeholder={isAr ? "— اختر —" : "— Select —"}
+          placeholder={isAr ? "اختر…" : "Select…"}
           searchPlaceholder={isAr ? "ابحث…" : "Search…"}
           emptyText={isAr ? "لا توجد نتائج" : "No results"}
           allowClear

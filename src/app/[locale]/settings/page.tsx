@@ -18,7 +18,7 @@ type Params = { locale: string };
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Settings" });
-  return { title: `${t("pageTitle")} — رِزق` };
+  return { title: `${t("pageTitle")} · رِزق` };
 }
 
 function formatDate(iso: string | null | undefined, locale: "ar" | "en"): string {

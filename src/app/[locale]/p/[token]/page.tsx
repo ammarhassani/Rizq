@@ -120,19 +120,19 @@ export async function generateMetadata({
 
   const description =
     locale === "ar"
-      ? `عرض تقديمي من ${brandName ?? "مستقل"} — السعر المقترح: ${anchor ? fmt.format(anchor) + " ريال" : "—"}`
-      : `Proposal from ${brandName ?? "freelancer"} — Proposed price: ${anchor ? fmt.format(anchor) + " SAR" : "—"}`;
+      ? `عرض تقديمي من ${brandName ?? "مستقل"}. السعر المقترح: ${anchor ? fmt.format(anchor) + " ريال" : "غير محدّد"}`
+      : `Proposal from ${brandName ?? "freelancer"}. Proposed price: ${anchor ? fmt.format(anchor) + " SAR" : "N/A"}`;
 
   const title =
     locale === "ar"
-      ? `عرض تقديمي — رِزق`
-      : `Proposal — Rizq`;
+      ? `عرض تقديمي رِزق`
+      : `Rizq Proposal`;
 
   return {
     title,
     description,
     openGraph: {
-      title: brandName ? `${brandName} — ${locale === "ar" ? "عرض رِزق" : "Rizq Proposal"}` : title,
+      title: brandName ? `${brandName}, ${locale === "ar" ? "عرض رِزق" : "Rizq Proposal"}` : title,
       description,
       type: "website",
     },

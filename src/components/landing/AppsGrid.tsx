@@ -65,7 +65,7 @@ export async function AppsGrid({ locale }: Props) {
                 <Link
                   href={app.href}
                   className={`group relative flex flex-col items-start gap-3 p-4 sm:p-5 rounded-2xl border border-rizq-gold/20 bg-rizq-cream hover:border-rizq-green/30 hover:bg-white hover:shadow-[0_4px_20px_-4px_rgba(26,95,63,0.18)] transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 min-h-[44px] ${font}`}
-                  aria-label={`${name} — ${tagline}`}
+                  aria-label={`${name}: ${tagline}`}
                 >
                   {/* Icon tile */}
                   <span

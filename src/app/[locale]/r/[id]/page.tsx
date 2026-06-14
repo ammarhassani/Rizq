@@ -63,10 +63,10 @@ export async function generateMetadata({
       : `Median: ${fmt.format(median)} SAR · ${sName} · ${cName}`;
 
   return {
-    title: `${tShare("title")} — رِزق`,
+    title: `${tShare("title")} · رِزق`,
     description,
     openGraph: {
-      title: `${tShare("title")} — ${sName}`,
+      title: `${tShare("title")} · ${sName}`,
       description,
       type: "website",
     },

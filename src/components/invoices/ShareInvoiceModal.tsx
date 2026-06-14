@@ -101,8 +101,8 @@ export function ShareInvoiceModal({
 
   const waText = shareUrl
     ? isAr
-      ? `فاتورة احترافية من رِزق — سعّر بثقة، اقبض رزقك.\n${shareUrl}`
-      : `A professional invoice from Rizq — Price with confidence, earn your rizq.\n${shareUrl}`
+      ? `فاتورة احترافية من رِزق. سعّر بثقة، اقبض رزقك.\n${shareUrl}`
+      : `A professional invoice from Rizq. Price with confidence, earn your rizq.\n${shareUrl}`
     : "";
 
   const waHref = shareUrl

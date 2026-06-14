@@ -199,7 +199,7 @@ export function UpgradeModal({ open, onClose, locale, reason }: Props) {
           ))}
         </ul>
 
-        {/* Halal / price note */}
+        {/* Pricing note */}
         <p className={`text-xs text-rizq-ink-soft/60 mb-5 ${font}`}>
           {t("halalNote")}
         </p>

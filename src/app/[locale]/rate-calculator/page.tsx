@@ -19,7 +19,7 @@ type Params = { locale: string };
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "RateCalculator" });
-  return { title: `${t("pageTitle")} — رِزق` };
+  return { title: `${t("pageTitle")} · رِزق` };
 }
 
 export type SpecialtyOption = { id: string; slug: string; name_ar: string; name_en: string };

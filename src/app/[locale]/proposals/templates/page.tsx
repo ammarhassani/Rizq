@@ -37,7 +37,7 @@ export async function generateMetadata({
     locale,
     namespace: "Proposals.templates",
   });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 // ---------------------------------------------------------------------------

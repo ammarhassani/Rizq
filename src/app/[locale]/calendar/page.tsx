@@ -91,7 +91,7 @@ function narrowEvent(raw: Record<string, unknown>): CalendarEvent {
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Calendar" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 export default async function CalendarPage({ params }: { params: Promise<Params> }) {

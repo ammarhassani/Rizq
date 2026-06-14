@@ -35,7 +35,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Proposals.new" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 // ---------------------------------------------------------------------------
@@ -156,5 +156,5 @@ function tierYears(min: number, max: number | null, locale: "ar" | "en"): string
   const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format;
   if (max === null) return locale === "ar" ? `${fmt(min)}+ سنوات` : `${fmt(min)}+ yrs`;
   if (min === max) return locale === "ar" ? `${fmt(min)} سنة` : `${fmt(min)} yr`;
-  return locale === "ar" ? `${fmt(min)}–${fmt(max)} سنوات` : `${fmt(min)}–${fmt(max)} yrs`;
+  return locale === "ar" ? `${fmt(min)} إلى ${fmt(max)} سنوات` : `${fmt(min)} to ${fmt(max)} yrs`;
 }

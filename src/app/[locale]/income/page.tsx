@@ -49,7 +49,7 @@ function calcChange(current: number | null, prev: number | null): number | null 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Income.list" });
-  return { title: `${t("title")} — رِزق` };
+  return { title: `${t("title")} · رِزق` };
 }
 
 export default async function IncomePage({ params }: { params: Promise<Params> }) {
@@ -203,7 +203,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
               </span>
               {projectionRow.confidence_low != null && projectionRow.confidence_high != null && (
                 <span className="text-xs text-rizq-ink-soft/50">
-                  ({fmtPrice(projectionRow.confidence_low, locale as "ar" | "en")} – {fmtPrice(projectionRow.confidence_high, locale as "ar" | "en")})
+                  ({fmtPrice(projectionRow.confidence_low, locale as "ar" | "en")} {locale === "ar" ? "إلى" : "to"} {fmtPrice(projectionRow.confidence_high, locale as "ar" | "en")})
                 </span>
               )}
             </div>

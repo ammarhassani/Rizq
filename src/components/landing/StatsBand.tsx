@@ -21,7 +21,7 @@ const STATS: Stat[] = [
 
 /**
  * Compact strip of real product numbers (13 tools · 25+ AI features ·
- * 3 data sources · 100% halal). Each number counts up once when the band
+ * 3 data sources · 2 languages). Each number counts up once when the band
  * scrolls into view. Client-only so it can observe intersection; honors
  * reduced motion (renders final values immediately, no count-up).
  *
@@ -105,7 +105,11 @@ function StatItem({
       return;
     }
     const node = ref.current;
-    if (!node) return;
+    // No node to observe: still show the real number rather than a stuck 0.
+    if (!node) {
+      setDisplay(value);
+      return;
+    }
 
     let raf = 0;
     const run = () => {
@@ -123,6 +127,16 @@ function StatItem({
       raf = requestAnimationFrame(tick);
     };
 
+    // If the band is already on screen at mount, fire immediately instead of
+    // waiting for an intersection change that may never come.
+    const rect = node.getBoundingClientRect();
+    const inViewNow =
+      rect.top < window.innerHeight && rect.bottom > 0 && rect.height > 0;
+    if (inViewNow) {
+      run();
+      return () => cancelAnimationFrame(raf);
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -132,12 +146,24 @@ function StatItem({
           }
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.25, rootMargin: "0px 0px -10% 0px" }
     );
     observer.observe(node);
+
+    // Safety net: never leave the number stuck at 0. If the observer hasn't
+    // fired within a short window (e.g. it attached after the element settled
+    // in view, or the threshold is never crossed), snap to the final value.
+    const fallback = window.setTimeout(() => {
+      if (!startedRef.current) {
+        startedRef.current = true;
+        setDisplay(value);
+      }
+    }, 1500);
+
     return () => {
       observer.disconnect();
       cancelAnimationFrame(raf);
+      window.clearTimeout(fallback);
     };
   }, [value, reduce]);
 

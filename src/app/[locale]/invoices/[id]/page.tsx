@@ -18,7 +18,7 @@ import { daysOverdue } from "@/lib/invoices/overdue";
 type Params = { locale: string; id: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  return { title: "فاتورة — رِزق" };
+  return { title: "فاتورة · رِزق" };
 }
 
 export default async function InvoiceDetailPage({

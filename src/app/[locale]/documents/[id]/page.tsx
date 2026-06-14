@@ -14,7 +14,7 @@ import { DocumentDetailClient } from "@/components/documents/DocumentDetailClien
 type Params = { locale: string; id: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  return { title: "وثيقة — رِزق" };
+  return { title: "وثيقة · رِزق" };
 }
 
 export default async function DocumentDetailPage({ params }: { params: Promise<Params> }) {

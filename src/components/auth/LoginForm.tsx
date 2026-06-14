@@ -72,7 +72,7 @@ export function LoginForm({ locale }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} method="post" noValidate className="space-y-4">
       <div>
         <label
           htmlFor="login-email"

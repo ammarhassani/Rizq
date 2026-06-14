@@ -35,7 +35,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }) {
   const { locale } = await params;
-  return { title: `عرض سعر — رِزق` };
+  return { title: `عرض سعر · رِزق` };
 }
 
 // ---------------------------------------------------------------------------
