@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBusinessInsightsPrompt, buildDeterministicInsights } from "./businessInsights";
+import { buildBusinessInsightsPrompt, buildDeterministicInsights, stripEmDashes } from "./businessInsights";
 import type { BusinessInsightsCtx } from "./businessInsights";
 
 const baseCtx: BusinessInsightsCtx = {
@@ -56,9 +56,9 @@ describe("buildBusinessInsightsPrompt", () => {
     expect(prompt).toMatch(/العربية|ar.*en|بالعربية/);
   });
 
-  it("contains the honesty-label requirement", () => {
+  it("instructs the model not to use em dashes", () => {
     const prompt = buildBusinessInsightsPrompt(baseCtx);
-    expect(prompt).toContain("ليس استشارة مهنية");
+    expect(prompt).toContain("الشرطة الطويلة");
   });
 
   it("handles empty ctx gracefully (no throws)", () => {
@@ -105,6 +105,13 @@ describe("buildDeterministicInsights (AI fallback)", () => {
     expect(buildDeterministicInsights(empty)).toEqual([]);
   });
 
+  it("never emits em or en dashes", () => {
+    for (const i of buildDeterministicInsights(baseCtx)) {
+      expect(i.ar).not.toMatch(/[—–]/);
+      expect(i.en).not.toMatch(/[—–]/);
+    }
+  });
+
   it("flags overdue invoices when present", () => {
     const ctx: BusinessInsightsCtx = {
       ...baseCtx,
@@ -115,5 +122,20 @@ describe("buildDeterministicInsights (AI fallback)", () => {
     };
     const deadline = buildDeterministicInsights(ctx).find((i) => i.kind === "deadline");
     expect(deadline?.en).toContain("overdue");
+  });
+});
+
+describe("stripEmDashes", () => {
+  it("replaces a spaced em dash with a comma (en) and Arabic comma (ar)", () => {
+    expect(stripEmDashes("an automated insight — not advice", "en")).toBe("an automated insight, not advice");
+    expect(stripEmDashes("تحليل آلي — ليس استشارة", "ar")).toBe("تحليل آلي، ليس استشارة");
+  });
+
+  it("handles en dashes too and collapses extra spaces", () => {
+    expect(stripEmDashes("a – b", "en")).toBe("a, b");
+  });
+
+  it("leaves regular hyphens in ranges untouched", () => {
+    expect(stripEmDashes("1000-1500 SAR", "en")).toBe("1000-1500 SAR");
   });
 });

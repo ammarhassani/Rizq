@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { ThumbsUp, ThumbsDown, RefreshCw, Sparkles } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ThumbsUp, ThumbsDown, RefreshCw, Sparkles, ChevronDown } from "lucide-react";
 import { getBusinessInsightsAction, submitInsightFeedbackAction } from "@/app/actions/dashboard/insights";
 import type { InsightsActionResult } from "@/app/actions/dashboard/insights";
+
+/** localStorage key for the collapsed/expanded preference (persists across reloads). */
+const COLLAPSE_KEY = "rizq.insights.collapsed";
 
 type Props = { locale: "ar" | "en" };
 
@@ -33,6 +36,30 @@ export function InsightsWidget({ locale }: Props) {
   const [cached, setCached] = useState(false);
   const [votes, setVotes] = useState<Record<number, "up" | "down">>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const collapseMounted = useRef(false);
+
+  // Restore the collapsed preference once on mount.
+  useEffect(() => {
+    if (collapseMounted.current) return;
+    collapseMounted.current = true;
+    try {
+      if (localStorage.getItem(COLLAPSE_KEY) === "true") setCollapsed(true);
+    } catch {
+      /* localStorage may be blocked */
+    }
+  }, []);
+
+  const toggleCollapsed = () =>
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(COLLAPSE_KEY, String(next));
+      } catch {
+        /* noop */
+      }
+      return next;
+    });
 
   const load = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true);
@@ -110,35 +137,55 @@ export function InsightsWidget({ locale }: Props) {
 
   return (
     <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 col-span-full">
-      {/* Header */}
-      <div className={`flex items-center justify-between mb-5 ${font}`}>
-        <div className="flex items-center gap-2">
+      {/* Header — the title + chevron toggle collapse; state persists. */}
+      <div className={`flex items-center justify-between ${collapsed ? "" : "mb-5"} ${font}`}>
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-controls="rizq-insights-body"
+          className="group -ms-1 flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-rizq-gold/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40"
+        >
           <Sparkles className="h-4 w-4 text-rizq-gold" />
           <span className={`text-xs font-semibold text-rizq-ink-soft/70 uppercase tracking-wide ${font}`}>
             {isAr ? "تحليل رِزق" : "Rizq Insights"}
           </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {cached && (
-            <span className={`text-xs text-rizq-ink-soft/50 ${font}`}>
-              {isAr ? "محفوظ مؤقتًا" : "Cached"}
+          {collapsed && insights.length > 0 && (
+            <span className="tabular font-sans inline-flex min-w-4 items-center justify-center rounded-full bg-rizq-gold/15 px-1.5 text-[11px] text-rizq-gold-deep">
+              {insights.length}
             </span>
           )}
-          <button
-            onClick={() => load(true)}
-            disabled={refreshing}
-            className="flex items-center gap-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
-            aria-label={isAr ? "تحديث" : "Refresh"}
-          >
-            <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
-            <span className={font}>{isAr ? "تحديث" : "Refresh"}</span>
-          </button>
-        </div>
+          <ChevronDown
+            className={`h-3.5 w-3.5 text-rizq-ink-soft/50 transition-transform motion-reduce:transition-none ${collapsed ? "" : "rotate-180"}`}
+            aria-hidden
+          />
+        </button>
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            {cached && (
+              <span className={`text-xs text-rizq-ink-soft/50 ${font}`}>
+                {isAr ? "محفوظ مؤقتًا" : "Cached"}
+              </span>
+            )}
+            <button
+              onClick={() => load(true)}
+              disabled={refreshing}
+              className="flex items-center gap-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
+              aria-label={isAr ? "تحديث" : "Refresh"}
+            >
+              <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
+              <span className={font}>{isAr ? "تحديث" : "Refresh"}</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Insight cards */}
-      <div className="space-y-3">
-        {insights.map((insight, i) => (
+      {/* Body — collapses away when toggled shut. */}
+      {!collapsed && (
+        <div id="rizq-insights-body" className="animate-fade-in motion-reduce:animate-none">
+          {/* Insight cards */}
+          <div className="space-y-3">
+            {insights.map((insight, i) => (
           <div key={i} className={`rounded-2xl border p-4 ${kindColors[insight.kind]}`}>
             <p className={`text-sm leading-relaxed ${font}`}>
               {isAr ? insight.ar : insight.en}
@@ -176,10 +223,12 @@ export function InsightsWidget({ locale }: Props) {
         ))}
       </div>
 
-      {generatedAt && (
-        <p className={`mt-4 text-xs text-rizq-ink-soft/40 ${font}`}>
-          {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
-        </p>
+          {generatedAt && (
+            <p className={`mt-4 text-xs text-rizq-ink-soft/40 ${font}`}>
+              {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

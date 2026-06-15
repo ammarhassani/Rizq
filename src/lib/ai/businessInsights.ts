@@ -32,6 +32,15 @@ function fmtNum(n: number): string {
 }
 
 /**
+ * Replace em/en dashes (a model-output tic the founder dislikes) with a comma.
+ * Only touches — and – ; regular hyphens in ranges like "1000-1500" are kept.
+ */
+export function stripEmDashes(s: string, locale: "ar" | "en"): string {
+  const sep = locale === "ar" ? "، " : ", ";
+  return s.replace(/\s*[—–]\s*/g, sep).replace(/\s{2,}/g, " ").trim();
+}
+
+/**
  * Deterministic, non-AI insights computed directly from the freelancer's data.
  * Used as a graceful fallback when the AI provider is unavailable, so the
  * dashboard card always shows something useful and truthful. These are plain
@@ -157,8 +166,8 @@ ${deadlinesSummary}
 - نبّه على المخاطر (فواتير متأخرة، عملاء لم يتم التواصل معهم >60 يومًا، مواعيد قادمة).
 - أبرز الفرص (عملاء بإمكانية تكرار، شهر دخل جيد).
 - لا تقدم استشارة مالية أو قانونية.
-- ضع في كل رؤية: "هذا تحليل آلي — ليس استشارة مهنية" (هذا الشرط إلزامي في كل عنصر ar).
 - كل رؤية جملة أو جملتان.
+- لا تستخدم الشرطة الطويلة (—) أبدًا؛ استخدم فاصلة أو جملة جديدة.
 - النبرة: سعودية مهذبة، مباشرة.
 - أعد النتيجة بالعربية (ar) والإنجليزية (en) مع تصنيف kind: income|client|proposal|deadline|general.`;
 }
@@ -178,7 +187,14 @@ export async function generateBusinessInsights(
       prompt,
       abortSignal: AbortSignal.timeout(20_000),
     });
-    return result.object;
+    // Safety net: strip any em/en dashes the model still emits.
+    return {
+      insights: result.object.insights.map((i) => ({
+        ...i,
+        ar: stripEmDashes(i.ar, "ar"),
+        en: stripEmDashes(i.en, "en"),
+      })),
+    };
   } catch (err) {
     console.error("[generateBusinessInsights] failed", err);
     return null;
