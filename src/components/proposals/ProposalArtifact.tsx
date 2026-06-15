@@ -1448,19 +1448,15 @@ export function ProposalArtifact({ data, locale }: Props) {
       className={`w-full max-w-2xl mx-auto print:max-w-none ${font}`}
       id="proposal-artifact"
     >
-      {/* Print-only header line */}
-      <div className="hidden print:block mb-6 pb-4 border-b border-rizq-gold/30">
-        <span className="font-arabic text-xl font-bold text-rizq-green">رِزق</span>
-      </div>
-
       <div className="space-y-4 sm:space-y-5">
-        {/* Branding + client_ref side-by-side on desktop */}
+        {/* New document model leads with the cover (its own print page); legacy
+            artifacts pair branding + client_ref side-by-side. */}
         {(() => {
           const brandingIdx = sections.findIndex((s) => s.id === "branding");
           const clientIdx = sections.findIndex((s) => s.id === "client_ref");
-          const hasBoth = brandingIdx !== -1 && clientIdx !== -1;
+          const hasLegacyHeader = brandingIdx !== -1 && clientIdx !== -1;
 
-          if (hasBoth) {
+          if (hasLegacyHeader) {
             const rest = sections.filter(
               (s) => s.id !== "branding" && s.id !== "client_ref"
             );
@@ -1475,9 +1471,22 @@ export function ProposalArtifact({ data, locale }: Props) {
             );
           }
 
-          return sections.map((s) => renderSection(s, locale));
+          return sections.map((s) =>
+            s.id === "cover" ? (
+              <div key={s.id} className="proposal-cover-page">
+                {renderSection(s, locale)}
+              </div>
+            ) : (
+              renderSection(s, locale)
+            )
+          );
         })()}
       </div>
+
+      {/* Brand footer — repeats on every printed page (hidden on screen) */}
+      <p className="proposal-print-footer" aria-hidden>
+        رِزق · Rizq
+      </p>
     </div>
   );
 }

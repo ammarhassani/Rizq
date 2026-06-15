@@ -14,6 +14,8 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
+import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles";
+import { PrintButton } from "@/components/proposals/PrintButton";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -132,6 +134,8 @@ export default async function ProposalDetailPage({
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="reading">
       <div dir={isAr ? "rtl" : "ltr"}>
+        {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
+        <ProposalPrintStyles />
         {/* Back link */}
         <Link
           href="/proposals"
@@ -164,6 +168,11 @@ export default async function ProposalDetailPage({
 
         {/* Actions */}
         <div className="mt-6 space-y-4">
+          {artifactData && (
+            <div className="print:hidden">
+              <PrintButton label={isAr ? "تنزيل PDF" : "Download PDF"} locale={locale as "ar" | "en"} />
+            </div>
+          )}
           <ProposalDetailActions
             locale={locale as "ar" | "en"}
             proposalId={id}

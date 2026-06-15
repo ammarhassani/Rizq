@@ -14,6 +14,7 @@ import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
+import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles";
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogProposalView } from "@/components/proposals/LogProposalView";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -184,16 +185,8 @@ export default async function ProposalSharePage({
 
   return (
     <>
-      {/* Print styles — A4, hide chrome, keep artifact readable */}
-      <style>{`
-        @media print {
-          nav, header, .print-hidden { display: none !important; }
-          body { background: white; }
-          #proposal-artifact { max-width: 100% !important; }
-          section { break-inside: avoid; page-break-inside: avoid; }
-          @page { size: A4; margin: 20mm 15mm; }
-        }
-      `}</style>
+      {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
+      <ProposalPrintStyles />
 
       <div className="relative min-h-screen flex flex-col bg-paper" dir={dir}>
         {/* Subtle dot grid — same as /r/[id] */}
