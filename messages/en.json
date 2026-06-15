@@ -979,6 +979,32 @@
         "close": "Close"
       }
     },
+    "refine": {
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "regenerate": "Regenerate",
+      "regenerating": "Regenerating…",
+      "tone": "Tone",
+      "tone_formal": "Formal",
+      "tone_balanced": "Balanced",
+      "tone_friendly": "Friendly",
+      "tone_persuasive": "Persuasive",
+      "saved": "Saved",
+      "genericError": "Could not complete that. Please try again.",
+      "aiUnavailable": "AI is unavailable right now. You can edit this manually.",
+      "remove": "Remove",
+      "phaseTitle": "Phase title",
+      "phaseBody": "Phase description",
+      "addPhase": "Add phase",
+      "noDeliverables": "No deliverables to describe yet.",
+      "deliverableDescription": "Short description for this deliverable",
+      "assumptions": "Assumptions",
+      "exclusions": "Exclusions",
+      "addAssumption": "Add assumption",
+      "addExclusion": "Add exclusion"
+    },
     "templates": {
       "eyebrow": "Template library",
       "title": "Your templates.",

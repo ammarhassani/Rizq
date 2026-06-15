@@ -155,9 +155,16 @@ export default async function ProposalDetailPage({
           </div>
         )}
 
-        {/* Artifact */}
+        {/* Artifact — editable (per-section inline refine) only for final/sent
+            proposals the owner can edit. The public share page passes neither
+            prop, staying strictly read-only. */}
         {artifactData ? (
-          <ProposalArtifact data={artifactData} locale={locale as "ar" | "en"} />
+          <ProposalArtifact
+            data={artifactData}
+            locale={locale as "ar" | "en"}
+            editable={canEdit}
+            proposalId={id}
+          />
         ) : (
           <div
             className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/60 p-8 text-center text-sm text-rizq-ink-soft ${font}`}

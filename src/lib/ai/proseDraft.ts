@@ -76,6 +76,61 @@ export const PROSE_FIELDS: readonly ProseField[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Section ↔ prose-field mapping (PURE — unit-tested) — Phase E selective regen
+// ---------------------------------------------------------------------------
+
+/**
+ * The editable PROSE section ids that map onto prose fields. (cover/timeline/
+ * pricing/etc. are never AI-rewritten, so they are not in this map.)
+ */
+export type EditableProseSectionId =
+  | "cover_letter"
+  | "understanding"
+  | "approach"
+  | "scope_of_work"
+  | "assumptions";
+
+/**
+ * Which prose field(s) a section owns. `scope_of_work` only owns the
+ * deliverable descriptions (the deliverables list itself is edited via the
+ * structured EditProposalForm, never the AI prose pass). `assumptions` owns
+ * BOTH assumptions and exclusions because they share one artifact section.
+ */
+const SECTION_PROSE_FIELDS: Record<EditableProseSectionId, readonly ProseField[]> = {
+  cover_letter: ["coverLetter"],
+  understanding: ["understanding"],
+  approach: ["approach"],
+  scope_of_work: ["deliverableDescriptions"],
+  assumptions: ["assumptions", "exclusions"],
+};
+
+/**
+ * Pick ONLY the prose key(s) that belong to a given artifact section, dropping
+ * everything else. This is the chokepoint that makes single-section regen safe:
+ * feeding `pickProseField(fullProse, "approach")` into `mergeProseIntoArtifact`
+ * updates ONLY the approach section and can never clobber another section's
+ * (possibly hand-edited) content.
+ *
+ * Unknown / non-prose section ids return {} (a no-op for the merge).
+ */
+export function pickProseField(
+  prose: ProseDraft | Partial<ProseDraft>,
+  sectionId: string
+): Partial<ProseDraft> {
+  const fields = SECTION_PROSE_FIELDS[sectionId as EditableProseSectionId];
+  if (!fields) return {};
+  const out: Partial<ProseDraft> = {};
+  for (const f of fields) {
+    if (prose[f] !== undefined) {
+      // Index-narrowing across a union of value types: assign field-by-field.
+      // Each field's value is structurally compatible with Partial<ProseDraft>.
+      (out as Record<ProseField, unknown>)[f] = prose[f];
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Prompt builder (PURE — unit-tested)
 // ---------------------------------------------------------------------------
 
@@ -176,6 +231,76 @@ Produce these sections:
 - لا تستخدم الشرطة الطويلة (—) أبدًا؛ استخدم فاصلة أو جملة جديدة. Never use the em dash (—); use a comma or a new sentence instead.
 - لا تقدّم وعودًا قانونية أو مالية. Make no legal or financial promises.
 - اكتب نصًا قابلًا للتحرير من قبل المستقل. These are editable drafts for the freelancer, keep them concise.`;
+}
+
+// ---------------------------------------------------------------------------
+// Prompt-args assembly from a proposal row (shared by the streaming draft route
+// AND the Phase E single-section regen action, so both build an IDENTICAL prompt)
+// ---------------------------------------------------------------------------
+
+/**
+ * The minimal brand/profile bag the prompt needs. Structurally satisfied by
+ * `UserBrandDefaults` from `@/lib/proposals/brand` without importing it here
+ * (this module stays client-safe + dependency-light).
+ */
+export type ProsePromptBrand = {
+  freelancerName: string;
+  bioAr: string | null;
+  bioEn: string | null;
+  yearsExperience: number | null;
+};
+
+/** Raw proposal fields the prompt assembly reads (subset of the proposals row). */
+export type ProsePromptProposal = {
+  scope: Scope;
+  briefText: string | null;
+  briefLanguage: string | null;
+  priceMin: number;
+  priceAnchor: number;
+  priceMax: number;
+};
+
+/**
+ * Assemble `ProsePromptArgs` from a proposal row + brand defaults, applying the
+ * same conventions as the streaming draft route: locale from brief_language,
+ * goals from `scope.extras.project_goals`, deliverables filtered to strings,
+ * and the locale-appropriate bio. PURE.
+ */
+export function proposalProsePromptArgs(
+  proposal: ProsePromptProposal,
+  brand: ProsePromptBrand
+): ProsePromptArgs {
+  const { scope } = proposal;
+  const locale: "ar" | "en" = proposal.briefLanguage === "en" ? "en" : "ar";
+
+  const extras = (scope.extras ?? {}) as Record<string, unknown>;
+  const goals =
+    typeof extras["project_goals"] === "string"
+      ? (extras["project_goals"] as string)
+      : null;
+
+  const deliverables = Array.isArray(scope.deliverables)
+    ? scope.deliverables.filter((d): d is string => typeof d === "string")
+    : [];
+
+  return {
+    scope,
+    brief: proposal.briefText ?? "",
+    goals,
+    profile: {
+      freelancerName: brand.freelancerName,
+      bio: locale === "en" ? brand.bioEn ?? brand.bioAr : brand.bioAr ?? brand.bioEn,
+      yearsExperience: brand.yearsExperience,
+      specialty: scope.specialty ?? null,
+    },
+    price: {
+      min: Number(proposal.priceMin),
+      anchor: Number(proposal.priceAnchor),
+      max: Number(proposal.priceMax),
+    },
+    deliverables,
+    locale,
+  };
 }
 
 // ---------------------------------------------------------------------------

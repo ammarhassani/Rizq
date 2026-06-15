@@ -21,6 +21,7 @@ import { deepseek, REASONING_MODEL, isAIConfigured } from "@/lib/ai/client";
 import {
   ProseSchema,
   buildProsePrompt,
+  proposalProsePromptArgs,
   mergeProseIntoArtifact,
   PROSE_FIELDS,
   type ProseField,
@@ -83,16 +84,6 @@ export async function POST(
       : null;
 
     const scope = (proposal.scope_json ?? {}) as Scope;
-    const briefText = (proposal.brief_text as string | null) ?? "";
-    const briefLanguage = (proposal.brief_language as string | null) ?? "ar";
-    const locale: "ar" | "en" = briefLanguage === "en" ? "en" : "ar";
-
-    // Goals live in scope_json.extras.project_goals (threaded by generateProposal).
-    const extras = (scope.extras ?? {}) as Record<string, unknown>;
-    const goals =
-      typeof extras["project_goals"] === "string"
-        ? (extras["project_goals"] as string)
-        : null;
 
     // Profile (brand defaults) for voice/bio context.
     const brand = await loadUserBrandDefaults(
@@ -101,28 +92,20 @@ export async function POST(
       user.email ?? null
     );
 
-    const deliverables = Array.isArray(scope.deliverables)
-      ? scope.deliverables.filter((d): d is string => typeof d === "string")
-      : [];
-
-    let prompt = buildProsePrompt({
-      scope,
-      brief: briefText,
-      goals,
-      profile: {
-        freelancerName: brand.freelancerName,
-        bio: locale === "en" ? brand.bioEn ?? brand.bioAr : brand.bioAr ?? brand.bioEn,
-        yearsExperience: brand.yearsExperience,
-        specialty: scope.specialty ?? null,
-      },
-      price: {
-        min: Number(proposal.price_min),
-        anchor: Number(proposal.price_anchor),
-        max: Number(proposal.price_max),
-      },
-      deliverables,
-      locale,
-    });
+    // Shared assembly (identical to the Phase E single-section regen action).
+    let prompt = buildProsePrompt(
+      proposalProsePromptArgs(
+        {
+          scope,
+          briefText: proposal.brief_text as string | null,
+          briefLanguage: proposal.brief_language as string | null,
+          priceMin: Number(proposal.price_min),
+          priceAnchor: Number(proposal.price_anchor),
+          priceMax: Number(proposal.price_max),
+        },
+        brand
+      )
+    );
 
     // Phase E narrowing: ask the model to refine just one field. The other
     // fields may still be returned (schema requires them) but the client merges

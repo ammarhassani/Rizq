@@ -979,6 +979,32 @@
         "close": "إغلاق"
       }
     },
+    "refine": {
+      "edit": "تعديل",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "cancel": "إلغاء",
+      "regenerate": "إعادة الصياغة",
+      "regenerating": "جارٍ إعادة الصياغة…",
+      "tone": "النبرة",
+      "tone_formal": "رسمية",
+      "tone_balanced": "متوازنة",
+      "tone_friendly": "ودّية",
+      "tone_persuasive": "مقنعة للسعر",
+      "saved": "تم الحفظ",
+      "genericError": "تعذّر تنفيذ العملية. حاول مرة أخرى.",
+      "aiUnavailable": "خدمة الذكاء الاصطناعي غير متاحة حاليًا. يمكنك التعديل يدويًا.",
+      "remove": "حذف",
+      "phaseTitle": "عنوان المرحلة",
+      "phaseBody": "وصف المرحلة",
+      "addPhase": "إضافة مرحلة",
+      "noDeliverables": "لا توجد مخرجات لوصفها بعد.",
+      "deliverableDescription": "وصف مختصر لهذا المخرج",
+      "assumptions": "الافتراضات",
+      "exclusions": "الاستثناءات",
+      "addAssumption": "إضافة افتراض",
+      "addExclusion": "إضافة استثناء"
+    },
     "templates": {
       "eyebrow": "مكتبة القوالب",
       "title": "قوالبك.",

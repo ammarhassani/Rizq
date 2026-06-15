@@ -3,6 +3,8 @@ import {
   ProseSchema,
   buildProsePrompt,
   mergeProseIntoArtifact,
+  pickProseField,
+  type ProseDraft,
   type ProsePromptArgs,
 } from "./proseDraft";
 import { buildArtifactData, type ArtifactData } from "@/lib/proposals/artifact";
@@ -352,5 +354,111 @@ describe("mergeProseIntoArtifact", () => {
     // Range hyphens are preserved.
     const merged2 = mergeProseIntoArtifact(freshArtifact(), { coverLetter: "1000-1500 SAR" });
     expect(sectionById(merged2, "cover_letter")!.content.body).toBe("1000-1500 SAR");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// pickProseField — selective single-section regen mapping (Phase E)
+// ---------------------------------------------------------------------------
+
+describe("pickProseField", () => {
+  const full: ProseDraft = {
+    coverLetter: "خطاب",
+    understanding: "فهم",
+    approach: [
+      { title: "أ", body: "ب" },
+      { title: "ج", body: "د" },
+    ],
+    deliverableDescriptions: ["وصف 1", "وصف 2"],
+    assumptions: ["افتراض 1", "افتراض 2"],
+    exclusions: ["استثناء 1"],
+  };
+
+  it("cover_letter → only { coverLetter }", () => {
+    expect(pickProseField(full, "cover_letter")).toEqual({ coverLetter: "خطاب" });
+  });
+
+  it("understanding → only { understanding }", () => {
+    expect(pickProseField(full, "understanding")).toEqual({ understanding: "فهم" });
+  });
+
+  it("approach → only { approach }", () => {
+    const picked = pickProseField(full, "approach");
+    expect(Object.keys(picked)).toEqual(["approach"]);
+    expect(picked.approach).toHaveLength(2);
+  });
+
+  it("scope_of_work → only { deliverableDescriptions } (NOT the deliverables list)", () => {
+    expect(pickProseField(full, "scope_of_work")).toEqual({
+      deliverableDescriptions: ["وصف 1", "وصف 2"],
+    });
+  });
+
+  it("assumptions → BOTH { assumptions, exclusions }", () => {
+    const picked = pickProseField(full, "assumptions");
+    expect(Object.keys(picked).sort()).toEqual(["assumptions", "exclusions"]);
+    expect(picked.assumptions).toEqual(["افتراض 1", "افتراض 2"]);
+    expect(picked.exclusions).toEqual(["استثناء 1"]);
+  });
+
+  it("unknown / non-prose section id → {}", () => {
+    expect(pickProseField(full, "pricing")).toEqual({});
+    expect(pickProseField(full, "cover")).toEqual({});
+    expect(pickProseField(full, "does_not_exist")).toEqual({});
+  });
+
+  it("omits keys absent from a partial prose object", () => {
+    // assumptions present but exclusions missing → only assumptions is picked.
+    const partial: Partial<ProseDraft> = { assumptions: ["only this"] };
+    expect(pickProseField(partial, "assumptions")).toEqual({ assumptions: ["only this"] });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Selective regen flow: pickProseField + mergeProseIntoArtifact updates ONE
+// section and leaves a previously hand-edited section untouched (Phase E core).
+// ---------------------------------------------------------------------------
+
+describe("selective regen via pickProseField + mergeProseIntoArtifact", () => {
+  const full: ProseDraft = {
+    coverLetter: "خطاب جديد من النموذج",
+    understanding: "فهم جديد من النموذج",
+    approach: [
+      { title: "مرحلة جديدة 1", body: "وصف 1" },
+      { title: "مرحلة جديدة 2", body: "وصف 2" },
+    ],
+    deliverableDescriptions: ["وصف جديد"],
+    assumptions: ["افتراض جديد", "آخر"],
+    exclusions: ["استثناء جديد"],
+  };
+
+  it("regenerating approach updates ONLY approach, not a user-edited cover_letter", () => {
+    // 1) Start fresh, then simulate the user hand-editing the cover letter.
+    const base = freshArtifact();
+    const userEdited: ArtifactData = {
+      sections: base.sections.map((s) =>
+        s.id === "cover_letter"
+          ? { ...s, content: { ...s.content, body: "نص كتبه المستخدم بنفسه", ai_generated: false } }
+          : s
+      ),
+    };
+
+    // 2) Regenerate ONLY approach: narrow the model output, then merge.
+    const picked = pickProseField(full, "approach");
+    const merged = mergeProseIntoArtifact(userEdited, picked);
+
+    // approach updated + flagged AI-generated.
+    const approach = sectionById(merged, "approach")!;
+    expect(approach.content.phases).toHaveLength(2);
+    expect((approach.content.phases as { title: string }[])[0].title).toBe("مرحلة جديدة 1");
+    expect(approach.content.ai_generated).toBe(true);
+
+    // cover_letter UNTOUCHED: user's text + ai_generated:false survive intact.
+    const cl = sectionById(merged, "cover_letter")!;
+    expect(cl.content.body).toBe("نص كتبه المستخدم بنفسه");
+    expect(cl.content.ai_generated).toBe(false);
+
+    // understanding likewise untouched (still templated default → null body).
+    expect(sectionById(merged, "understanding")!.content.body).toBeNull();
   });
 });

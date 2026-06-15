@@ -3,7 +3,8 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { ARTIFACT_SECTIONS, type ArtifactSection } from "@/lib/proposals/artifact";
-import { adjustTone, type ToneSection } from "@/lib/ai/tone";
+import { adjustTone, rewriteSectionTone, type ToneSection } from "@/lib/ai/tone";
+import { stripDashes } from "@/lib/ai/proseDraft";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -11,12 +12,25 @@ import { adjustTone, type ToneSection } from "@/lib/ai/tone";
 
 const TONE_VALUES = ["formal", "balanced", "friendly", "persuasive"] as const;
 
+/**
+ * Prose section ids that the PER-SECTION tone path can rewrite (Phase E). The
+ * global path (no section_id) keeps its original behavior over scope_of_work /
+ * milestones / timeline; the per-section path handles the prose shapes directly.
+ */
+const PROSE_SECTION_IDS = [
+  "cover_letter",
+  "understanding",
+  "approach",
+  "scope_of_work",
+  "assumptions",
+] as const;
+
 const InputSchema = z.object({
   proposal_id: z.string().uuid(),
   tone: z.enum(TONE_VALUES),
+  // Phase E: when present, rewrite ONLY this one section; absent → global.
+  section_id: z.enum(PROSE_SECTION_IDS).optional(),
 });
-
-type Input = z.infer<typeof InputSchema>;
 
 // ---------------------------------------------------------------------------
 // Return type (discriminated union)
@@ -160,14 +174,96 @@ function mergeRewrittenText(
 }
 
 // ---------------------------------------------------------------------------
+// Per-section prose tone (Phase E)
+//
+// Unlike the global path (which joins/splits a single string per section), the
+// prose path rewrites each text FRAGMENT in place so structure survives:
+//   cover_letter / understanding : body
+//   approach                     : each phase title + body
+//   scope_of_work                : each deliverable description (preserves the
+//                                  deliverables list, never rewritten)
+//   assumptions                  : each assumption + each exclusion line
+// Each fragment passes through rewriteSectionTone (the preservesData guard keeps
+// numbers/dates/names), and the result is dash-stripped. Returns the new content
+// object + whether anything actually changed.
+// ---------------------------------------------------------------------------
+
+async function rewriteProseSection(
+  section: ArtifactSection,
+  toneInstruction: string
+): Promise<{ content: Record<string, unknown>; modified: boolean }> {
+  const c = { ...section.content };
+  let modified = false;
+
+  const one = async (text: string): Promise<string> => {
+    const r = await rewriteSectionTone(text, toneInstruction);
+    if (r.modified) modified = true;
+    return stripDashes(r.text);
+  };
+
+  const list = async (vals: unknown): Promise<string[] | null> => {
+    if (!Array.isArray(vals)) return null;
+    const items = vals.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+    if (items.length === 0) return null;
+    return Promise.all(items.map(one));
+  };
+
+  switch (section.id) {
+    case "cover_letter":
+    case "understanding": {
+      if (typeof c["body"] === "string" && c["body"].trim().length > 0) {
+        c["body"] = await one(c["body"] as string);
+      }
+      break;
+    }
+    case "approach": {
+      if (Array.isArray(c["phases"])) {
+        const phases = c["phases"] as Array<Record<string, unknown>>;
+        c["phases"] = await Promise.all(
+          phases.map(async (p) => {
+            if (typeof p !== "object" || p === null) return p;
+            const title =
+              typeof p["title"] === "string" && p["title"].trim().length > 0
+                ? await one(p["title"] as string)
+                : p["title"];
+            const body =
+              typeof p["body"] === "string" && p["body"].trim().length > 0
+                ? await one(p["body"] as string)
+                : p["body"];
+            return { ...p, title, body };
+          })
+        );
+      }
+      break;
+    }
+    case "scope_of_work": {
+      const rewritten = await list(c["deliverable_descriptions"]);
+      if (rewritten) c["deliverable_descriptions"] = rewritten;
+      break;
+    }
+    case "assumptions": {
+      const a = await list(c["assumptions"]);
+      const e = await list(c["exclusions"]);
+      if (a) c["assumptions"] = a;
+      if (e) c["exclusions"] = e;
+      break;
+    }
+    default:
+      break;
+  }
+
+  return { content: c, modified };
+}
+
+// ---------------------------------------------------------------------------
 // Server action
 // ---------------------------------------------------------------------------
 
-export async function adjustProposalTone(rawInput: Input): Promise<AdjustToneResult> {
+export async function adjustProposalTone(rawInput: unknown): Promise<AdjustToneResult> {
   // Validate input.
   const parsed = InputSchema.safeParse(rawInput);
   if (!parsed.success) return { ok: false, code: "error" };
-  const { proposal_id, tone } = parsed.data;
+  const { proposal_id, tone, section_id } = parsed.data;
 
   const supabase = await createClient();
 
@@ -200,16 +296,81 @@ export async function adjustProposalTone(rawInput: Input): Promise<AdjustToneRes
 
   const toneInstruction = toneRow.prompt as string;
 
+  const artifactJson = proposal.artifact_json as { sections?: ArtifactSection[] } | null;
+  const rawSections: ArtifactSection[] = artifactJson?.sections ?? [];
+
+  // -------------------------------------------------------------------------
+  // PER-SECTION path (Phase E): rewrite ONLY the requested prose section.
+  // -------------------------------------------------------------------------
+  if (section_id) {
+    const target = rawSections.find((s) => s.id === section_id);
+    if (!target) {
+      // Section not present yet — nothing to rewrite; return artifact unchanged.
+      return {
+        ok: true,
+        modified: [],
+        artifact_json: (artifactJson ?? { sections: [] }) as import("@/lib/proposals/artifact").ArtifactData,
+      };
+    }
+
+    let rewrite: { content: Record<string, unknown>; modified: boolean };
+    try {
+      rewrite = await rewriteProseSection(target, toneInstruction);
+    } catch (err) {
+      console.error("[adjustProposalTone] per-section rewrite threw", err);
+      return { ok: false, code: "error" };
+    }
+
+    const updatedSections = rawSections.map((s) =>
+      s.id === section_id ? { ...s, content: rewrite.content } : s
+    );
+    const updatedArtifactJson = { ...artifactJson, sections: updatedSections };
+
+    const existingAdjustments = Array.isArray(proposal.tone_adjustments)
+      ? (proposal.tone_adjustments as unknown[])
+      : [];
+    const updatedAdjustments = [
+      ...existingAdjustments,
+      {
+        tone,
+        section: section_id,
+        applied_at: new Date().toISOString(),
+        sections_modified: rewrite.modified ? [section_id] : [],
+      },
+    ];
+
+    const { error: sectionUpdateErr } = await supabase
+      .from("proposals")
+      .update({
+        artifact_json: updatedArtifactJson,
+        tone_adjustments: updatedAdjustments,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", proposal_id);
+
+    if (sectionUpdateErr) {
+      console.error("[adjustProposalTone] per-section update failed", sectionUpdateErr);
+      return { ok: false, code: "error" };
+    }
+
+    return {
+      ok: true,
+      modified: rewrite.modified ? [section_id] : [],
+      artifact_json: updatedArtifactJson as import("@/lib/proposals/artifact").ArtifactData,
+    };
+  }
+
+  // -------------------------------------------------------------------------
+  // GLOBAL path (no section_id) — unchanged behavior.
+  // -------------------------------------------------------------------------
+
   // Identify aiEditable section ids.
   const aiEditableIds = new Set(
     ARTIFACT_SECTIONS.filter((s) => s.aiEditable).map((s) => s.id)
   );
 
-  // Extract aiEditable sections from artifact_json.
-  // artifact_json may be null if the proposal hasn't been finalised yet.
-  const artifactJson = proposal.artifact_json as { sections?: ArtifactSection[] } | null;
-  const rawSections: ArtifactSection[] = artifactJson?.sections ?? [];
-
+  // Extract aiEditable sections from artifact_json (declared above; may be null
+  // if the proposal hasn't been finalised yet).
   const editableSections = rawSections.filter((s) => aiEditableIds.has(s.id));
 
   // Build ToneSection list — only sections with non-empty text participate.

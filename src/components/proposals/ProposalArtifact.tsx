@@ -10,6 +10,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { RizqSeal } from "@/components/proposals/RizqSeal";
+import { SectionEditor } from "@/components/proposals/SectionEditor";
 import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
@@ -19,7 +20,30 @@ import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
 type Props = {
   data: ArtifactData;
   locale: "ar" | "en";
+  /**
+   * When true (owner detail page only) AND proposalId is provided, an inline
+   * SectionEditor control bar is rendered after each editable prose section.
+   * Defaults to false so the PUBLIC share page stays strictly read-only.
+   */
+  editable?: boolean;
+  proposalId?: string;
 };
+
+/** Prose sections that carry an inline refine control bar when editable. */
+type EditableProseId =
+  | "cover_letter"
+  | "understanding"
+  | "approach"
+  | "scope_of_work"
+  | "assumptions";
+
+const EDITABLE_PROSE_IDS = new Set<string>([
+  "cover_letter",
+  "understanding",
+  "approach",
+  "scope_of_work",
+  "assumptions",
+]);
 
 // ---------------------------------------------------------------------------
 // i18n strings (inline — avoids "use client" / async boundary for translations
@@ -1435,12 +1459,36 @@ function renderSection(section: ArtifactSection, locale: "ar" | "en") {
 // Main export
 // ---------------------------------------------------------------------------
 
-export function ProposalArtifact({ data, locale }: Props) {
+export function ProposalArtifact({ data, locale, editable = false, proposalId }: Props) {
   const dir = locale === "ar" ? "rtl" : "ltr";
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
+  // Inline editing chrome is opt-in (owner detail page); the share page never
+  // passes these, so it renders exactly as before — strictly read-only.
+  const showEditor = editable && typeof proposalId === "string" && proposalId.length > 0;
+
   // Sort by order in case storage has them out of order
   const sections = [...data.sections].sort((a, b) => a.order - b.order);
+
+  /**
+   * Render a section and, when editing is enabled and it is an editable prose
+   * section, append its inline SectionEditor control bar directly after it.
+   */
+  function renderSectionWithEditor(s: ArtifactSection) {
+    const rendered = renderSection(s, locale);
+    if (!showEditor || !EDITABLE_PROSE_IDS.has(s.id)) return rendered;
+    return (
+      <div key={s.id}>
+        {rendered}
+        <SectionEditor
+          proposalId={proposalId as string}
+          sectionId={s.id as EditableProseId}
+          locale={locale}
+          content={s.content}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -1466,7 +1514,7 @@ export function ProposalArtifact({ data, locale }: Props) {
                   {renderSection(sections[brandingIdx], locale)}
                   {renderSection(sections[clientIdx], locale)}
                 </div>
-                {rest.map((s) => renderSection(s, locale))}
+                {rest.map((s) => renderSectionWithEditor(s))}
               </>
             );
           }
@@ -1477,7 +1525,7 @@ export function ProposalArtifact({ data, locale }: Props) {
                 {renderSection(s, locale)}
               </div>
             ) : (
-              renderSection(s, locale)
+              renderSectionWithEditor(s)
             )
           );
         })()}
