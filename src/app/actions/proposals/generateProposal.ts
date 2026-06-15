@@ -24,6 +24,10 @@ const InputSchema = z.object({
   city_slug: z.string().min(1).max(64),
   experience_tier_slug: z.string().min(1).max(64),
   template_id: z.string().uuid().optional(),
+  // Optional, secondary input (keeps "≤3 inputs to first value"). Threaded into
+  // scope_json.extras.project_goals so the Phase D prose pass can ground the
+  // cover letter / understanding in the client's stated goals.
+  project_goals: z.string().max(2000).optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -162,6 +166,13 @@ export async function generateProposal(
     return { ok: false, code: "extraction_failed" };
   }
   const { scope, model, promptHash, confidence, raw } = extraction;
+
+  // 4b. Thread optional project_goals into scope.extras (read later by the Phase
+  // D prose route from scope_json.extras.project_goals). Trim + drop if blank.
+  const trimmedGoals = input.project_goals?.trim();
+  if (trimmedGoals) {
+    scope.extras = { ...(scope.extras ?? {}), project_goals: trimmedGoals };
+  }
 
   // 5. Validate city/tier slugs; specialty comes from scope (already validated by AI)
   const specialtySlug = scope.specialty;

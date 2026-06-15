@@ -10,22 +10,26 @@
  * All server actions are called via useTransition.
  */
 
-import { useState, useTransition, useCallback } from "react";
-import { Loader2, Copy, Check, Share2 } from "lucide-react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
+import { Loader2, Copy, Check, Share2, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { generateProposal } from "@/app/actions/proposals/generateProposal";
 import { answerFollowUps } from "@/app/actions/proposals/answerFollowUps";
 import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
 import { setProposalShare } from "@/app/actions/proposals/shareActions";
 import { track } from "@/lib/analytics/track";
+import { useRouter } from "@/i18n/navigation";
 import { ArtifactSkeleton } from "./ArtifactSkeleton";
 import { FollowUpCards } from "./FollowUpCards";
 import { ProposalArtifact } from "./ProposalArtifact";
+import { StreamingProse } from "./StreamingProse";
 import { ToneBar } from "./ToneBar";
 import { ScopeInsight } from "./ScopeInsight";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { ClientPicker } from "@/components/clients/ClientPicker";
 import { Combobox } from "@/components/ui/Combobox";
+import { ProseSchema, mergeProseIntoArtifact } from "@/lib/ai/proseDraft";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
@@ -53,6 +57,9 @@ type ViewKind =
   | { kind: "form"; error?: string }
   | { kind: "loading" }
   | { kind: "followups"; proposalId: string; followUps: FollowUpTemplate[]; artifact: ArtifactData }
+  // Phase D: pass-1 artifact (templated defaults + real price) is ready; the AI
+  // prose stream fills narrative sections live before we land on "artifact".
+  | { kind: "drafting"; proposalId: string; baseArtifact: ArtifactData }
   | { kind: "artifact"; proposalId: string; artifact: ArtifactData; finalized: boolean; shareToken?: string }
   | { kind: "quota_exhausted" }
   | { kind: "extraction_failed"; briefText: string }
@@ -94,9 +101,12 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
 
+  const router = useRouter();
+
   // Form state
   const [briefText, setBriefText] = useState("");
   const [clientName, setClientName] = useState("");
+  const [goalsText, setGoalsText] = useState("");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [citySlug, setCitySlug] = useState(defaultCitySlug);
   const [tierSlug, setTierSlug] = useState("mid");
@@ -138,6 +148,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         city_slug: citySlug,
         experience_tier_slug: tierSlug,
         template_id: selectedTemplateId || undefined,
+        project_goals: goalsText.trim() || undefined,
       });
 
       if (!result.ok) {
@@ -174,11 +185,11 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         return;
       }
 
+      // No follow-ups: scope is final → kick off the live prose pass.
       setView({
-        kind: "artifact",
+        kind: "drafting",
         proposalId: result.proposal_id,
-        artifact: result.artifact_json,
-        finalized: false,
+        baseArtifact: result.artifact_json,
       });
     });
   }
@@ -196,7 +207,8 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
           return;
         }
         track("proposal_followups_answered", { locale, proposal_id: proposalId });
-        setView({ kind: "artifact", proposalId, artifact: result.artifact_json, finalized: false });
+        // Scope is now final → run the live prose pass before the artifact.
+        setView({ kind: "drafting", proposalId, baseArtifact: result.artifact_json });
       });
     },
     [locale, t]
@@ -245,6 +257,20 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
       return prev;
     });
   }, []);
+
+  // ---------------------------------------------------------------------------
+  // Drafting complete — land on the artifact. The onFinish DB write is
+  // authoritative, so we refresh server data; the artifact we show is the final
+  // merged client object (server refresh keeps the proposal detail page in sync).
+  // ---------------------------------------------------------------------------
+
+  const handleDraftDone = useCallback(
+    (proposalId: string, finalArtifact: ArtifactData) => {
+      router.refresh();
+      setView({ kind: "artifact", proposalId, artifact: finalArtifact, finalized: false });
+    },
+    [router]
+  );
 
   // ---------------------------------------------------------------------------
   // Rendering
@@ -342,9 +368,23 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         questions={view.followUps}
         onSubmit={(answers) => handleFollowUpSubmit(view.proposalId, answers)}
         onSkip={() =>
-          setView({ kind: "artifact", proposalId: view.proposalId, artifact: view.artifact, finalized: false })
+          setView({ kind: "drafting", proposalId: view.proposalId, baseArtifact: view.artifact })
         }
         pending={isFlowPending}
+      />
+    );
+  }
+
+  // DRAFTING — live AI prose stream fills the artifact's narrative sections.
+  if (view.kind === "drafting") {
+    return (
+      <DraftingView
+        key={view.proposalId}
+        locale={locale}
+        proposalId={view.proposalId}
+        baseArtifact={view.baseArtifact}
+        onDone={handleDraftDone}
+        label={t("drafting")}
       />
     );
   }
@@ -453,6 +493,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
               onClick={() => {
                 setBriefText("");
                 setClientName("");
+                setGoalsText("");
                 setSelectedClientId("");
                 setCitySlug(defaultCitySlug);
                 setTierSlug("mid");
@@ -547,6 +588,25 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
           rows={6}
           placeholder={t("briefPlaceholder")}
           className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
+        />
+      </div>
+
+      {/* Project goals (optional, secondary) — grounds the AI prose pass. */}
+      <div>
+        <label
+          htmlFor="goals"
+          className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
+        >
+          {t("goalsLabel")}
+          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+        </label>
+        <textarea
+          id="goals"
+          value={goalsText}
+          onChange={(e) => setGoalsText(e.target.value)}
+          rows={2}
+          placeholder={t("goalsPlaceholder")}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
         />
       </div>
 
@@ -665,6 +725,115 @@ function SelectField({
         searchPlaceholder={tCommon("combobox.searchPlaceholder")}
         emptyText={tCommon("combobox.noResults")}
       />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// DraftingView — owns the streaming `useObject` hook (Phase D).
+// ---------------------------------------------------------------------------
+//
+// Mounted only while in the "drafting" state, keyed by proposalId so the hook
+// resets per proposal. On mount it submits to /api/proposals/[id]/draft and
+// renders the artifact live as the prose partial streams in. On completion (or
+// any error / ai_unconfigured), it hands the freshest merged artifact back to
+// the parent, which refreshes server data and lands on the artifact view.
+//
+// Graceful degrade: if the route returns ai_unconfigured (200 JSON, not a
+// schema stream) or errors/times out, useObject's onError fires (or the stream
+// finishes with no object); either way we fall through to the artifact with
+// templated defaults, no scary error (matches the dashboard insights pattern).
+
+function DraftingView({
+  locale,
+  proposalId,
+  baseArtifact,
+  onDone,
+  label,
+}: {
+  locale: "ar" | "en";
+  proposalId: string;
+  baseArtifact: ArtifactData;
+  onDone: (proposalId: string, finalArtifact: ArtifactData) => void;
+  label: string;
+}) {
+  const font = locale === "ar" ? "font-arabic" : "font-sans";
+
+  const { object, submit, isLoading, error, stop } = useObject({
+    api: `/api/proposals/${proposalId}/draft`,
+    schema: ProseSchema,
+  });
+
+  // Latest merged artifact, kept in a ref so completion uses the freshest data
+  // without making the completion effect depend on `object` (which changes on
+  // every streamed chunk). The ref is synced in an effect (never during render).
+  const liveArtifact = mergeProseIntoArtifact(baseArtifact, object);
+  const latestRef = useRef<ArtifactData>(liveArtifact);
+  useEffect(() => {
+    latestRef.current = liveArtifact;
+  }, [liveArtifact]);
+
+  // Kick off the stream exactly once on mount.
+  const startedRef = useRef(false);
+  const sawLoadingRef = useRef(false);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    track("proposal_draft_started", { locale, proposal_id: proposalId });
+    submit({});
+    // submit is stable for the hook's lifetime; intentionally run-once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Abort the in-flight request if the user navigates away mid-stream.
+  useEffect(() => {
+    return () => {
+      if (!doneRef.current) stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Complete on the loading falling-edge OR on error. Fire onDone once.
+  const finish = useCallback(() => {
+    if (doneRef.current) return;
+    doneRef.current = true;
+    onDone(proposalId, latestRef.current);
+  }, [onDone, proposalId]);
+
+  useEffect(() => {
+    if (isLoading) {
+      sawLoadingRef.current = true;
+      return;
+    }
+    // Not loading. Complete once we've either seen a loading cycle finish or
+    // hit an error (covers ai_unconfigured / network failure before streaming).
+    if (sawLoadingRef.current || error) {
+      track("proposal_draft_done", {
+        locale,
+        proposal_id: proposalId,
+        had_error: error != null,
+      });
+      finish();
+    }
+  }, [isLoading, error, finish, locale, proposalId]);
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Live drafting status */}
+      <div
+        className={`flex items-center justify-center gap-2 text-sm text-rizq-gold-dark ${font}`}
+        aria-live="polite"
+      >
+        <Sparkles size={15} className="animate-pulse shrink-0" />
+        <span>{label}</span>
+      </div>
+
+      {/* Artifact, prose sections filling in live */}
+      <StreamingProse active={isLoading}>
+        <ProposalArtifact data={liveArtifact} locale={locale} />
+      </StreamingProse>
     </div>
   );
 }
