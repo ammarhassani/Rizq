@@ -79,6 +79,7 @@ const StepPortfolioSchema = z.object({
 const StepBrandSchema = z.object({
   brand_name: z.string().trim().max(120).optional().nullable(),
   brand_name_ar: z.string().trim().max(120).optional().nullable(),
+  logo_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
   brand_colors: z
     .object({ primary: z.string().max(20), secondary: z.string().max(20).optional() })
     .optional()

@@ -10,7 +10,7 @@ import {
 } from "@/lib/proposals/artifact";
 import { applyAnswers } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
-import { loadUserBrandDefaults } from "@/lib/proposals/brand";
+import { loadUserBrandDefaults, loadTestimonials } from "@/lib/proposals/brand";
 import type { Scope } from "@/lib/ai/scope";
 
 // ---------------------------------------------------------------------------
@@ -148,6 +148,7 @@ export async function answerFollowUps(
     userId,
     userResult.user.email ?? null
   );
+  const testimonials = await loadTestimonials(supabase, userId);
 
   // IP terms: scope-derived → user default → 'full_transfer'
   const scopeDerivedIpTerms: "full_transfer" | "license" | "per_project" | null =
@@ -207,7 +208,7 @@ export async function answerFollowUps(
     totalProjectsCompleted: brand.totalProjectsCompleted,
     notableClients: brand.notableClients,
     portfolioSamples: brand.portfolioSamples,
-    testimonials: null,
+    testimonials,
   };
   const artifactData = buildArtifactData(artifactInput);
 

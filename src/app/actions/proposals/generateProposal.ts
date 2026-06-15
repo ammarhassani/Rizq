@@ -10,7 +10,7 @@ import {
 import { buildArtifactData } from "@/lib/proposals/artifact";
 import { selectFollowUps, type FollowUpTemplate } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
-import { loadUserBrandDefaults } from "@/lib/proposals/brand";
+import { loadUserBrandDefaults, loadTestimonials } from "@/lib/proposals/brand";
 import type { PricingJson } from "@/lib/proposals/templateHelpers";
 
 // ---------------------------------------------------------------------------
@@ -232,6 +232,9 @@ export async function generateProposal(
     userResult.user.email ?? null
   );
 
+  // Load active testimonials once; reused across both buildArtifactData calls.
+  const testimonials = await loadTestimonials(supabase, userId);
+
   const freelancerName = brand.freelancerName;
 
   // 11. Build artifact (apply template defaults when present; user defaults as fallback)
@@ -293,7 +296,7 @@ export async function generateProposal(
     totalProjectsCompleted: brand.totalProjectsCompleted,
     notableClients: brand.notableClients,
     portfolioSamples: brand.portfolioSamples,
-    testimonials: null,
+    testimonials,
   } as const;
 
   const artifactData = buildArtifactData({

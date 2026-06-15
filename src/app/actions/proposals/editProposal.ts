@@ -6,7 +6,7 @@ import { summarizeChange } from "@/lib/ai/changeSummary";
 import { buildArtifactData } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
 import type { ArtifactData } from "@/lib/proposals/artifact";
-import { loadUserBrandDefaults } from "@/lib/proposals/brand";
+import { loadUserBrandDefaults, loadTestimonials } from "@/lib/proposals/brand";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -108,6 +108,7 @@ export async function editProposal(
     userId,
     userResult.user.email ?? null
   );
+  const testimonials = await loadTestimonials(supabase, userId);
   const freelancerName = brand.freelancerName;
 
   // Rebuild artifact_json from patched scope + new anchor so the artifact
@@ -208,7 +209,7 @@ export async function editProposal(
     totalProjectsCompleted: brand.totalProjectsCompleted,
     notableClients: brand.notableClients,
     portfolioSamples: brand.portfolioSamples,
-    testimonials: null,
+    testimonials,
   });
 
   // Generate AI change summary (non-fatal — null on failure)

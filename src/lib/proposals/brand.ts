@@ -240,3 +240,50 @@ export async function loadUserBrandDefaults(
     portfolioSamples,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Testimonials loader (Phase C — proposal "About you" social proof)
+// ---------------------------------------------------------------------------
+
+/** Camel-cased testimonial shape consumed by the proposal artifact. */
+export type ArtifactTestimonial = {
+  clientName: string | null;
+  clientTitle: string | null;
+  quoteAr: string | null;
+  quoteEn: string | null;
+  rating: number | null;
+};
+
+/**
+ * Loads the user's ACTIVE testimonials (owner-scoped via RLS), ordered by
+ * sort_order then created_at, mapped to the camelCase artifact shape.
+ *
+ * Defensive: the Supabase client is untyped, so every column is cast through
+ * `unknown`. Returns [] on no rows OR any query error (testimonials are
+ * supplementary social proof — never fail the proposal build over them).
+ */
+export async function loadTestimonials(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<ArtifactTestimonial[]> {
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("client_name, client_title, quote_ar, quote_en, rating")
+    .eq("user_id", userId)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error || !Array.isArray(data)) return [];
+
+  return (data as Array<Record<string, unknown>>).map((row) => {
+    const rawRating = row["rating"];
+    return {
+      clientName: (row["client_name"] as string | null) ?? null,
+      clientTitle: (row["client_title"] as string | null) ?? null,
+      quoteAr: (row["quote_ar"] as string | null) ?? null,
+      quoteEn: (row["quote_en"] as string | null) ?? null,
+      rating: typeof rawRating === "number" ? rawRating : null,
+    };
+  });
+}
