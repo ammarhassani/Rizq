@@ -21,75 +21,92 @@ function baseInput(overrides?: Partial<ArtifactInput>): ArtifactInput {
     brandColors: null,
     contact: { email: "m@example.com", phone: null, whatsapp: "+966501234567" },
     clientName: "شركة الأفق",
+    projectTitle: null,
+    issueDate: "2026-06-15T00:00:00.000Z",
     deliverables: ["تصميم الهوية البصرية", "ملفات قابلة للتعديل"],
     projectDescriptionAr: "تصميم هوية بصرية متكاملة",
     revisions: 3,
+    coverLetterBody: null,
+    understandingBody: null,
+    approachPhases: null,
+    assumptions: null,
+    exclusions: null,
+    deliverableDescriptions: null,
+    proseAiGenerated: false,
     priceMin: 3000,
     priceAnchor: 4500,
     priceMax: 6000,
     provenanceCitation: "تقدير رِزق بناءً على 22 سجلاً (مرجع منشور) حتى عام 2026.",
+    included: null,
     depositPct: 50,
     ipTerms: "full_transfer",
     startDate: "2026-07-01",
     deliveryDate: "2026-08-15",
     validityDays: 30,
+    bioAr: null,
+    bioEn: null,
+    yearsExperience: null,
+    totalProjectsCompleted: null,
+    notableClients: null,
+    portfolioSamples: null,
+    testimonials: null,
     ...overrides,
   };
 }
 
 // ---------------------------------------------------------------------------
-// ARTIFACT_SECTIONS registry
+// ARTIFACT_SECTIONS registry (new 13-section document model)
 // ---------------------------------------------------------------------------
 
 describe("ARTIFACT_SECTIONS registry", () => {
-  it("contains exactly 9 entries", () => {
-    expect(ARTIFACT_SECTIONS).toHaveLength(9);
+  it("contains exactly 13 entries", () => {
+    expect(ARTIFACT_SECTIONS).toHaveLength(13);
   });
 
-  it("has unique, sequential orders 1..9", () => {
+  it("has unique, sequential orders 1..13", () => {
     const orders = ARTIFACT_SECTIONS.map((s) => s.order).sort((a, b) => a - b);
-    expect(orders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(orders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   });
 
-  it("flags scope_of_work as editable and aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "scope_of_work")!;
-    expect(s.editable).toBe(true);
-    expect(s.aiEditable).toBe(true);
+  it("cover is order 1 and verification is order 13", () => {
+    const byOrder = [...ARTIFACT_SECTIONS].sort((a, b) => a.order - b.order);
+    expect(byOrder[0]!.id).toBe("cover");
+    expect(byOrder[byOrder.length - 1]!.id).toBe("verification");
   });
 
-  it("flags ip_terms as editable but NOT aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "ip_terms")!;
-    expect(s.editable).toBe(true);
-    expect(s.aiEditable).toBe(false);
+  it("flags prose sections as editable AND aiEditable", () => {
+    for (const id of [
+      "cover_letter",
+      "understanding",
+      "approach",
+      "scope_of_work",
+      "assumptions",
+    ] as const) {
+      const s = ARTIFACT_SECTIONS.find((x) => x.id === id)!;
+      expect(s.editable, id).toBe(true);
+      expect(s.aiEditable, id).toBe(true);
+    }
+  });
+
+  it("flags structured sections as editable but NOT aiEditable", () => {
+    for (const id of [
+      "cover",
+      "timeline",
+      "milestones",
+      "about",
+      "next_steps",
+      "pricing",
+      "terms",
+    ] as const) {
+      const s = ARTIFACT_SECTIONS.find((x) => x.id === id)!;
+      expect(s.editable, id).toBe(true);
+      expect(s.aiEditable, id).toBe(false);
+    }
   });
 
   it("flags verification as NOT editable and NOT aiEditable", () => {
     const s = ARTIFACT_SECTIONS.find((s) => s.id === "verification")!;
     expect(s.editable).toBe(false);
-    expect(s.aiEditable).toBe(false);
-  });
-
-  it("flags terms_footer as NOT editable and NOT aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "terms_footer")!;
-    expect(s.editable).toBe(false);
-    expect(s.aiEditable).toBe(false);
-  });
-
-  it("flags milestones as editable and aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "milestones")!;
-    expect(s.editable).toBe(true);
-    expect(s.aiEditable).toBe(true);
-  });
-
-  it("flags pricing as editable but NOT aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "pricing")!;
-    expect(s.editable).toBe(true);
-    expect(s.aiEditable).toBe(false);
-  });
-
-  it("flags branding as editable but NOT aiEditable", () => {
-    const s = ARTIFACT_SECTIONS.find((s) => s.id === "branding")!;
-    expect(s.editable).toBe(true);
     expect(s.aiEditable).toBe(false);
   });
 });
@@ -99,93 +116,191 @@ describe("ARTIFACT_SECTIONS registry", () => {
 // ---------------------------------------------------------------------------
 
 describe("buildArtifactData", () => {
-  it("returns exactly 9 sections", () => {
+  it("returns exactly 13 sections", () => {
     const { sections } = buildArtifactData(baseInput());
-    expect(sections).toHaveLength(9);
+    expect(sections).toHaveLength(13);
   });
 
-  it("sections are sorted ascending by order (1..9)", () => {
+  it("sections are sorted ascending by order (1..13)", () => {
     const { sections } = buildArtifactData(baseInput());
     const orders = sections.map((s) => s.order);
-    expect(orders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(orders).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   });
 
   it("each section carries correct editable/aiEditable flags from registry", () => {
     const { sections } = buildArtifactData(baseInput());
-
     const byId = Object.fromEntries(sections.map((s) => [s.id, s]));
 
+    expect(byId["cover_letter"]!.aiEditable).toBe(true);
     expect(byId["scope_of_work"]!.aiEditable).toBe(true);
-    expect(byId["scope_of_work"]!.editable).toBe(true);
-    expect(byId["ip_terms"]!.aiEditable).toBe(false);
-    expect(byId["ip_terms"]!.editable).toBe(true);
-    expect(byId["verification"]!.editable).toBe(false);
-    expect(byId["verification"]!.aiEditable).toBe(false);
-    expect(byId["terms_footer"]!.editable).toBe(false);
     expect(byId["pricing"]!.editable).toBe(true);
     expect(byId["pricing"]!.aiEditable).toBe(false);
+    expect(byId["terms"]!.aiEditable).toBe(false);
+    expect(byId["verification"]!.editable).toBe(false);
+    expect(byId["verification"]!.aiEditable).toBe(false);
   });
 });
 
 // ---------------------------------------------------------------------------
-// branding section — fallback logic
+// cover section — brand fallback + document meta
 // ---------------------------------------------------------------------------
 
-describe("branding section", () => {
+describe("cover section", () => {
   it("falls back to freelancerName when brandNameAr is null", () => {
     const { sections } = buildArtifactData(baseInput({ brandNameAr: null }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["brandName"]).toBe("محمد العمري");
+    const cover = sections.find((s) => s.id === "cover")!;
+    expect(cover.content["brandName"]).toBe("محمد العمري");
   });
 
   it("uses brandNameAr when provided", () => {
     const { sections } = buildArtifactData(baseInput({ brandNameAr: "استوديو العمري" }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["brandName"]).toBe("استوديو العمري");
-  });
-
-  it("falls back to RIZQ_DEFAULTS.taglineAr when taglineAr is null", () => {
-    const { sections } = buildArtifactData(baseInput({ taglineAr: null }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["tagline"]).toBe(RIZQ_DEFAULTS.taglineAr);
-  });
-
-  it("uses taglineAr when provided", () => {
-    const custom = "بناء المستقبل اليوم";
-    const { sections } = buildArtifactData(baseInput({ taglineAr: custom }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["tagline"]).toBe(custom);
+    const cover = sections.find((s) => s.id === "cover")!;
+    expect(cover.content["brandName"]).toBe("استوديو العمري");
   });
 
   it("falls back to RIZQ_DEFAULTS.colors when brandColors is null", () => {
     const { sections } = buildArtifactData(baseInput({ brandColors: null }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["colors"]).toEqual(RIZQ_DEFAULTS.colors);
+    const cover = sections.find((s) => s.id === "cover")!;
+    expect(cover.content["colors"]).toEqual(RIZQ_DEFAULTS.colors);
   });
 
-  it("uses provided brandColors when not null", () => {
-    const colors = { primary: "#000000", secondary: "#FFFFFF" };
-    const { sections } = buildArtifactData(baseInput({ brandColors: colors }));
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["colors"]).toEqual(colors);
-  });
-
-  it("includes contact and logoUrl in branding content", () => {
-    const { sections } = buildArtifactData(
-      baseInput({ logoUrl: "https://cdn.example.com/logo.png" })
-    );
-    const branding = sections.find((s) => s.id === "branding")!;
-    expect(branding.content["logoUrl"]).toBe("https://cdn.example.com/logo.png");
-    expect(branding.content["contact"]).toEqual({
+  it("carries client name, issue date, validity, and contact", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const cover = sections.find((s) => s.id === "cover")!;
+    expect(cover.content["clientName"]).toBe("شركة الأفق");
+    expect(cover.content["issueDate"]).toBe("2026-06-15T00:00:00.000Z");
+    expect(cover.content["validityDays"]).toBe(30);
+    expect(cover.content["contact"]).toEqual({
       email: "m@example.com",
       phone: null,
       whatsapp: "+966501234567",
     });
   });
+
+  it("carries projectTitle (may be null)", () => {
+    const { sections } = buildArtifactData(baseInput({ projectTitle: null }));
+    const cover = sections.find((s) => s.id === "cover")!;
+    expect(cover.content["projectTitle"]).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
-// pricing section — honesty architecture (spec §II.2)
+// prose sections — null bodies + honesty flag (Phase A: never fabricated)
+// ---------------------------------------------------------------------------
+
+describe("prose sections (cover_letter / understanding / approach)", () => {
+  it("default body/phases to null with ai_generated:false when no prose passed", () => {
+    const { sections } = buildArtifactData(baseInput());
+
+    const coverLetter = sections.find((s) => s.id === "cover_letter")!;
+    expect(coverLetter.content["body"]).toBeNull();
+    expect(coverLetter.content["ai_generated"]).toBe(false);
+
+    const understanding = sections.find((s) => s.id === "understanding")!;
+    expect(understanding.content["body"]).toBeNull();
+    expect(understanding.content["ai_generated"]).toBe(false);
+
+    const approach = sections.find((s) => s.id === "approach")!;
+    expect(approach.content["phases"]).toBeNull();
+    expect(approach.content["ai_generated"]).toBe(false);
+  });
+
+  it("ai_generated stays false when prose present but proseAiGenerated is false", () => {
+    const { sections } = buildArtifactData(
+      baseInput({
+        coverLetterBody: "نص مكتوب يدويًا",
+        understandingBody: "فهم مكتوب يدويًا",
+        proseAiGenerated: false,
+      })
+    );
+    expect(sections.find((s) => s.id === "cover_letter")!.content["ai_generated"]).toBe(false);
+    expect(sections.find((s) => s.id === "understanding")!.content["ai_generated"]).toBe(false);
+  });
+
+  it("ai_generated is true only when prose present AND proseAiGenerated is true", () => {
+    const { sections } = buildArtifactData(
+      baseInput({
+        coverLetterBody: "نص من الذكاء الاصطناعي",
+        understandingBody: "فهم من الذكاء الاصطناعي",
+        approachPhases: [{ title: "اكتشاف", body: "..." }],
+        proseAiGenerated: true,
+      })
+    );
+    const coverLetter = sections.find((s) => s.id === "cover_letter")!;
+    expect(coverLetter.content["body"]).toBe("نص من الذكاء الاصطناعي");
+    expect(coverLetter.content["ai_generated"]).toBe(true);
+
+    const approach = sections.find((s) => s.id === "approach")!;
+    expect(approach.content["ai_generated"]).toBe(true);
+  });
+
+  it("ai_generated stays false when proseAiGenerated true but a given body is null", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ coverLetterBody: null, proseAiGenerated: true })
+    );
+    expect(sections.find((s) => s.id === "cover_letter")!.content["ai_generated"]).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// assumptions section — null defaults + honesty flag
+// ---------------------------------------------------------------------------
+
+describe("assumptions section", () => {
+  it("defaults assumptions/exclusions to null with ai_generated:false", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const s = sections.find((s) => s.id === "assumptions")!;
+    expect(s.content["assumptions"]).toBeNull();
+    expect(s.content["exclusions"]).toBeNull();
+    expect(s.content["ai_generated"]).toBe(false);
+  });
+
+  it("ai_generated true when assumptions present AND proseAiGenerated true", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ assumptions: ["ملاحظات في الوقت المناسب"], proseAiGenerated: true })
+    );
+    const s = sections.find((s) => s.id === "assumptions")!;
+    expect(s.content["assumptions"]).toEqual(["ملاحظات في الوقت المناسب"]);
+    expect(s.content["ai_generated"]).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scope_of_work section — deliverable descriptions + honesty flag
+// ---------------------------------------------------------------------------
+
+describe("scope_of_work section", () => {
+  it("carries deliverables, description, revisions; descriptions null + ai_generated false by default", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const s = sections.find((s) => s.id === "scope_of_work")!;
+    expect(s.content["deliverables"]).toEqual([
+      "تصميم الهوية البصرية",
+      "ملفات قابلة للتعديل",
+    ]);
+    expect(s.content["description"]).toBe("تصميم هوية بصرية متكاملة");
+    expect(s.content["revisions"]).toBe(3);
+    expect(s.content["deliverable_descriptions"]).toBeNull();
+    expect(s.content["ai_generated"]).toBe(false);
+  });
+
+  it("carries deliverable_descriptions when provided", () => {
+    const { sections } = buildArtifactData(
+      baseInput({
+        deliverableDescriptions: ["شعار وألوان وخطوط", "ملفات المصدر"],
+        proseAiGenerated: true,
+      })
+    );
+    const s = sections.find((s) => s.id === "scope_of_work")!;
+    expect(s.content["deliverable_descriptions"]).toEqual([
+      "شعار وألوان وخطوط",
+      "ملفات المصدر",
+    ]);
+    expect(s.content["ai_generated"]).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// pricing section — honesty architecture (citation) + extras
 // ---------------------------------------------------------------------------
 
 describe("pricing section", () => {
@@ -212,10 +327,25 @@ describe("pricing section", () => {
       "تقدير رِزق بناءً على 22 سجلاً (مرجع منشور) حتى عام 2026."
     );
   });
+
+  it("carries included (null by default) and depositPct", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const pricing = sections.find((s) => s.id === "pricing")!;
+    expect(pricing.content["included"]).toBeNull();
+    expect(pricing.content["depositPct"]).toBe(50);
+  });
+
+  it("carries included when provided", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ included: ["تصميم", "ملفات"] })
+    );
+    const pricing = sections.find((s) => s.id === "pricing")!;
+    expect(pricing.content["included"]).toEqual(["تصميم", "ملفات"]);
+  });
 });
 
 // ---------------------------------------------------------------------------
-// milestones section
+// milestones section (unchanged behaviour)
 // ---------------------------------------------------------------------------
 
 describe("milestones section", () => {
@@ -227,20 +357,14 @@ describe("milestones section", () => {
     expect(total).toBe(100);
   });
 
-  it("first milestone is the deposit", () => {
+  it("first milestone is the deposit, second is delivery with the remainder", () => {
     const { sections } = buildArtifactData(baseInput({ depositPct: 40 }));
     const milestones = sections.find((s) => s.id === "milestones")!;
     const list = milestones.content["milestones"] as Array<{ pct: number; trigger: string }>;
     expect(list[0]!.trigger).toBe("deposit");
     expect(list[0]!.pct).toBe(40);
-  });
-
-  it("second milestone is delivery with the remainder", () => {
-    const { sections } = buildArtifactData(baseInput({ depositPct: 30 }));
-    const milestones = sections.find((s) => s.id === "milestones")!;
-    const list = milestones.content["milestones"] as Array<{ pct: number; trigger: string }>;
     expect(list[1]!.trigger).toBe("delivery");
-    expect(list[1]!.pct).toBe(70);
+    expect(list[1]!.pct).toBe(60);
   });
 
   it("handles depositPct of 100 (full upfront)", () => {
@@ -253,32 +377,8 @@ describe("milestones section", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Remaining sections — smoke checks
+// timeline section
 // ---------------------------------------------------------------------------
-
-describe("client_ref section", () => {
-  it("carries clientName (may be null)", () => {
-    const { sections } = buildArtifactData(baseInput({ clientName: null }));
-    const s = sections.find((s) => s.id === "client_ref")!;
-    expect(s.content["clientName"]).toBeNull();
-  });
-
-  it("carries provided clientName", () => {
-    const { sections } = buildArtifactData(baseInput({ clientName: "Acme Corp" }));
-    const s = sections.find((s) => s.id === "client_ref")!;
-    expect(s.content["clientName"]).toBe("Acme Corp");
-  });
-});
-
-describe("scope_of_work section", () => {
-  it("carries deliverables, description, revisions", () => {
-    const { sections } = buildArtifactData(baseInput());
-    const s = sections.find((s) => s.id === "scope_of_work")!;
-    expect(s.content["deliverables"]).toEqual(["تصميم الهوية البصرية", "ملفات قابلة للتعديل"]);
-    expect(s.content["description"]).toBe("تصميم هوية بصرية متكاملة");
-    expect(s.content["revisions"]).toBe(3);
-  });
-});
 
 describe("timeline section", () => {
   it("carries startDate, deliveryDate, revisions", () => {
@@ -290,13 +390,83 @@ describe("timeline section", () => {
   });
 });
 
-describe("ip_terms section", () => {
-  it("carries the ipTerms value", () => {
-    const { sections } = buildArtifactData(baseInput({ ipTerms: "license" }));
-    const s = sections.find((s) => s.id === "ip_terms")!;
-    expect(s.content["terms"]).toBe("license");
+// ---------------------------------------------------------------------------
+// about section — profile pass-through
+// ---------------------------------------------------------------------------
+
+describe("about section", () => {
+  it("defaults arrays to [] and scalars to null when no profile data", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const about = sections.find((s) => s.id === "about")!;
+    expect(about.content["bioAr"]).toBeNull();
+    expect(about.content["bioEn"]).toBeNull();
+    expect(about.content["yearsExperience"]).toBeNull();
+    expect(about.content["totalProjectsCompleted"]).toBeNull();
+    expect(about.content["notableClients"]).toEqual([]);
+    expect(about.content["portfolioSamples"]).toEqual([]);
+    expect(about.content["testimonials"]).toEqual([]);
+  });
+
+  it("passes through provided profile data", () => {
+    const portfolio = [{ title: "مشروع", url: "https://x.test", description: "وصف" }];
+    const { sections } = buildArtifactData(
+      baseInput({
+        bioAr: "مصمم هوية بصرية",
+        bioEn: "Brand designer",
+        yearsExperience: 7,
+        totalProjectsCompleted: 42,
+        notableClients: ["أرامكو", "stc"],
+        portfolioSamples: portfolio,
+      })
+    );
+    const about = sections.find((s) => s.id === "about")!;
+    expect(about.content["bioAr"]).toBe("مصمم هوية بصرية");
+    expect(about.content["bioEn"]).toBe("Brand designer");
+    expect(about.content["yearsExperience"]).toBe(7);
+    expect(about.content["totalProjectsCompleted"]).toBe(42);
+    expect(about.content["notableClients"]).toEqual(["أرامكو", "stc"]);
+    expect(about.content["portfolioSamples"]).toEqual(portfolio);
   });
 });
+
+// ---------------------------------------------------------------------------
+// terms section — carries inputs the renderer expands to clauses
+// ---------------------------------------------------------------------------
+
+describe("terms section", () => {
+  it("carries ipTerms, depositPct, revisions, validityDays", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ ipTerms: "license", depositPct: 30, revisions: 2, validityDays: 14 })
+    );
+    const s = sections.find((s) => s.id === "terms")!;
+    expect(s.content["ipTerms"]).toBe("license");
+    expect(s.content["depositPct"]).toBe(30);
+    expect(s.content["revisions"]).toBe(2);
+    expect(s.content["validityDays"]).toBe(14);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// next_steps section
+// ---------------------------------------------------------------------------
+
+describe("next_steps section", () => {
+  it("carries contact, validityDays, freelancerName", () => {
+    const { sections } = buildArtifactData(baseInput());
+    const s = sections.find((s) => s.id === "next_steps")!;
+    expect(s.content["validityDays"]).toBe(30);
+    expect(s.content["freelancerName"]).toBe("محمد العمري");
+    expect(s.content["contact"]).toEqual({
+      email: "m@example.com",
+      phone: null,
+      whatsapp: "+966501234567",
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// verification section (unchanged)
+// ---------------------------------------------------------------------------
 
 describe("verification section", () => {
   it("carries proposalId, a label, and a methodologyHref", () => {
@@ -306,14 +476,5 @@ describe("verification section", () => {
     expect(typeof s.content["label"]).toBe("string");
     expect((s.content["label"] as string).length).toBeGreaterThan(0);
     expect(s.content["methodologyHref"]).toBe("/methodology");
-  });
-});
-
-describe("terms_footer section", () => {
-  it("carries jurisdiction KSA and validityDays", () => {
-    const { sections } = buildArtifactData(baseInput({ validityDays: 14 }));
-    const s = sections.find((s) => s.id === "terms_footer")!;
-    expect(s.content["jurisdiction"]).toBe("KSA");
-    expect(s.content["validityDays"]).toBe(14);
   });
 });

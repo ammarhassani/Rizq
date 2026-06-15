@@ -42,6 +42,18 @@ export type UserBrandDefaults = {
   defaultIpTerms: "full_transfer" | "license" | "per_project" | null;
   /** Preferred communication tone (validated; defaults to "balanced"). */
   preferredTone: "formal" | "balanced" | "friendly";
+  /** Arabic bio / about text (bio_ar → null). */
+  bioAr: string | null;
+  /** English bio / about text (bio_en → null). */
+  bioEn: string | null;
+  /** Years of experience (int; null if absent / non-numeric). */
+  yearsExperience: number | null;
+  /** Total projects completed (int; null if absent / non-numeric). */
+  totalProjectsCompleted: number | null;
+  /** Notable client names (text[] → array of strings, default []). */
+  notableClients: string[];
+  /** Portfolio samples (jsonb array → typed shape, default []). */
+  portfolioSamples: { title: string; url: string | null; description: string | null }[];
 };
 
 // ---------------------------------------------------------------------------
@@ -68,6 +80,34 @@ function parseBrandColors(
     };
   }
   return null;
+}
+
+/** Coerce an unknown into a string[] (filters non-strings); [] otherwise. */
+function parseStringArray(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((v): v is string => typeof v === "string");
+}
+
+/**
+ * Map a jsonb array into the typed portfolio-sample shape.
+ * Non-object entries are dropped; title is coerced to string; url/description
+ * to string|null. Returns [] when the input is not an array.
+ */
+function parsePortfolioSamples(
+  raw: unknown
+): { title: string; url: string | null; description: string | null }[] {
+  if (!Array.isArray(raw)) return [];
+  const out: { title: string; url: string | null; description: string | null }[] = [];
+  for (const entry of raw) {
+    if (entry === null || typeof entry !== "object" || Array.isArray(entry)) continue;
+    const o = entry as Record<string, unknown>;
+    out.push({
+      title: typeof o["title"] === "string" ? o["title"] : "",
+      url: typeof o["url"] === "string" ? o["url"] : null,
+      description: typeof o["description"] === "string" ? o["description"] : null,
+    });
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,6 +146,12 @@ export async function loadUserBrandDefaults(
         "default_revisions",
         "default_ip_terms",
         "preferred_tone",
+        "bio_ar",
+        "bio_en",
+        "years_experience",
+        "portfolio_samples",
+        "total_projects_completed",
+        "notable_clients",
       ].join(", ")
     )
     .eq("id", userId)
@@ -162,6 +208,19 @@ export async function loadUserBrandDefaults(
       ? (rawTone as "formal" | "balanced" | "friendly")
       : "balanced";
 
+  // Profile / about fields (untyped client — parse defensively).
+  const bioAr = (p["bio_ar"] as string | null) ?? null;
+  const bioEn = (p["bio_en"] as string | null) ?? null;
+
+  const rawYears = p["years_experience"];
+  const yearsExperience = typeof rawYears === "number" ? rawYears : null;
+
+  const rawTotal = p["total_projects_completed"];
+  const totalProjectsCompleted = typeof rawTotal === "number" ? rawTotal : null;
+
+  const notableClients = parseStringArray(p["notable_clients"]);
+  const portfolioSamples = parsePortfolioSamples(p["portfolio_samples"]);
+
   return {
     freelancerName,
     brandNameAr,
@@ -173,5 +232,11 @@ export async function loadUserBrandDefaults(
     defaultRevisions,
     defaultIpTerms,
     preferredTone,
+    bioAr,
+    bioEn,
+    yearsExperience,
+    totalProjectsCompleted,
+    notableClients,
+    portfolioSamples,
   };
 }

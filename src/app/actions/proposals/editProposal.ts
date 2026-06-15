@@ -125,15 +125,25 @@ export async function editProposal(
         ? "license"
         : "full_transfer";
 
-  // Attempt to re-read validityDays + depositPct from existing artifact terms_footer/milestones
+  // Attempt to re-read validityDays + depositPct + issueDate from the existing
+  // artifact. New model stores validity in `terms`/`cover` and deposit in
+  // `milestones`; legacy model used `terms_footer`. Check both for compat.
   let validityDays = 30;
   let depositPct = 50;
+  let existingIssueDate: string | null = null;
   if (oldArtifact) {
     const termsSection = oldArtifact.sections?.find(
-      (s) => s.id === "terms_footer"
+      (s) => s.id === "terms" || s.id === "terms_footer"
     );
     if (typeof termsSection?.content?.validityDays === "number") {
       validityDays = termsSection.content.validityDays as number;
+    }
+    const coverSection = oldArtifact.sections?.find((s) => s.id === "cover");
+    if (typeof coverSection?.content?.validityDays === "number") {
+      validityDays = coverSection.content.validityDays as number;
+    }
+    if (typeof coverSection?.content?.issueDate === "string") {
+      existingIssueDate = coverSection.content.issueDate as string;
     }
     const milestonesSection = oldArtifact.sections?.find(
       (s) => s.id === "milestones"
@@ -169,19 +179,36 @@ export async function editProposal(
     brandColors: brand.brandColors,
     contact: brand.contact,
     clientName: (proposal["client_name"] as string | null) ?? null,
+    projectTitle: null,
+    issueDate: existingIssueDate ?? new Date().toISOString(),
     deliverables: (newScope.deliverables as string[]) ?? [],
     projectDescriptionAr,
     revisions:
       typeof newScope.revisions === "number" ? newScope.revisions : null,
+    coverLetterBody: null,
+    understandingBody: null,
+    approachPhases: null,
+    assumptions: null,
+    exclusions: null,
+    deliverableDescriptions: null,
+    proseAiGenerated: false,
     priceMin,
     priceAnchor: newPriceAnchor,
     priceMax,
     provenanceCitation: (proposal["provenance_citation"] as string) ?? "",
+    included: null,
     depositPct,
     ipTerms,
     startDate: null,
     deliveryDate: null,
     validityDays,
+    bioAr: brand.bioAr,
+    bioEn: brand.bioEn,
+    yearsExperience: brand.yearsExperience,
+    totalProjectsCompleted: brand.totalProjectsCompleted,
+    notableClients: brand.notableClients,
+    portfolioSamples: brand.portfolioSamples,
+    testimonials: null,
   });
 
   // Generate AI change summary (non-fatal — null on failure)

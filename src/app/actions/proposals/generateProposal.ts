@@ -253,9 +253,11 @@ export async function generateProposal(
     brand.defaultIpTerms ??
     "full_transfer";
 
-  const artifactData = buildArtifactData({
-    locale: briefLang === "en" ? "en" : "ar",
-    proposalId: "pending", // placeholder; will update after insert
+  // Shared artifact input — everything except the proposalId (which is only
+  // known after insert). Phase A: prose is null (renderer supplies templated
+  // defaults), proseAiGenerated is false. Profile/about fields come from brand.
+  const artifactBase = {
+    locale: (briefLang === "en" ? "en" : "ar") as "ar" | "en",
     freelancerName,
     brandNameAr: brand.brandNameAr,
     taglineAr: brand.taglineAr,
@@ -263,18 +265,40 @@ export async function generateProposal(
     brandColors: brand.brandColors,
     contact: brand.contact,
     clientName: resolvedClientName,
+    projectTitle: null,
+    issueDate: new Date().toISOString(),
     deliverables: scope.deliverables,
     projectDescriptionAr: null,
     revisions: resolvedRevisions,
+    coverLetterBody: null,
+    understandingBody: null,
+    approachPhases: null,
+    assumptions: null,
+    exclusions: null,
+    deliverableDescriptions: null,
+    proseAiGenerated: false,
     priceMin: proposalPrice.min,
     priceAnchor: proposalPrice.anchor,
     priceMax: proposalPrice.max,
     provenanceCitation,
+    included: null,
     depositPct: resolvedDepositPct,
     ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
     validityDays: 30,
+    bioAr: brand.bioAr,
+    bioEn: brand.bioEn,
+    yearsExperience: brand.yearsExperience,
+    totalProjectsCompleted: brand.totalProjectsCompleted,
+    notableClients: brand.notableClients,
+    portfolioSamples: brand.portfolioSamples,
+    testimonials: null,
+  } as const;
+
+  const artifactData = buildArtifactData({
+    ...artifactBase,
+    proposalId: "pending", // placeholder; will update after insert
   });
 
   // 12. Insert proposal — catch errcode 53400 for quota
@@ -328,27 +352,8 @@ export async function generateProposal(
 
   // Update artifact_json with the real proposal ID (keep brand fields consistent)
   const artifactWithId = buildArtifactData({
-    locale: briefLang === "en" ? "en" : "ar",
+    ...artifactBase,
     proposalId,
-    freelancerName,
-    brandNameAr: brand.brandNameAr,
-    taglineAr: brand.taglineAr,
-    logoUrl: brand.logoUrl,
-    brandColors: brand.brandColors,
-    contact: brand.contact,
-    clientName: resolvedClientName,
-    deliverables: scope.deliverables,
-    projectDescriptionAr: null,
-    revisions: resolvedRevisions,
-    priceMin: proposalPrice.min,
-    priceAnchor: proposalPrice.anchor,
-    priceMax: proposalPrice.max,
-    provenanceCitation,
-    depositPct: resolvedDepositPct,
-    ipTerms: resolvedIpTerms,
-    startDate: null,
-    deliveryDate: null,
-    validityDays: 30,
   });
 
   await supabase

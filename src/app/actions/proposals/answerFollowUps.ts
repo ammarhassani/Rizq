@@ -159,6 +159,16 @@ export async function answerFollowUps(
   const resolvedIpTerms: "full_transfer" | "license" | "per_project" =
     scopeDerivedIpTerms ?? brand.defaultIpTerms ?? "full_transfer";
 
+  // Preserve the original issue date if the stored artifact carried one; else now.
+  const oldArtifact = proposal["artifact_json"] as
+    | { sections?: Array<{ id?: string; content?: Record<string, unknown> }> }
+    | null;
+  const oldCover = oldArtifact?.sections?.find((s) => s?.id === "cover");
+  const existingIssueDate =
+    typeof oldCover?.content?.["issueDate"] === "string"
+      ? (oldCover.content["issueDate"] as string)
+      : null;
+
   const artifactInput: ArtifactInput = {
     locale: briefLang,
     proposalId: proposal_id,
@@ -169,18 +179,35 @@ export async function answerFollowUps(
     brandColors: brand.brandColors,
     contact: brand.contact,
     clientName: (proposal.client_name as string | null) ?? null,
+    projectTitle: null,
+    issueDate: existingIssueDate ?? new Date().toISOString(),
     deliverables: updatedScope.deliverables,
     projectDescriptionAr: null,
     revisions: updatedScope.revisions ?? brand.defaultRevisions,
+    coverLetterBody: null,
+    understandingBody: null,
+    approachPhases: null,
+    assumptions: null,
+    exclusions: null,
+    deliverableDescriptions: null,
+    proseAiGenerated: false,
     priceMin: proposalPrice.min,
     priceAnchor: proposalPrice.anchor,
     priceMax: proposalPrice.max,
     provenanceCitation,
+    included: null,
     depositPct: brand.defaultDepositPct ?? 50,
     ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
     validityDays: 30,
+    bioAr: brand.bioAr,
+    bioEn: brand.bioEn,
+    yearsExperience: brand.yearsExperience,
+    totalProjectsCompleted: brand.totalProjectsCompleted,
+    notableClients: brand.notableClients,
+    portfolioSamples: brand.portfolioSamples,
+    testimonials: null,
   };
   const artifactData = buildArtifactData(artifactInput);
 

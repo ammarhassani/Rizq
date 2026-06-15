@@ -72,9 +72,12 @@ function parseArtifactData(raw: unknown): ArtifactData | null {
 
 function buildContactLinks(artifact: ArtifactData | null) {
   if (!artifact) return { email: null, whatsapp: null };
-  const branding = artifact.sections.find((s) => s.id === "branding");
-  if (!branding) return { email: null, whatsapp: null };
-  const contact = branding.content["contact"] as
+  // New document model carries contact on `cover`; legacy on `branding`.
+  const section =
+    artifact.sections.find((s) => s.id === "cover") ??
+    artifact.sections.find((s) => s.id === "branding");
+  if (!section) return { email: null, whatsapp: null };
+  const contact = section.content["contact"] as
     | { email?: string | null; whatsapp?: string | null }
     | null
     | undefined;
@@ -102,7 +105,10 @@ export async function generateMetadata({
 
   const artifact = parseArtifactData(row.artifact_json);
   const pricing = artifact?.sections.find((s) => s.id === "pricing");
-  const branding = artifact?.sections.find((s) => s.id === "branding");
+  // New model carries brand on `cover`; legacy on `branding`.
+  const branding =
+    artifact?.sections.find((s) => s.id === "cover") ??
+    artifact?.sections.find((s) => s.id === "branding");
 
   const brandName =
     typeof branding?.content["brandName"] === "string"
