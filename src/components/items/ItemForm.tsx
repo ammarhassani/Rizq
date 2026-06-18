@@ -58,6 +58,11 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // This form is embedded in a dialog that may render (via React portal) inside
+    // another <form> such as the invoice builder. React bubbles submit events
+    // through the component tree, so without this the parent form would ALSO
+    // submit (creating a phantom invoice). Stop the bubble.
+    e.stopPropagation();
     const trimmedName = name.trim();
     if (!trimmedName) {
       setError(t("errors.nameRequired"));

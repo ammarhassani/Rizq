@@ -16,7 +16,13 @@ export type GigRow = {
   client_name?: string | null; // joined in
 };
 
-type Props = { gig: GigRow; locale: "ar" | "en" };
+type Props = {
+  gig: GigRow;
+  locale: "ar" | "en";
+  /** When provided, replaces the static status badge (e.g. an interactive status
+   *  quick-edit on the list) so there's only one status indicator, no overlap. */
+  statusSlot?: React.ReactNode;
+};
 
 const STATUS_STYLES: Record<string, string> = {
   paid: "bg-emerald-50 text-emerald-700",
@@ -64,7 +70,7 @@ function fmtPrice(n: number, locale: "ar" | "en"): string {
   }).format(n);
 }
 
-export function GigCard({ gig, locale }: Props) {
+export function GigCard({ gig, locale, statusSlot }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -105,9 +111,11 @@ export function GigCard({ gig, locale }: Props) {
             {fmtPrice(gig.amount_sar, locale)}
           </p>
           <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}>
-            {statusLabel}
-          </span>
+          {statusSlot ?? (
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}>
+              {statusLabel}
+            </span>
+          )}
         </div>
       </div>
     </Link>

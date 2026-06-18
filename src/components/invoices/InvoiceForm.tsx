@@ -175,6 +175,10 @@ export function InvoiceForm({
   }
 
   function handleSubmit(e: React.FormEvent) {
+    // Defense-in-depth: ignore submit events that bubbled up from a nested or
+    // portaled child form (the item / fee / client dialogs). Only this form's
+    // own submit should create an invoice.
+    if (e.target !== e.currentTarget) return;
     e.preventDefault();
 
     if (!clientId) {

@@ -56,6 +56,10 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Embedded in a dialog that may live inside another <form> (e.g. the invoice
+    // builder). React bubbles submit through the component tree, so stop it here
+    // or the parent form would also submit (phantom invoice).
+    e.stopPropagation();
     const trimmedName = name.trim();
     if (!trimmedName) {
       setError(t("errors.nameRequired"));

@@ -1,9 +1,9 @@
 /**
- * /[locale]/settings/studio — Studio profile editor (Phase C).
+ * /[locale]/proposals/profile — Studio profile editor.
  *
  * Edits the bio / portfolio / brand data + client testimonials that populate
- * the proposal "About you" section. Server component, auth-gated. Mirrors the
- * settings/page.tsx auth + layout structure.
+ * the proposal "About you" section. Lives inside the Studio (proposals) area so
+ * it sits next to the proposals it feeds. Server component, auth-gated.
  */
 import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
@@ -108,13 +108,13 @@ export default async function StudioProfilePage({
       maxWidth="reading"
     >
       <div dir={dir}>
-        {/* Back link */}
+        {/* Back link → Studio (proposals) */}
         <Link
-          href="/settings"
+          href="/proposals"
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink mb-8 transition-colors ${font}`}
         >
           <ArrowLeft size={14} strokeWidth={1.8} className={isAr ? "rotate-180" : ""} />
-          <span>{t("backToSettings")}</span>
+          <span>{isAr ? "العودة إلى العروض" : "Back to proposals"}</span>
         </Link>
 
         {/* Page header */}

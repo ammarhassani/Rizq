@@ -18,7 +18,14 @@ export type ClientRow = {
   is_active: boolean | null;
 };
 
-type Props = { client: ClientRow; locale: "ar" | "en" };
+type Props = {
+  client: ClientRow;
+  locale: "ar" | "en";
+  /** Optional interactive control (e.g. the follow-up priority quick-edit)
+   *  rendered inline in the card's meta row. Kept out of the title/price area
+   *  so it never overlaps existing content. */
+  prioritySlot?: React.ReactNode;
+};
 
 function relativeDate(iso: string | null, locale: "ar" | "en"): string {
   if (!iso) return locale === "ar" ? "لم يُتواصل بعد" : "Never contacted";
@@ -45,7 +52,7 @@ function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function ClientCard({ client, locale }: Props) {
+export function ClientCard({ client, locale, prioritySlot }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -80,6 +87,7 @@ export function ClientCard({ client, locale }: Props) {
       </div>
       <div dir={dir} className="mt-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
+          {prioritySlot}
           {client.total_gigs != null && client.total_gigs > 0 && (
             <span className={`text-xs text-rizq-ink-soft ${font}`}>
               {client.total_gigs} {isAr ? "مشروع" : "gigs"}

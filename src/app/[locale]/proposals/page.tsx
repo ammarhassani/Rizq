@@ -11,6 +11,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
+import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalCard } from "@/components/proposals/ProposalCard";
@@ -78,7 +79,7 @@ export default async function ProposalsListPage({
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "عروضي" : "My Proposals"} maxWidth="wide">
       <div dir={isAr ? "rtl" : "ltr"}>
         {/* Header row */}
-        <div className="mb-6 sm:mb-8 flex items-end justify-between gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow mb-3">{t("eyebrow")}</p>
             <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
@@ -87,13 +88,22 @@ export default async function ProposalsListPage({
             </p>
           </div>
 
-          {/* New proposal CTA */}
-          <Link
-            href="/proposals/new"
-            className={`shrink-0 inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
-          >
-            {t("newProposal")}
-          </Link>
+          {/* Actions: Studio profile (feeds the "About you" section) + New proposal */}
+          <div className="shrink-0 flex items-center gap-2">
+            <Link
+              href="/proposals/profile"
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink px-4 py-3 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
+            >
+              <Briefcase size={16} strokeWidth={1.7} aria-hidden />
+              <span>{isAr ? "ملف الاستوديو" : "Studio profile"}</span>
+            </Link>
+            <Link
+              href="/proposals/new"
+              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
+            >
+              {t("newProposal")}
+            </Link>
+          </div>
         </div>
 
         {/* List or empty state */}

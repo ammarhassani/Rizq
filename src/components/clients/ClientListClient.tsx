@@ -144,12 +144,13 @@ export function ClientListClient({ clients, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((c) => (
-            <MotionItem key={c.id} className="relative">
-              <ClientCard client={c} locale={locale} />
-              {/* Inline quick-edit: follow-up priority, no page open needed */}
-              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
-                <PriorityQuickEdit clientId={c.id} current={c.follow_up_priority} locale={locale} />
-              </div>
+            <MotionItem key={c.id}>
+              {/* Priority quick-edit sits inline in the card's meta row, no overlap. */}
+              <ClientCard
+                client={c}
+                locale={locale}
+                prioritySlot={<PriorityQuickEdit clientId={c.id} current={c.follow_up_priority} locale={locale} />}
+              />
             </MotionItem>
           ))}
         </MotionList>

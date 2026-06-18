@@ -16,7 +16,13 @@ export type InvoiceRow = {
   client_name?: string | null; // joined in
 };
 
-type Props = { invoice: InvoiceRow; locale: "ar" | "en" };
+type Props = {
+  invoice: InvoiceRow;
+  locale: "ar" | "en";
+  /** When provided, replaces the static status badge (e.g. an interactive
+   *  status quick-edit on the list). Avoids rendering two status indicators. */
+  statusSlot?: React.ReactNode;
+};
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-rizq-ink/8 text-rizq-ink-soft",
@@ -63,7 +69,7 @@ function fmtMoney(n: number, locale: "ar" | "en"): string {
   }).format(n);
 }
 
-export function InvoiceCard({ invoice, locale }: Props) {
+export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -116,11 +122,13 @@ export function InvoiceCard({ invoice, locale }: Props) {
           <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>
             {isAr ? "ر.س" : "SAR"}
           </p>
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}
-          >
-            {statusLabel}
-          </span>
+          {statusSlot ?? (
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}
+            >
+              {statusLabel}
+            </span>
+          )}
         </div>
       </div>
     </Link>

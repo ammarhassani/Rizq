@@ -11,7 +11,7 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { SettingsClient } from "@/components/settings/SettingsClient";
-import { User, Crown, Calendar, ArrowLeft, Briefcase, ChevronLeft } from "lucide-react";
+import { User, Crown, Calendar, ArrowLeft } from "lucide-react";
 
 type Params = { locale: string };
 
@@ -166,34 +166,6 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
           </div>
         </section>
 
-        {/* ── Studio profile link ─────────────────────────────────────── */}
-        <section className="mb-10">
-          <Link
-            href="/settings/studio"
-            className="group block rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 hover:border-rizq-green/40 transition-colors"
-          >
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-rizq-green/10 border border-rizq-green/20 flex items-center justify-center shrink-0">
-                <Briefcase size={20} strokeWidth={1.6} className="text-rizq-green" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold text-rizq-ink ${font}`}>
-                  {t("studioProfileTitle")}
-                </p>
-                <p className={`text-sm text-rizq-ink-soft mt-0.5 ${font}`}>
-                  {t("studioProfileDescription")}
-                </p>
-              </div>
-              <ChevronLeft
-                size={18}
-                strokeWidth={1.8}
-                className={`text-rizq-ink-soft/50 group-hover:text-rizq-green shrink-0 transition-colors ${
-                  isAr ? "" : "rotate-180"
-                }`}
-              />
-            </div>
-          </Link>
-        </section>
 
         {/* ── PDPL: Privacy & data + Danger zone ─────────────────────── */}
         <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">

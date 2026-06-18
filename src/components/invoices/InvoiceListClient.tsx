@@ -147,12 +147,16 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((invoice) => (
-            <MotionItem key={invoice.id} className="relative">
-              <InvoiceCard invoice={invoice} locale={locale} />
-              {/* Inline quick-edit: change invoice status without opening the page */}
-              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
-                <InvoiceStatusQuickEdit invoiceId={invoice.id} current={invoice.status} locale={locale} />
-              </div>
+            <MotionItem key={invoice.id}>
+              {/* The status quick-edit replaces the card's static status badge
+                  (in-place), so there's exactly one status control, no overlap. */}
+              <InvoiceCard
+                invoice={invoice}
+                locale={locale}
+                statusSlot={
+                  <InvoiceStatusQuickEdit invoiceId={invoice.id} current={invoice.status} locale={locale} />
+                }
+              />
             </MotionItem>
           ))}
         </MotionList>

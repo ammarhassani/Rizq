@@ -18,12 +18,14 @@ type InsightItem = {
   kind: "income" | "client" | "proposal" | "deadline" | "general";
 };
 
-const kindColors: Record<InsightItem["kind"], string> = {
-  income: "bg-emerald-50 border-emerald-200 text-emerald-800",
-  client: "bg-blue-50 border-blue-200 text-blue-800",
-  proposal: "bg-amber-50 border-amber-200 text-amber-800",
-  deadline: "bg-red-50 border-red-200 text-red-800",
-  general: "bg-rizq-cream border-rizq-gold/30 text-rizq-ink",
+/** Small kind dot so the consolidated banner stays one surface (no per-insight
+ *  colored boxes) while still hinting the category at a glance. */
+const kindDot: Record<InsightItem["kind"], string> = {
+  income: "bg-emerald-500",
+  client: "bg-blue-500",
+  proposal: "bg-amber-500",
+  deadline: "bg-red-500",
+  general: "bg-rizq-gold",
 };
 
 /** Defensively sanitize AI text before display (belt-and-suspenders; the route
@@ -318,58 +320,69 @@ export function InsightsWidget({ locale }: Props) {
         )}
       </div>
 
-      {/* Body — collapses away when toggled shut. */}
+      {/* Body — collapses away when toggled shut. One banner: insights are
+          compact rows on a single surface, not separate colored cards. */}
       {!collapsed && (
         <div id="rizq-insights-body" className="animate-fade-in motion-reduce:animate-none" aria-live="polite">
-          {/* Insight cards */}
-          <div className="space-y-3">
-            {displayInsights.map((insight, i) => (
-          <div key={i} className={`rounded-2xl border p-4 ${kindColors[insight.kind]}`}>
-            <p className={`text-sm leading-relaxed ${font}`}>
-              {isAr ? insight.ar : insight.en}
-            </p>
-            <div className={`mt-2 flex items-center justify-between gap-2 ${font}`}>
-              <p className={`text-xs opacity-60 ${font}`}>
-                {source === "ai"
-                  ? isAr
-                    ? "هذا تحليل آلي، ليس استشارة مهنية"
-                    : "AI-generated, not professional advice"
-                  : isAr
-                    ? "ملخص محسوب من بياناتك"
-                    : "Summary computed from your data"}
-              </p>
-              {source === "ai" && !isStreaming && (
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => handleVote(i, "up")}
-                    className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-emerald-600" : "text-current opacity-40 hover:opacity-70"}`}
-                    aria-label="useful"
-                  >
-                    <ThumbsUp className="h-3 w-3" />
-                  </button>
-                  <button
-                    onClick={() => handleVote(i, "down")}
-                    className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-red-600" : "text-current opacity-40 hover:opacity-70"}`}
-                    aria-label="not useful"
-                  >
-                    <ThumbsDown className="h-3 w-3" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {/* Live streaming placeholder while the first card is still arriving. */}
-        {isStreaming && displayInsights.length === 0 && (
-          <div className="h-16 rounded-2xl bg-rizq-gold/10 animate-pulse" />
-        )}
-      </div>
-
-          {generatedAt && !isStreaming && (
-            <p className={`mt-4 text-xs text-rizq-ink-soft/40 ${font}`}>
-              {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
-            </p>
+          {displayInsights.length > 0 && (
+            <ul className="divide-y divide-rizq-gold/15">
+              {displayInsights.map((insight, i) => (
+                <li key={i} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+                  <span
+                    aria-hidden
+                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${kindDot[insight.kind]}`}
+                  />
+                  <p className={`flex-1 text-sm leading-relaxed text-rizq-ink ${font}`}>
+                    {isAr ? insight.ar : insight.en}
+                  </p>
+                  {source === "ai" && !isStreaming && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => handleVote(i, "up")}
+                        className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-emerald-600" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        aria-label="useful"
+                      >
+                        <ThumbsUp className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => handleVote(i, "down")}
+                        className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-red-600" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        aria-label="not useful"
+                      >
+                        <ThumbsDown className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
           )}
+
+          {/* Live streaming placeholder while the first insight is still arriving. */}
+          {isStreaming && displayInsights.length === 0 && (
+            <div className="space-y-2">
+              <div className="h-4 w-3/4 rounded bg-rizq-gold/10 animate-pulse" />
+              <div className="h-4 w-2/3 rounded bg-rizq-gold/10 animate-pulse" />
+            </div>
+          )}
+
+          {/* Single honesty + timestamp footer for the whole banner. */}
+          <div className={`mt-4 flex items-center justify-between gap-2 ${font}`}>
+            <p className={`text-xs text-rizq-ink-soft/50 ${font}`}>
+              {source === "ai"
+                ? isAr
+                  ? "تحليل آلي، ليس استشارة مهنية"
+                  : "AI-generated, not professional advice"
+                : isAr
+                  ? "ملخص محسوب من بياناتك"
+                  : "Summary computed from your data"}
+            </p>
+            {generatedAt && !isStreaming && (
+              <p className={`text-xs text-rizq-ink-soft/40 ${font}`}>
+                {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>

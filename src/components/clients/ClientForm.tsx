@@ -76,6 +76,10 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Embedded (via AddClientDialog) inside other forms like the invoice/gig
+    // builders. Stop the submit bubbling through React portals to the parent
+    // form, which would otherwise also submit.
+    e.stopPropagation();
     if (!name.trim()) {
       setError(t("errors.nameRequired"));
       return;

@@ -360,12 +360,13 @@ export function IncomeListClient({ gigs, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((gig) => (
-            <MotionItem key={gig.id} className="relative">
-              <GigCard gig={gig} locale={locale} />
-              {/* Inline quick-edit: change gig status without opening the page */}
-              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
-                <GigStatusQuickEdit gigId={gig.id} current={gig.status} locale={locale} />
-              </div>
+            <MotionItem key={gig.id}>
+              {/* Status quick-edit replaces the card's static status badge in-place. */}
+              <GigCard
+                gig={gig}
+                locale={locale}
+                statusSlot={<GigStatusQuickEdit gigId={gig.id} current={gig.status} locale={locale} />}
+              />
             </MotionItem>
           ))}
         </MotionList>
