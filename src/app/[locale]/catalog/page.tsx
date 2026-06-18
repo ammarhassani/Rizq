@@ -56,15 +56,17 @@ export default async function CatalogPage({ params }: { params: Promise<Params> 
 
   const { data: presetRows } = await supabase
     .from("fee_presets")
-    .select("id, name, category, amount_sar, is_active")
+    .select("id, name, category, amount_sar, fee_type, percentage, is_active")
     .order("name", { ascending: true });
 
   const feePresets = (presetRows ?? []).map(
-    (p: { id: string; name: string; category: string | null; amount_sar: number; is_active: boolean }) => ({
+    (p: { id: string; name: string; category: string | null; amount_sar: number; fee_type: string | null; percentage: number | null; is_active: boolean }) => ({
       id: p.id,
       name: p.name,
       category: p.category ?? null,
       amount_sar: Number(p.amount_sar),
+      fee_type: p.fee_type === "percentage" ? ("percentage" as const) : ("fixed" as const),
+      percentage: p.percentage != null ? Number(p.percentage) : null,
       is_active: p.is_active,
     })
   );

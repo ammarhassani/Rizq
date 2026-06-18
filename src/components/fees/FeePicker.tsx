@@ -47,27 +47,42 @@ export function FeePicker({ locale, presets, onPick, id }: Props) {
     [isAr]
   );
 
+  /** Display value: "5%" for percentage presets, "50 SAR" for fixed. */
+  const fmtValue = React.useCallback(
+    (p: CreatedFeePreset) =>
+      p.fee_type === "percentage" ? `${p.percentage ?? 0}%` : fmtAmount(p.amount_sar),
+    [fmtAmount]
+  );
+
+  /** Translate a preset into the invoice fee shape. Percentage fees carry their
+   *  rate; the invoice form resolves amount_sar against the items subtotal. */
+  const presetToFee = React.useCallback(
+    (p: CreatedFeePreset): InvoiceFee =>
+      p.fee_type === "percentage"
+        ? { name: p.name, category: p.category, amount_sar: 0, fee_type: "percentage", rate: p.percentage ?? 0 }
+        : { name: p.name, category: p.category, amount_sar: p.amount_sar, fee_type: "fixed", rate: null },
+    []
+  );
+
   const options: ComboboxOption[] = React.useMemo(
     () =>
       localPresets.map((p) => ({
         value: p.id,
         label: p.name,
-        hint: p.category ? `${fmtAmount(p.amount_sar)} · ${p.category}` : fmtAmount(p.amount_sar),
+        hint: p.category ? `${fmtValue(p)} · ${p.category}` : fmtValue(p),
       })),
-    [localPresets, fmtAmount]
+    [localPresets, fmtValue]
   );
 
   function handlePick(value: string | null) {
     if (!value) return;
     const preset = localPresets.find((p) => p.id === value);
-    if (preset) {
-      onPick({ name: preset.name, category: preset.category, amount_sar: preset.amount_sar });
-    }
+    if (preset) onPick(presetToFee(preset));
   }
 
   function handleSaved(preset: CreatedFeePreset) {
     setLocalPresets((prev) => (prev.some((p) => p.id === preset.id) ? prev : [preset, ...prev]));
-    onPick({ name: preset.name, category: preset.category, amount_sar: preset.amount_sar });
+    onPick(presetToFee(preset));
   }
 
   return (

@@ -34,13 +34,22 @@ export type InvoiceTotals = {
 };
 
 /**
- * A categorized fixed fee added onto an invoice (stored in invoices.fees jsonb).
- * `amount_sar` is a flat amount, not a rate. Fees are part of the taxable supply.
+ * A categorized fee added onto an invoice (stored in invoices.fees jsonb). A fee
+ * is either a flat amount or a percentage of the items subtotal:
+ *  - fee_type "fixed" (or absent, for back-compat): `amount_sar` is the flat
+ *    value; `rate` is null.
+ *  - fee_type "percentage": `rate` is the percent (e.g. 5 = 5%); `amount_sar`
+ *    holds the RESOLVED amount = round(itemsSubtotal * rate / 100, 2), filled in
+ *    by the caller at creation time so the DB trigger (which sums amount_sar)
+ *    and the stored document stay correct.
+ * Fees are part of the taxable supply (VAT applies to items + fees).
  */
 export type InvoiceFee = {
   name: string;
   category: string | null;
   amount_sar: number;
+  fee_type?: "fixed" | "percentage";
+  rate?: number | null;
 };
 
 /** Output of `computeInvoiceTotals` — items subtotal + fees, then VAT on both. */
@@ -112,9 +121,25 @@ export function computeTotals(
   return { subtotal_sar: subtotal, vat_sar, total_sar };
 }
 
-/** Σ of fee amounts, rounded to 2 dp. Negative/NaN amounts treated as 0. */
-export function feesSubtotal(fees: InvoiceFee[]): number {
-  return round2(fees.reduce((sum, f) => sum + safeNum(f.amount_sar), 0));
+/**
+ * Resolve a single fee to a concrete SAR amount against the items subtotal.
+ *  - percentage fee → round(itemsSubtotal * rate / 100, 2)
+ *  - fixed fee (or no fee_type) → its flat amount_sar
+ * Negative/NaN inputs are treated as 0.
+ */
+export function resolveFeeAmount(fee: InvoiceFee, itemsSubtotal: number): number {
+  if (fee.fee_type === "percentage") {
+    return round2(safeNum(itemsSubtotal) * safeNum(fee.rate ?? 0) / 100);
+  }
+  return round2(safeNum(fee.amount_sar));
+}
+
+/**
+ * Σ of resolved fee amounts, rounded to 2 dp. Percentage fees resolve against
+ * `itemsSubtotal`; fixed fees use their flat amount. Negative/NaN → 0.
+ */
+export function feesSubtotal(fees: InvoiceFee[], itemsSubtotal: number): number {
+  return round2(fees.reduce((sum, f) => sum + resolveFeeAmount(f, itemsSubtotal), 0));
 }
 
 /**
@@ -123,12 +148,14 @@ export function feesSubtotal(fees: InvoiceFee[]): number {
  * Mirrors private.invoice_compute_before (migration
  * 20260614111456_items_catalog_fee_presets_and_invoice_fees.sql):
  *  - subtotal = Σ item.total_sar
- *  - fees     = Σ fee.amount_sar
+ *  - fees     = Σ resolved fee amount (percentage fees resolve against subtotal)
  *  - vat_sar  = round((subtotal + fees) * vatPct / 100, 2)   ← VAT on items+fees
  *  - total    = subtotal + fees + vat_sar
  *
- * In Rizq, VAT is fixed at 15% (toggle on) or 0% (toggle off) at the UI layer,
- * but this fn accepts any vatPct so it stays a faithful mirror of the trigger.
+ * Percentage fees are a percent of the items subtotal (before VAT and before
+ * other fees) — they never stack on each other. In Rizq, VAT is fixed at 15%
+ * (toggle on) or 0% (toggle off) at the UI layer, but this fn accepts any vatPct
+ * so it stays a faithful mirror of the trigger.
  */
 export function computeInvoiceTotals(
   items: InvoiceLineItem[],
@@ -139,7 +166,7 @@ export function computeInvoiceTotals(
   const subtotal = round2(
     items.reduce((sum, item) => sum + safeNum(item.total_sar), 0)
   );
-  const fees_sar = feesSubtotal(fees);
+  const fees_sar = feesSubtotal(fees, subtotal);
   const vat_sar = round2((subtotal + fees_sar) * safePct / 100);
   const total_sar = subtotal + fees_sar + vat_sar;
 

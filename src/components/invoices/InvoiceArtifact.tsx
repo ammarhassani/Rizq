@@ -491,6 +491,8 @@ function TotalsSection({
         .map((f) => ({
           name: str(f["name"]),
           amount_sar: num(f["amount_sar"]),
+          isPct: f["fee_type"] === "percentage",
+          rate: f["rate"] != null ? num(f["rate"]) : null,
         }))
         .filter((f) => f.name.length > 0)
     : [];
@@ -510,10 +512,15 @@ function TotalsSection({
           </span>
         </div>
 
-        {/* Fee rows — each categorized fixed fee, by name */}
+        {/* Fee rows — fixed or percentage; percentage shows its rate */}
         {fees.map((f, i) => (
           <div key={i} className="flex items-center justify-between gap-4">
-            <span className={`text-sm text-rizq-ink-soft ${font}`}>{f.name}</span>
+            <span className={`text-sm text-rizq-ink-soft ${font}`}>
+              {f.name}
+              {f.isPct && f.rate != null && (
+                <span className="text-xs text-rizq-ink-soft/50"> ({f.rate}%)</span>
+              )}
+            </span>
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
               {fmtMoney(f.amount_sar, locale)}{" "}
               <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>

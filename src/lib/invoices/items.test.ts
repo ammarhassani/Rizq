@@ -4,6 +4,7 @@ import {
   computeTotals,
   computeInvoiceTotals,
   feesSubtotal,
+  resolveFeeAmount,
   type InvoiceLineItem,
   type InvoiceFee,
 } from "./items";
@@ -206,12 +207,12 @@ describe("computeTotals — negative/NaN guards", () => {
 // ---------------------------------------------------------------------------
 
 describe("feesSubtotal", () => {
-  it("sums fee amounts, rounding to 2dp", () => {
+  it("sums fixed fee amounts, rounding to 2dp", () => {
     const fees: InvoiceFee[] = [
       { name: "استعجال", category: null, amount_sar: 150.005 },
       { name: "توصيل", category: "لوجستيات", amount_sar: 50 },
     ];
-    expect(feesSubtotal(fees)).toBe(200.01);
+    expect(feesSubtotal(fees, 1000)).toBe(200.01);
   });
 
   it("treats negative/NaN fee amounts as 0", () => {
@@ -220,11 +221,43 @@ describe("feesSubtotal", () => {
       { name: "b", category: null, amount_sar: NaN },
       { name: "c", category: null, amount_sar: 80 },
     ];
-    expect(feesSubtotal(fees)).toBe(80);
+    expect(feesSubtotal(fees, 1000)).toBe(80);
+  });
+
+  it("resolves percentage fees against the items subtotal", () => {
+    const fees: InvoiceFee[] = [
+      { name: "عمولة المنصة", category: null, amount_sar: 0, fee_type: "percentage", rate: 5 },
+      { name: "توصيل", category: null, amount_sar: 50, fee_type: "fixed", rate: null },
+    ];
+    // 5% of 1000 = 50, plus the 50 fixed = 100
+    expect(feesSubtotal(fees, 1000)).toBe(100);
+  });
+
+  it("percentage fee scales with the subtotal (ignores its stored amount_sar)", () => {
+    const fees: InvoiceFee[] = [
+      { name: "عمولة", category: null, amount_sar: 999, fee_type: "percentage", rate: 10 },
+    ];
+    expect(feesSubtotal(fees, 2500)).toBe(250);
   });
 
   it("empty fees → 0", () => {
-    expect(feesSubtotal([])).toBe(0);
+    expect(feesSubtotal([], 1000)).toBe(0);
+  });
+});
+
+describe("resolveFeeAmount", () => {
+  it("fixed fee → its flat amount", () => {
+    expect(resolveFeeAmount({ name: "x", category: null, amount_sar: 75, fee_type: "fixed", rate: null }, 1000)).toBe(75);
+  });
+  it("absent fee_type → treated as fixed", () => {
+    expect(resolveFeeAmount({ name: "x", category: null, amount_sar: 40 }, 1000)).toBe(40);
+  });
+  it("percentage fee → rate% of subtotal, rounded 2dp", () => {
+    expect(resolveFeeAmount({ name: "x", category: null, amount_sar: 0, fee_type: "percentage", rate: 7.5 }, 1000)).toBe(75);
+    expect(resolveFeeAmount({ name: "x", category: null, amount_sar: 0, fee_type: "percentage", rate: 3 }, 333.33)).toBe(10);
+  });
+  it("percentage with missing/NaN rate → 0", () => {
+    expect(resolveFeeAmount({ name: "x", category: null, amount_sar: 0, fee_type: "percentage", rate: null }, 1000)).toBe(0);
   });
 });
 
@@ -256,5 +289,30 @@ describe("computeInvoiceTotals", () => {
     expect(r.fees_sar).toBe(0);
     expect(r.vat_sar).toBe(150);
     expect(r.total_sar).toBe(1150);
+  });
+
+  it("percentage fee resolves against the items subtotal, then VAT on items+fee", () => {
+    const items: InvoiceLineItem[] = [item("خدمة", 1, 1000)];
+    const fees: InvoiceFee[] = [
+      { name: "عمولة المنصة", category: null, amount_sar: 0, fee_type: "percentage", rate: 5 },
+    ];
+    const r = computeInvoiceTotals(items, fees, 15);
+    // fee = 5% of 1000 = 50; base = 1050; vat = 157.5; total = 1207.5
+    expect(r.fees_sar).toBe(50);
+    expect(r.vat_sar).toBe(157.5);
+    expect(r.total_sar).toBe(1207.5);
+  });
+
+  it("mixes a fixed and a percentage fee", () => {
+    const items: InvoiceLineItem[] = [item("خدمة", 2, 500)];
+    const fees: InvoiceFee[] = [
+      { name: "توصيل", category: null, amount_sar: 75, fee_type: "fixed", rate: null },
+      { name: "عمولة", category: null, amount_sar: 0, fee_type: "percentage", rate: 10 },
+    ];
+    const r = computeInvoiceTotals(items, fees, 0);
+    // subtotal 1000; fees = 75 + 100 = 175; total = 1175
+    expect(r.subtotal_sar).toBe(1000);
+    expect(r.fees_sar).toBe(175);
+    expect(r.total_sar).toBe(1175);
   });
 });

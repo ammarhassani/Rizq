@@ -17,7 +17,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createInvoice } from "@/app/actions/invoices/createInvoice";
-import { computeInvoiceTotals, lineItemTotal } from "@/lib/invoices/items";
+import { computeInvoiceTotals, lineItemTotal, resolveFeeAmount } from "@/lib/invoices/items";
 import type { InvoiceFee } from "@/lib/invoices/items";
 import { Loader2, Trash2, Check } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
@@ -398,14 +398,21 @@ export function InvoiceForm({
                     dir={dir}
                   >
                     <div className="min-w-0">
-                      <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{fee.name}</p>
+                      <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>
+                        {fee.name}
+                        {fee.fee_type === "percentage" && (
+                          <span className={`ms-1.5 text-xs font-normal text-rizq-ink-soft/60 ${font}`}>
+                            ({fee.rate ?? 0}%)
+                          </span>
+                        )}
+                      </p>
                       {fee.category && (
                         <p className={`text-xs text-rizq-ink-soft/60 truncate ${font}`}>{fee.category}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-                        {fmtMoney(fee.amount_sar)}{" "}
+                        {fmtMoney(resolveFeeAmount(fee, totals.subtotal_sar))}{" "}
                         <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{currency}</span>
                       </span>
                       <button

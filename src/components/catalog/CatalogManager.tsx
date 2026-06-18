@@ -182,7 +182,9 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
       download("catalog-fees.csv", toCsv(visibleFees, [
         { key: "name", header: "name" },
         { key: "category", header: "category" },
+        { key: "fee_type", header: "fee_type" },
         { key: "amount_sar", header: "amount_sar" },
+        { key: "percentage", header: "percentage" },
       ]));
     }
   }
@@ -215,12 +217,33 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
         if (res.ok) router.refresh();
       });
     } else {
-      const all = records.map((r) => ({
-        name: (r["name"] ?? r["fee"] ?? "").trim(),
-        category: r["category"] || undefined,
-        amount_sar: parseMoneyCell(r["amountsar"] ?? r["amount"] ?? r["price"]),
-      }));
-      const rows = all.filter((r) => r.name && r.amount_sar != null) as { name: string; category?: string; amount_sar: number }[];
+      const all = records.map((r) => {
+        const isPct = (r["feetype"] ?? r["fee_type"] ?? "").trim().toLowerCase() === "percentage";
+        const pct = parseMoneyCell(r["percentage"] ?? r["percent"] ?? r["rate"]);
+        return {
+          name: (r["name"] ?? r["fee"] ?? "").trim(),
+          category: r["category"] || undefined,
+          fee_type: isPct ? ("percentage" as const) : ("fixed" as const),
+          amount_sar: parseMoneyCell(r["amountsar"] ?? r["amount"] ?? r["price"]),
+          percentage: pct,
+        };
+      });
+      // A row is valid if it's a fixed fee with an amount, or a percentage fee
+      // with a rate in (0, 100].
+      const rows = all
+        .filter((r) =>
+          r.name &&
+          (r.fee_type === "percentage"
+            ? r.percentage != null && r.percentage > 0 && r.percentage <= 100
+            : r.amount_sar != null)
+        )
+        .map((r) => ({
+          name: r.name,
+          category: r.category,
+          fee_type: r.fee_type,
+          amount_sar: r.fee_type === "percentage" ? 0 : (r.amount_sar as number),
+          percentage: r.fee_type === "percentage" ? (r.percentage as number) : undefined,
+        }));
       const skipped = all.length - rows.length;
       if (rows.length === 0) { setImportMsg(t("importEmpty")); return; }
       startImport(async () => {
@@ -374,7 +397,11 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                 <Card key={p.id} archived={!p.is_active} selected={selFees.has(p.id)} onToggle={() => toggleSel(p.id)} selectLabel={t("select")} archivedBadge={t("archivedBadge")} font={font}>
                   <h3 className={cn("text-base font-semibold leading-snug text-rizq-ink", font)}>{p.name}</h3>
                   {p.category && <CategoryChip label={p.category} font={font} />}
-                  <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{fmt(p.amount_sar)}{" "}<span className={cn("text-xs font-normal text-rizq-ink-soft/60", font)}>{currency}</span></p>
+                  {p.fee_type === "percentage" ? (
+                    <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{p.percentage ?? 0}%</p>
+                  ) : (
+                    <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{fmt(p.amount_sar)}{" "}<span className={cn("text-xs font-normal text-rizq-ink-soft/60", font)}>{currency}</span></p>
+                  )}
                   <RowActions
                     font={font}
                     actions={

@@ -76,16 +76,18 @@ export default async function InvoicesNewPage({
 
   const { data: presets } = await supabase
     .from("fee_presets")
-    .select("id, name, category, amount_sar")
+    .select("id, name, category, amount_sar, fee_type, percentage")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
   const feePresets = (presets ?? []).map(
-    (p: { id: string; name: string; category: string | null; amount_sar: number }) => ({
+    (p: { id: string; name: string; category: string | null; amount_sar: number; fee_type: string | null; percentage: number | null }) => ({
       id: p.id,
       name: p.name,
       category: p.category ?? null,
       amount_sar: Number(p.amount_sar),
+      fee_type: p.fee_type === "percentage" ? ("percentage" as const) : ("fixed" as const),
+      percentage: p.percentage != null ? Number(p.percentage) : null,
     })
   );
 

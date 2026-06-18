@@ -137,6 +137,8 @@ export async function buildInvoiceArtifactInputFromRow({
           name: String(f["name"] ?? ""),
           category: (f["category"] as string | null) ?? null,
           amount_sar: Number(f["amount_sar"]) || 0,
+          fee_type: f["fee_type"] === "percentage" ? ("percentage" as const) : ("fixed" as const),
+          rate: f["rate"] != null ? Number(f["rate"]) : null,
         }))
         .filter((f) => f.name.length > 0)
     : [];

@@ -42,8 +42,16 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
 
   const [name, setName] = useState(initialData?.name ?? "");
   const [category, setCategory] = useState(initialData?.category ?? "");
+  const [feeType, setFeeType] = useState<"fixed" | "percentage">(
+    initialData?.fee_type ?? "fixed"
+  );
   const [amount, setAmount] = useState(
-    initialData?.amount_sar != null ? String(initialData.amount_sar) : ""
+    initialData?.amount_sar != null && (initialData.fee_type ?? "fixed") === "fixed"
+      ? String(initialData.amount_sar)
+      : ""
+  );
+  const [percentage, setPercentage] = useState(
+    initialData?.percentage != null ? String(initialData.percentage) : ""
   );
 
   const inputClass = cn(
@@ -65,8 +73,15 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
       setError(t("errors.nameRequired"));
       return;
     }
+    const isPct = feeType === "percentage";
     const amt = parseNum(amount);
-    if (!amount.trim() || amt <= 0) {
+    const pct = parseNum(percentage);
+    if (isPct) {
+      if (!percentage.trim() || pct <= 0 || pct > 100) {
+        setError(isAr ? "أدخل نسبة بين 0 و100." : "Enter a percentage between 0 and 100.");
+        return;
+      }
+    } else if (!amount.trim() || amt <= 0) {
       setError(t("errors.amountRequired"));
       return;
     }
@@ -79,7 +94,9 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
           patch: {
             name: trimmedName,
             category: category.trim() || null,
-            amount_sar: amt,
+            fee_type: feeType,
+            amount_sar: isPct ? 0 : amt,
+            percentage: isPct ? pct : null,
           },
         });
         if (!result.ok) {
@@ -94,7 +111,9 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
       const result = await createFeePreset({
         name: trimmedName,
         category: category.trim() || undefined,
-        amount_sar: amt,
+        fee_type: feeType,
+        amount_sar: isPct ? 0 : amt,
+        percentage: isPct ? pct : undefined,
       });
 
       if (!result.ok) {
@@ -134,28 +153,87 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
         />
       </div>
 
-      {/* Amount (required) + Category */}
+      {/* Fee type — fixed amount or a percentage of the items subtotal */}
+      <div>
+        <label className={labelClass}>{isAr ? "نوع الرسوم" : "Fee type"}</label>
+        <div dir={dir} className="inline-flex rounded-full border border-rizq-gold/30 bg-rizq-cream/60 p-1">
+          {([
+            { key: "fixed", label: isAr ? "قيمة ثابتة" : "Fixed value" },
+            { key: "percentage", label: isAr ? "نسبة مئوية" : "Percentage" },
+          ] as const).map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setFeeType(opt.key)}
+              aria-pressed={feeType === opt.key}
+              className={cn(
+                "rounded-full px-4 py-2 text-sm font-medium transition-all",
+                feeType === opt.key
+                  ? "bg-rizq-green text-rizq-cream"
+                  : "text-rizq-ink-soft hover:text-rizq-ink",
+                font
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Value (fixed amount OR percentage) + Category */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>
-            {t("amountLabel")} <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="any"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-              className={cn(inputClass, "pe-12 tabular font-sans")}
-              dir="ltr"
-            />
-            <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
-              {isAr ? "ر.س" : "SAR"}
-            </span>
-          </div>
+          {feeType === "percentage" ? (
+            <>
+              <label className={labelClass}>
+                {isAr ? "النسبة" : "Percentage"} <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  max="100"
+                  step="any"
+                  value={percentage}
+                  onChange={(e) => setPercentage(e.target.value)}
+                  placeholder="0"
+                  className={cn(inputClass, "pe-10 tabular font-sans")}
+                  dir="ltr"
+                />
+                <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
+                  %
+                </span>
+              </div>
+              <p className={`mt-1.5 text-xs text-rizq-ink-soft/60 ${font}`}>
+                {isAr
+                  ? "نسبة من المجموع الفرعي للبنود (قبل الضريبة)."
+                  : "Percent of the items subtotal (before VAT)."}
+              </p>
+            </>
+          ) : (
+            <>
+              <label className={labelClass}>
+                {t("amountLabel")} <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="any"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0"
+                  className={cn(inputClass, "pe-12 tabular font-sans")}
+                  dir="ltr"
+                />
+                <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
+                  {isAr ? "ر.س" : "SAR"}
+                </span>
+              </div>
+            </>
+          )}
         </div>
         <div>
           <label className={labelClass}>

@@ -12,7 +12,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { computeTotals } from "@/lib/invoices/items";
+import { computeTotals, resolveFeeAmount } from "@/lib/invoices/items";
 import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
@@ -33,6 +33,10 @@ const FeeSchema = z.object({
   name: z.string().min(1),
   category: z.string().nullable().optional(),
   amount_sar: z.number().nonnegative(),
+  // A percentage fee carries fee_type "percentage" + rate; its amount_sar is
+  // resolved server-side against the items subtotal (the client value is a hint).
+  fee_type: z.enum(["fixed", "percentage"]).optional(),
+  rate: z.number().min(0).max(100).nullable().optional(),
 });
 
 const PaymentMethodEnum = z.enum(["bank_transfer", "stc_pay", "cash", "other"]);
@@ -126,12 +130,20 @@ export async function createInvoice(
   // Compute the items subtotal (authoritative — the DB trigger then adds fees
   // into the VAT base and the grand total).
   const items: InvoiceLineItem[] = data.items as InvoiceLineItem[];
-  const fees: InvoiceFee[] = data.fees.map((f) => ({
-    name: f.name,
-    category: f.category ?? null,
-    amount_sar: f.amount_sar,
-  }));
   const subtotalSar = computeTotals(items, data.vat_pct).subtotal_sar;
+  // Resolve each fee to a concrete amount (percentage fees against the items
+  // subtotal) so the stored amount_sar is authoritative and the DB trigger,
+  // which sums amount_sar, stays correct. fee_type/rate are kept for display.
+  const fees: InvoiceFee[] = data.fees.map((f) => {
+    const fee: InvoiceFee = {
+      name: f.name,
+      category: f.category ?? null,
+      amount_sar: f.amount_sar,
+      fee_type: f.fee_type ?? "fixed",
+      rate: f.rate ?? null,
+    };
+    return { ...fee, amount_sar: resolveFeeAmount(fee, subtotalSar) };
+  });
 
   // Resolve due_date — use provided or default to today + 15 days
   let dueDate: string;
