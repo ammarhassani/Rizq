@@ -21,8 +21,11 @@ const InputSchema = z.object({
   brief_text: z.string().min(10),
   client_name: z.string().optional(),
   client_id: z.string().uuid().optional(),
-  city_slug: z.string().min(1).max(64),
-  experience_tier_slug: z.string().min(1).max(64),
+  // Resolved in the BACKGROUND when omitted: city from the client (then the
+  // freelancer's own city), experience tier from the freelancer's profile.
+  // Kept optional so an explicit override still works.
+  city_slug: z.string().min(1).max(64).optional(),
+  experience_tier_slug: z.string().min(1).max(64).optional(),
   template_id: z.string().uuid().optional(),
   // Optional, secondary input (keeps "≤3 inputs to first value"). Threaded into
   // scope_json.extras.project_goals so the Phase D prose pass can ground the
@@ -120,11 +123,12 @@ export async function generateProposal(
   // 2b. Resolve client_id → client_name when client_id is provided (M2→M1 wiring)
   let resolvedClientId: string | null = input.client_id ?? null;
   let resolvedClientName: string | null = input.client_name ?? null;
+  let resolvedClientCity: string | null = null;
 
   if (input.client_id) {
     const { data: clientRow } = await supabase
       .from("clients")
-      .select("id, name")
+      .select("id, name, city")
       .eq("id", input.client_id)
       .eq("user_id", userId)
       .maybeSingle();
@@ -132,11 +136,22 @@ export async function generateProposal(
     if (clientRow) {
       resolvedClientId = clientRow.id as string;
       resolvedClientName = clientRow.name as string;
+      resolvedClientCity = (clientRow.city as string | null) ?? null;
     } else {
       // client_id supplied but not owned by user — ignore silently, fall back to free-text
       resolvedClientId = null;
     }
   }
+
+  // Background pricing inputs (the generate form no longer asks for these):
+  // the freelancer's saved city + experience tier (from onboarding / settings).
+  const { data: ownerProfile } = await supabase
+    .from("users")
+    .select("city, experience_tier_id")
+    .eq("id", userId)
+    .maybeSingle();
+  const ownerCity = (ownerProfile?.city as string | null) ?? null;
+  const ownerTierId = (ownerProfile?.experience_tier_id as string | null) ?? null;
 
   // 2d. Load template defaults when template_id is provided
   let templateDefaults: PricingJson | null = null;
@@ -174,21 +189,47 @@ export async function generateProposal(
     scope.extras = { ...(scope.extras ?? {}), project_goals: trimmedGoals };
   }
 
-  // 5. Validate city/tier slugs; specialty comes from scope (already validated by AI)
+  // 5. Resolve specialty (from scope) + city + experience tier.
+  //    City and tier are resolved in the BACKGROUND so the freelancer never
+  //    re-picks them: city = client's city → freelancer's city → first active;
+  //    tier = freelancer's profile tier → "mid" → first. An explicit slug wins.
   const specialtySlug = scope.specialty;
-  const citySlug = input.city_slug;
-  const tierSlug = input.experience_tier_slug;
-
   const specialtyId = refCtx.specialtyIdBySlug.get(specialtySlug);
-  const cityId = refCtx.cityIdBySlug.get(citySlug);
-  const tierId = refCtx.tierIdBySlug.get(tierSlug);
-
-  if (!cityId || !tierId) {
-    return { ok: false, code: "invalid" };
-  }
   if (!specialtyId) {
     // Specialty extracted by AI but not in our active list
     return { ok: false, code: "invalid" };
+  }
+
+  const matchCitySlug = (text: string | null): string | null => {
+    if (!text) return null;
+    const m = refCtx.cities.find(
+      (c) => c.slug === text || c.name_ar === text || c.name_en === text
+    );
+    return m?.slug ?? null;
+  };
+  const citySlug =
+    (input.city_slug && refCtx.cityIdBySlug.has(input.city_slug) ? input.city_slug : null) ??
+    matchCitySlug(resolvedClientCity) ??
+    matchCitySlug(ownerCity) ??
+    refCtx.cities[0]?.slug ??
+    "";
+
+  const tierFromProfile = ownerTierId
+    ? refCtx.tiers.find((tr) => tr.id === ownerTierId)?.slug ?? null
+    : null;
+  const tierSlug =
+    (input.experience_tier_slug && refCtx.tierIdBySlug.has(input.experience_tier_slug)
+      ? input.experience_tier_slug
+      : null) ??
+    tierFromProfile ??
+    (refCtx.tierIdBySlug.has("mid") ? "mid" : null) ??
+    refCtx.tiers[0]?.slug ??
+    "";
+
+  const cityId = refCtx.cityIdBySlug.get(citySlug);
+  const tierId = refCtx.tierIdBySlug.get(tierSlug);
+  if (!cityId || !tierId) {
+    return { ok: false, code: "error" };
   }
 
   // 6. Resolve market price band

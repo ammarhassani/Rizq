@@ -37,16 +37,11 @@ type Option = { slug: string; label: string; hint?: string };
 
 type TemplateOption = { id: string; name_ar: string; name_en: string | null };
 
-type ClientOption = { id: string; name: string; citySlug?: string | null };
+type ClientOption = { id: string; name: string };
 
 type Props = {
   locale: "ar" | "en";
   specialties: Option[];
-  cities: Option[];
-  tiers: Option[];
-  defaultCitySlug: string;
-  /** The user's experience tier (from onboarding / settings); defaults the select. */
-  defaultTierSlug?: string;
   templates?: TemplateOption[];
   clients?: ClientOption[];
 };
@@ -67,7 +62,7 @@ type ViewKind =
 // Main component
 // ---------------------------------------------------------------------------
 
-export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, defaultTierSlug = "mid", templates = [], clients = [] }: Props) {
+export function ProposalFlow({ locale, specialties, templates = [], clients = [] }: Props) {
   const t = useTranslations("Proposals.new");
   const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
@@ -80,8 +75,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   const [briefText, setBriefText] = useState("");
   const [goalsText, setGoalsText] = useState("");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
-  const [citySlug, setCitySlug] = useState(defaultCitySlug);
-  const [tierSlug, setTierSlug] = useState(defaultTierSlug);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   // Main flow transition (generate + followups)
@@ -106,20 +99,15 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
       });
       return;
     }
-    if (!citySlug || !tierSlug) {
-      setView({ kind: "form", error: t("errors.selectCityTier") });
-      return;
-    }
     setView({ kind: "loading" });
 
     startFlowTransition(async () => {
       const result = await generateProposal({
         brief_text: briefText.trim(),
         // Client is mandatory — always a real client from the book (client_name
-        // is resolved server-side from the id).
+        // is resolved server-side from the id). City + experience tier are
+        // resolved server-side (client city + the freelancer's profile).
         client_id: selectedClientId,
-        city_slug: citySlug,
-        experience_tier_slug: tierSlug,
         template_id: selectedTemplateId || undefined,
         project_goals: goalsText.trim() || undefined,
       });
@@ -367,12 +355,7 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         <ClientPicker
           id="client-picker"
           value={selectedClientId}
-          onChange={(v) => {
-            setSelectedClientId(v);
-            // Auto-fill the pricing city from the selected client's city (if set).
-            const picked = clients.find((c) => c.id === v);
-            if (picked?.citySlug) setCitySlug(picked.citySlug);
-          }}
+          onChange={(v) => setSelectedClientId(v)}
           clients={clients}
           locale={locale}
           noneLabel={t("newClient")}
@@ -416,27 +399,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         />
       </div>
 
-      {/* City select */}
-      <SelectField
-        locale={locale}
-        id="city"
-        label={t("cityLabel")}
-        placeholder={t("cityPlaceholder")}
-        value={citySlug}
-        onChange={setCitySlug}
-        options={cities}
-      />
-
-      {/* Experience tier select */}
-      <SelectField
-        locale={locale}
-        id="tier"
-        label={t("tierLabel")}
-        placeholder={t("tierPlaceholder")}
-        value={tierSlug}
-        onChange={setTierSlug}
-        options={tiers}
-      />
 
       {/* Error */}
       {formError && (
@@ -466,51 +428,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         )}
       </button>
     </form>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// SelectField (same pattern as ToolFlow)
-// ---------------------------------------------------------------------------
-
-function SelectField({
-  locale,
-  id,
-  label,
-  placeholder,
-  value,
-  onChange,
-  options,
-}: {
-  locale: "ar" | "en";
-  id: string;
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: Option[];
-}) {
-  const tCommon = useTranslations("Common");
-  const font = locale === "ar" ? "font-arabic" : "font-sans";
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
-      >
-        {label}
-      </label>
-      <Combobox
-        id={id}
-        locale={locale}
-        value={value || null}
-        onChange={(v) => onChange(v ?? "")}
-        options={options.map((o) => ({ value: o.slug, label: o.label, hint: o.hint }))}
-        placeholder={placeholder}
-        searchPlaceholder={tCommon("combobox.searchPlaceholder")}
-        emptyText={tCommon("combobox.noResults")}
-      />
-    </div>
   );
 }
 

@@ -13,7 +13,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCities, getExperienceTiers } from "@/lib/pricing/refDataDb";
 import { listTemplates } from "@/app/actions/proposals/templates";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
@@ -71,63 +70,22 @@ export default async function ProposalNewPage({
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const isAr = locale === "ar";
 
-  // Load ref data + templates + clients in parallel
-  const [cities, tiers, templatesResult, clientsRaw] = await Promise.all([
-    getCities(),
-    getExperienceTiers(),
+  // Templates + clients only. City + experience tier are resolved server-side
+  // at generation time (client city + the freelancer's profile), so the form
+  // does not ask for them.
+  const [templatesResult, clientsRaw] = await Promise.all([
     listTemplates(),
     supabase
       .from("clients")
-      .select("id, name, city")
+      .select("id, name")
       .eq("user_id", userData.user.id)
       .eq("is_active", true)
       .order("name", { ascending: true }),
   ]);
   const userTemplates = templatesResult.ok ? templatesResult.templates : [];
-
-  // Match a free-text city to a known city slug (null when no match / no value).
-  const matchCitySlug = (text: string | null): string | null => {
-    if (!text) return null;
-    const m = cities.find(
-      (c) => c.name_ar === text || c.name_en === text || c.slug === text
-    );
-    return m?.slug ?? null;
-  };
-
-  // Carry each client's city (mapped to a slug) so selecting a client can set
-  // the pricing city from the client record (the city field is auto-filled).
   const userClients = (clientsRaw.data ?? []).map((c) => ({
     id: c.id as string,
     name: c.name as string,
-    citySlug: matchCitySlug((c.city as string | null) ?? null),
-  }));
-
-  // Load user profile for default city + experience tier (from onboarding /
-  // settings) so the freelancer never re-picks their own experience each time.
-  const { data: userProfile } = await supabase
-    .from("users")
-    .select("city, experience_tier_id")
-    .eq("id", userData.user.id)
-    .single();
-
-  const storedCity = (userProfile?.city as string | null) ?? null;
-  const defaultCitySlug = matchCitySlug(storedCity) ?? cities[0]?.slug ?? "";
-
-  // Resolve the user's experience tier to a slug; default to "mid" if unset.
-  const userTierId = (userProfile?.experience_tier_id as string | null) ?? null;
-  const defaultTierSlug =
-    (userTierId ? tiers.find((tr) => tr.id === userTierId)?.slug : null) ?? "mid";
-
-  // Map to option shape with locale-aware labels
-  const cityOptions = cities.map((c) => ({
-    slug: c.slug,
-    label: isAr ? c.name_ar : c.name_en,
-  }));
-
-  const tierOptions = tiers.map((tier) => ({
-    slug: tier.slug,
-    label: isAr ? tier.name_ar : tier.name_en,
-    hint: tierYears(tier.years_min, tier.years_max, locale as "ar" | "en"),
   }));
 
   return (
@@ -146,10 +104,6 @@ export default async function ProposalNewPage({
         <ProposalFlow
           locale={locale as "ar" | "en"}
           specialties={[]} /* specialty is AI-detected from brief — no manual select */
-          cities={cityOptions}
-          tiers={tierOptions}
-          defaultCitySlug={defaultCitySlug}
-          defaultTierSlug={defaultTierSlug}
           templates={userTemplates.map((t) => ({
             id: t.id,
             name_ar: t.name_ar,
@@ -162,13 +116,3 @@ export default async function ProposalNewPage({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function tierYears(min: number, max: number | null, locale: "ar" | "en"): string {
-  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format;
-  if (max === null) return locale === "ar" ? `${fmt(min)}+ سنوات` : `${fmt(min)}+ yrs`;
-  if (min === max) return locale === "ar" ? `${fmt(min)} سنة` : `${fmt(min)} yr`;
-  return locale === "ar" ? `${fmt(min)} إلى ${fmt(max)} سنوات` : `${fmt(min)} to ${fmt(max)} yrs`;
-}
