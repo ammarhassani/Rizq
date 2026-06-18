@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Toaster } from "sonner";
 import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
 import { NavProgress } from "./NavProgress";
@@ -39,7 +40,49 @@ export function AppShellClient(props: Props) {
     <CommandPaletteProvider>
       <ShellFrame {...props} />
       <CommandPaletteMount locale={props.locale} />
+      <BrandToaster locale={props.locale} />
     </CommandPaletteProvider>
+  );
+}
+
+/**
+ * Global toast surface — mounted once for the whole authed shell so any page
+ * (Catalog today, clients/invoices/income later) can fire `toast()` from sonner.
+ *
+ * Themed on-brand: cream surface, gold hairline border, rizq-ink text, rounded-xl,
+ * and the locale-appropriate app font (Tajawal for Arabic, Inter for English).
+ * `dir` flips the toast layout + Undo button placement for RTL. Sonner already
+ * respects prefers-reduced-motion, dismiss-on-swipe, and stacking.
+ */
+function BrandToaster({ locale }: { locale: "ar" | "en" }) {
+  const isAr = locale === "ar";
+  return (
+    <Toaster
+      position="bottom-center"
+      dir={isAr ? "rtl" : "ltr"}
+      closeButton
+      gap={10}
+      // 5s default; the Undo (action) toasts pass their own ~7s duration.
+      duration={5000}
+      toastOptions={{
+        className: isAr ? "font-arabic" : "font-sans",
+        style: {
+          background: "var(--color-rizq-cream)",
+          border: "1px solid color-mix(in srgb, var(--color-rizq-gold) 45%, transparent)",
+          color: "var(--color-rizq-ink)",
+          borderRadius: "0.75rem",
+          boxShadow: "0 8px 30px -10px rgba(26, 26, 26, 0.25)",
+        },
+        classNames: {
+          title: "text-sm font-medium",
+          description: "text-rizq-ink-soft",
+          actionButton:
+            "!bg-rizq-green !text-rizq-cream !rounded-full !px-3 !text-xs !font-medium hover:!bg-rizq-green-dark",
+          closeButton:
+            "!bg-rizq-cream !border-rizq-gold/40 !text-rizq-ink-soft hover:!text-rizq-ink",
+        },
+      }}
+    />
   );
 }
 

@@ -2083,6 +2083,10 @@
     "histTotalRevenue": "إجمالي الإيراد",
     "histRecentHeading": "أحدث الفواتير",
     "histClientUnknown": "بدون عميل",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "archivedToast": "تمت الأرشفة ({count})",
+    "restoredToast": "تمت الاستعادة",
+    "deletedToast": "تم الحذف ({count})",
+    "undo": "تراجع"
   }
 }

@@ -2083,6 +2083,10 @@
     "histTotalRevenue": "Total revenue",
     "histRecentHeading": "Recent invoices",
     "histClientUnknown": "No client",
-    "close": "Close"
+    "close": "Close",
+    "archivedToast": "Archived ({count})",
+    "restoredToast": "Restored",
+    "deletedToast": "Deleted ({count})",
+    "undo": "Undo"
   }
 }

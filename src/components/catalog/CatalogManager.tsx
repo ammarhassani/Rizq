@@ -15,6 +15,7 @@
 import * as React from "react";
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import {
@@ -41,7 +42,9 @@ type Props = {
 
 type Tab = "items" | "fees";
 type StatusFilter = "active" | "archived" | "all";
-type PendingConfirm = { op: "archive" | "delete"; kind: Tab; ids: string[] } | null;
+// Only DELETE is gated by the confirm dialog now — it is irreversible. Archive
+// runs instantly with an Undo toast instead (the modern "act now, undo" pattern).
+type PendingConfirm = { op: "delete"; kind: Tab; ids: string[] } | null;
 
 export function CatalogManager({ locale, items, feePresets }: Props) {
   const t = useTranslations("Catalog");
@@ -101,26 +104,57 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
   }
 
   // ── Archive / restore / delete ───────────────────────────────────────────
-  function doRestore(kind: Tab, ids: string[]) {
+  const setActive = React.useCallback(
+    (kind: Tab, ids: string[], active: boolean) =>
+      kind === "items" ? setItemsActive({ ids, active }) : setFeePresetsActive({ ids, active }),
+    []
+  );
+
+  // Restore the given ids back to active, then show a brief confirmation toast.
+  // `silent` skips the toast (used internally so Undo→Restore reads naturally).
+  function doRestore(kind: Tab, ids: string[], silent = false) {
     if (ids.length === 0) return;
     startMutate(async () => {
-      const r = kind === "items"
-        ? await setItemsActive({ ids, active: true })
-        : await setFeePresetsActive({ ids, active: true });
-      if (r.ok) afterMutation();
+      const r = await setActive(kind, ids, true);
+      if (r.ok) {
+        afterMutation();
+        if (!silent) toast.success(t("restoredToast"));
+      }
     });
   }
+
+  // Archive instantly (no confirm dialog) and offer Undo. The ids are captured
+  // in this closure so Undo restores exactly what was archived, even if the
+  // selection has since changed.
+  function doArchive(kind: Tab, ids: string[]) {
+    if (ids.length === 0) return;
+    startMutate(async () => {
+      const r = await setActive(kind, ids, false);
+      if (r.ok) {
+        afterMutation();
+        toast(t("archivedToast", { count: ids.length }), {
+          duration: 7000,
+          action: {
+            label: t("undo"),
+            onClick: () => doRestore(kind, ids, true),
+          },
+        });
+      }
+    });
+  }
+
+  // Confirm dialog now handles DELETE only (irreversible).
   function confirmPending() {
     if (!confirm) return;
-    const { op, kind, ids } = confirm;
+    const { kind, ids } = confirm;
+    const count = ids.length;
     startMutate(async () => {
-      let r: { ok: boolean };
-      if (op === "delete") {
-        r = kind === "items" ? await deleteItems({ ids }) : await deleteFeePresets({ ids });
-      } else {
-        r = kind === "items" ? await setItemsActive({ ids, active: false }) : await setFeePresetsActive({ ids, active: false });
+      const r = kind === "items" ? await deleteItems({ ids }) : await deleteFeePresets({ ids });
+      if (r.ok) {
+        setConfirm(null);
+        afterMutation();
+        toast.success(t("deletedToast", { count }));
       }
-      if (r.ok) { setConfirm(null); afterMutation(); }
     });
   }
 
@@ -289,7 +323,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
               </button>
             )}
             {status !== "archived" && (
-              <button type="button" disabled={isMutating} onClick={() => setConfirm({ op: "archive", kind: tab, ids: [...sel] })}
+              <button type="button" disabled={isMutating} onClick={() => doArchive(tab, [...sel])}
                 className={cn("inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/40 bg-rizq-cream px-3.5 py-2 text-sm text-rizq-ink transition-all hover:border-rizq-green/50 hover:text-rizq-green disabled:opacity-60", font)}>
                 <Trash2 size={14} aria-hidden /> <span>{t("bulkArchive")}</span>
               </button>
@@ -326,7 +360,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                         ? [
                             { icon: <Pencil size={15} aria-hidden />, label: t("edit"), onClick: () => setItemDialog({ open: true, mode: "edit", initialData: it }) },
                             { icon: <HistoryIcon size={15} aria-hidden />, label: t("history"), onClick: () => setHistoryItem(it) },
-                            { icon: <Trash2 size={15} aria-hidden />, label: t("archive"), onClick: () => setConfirm({ op: "archive", kind: "items", ids: [it.id] }) },
+                            { icon: <Trash2 size={15} aria-hidden />, label: t("archive"), onClick: () => doArchive("items", [it.id]) },
                           ]
                         : [
                             { icon: <RotateCcw size={15} aria-hidden />, label: t("restore"), onClick: () => doRestore("items", [it.id]) },
@@ -347,7 +381,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                       p.is_active
                         ? [
                             { icon: <Pencil size={15} aria-hidden />, label: t("edit"), onClick: () => setFeeDialog({ open: true, mode: "edit", initialData: p }) },
-                            { icon: <Trash2 size={15} aria-hidden />, label: t("archive"), onClick: () => setConfirm({ op: "archive", kind: "fees", ids: [p.id] }) },
+                            { icon: <Trash2 size={15} aria-hidden />, label: t("archive"), onClick: () => doArchive("fees", [p.id]) },
                           ]
                         : [
                             { icon: <RotateCcw size={15} aria-hidden />, label: t("restore"), onClick: () => doRestore("fees", [p.id]) },
@@ -365,22 +399,23 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
       <FeeDialog open={feeDialog.open} onOpenChange={(open) => setFeeDialog((s) => ({ ...s, open }))} mode={feeDialog.mode} initialData={feeDialog.initialData} onSaved={() => router.refresh()} locale={locale} />
       <SalesHistoryDialog open={historyItem !== null} onOpenChange={(open) => { if (!open) setHistoryItem(null); }} item={historyItem} locale={locale} />
 
-      {/* Confirm (archive / delete) */}
+      {/* Confirm — DELETE only (irreversible). Archive uses the instant + Undo
+          toast flow instead, so it never opens this dialog. */}
       <DialogPrimitive.Root open={confirm !== null} onOpenChange={(open) => { if (!open && !isMutating) setConfirm(null); }}>
         <DialogPrimitive.Portal>
           <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-rizq-ink/30 supports-backdrop-filter:backdrop-blur-sm data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 motion-reduce:animate-none" />
           <DialogPrimitive.Popup dir={isAr ? "rtl" : "ltr"}
             className={cn("fixed start-1/2 top-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 sm:max-w-md rounded-3xl border border-rizq-gold/25 bg-rizq-cream/98 p-6 shadow-xl sm:p-8 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:animate-none", font)}>
             <div className="flex items-start gap-3">
-              <span className={cn("mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full", confirm?.op === "delete" ? "bg-red-50 text-red-600" : "bg-rizq-gold/15 text-rizq-gold-deep")}>
+              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
                 <TriangleAlert size={18} strokeWidth={2} aria-hidden />
               </span>
               <div className="min-w-0">
                 <DialogPrimitive.Title className={cn("text-base font-semibold text-rizq-ink", font)}>
-                  {confirm?.op === "delete" ? t("deleteConfirmTitle") : t("archiveConfirmTitle")}
+                  {t("deleteConfirmTitle")}
                 </DialogPrimitive.Title>
                 <DialogPrimitive.Description className={cn("mt-1 text-sm text-rizq-ink-soft", font)}>
-                  {t(confirm?.op === "delete" ? "deleteConfirmBody" : "archiveConfirmBody", { count: confirm?.ids.length ?? 0 })}
+                  {t("deleteConfirmBody", { count: confirm?.ids.length ?? 0 })}
                 </DialogPrimitive.Description>
               </div>
             </div>
@@ -390,12 +425,11 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                 {t("confirmCancel")}
               </DialogPrimitive.Close>
               <button type="button" onClick={confirmPending} disabled={isMutating}
-                className={cn("inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-medium text-white transition-all disabled:opacity-70",
-                  confirm?.op === "delete" ? "bg-red-600 hover:bg-red-700" : "bg-rizq-green hover:bg-rizq-green-dark")}>
+                className={cn("inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-red-600 px-7 py-3 text-sm font-medium text-white transition-all hover:bg-red-700 disabled:opacity-70", font)}>
                 {isMutating ? (
-                  <><Loader2 size={16} className="animate-spin" strokeWidth={2.2} aria-hidden /><span>{confirm?.op === "delete" ? t("deleting") : t("archiving")}</span></>
+                  <><Loader2 size={16} className="animate-spin" strokeWidth={2.2} aria-hidden /><span>{t("deleting")}</span></>
                 ) : (
-                  <span>{confirm?.op === "delete" ? t("confirmDelete") : t("confirmArchive")}</span>
+                  <span>{t("confirmDelete")}</span>
                 )}
               </button>
             </div>
