@@ -8,6 +8,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2, Sparkles, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -80,47 +81,59 @@ export function InvoiceDetailActions({
 
   const allowed = TRANSITIONS[status] ?? [];
 
-  function handleMarkSent() {
-    startMarkSentTransition(async () => {
-      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: "sent" });
+  const STATUS_LABEL_AR: Record<string, string> = {
+    draft: "مسودة", sent: "مُرسَلة", viewed: "مُطَّلَع عليها",
+    paid: "مدفوعة", overdue: "متأخرة", cancelled: "ملغاة",
+  };
+  const STATUS_LABEL_EN: Record<string, string> = {
+    draft: "Draft", sent: "Sent", viewed: "Viewed",
+    paid: "Paid", overdue: "Overdue", cancelled: "Cancelled",
+  };
+
+  // Reverse a status change for the Undo toast. Uses allow_reverse since the
+  // backward step is rarely a legal forward transition.
+  function revertStatus(prevStatus: string, start: (cb: () => void) => void) {
+    start(async () => {
+      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: prevStatus, allow_reverse: true });
       if (result.ok) router.refresh();
+      else toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
     });
   }
 
-  function handleMarkViewed() {
-    startMarkViewedTransition(async () => {
-      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: "viewed" });
-      if (result.ok) router.refresh();
+  // Apply a forward status change instantly + offer Undo back to `status`.
+  function applyStatus(next: string, start: (cb: () => void) => void) {
+    const prev = status;
+    start(async () => {
+      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: next });
+      if (result.ok) {
+        router.refresh();
+        const label = isAr ? STATUS_LABEL_AR[next] : STATUS_LABEL_EN[next];
+        toast.success(isAr ? `الحالة: ${label} · يمكنك التراجع` : `Marked ${label} · Undo`, {
+          duration: 7000,
+          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev, start) },
+        });
+      } else {
+        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+      }
     });
   }
 
-  function handleMarkPaid() {
-    startMarkPaidTransition(async () => {
-      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: "paid" });
-      if (result.ok) router.refresh();
-    });
-  }
-
-  function handleMarkOverdue() {
-    startMarkOverdueTransition(async () => {
-      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: "overdue" });
-      if (result.ok) router.refresh();
-    });
-  }
-
-  function handleMarkCancelled() {
-    startMarkCancelledTransition(async () => {
-      const result = await markInvoiceStatus({ invoice_id: invoiceId, status: "cancelled" });
-      if (result.ok) router.refresh();
-    });
-  }
+  function handleMarkSent() { applyStatus("sent", startMarkSentTransition); }
+  function handleMarkViewed() { applyStatus("viewed", startMarkViewedTransition); }
+  function handleMarkPaid() { applyStatus("paid", startMarkPaidTransition); }
+  function handleMarkOverdue() { applyStatus("overdue", startMarkOverdueTransition); }
+  function handleMarkCancelled() { applyStatus("cancelled", startMarkCancelledTransition); }
 
   function handleDelete() {
     startDeleteTransition(async () => {
       const result = await deleteInvoice({ invoice_id: invoiceId });
       if (result.ok) {
+        // Hard delete — irreversible, so a plain confirmation toast (no Undo).
+        toast.success(isAr ? "تم الحذف" : "Deleted");
         router.push("/invoices" as "/invoices");
         router.refresh();
+      } else {
+        toast.error(isAr ? "تعذّر الحذف." : "Couldn't delete.");
       }
     });
   }

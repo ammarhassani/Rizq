@@ -5,14 +5,13 @@
  * Phase-4 task P4.4. Mirrors IncomeListClient in structure and pattern.
  */
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { InvoiceCard, type InvoiceRow } from "./InvoiceCard";
-import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
+import { InvoiceStatusQuickEdit } from "./InvoiceStatusQuickEdit";
 import { isOverdue } from "@/lib/invoices/overdue";
 
 type FilterChip = "all" | "draft" | "sent" | "paid" | "overdue";
@@ -43,8 +42,6 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
   const dir = isAr ? "rtl" : "ltr";
 
   const [filter, setFilter] = useState<FilterChip>("all");
-  const [markingId, setMarkingId] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
 
   const today = new Date();
 
@@ -72,14 +69,6 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
     { key: "paid", label: t("filterPaid") },
     { key: "overdue", label: t("filterOverdue") },
   ];
-
-  function handleMarkPaid(invoiceId: string) {
-    setMarkingId(invoiceId);
-    startTransition(async () => {
-      await markInvoiceStatus({ invoice_id: invoiceId, status: "paid" });
-      setMarkingId(null);
-    });
-  }
 
   return (
     <div className="space-y-4 pb-20">
@@ -158,26 +147,12 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((invoice) => (
-            <MotionItem key={invoice.id} className="relative group/row">
+            <MotionItem key={invoice.id} className="relative">
               <InvoiceCard invoice={invoice} locale={locale} />
-              {/* Quick "Mark paid" affordance for sent/viewed invoices */}
-              {(invoice.status === "sent" || invoice.status === "viewed") && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleMarkPaid(invoice.id);
-                  }}
-                  disabled={markingId === invoice.id}
-                  className={`absolute ${isAr ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium opacity-0 group-hover/row:opacity-100 transition-opacity focus:opacity-100 hover:bg-emerald-700 disabled:opacity-50 ${font}`}
-                >
-                  {markingId === invoice.id ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <span>{t("markPaid")}</span>
-                  )}
-                </button>
-              )}
+              {/* Inline quick-edit: change invoice status without opening the page */}
+              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
+                <InvoiceStatusQuickEdit invoiceId={invoice.id} current={invoice.status} locale={locale} />
+              </div>
             </MotionItem>
           ))}
         </MotionList>

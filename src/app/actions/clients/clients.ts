@@ -168,6 +168,30 @@ export async function archiveClient(input: unknown): Promise<SimpleActionResult>
   return { ok: true };
 }
 
+// ─── restoreClient ───────────────────────────────────────────────────────────
+// Reverse of archiveClient — sets is_active back to true. Used by the
+// "Archived · Undo" toast so archive can be honestly reversed.
+
+export async function restoreClient(input: unknown): Promise<SimpleActionResult> {
+  const parsed = ArchiveClientSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+
+  const supabase = await createSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { ok: false, code: "unauthorized" };
+
+  const { error } = await supabase
+    .from("clients")
+    .update({ is_active: true, updated_at: new Date().toISOString() })
+    .eq("id", parsed.data.id)
+    .eq("user_id", userData.user.id);
+
+  if (error) return { ok: false, code: "error" };
+
+  revalidatePath("/[locale]/clients", "page");
+  return { ok: true };
+}
+
 // ─── addClientNote ─────────────────────────────────────────────────────────
 
 export async function addClientNote(input: unknown): Promise<SimpleActionResult> {

@@ -67,6 +67,12 @@ const TRANSITIONS: Record<InvoiceStatus, InvoiceStatus[]> = {
 const InputSchema = z.object({
   invoice_id: z.string().uuid(),
   status: z.enum(ALLOWED_STATUSES),
+  // When true, the normal forward-only transition guard is skipped so a status
+  // change can be reversed (powers the "Marked … · Undo" toast). This still
+  // never lets you undo INTO a terminal state you weren't in — the caller
+  // captures the exact prior status and passes it back, so the only effect is
+  // allowing an otherwise-disallowed backward step (e.g. sent → draft).
+  allow_reverse: z.boolean().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -94,7 +100,7 @@ export async function markInvoiceStatus(
 ): Promise<MarkInvoiceStatusResult> {
   const parsed = InputSchema.safeParse(rawInput);
   if (!parsed.success) return { ok: false, code: "invalid" };
-  const { invoice_id, status: targetStatus } = parsed.data;
+  const { invoice_id, status: targetStatus, allow_reverse } = parsed.data;
 
   const supabase = await createClient();
 
@@ -117,10 +123,12 @@ export async function markInvoiceStatus(
 
   const currentStatus = invoice.status as InvoiceStatus;
 
-  // Validate transition
-  const allowed = TRANSITIONS[currentStatus] ?? [];
-  if (!allowed.includes(targetStatus)) {
-    return { ok: false, code: "invalid_transition" };
+  // Validate transition (forward-only) unless an explicit reverse/undo is requested.
+  if (!allow_reverse) {
+    const allowed = TRANSITIONS[currentStatus] ?? [];
+    if (!allowed.includes(targetStatus)) {
+      return { ok: false, code: "invalid_transition" };
+    }
   }
 
   // Build update payload

@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ThumbsUp, ThumbsDown, RefreshCw, Sparkles, ChevronDown } from "lucide-react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { getBusinessInsightsAction, submitInsightFeedbackAction } from "@/app/actions/dashboard/insights";
 import type { InsightsActionResult } from "@/app/actions/dashboard/insights";
+import { BusinessInsightsSchema, stripEmDashes } from "@/lib/ai/businessInsights";
 
 /** localStorage key for the collapsed/expanded preference (persists across reloads). */
 const COLLAPSE_KEY = "rizq.insights.collapsed";
@@ -24,6 +26,16 @@ const kindColors: Record<InsightItem["kind"], string> = {
   general: "bg-rizq-cream border-rizq-gold/30 text-rizq-ink",
 };
 
+/** Defensively sanitize AI text before display (belt-and-suspenders; the route
+ * already strips em dashes on persist, but partial stream chunks bypass that). */
+function cleanInsight(i: Partial<InsightItem> | undefined): InsightItem | null {
+  if (!i) return null;
+  const ar = typeof i.ar === "string" ? stripEmDashes(i.ar, "ar") : "";
+  const en = typeof i.en === "string" ? stripEmDashes(i.en, "en") : "";
+  if (!ar && !en) return null;
+  return { ar, en, kind: i.kind ?? "general" };
+}
+
 export function InsightsWidget({ locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -38,6 +50,11 @@ export function InsightsWidget({ locale }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const collapseMounted = useRef(false);
+
+  // Streaming state. When `streaming` is true the cards render from the live
+  // `object.insights` partial; otherwise from committed `insights` state.
+  const [streaming, setStreaming] = useState(false);
+  const sawLoadingRef = useRef(false);
 
   // Restore the collapsed preference once on mount.
   useEffect(() => {
@@ -61,10 +78,11 @@ export function InsightsWidget({ locale }: Props) {
       return next;
     });
 
-  const load = useCallback(async (refresh = false) => {
-    if (refresh) setRefreshing(true);
-    else setStatus("loading");
-
+  // ---------------------------------------------------------------------------
+  // Non-stream fallback path (deterministic summary or cached AI).
+  // Mirrors the previous behaviour: read cache / aggregate / AI-or-summary.
+  // ---------------------------------------------------------------------------
+  const loadFromAction = useCallback(async (refresh = false) => {
     try {
       const res: InsightsActionResult = await getBusinessInsightsAction({ refresh });
       if (!res.ok) {
@@ -82,17 +100,133 @@ export function InsightsWidget({ locale }: Props) {
       setStatus("ok");
     } catch {
       setStatus("error");
-    } finally {
-      setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  // ---------------------------------------------------------------------------
+  // Streaming path — token-by-token via /api/dashboard/insights/draft.
+  // ---------------------------------------------------------------------------
+  const { object, submit, isLoading, error, stop } = useObject({
+    api: "/api/dashboard/insights/draft",
+    schema: BusinessInsightsSchema,
+  });
+
+  const startStream = useCallback(() => {
+    sawLoadingRef.current = false;
+    setStreaming(true);
+    setStatus("ok");
+    setCached(false);
+    setSource("ai");
+    setVotes({});
+    submit({});
+    // submit is stable for the hook's lifetime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Abort any in-flight stream on unmount.
+  useEffect(() => {
+    return () => {
+      stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Settle the stream: on the loading falling-edge OR on error.
+  useEffect(() => {
+    if (!streaming) return;
+    if (isLoading) {
+      sawLoadingRef.current = true;
+      return;
+    }
+    if (!sawLoadingRef.current && !error) return; // stream not started yet
+
+    const streamed = (object?.insights ?? [])
+      .map((i) => cleanInsight(i as Partial<InsightItem>))
+      .filter((i): i is InsightItem => i !== null);
+
+    setStreaming(false);
+    setRefreshing(false);
+
+    if (error || streamed.length === 0) {
+      // ai_unconfigured / no_data / network error → deterministic-summary fallback.
+      // (Force a refresh so a stale empty cache doesn't mask fresh data.)
+      void loadFromAction(true);
+      return;
+    }
+
+    // Settle into the final streamed list. The route persisted these to the
+    // cache in onFinish, so the next plain load returns cached:true.
+    setInsights(streamed);
+    setSource("ai");
+    setGeneratedAt(new Date().toISOString());
+    setStatus("ok");
+  }, [streaming, isLoading, error, object, loadFromAction]);
+
+  // ---------------------------------------------------------------------------
+  // Initial load: instant cached path, else stream.
+  // ---------------------------------------------------------------------------
+  const initialLoad = useCallback(async () => {
+    setStatus("loading");
+    try {
+      const res: InsightsActionResult = await getBusinessInsightsAction();
+      if (!res.ok) {
+        setStatus("error");
+        return;
+      }
+      // Valid cache → show instantly, no streaming.
+      if (res.cached) {
+        if (res.empty || res.insights.length === 0) {
+          setStatus("empty");
+          return;
+        }
+        setInsights(res.insights as InsightItem[]);
+        setSource(res.source ?? "ai");
+        setGeneratedAt(res.generated_at);
+        setCached(true);
+        setStatus("ok");
+        return;
+      }
+      // No valid cache. If the action already produced AI insights (it
+      // generated + cached them), just show those; otherwise (summary fallback,
+      // or empty) we still want the live experience, so stream.
+      if (res.empty || res.insights.length === 0) {
+        setStatus("empty");
+        return;
+      }
+      // The action ran with no cache: it either AI-generated (source "ai") or
+      // fell back to summary. To deliver the live token-by-token experience we
+      // stream a fresh pass; if streaming can't run (no AI / no data) the
+      // settle effect falls back to the deterministic summary.
+      startStream();
+    } catch {
+      setStatus("error");
+    }
+  }, [startStream]);
+
+  const didInit = useRef(false);
+  useEffect(() => {
+    if (didInit.current) return;
+    didInit.current = true;
+    void initialLoad();
+  }, [initialLoad]);
+
+  // Refresh always streams a fresh pass.
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    startStream();
+  }, [startStream]);
 
   const handleVote = async (index: number, vote: "up" | "down") => {
     setVotes((v) => ({ ...v, [index]: vote }));
     await submitInsightFeedbackAction({ index, vote }).catch(() => {});
   };
+
+  // Cards to render: live stream partial while streaming, else committed list.
+  const displayInsights: InsightItem[] = streaming
+    ? (object?.insights ?? [])
+        .map((i) => cleanInsight(i as Partial<InsightItem>))
+        .filter((i): i is InsightItem => i !== null)
+    : insights;
 
   if (status === "loading") {
     return (
@@ -126,7 +260,7 @@ export function InsightsWidget({ locale }: Props) {
           {isAr ? "تعذّر تحميل التحليلات. حاول مجددًا." : "Could not load insights. Try again."}
         </p>
         <button
-          onClick={() => load()}
+          onClick={() => void loadFromAction()}
           className={`mt-3 text-xs text-rizq-green hover:underline ${font}`}
         >
           {isAr ? "إعادة المحاولة" : "Retry"}
@@ -134,6 +268,10 @@ export function InsightsWidget({ locale }: Props) {
       </div>
     );
   }
+
+  // While streaming, feedback thumbs are hidden until the stream settles (the
+  // cache row + indices aren't final yet). AI honesty badge still shows.
+  const isStreaming = streaming;
 
   return (
     <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 col-span-full">
@@ -146,13 +284,13 @@ export function InsightsWidget({ locale }: Props) {
           aria-controls="rizq-insights-body"
           className="group -ms-1 flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-rizq-gold/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40"
         >
-          <Sparkles className="h-4 w-4 text-rizq-gold" />
+          <Sparkles className={`h-4 w-4 text-rizq-gold ${isStreaming ? "animate-pulse" : ""}`} />
           <span className={`text-xs font-semibold text-rizq-ink-soft/70 uppercase tracking-wide ${font}`}>
             {isAr ? "تحليل رِزق" : "Rizq Insights"}
           </span>
-          {collapsed && insights.length > 0 && (
+          {collapsed && displayInsights.length > 0 && (
             <span className="tabular font-sans inline-flex min-w-4 items-center justify-center rounded-full bg-rizq-gold/15 px-1.5 text-[11px] text-rizq-gold-deep">
-              {insights.length}
+              {displayInsights.length}
             </span>
           )}
           <ChevronDown
@@ -162,18 +300,18 @@ export function InsightsWidget({ locale }: Props) {
         </button>
         {!collapsed && (
           <div className="flex items-center gap-2">
-            {cached && (
+            {cached && !isStreaming && (
               <span className={`text-xs text-rizq-ink-soft/50 ${font}`}>
                 {isAr ? "محفوظ مؤقتًا" : "Cached"}
               </span>
             )}
             <button
-              onClick={() => load(true)}
-              disabled={refreshing}
+              onClick={handleRefresh}
+              disabled={refreshing || isStreaming}
               className="flex items-center gap-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
               aria-label={isAr ? "تحديث" : "Refresh"}
             >
-              <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3 w-3 ${refreshing || isStreaming ? "animate-spin" : ""}`} />
               <span className={font}>{isAr ? "تحديث" : "Refresh"}</span>
             </button>
           </div>
@@ -182,10 +320,10 @@ export function InsightsWidget({ locale }: Props) {
 
       {/* Body — collapses away when toggled shut. */}
       {!collapsed && (
-        <div id="rizq-insights-body" className="animate-fade-in motion-reduce:animate-none">
+        <div id="rizq-insights-body" className="animate-fade-in motion-reduce:animate-none" aria-live="polite">
           {/* Insight cards */}
           <div className="space-y-3">
-            {insights.map((insight, i) => (
+            {displayInsights.map((insight, i) => (
           <div key={i} className={`rounded-2xl border p-4 ${kindColors[insight.kind]}`}>
             <p className={`text-sm leading-relaxed ${font}`}>
               {isAr ? insight.ar : insight.en}
@@ -200,7 +338,7 @@ export function InsightsWidget({ locale }: Props) {
                     ? "ملخص محسوب من بياناتك"
                     : "Summary computed from your data"}
               </p>
-              {source === "ai" && (
+              {source === "ai" && !isStreaming && (
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => handleVote(i, "up")}
@@ -221,9 +359,13 @@ export function InsightsWidget({ locale }: Props) {
             </div>
           </div>
         ))}
+        {/* Live streaming placeholder while the first card is still arriving. */}
+        {isStreaming && displayInsights.length === 0 && (
+          <div className="h-16 rounded-2xl bg-rizq-gold/10 animate-pulse" />
+        )}
       </div>
 
-          {generatedAt && (
+          {generatedAt && !isStreaming && (
             <p className={`mt-4 text-xs text-rizq-ink-soft/40 ${font}`}>
               {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
             </p>

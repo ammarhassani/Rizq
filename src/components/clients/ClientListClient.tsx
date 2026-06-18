@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { ClientCard, type ClientRow } from "./ClientCard";
+import { PriorityQuickEdit } from "./PriorityQuickEdit";
 
 type FilterChip = "all" | "needs_followup" | "recent" | "individual" | "smb" | "corporate" | "government" | "agency";
 type SortKey = "needs_followup" | "last_contacted" | "alphabetical" | "total_value";
@@ -143,8 +144,12 @@ export function ClientListClient({ clients, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((c) => (
-            <MotionItem key={c.id}>
+            <MotionItem key={c.id} className="relative">
               <ClientCard client={c} locale={locale} />
+              {/* Inline quick-edit: follow-up priority, no page open needed */}
+              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
+                <PriorityQuickEdit clientId={c.id} current={c.follow_up_priority} locale={locale} />
+              </div>
             </MotionItem>
           ))}
         </MotionList>

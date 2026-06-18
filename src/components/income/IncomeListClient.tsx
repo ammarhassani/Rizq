@@ -6,7 +6,7 @@ import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
-import { markGigStatus } from "@/app/actions/gigs/gigs";
+import { GigStatusQuickEdit } from "./GigStatusQuickEdit";
 import { forecastIncomeAction } from "@/app/actions/gigs/incomeAi";
 import { exportIncomeCsv } from "@/app/actions/gigs/exportIncomeCsv";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
@@ -57,7 +57,6 @@ export function IncomeListClient({ gigs, locale }: Props) {
 
   const [filter, setFilter] = useState<FilterChip>("all");
   const [sort, setSort] = useState<SortKey>("delivery_date");
-  const [markingId, setMarkingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   const [forecast, setForecast] = useState<ForecastState>({ status: "idle" });
@@ -128,14 +127,6 @@ export function IncomeListClient({ gigs, locale }: Props) {
     { key: "amount", label: t("sortAmount") },
     { key: "status", label: t("sortStatus") },
   ];
-
-  function handleMarkPaid(gigId: string) {
-    setMarkingId(gigId);
-    startTransition(async () => {
-      await markGigStatus({ id: gigId, status: "paid" });
-      setMarkingId(null);
-    });
-  }
 
   function handleExportCsv() {
     setCsvState("loading");
@@ -369,23 +360,12 @@ export function IncomeListClient({ gigs, locale }: Props) {
       ) : (
         <MotionList className="space-y-3">
           {filtered.map((gig) => (
-            <MotionItem key={gig.id} className="relative group/row">
+            <MotionItem key={gig.id} className="relative">
               <GigCard gig={gig} locale={locale} />
-              {/* Quick "Mark paid" affordance for non-paid, non-cancelled gigs */}
-              {gig.status !== "paid" && gig.status !== "cancelled" && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); handleMarkPaid(gig.id); }}
-                  disabled={markingId === gig.id}
-                  className={`absolute ${isAr ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium opacity-0 group-hover/row:opacity-100 transition-opacity focus:opacity-100 hover:bg-emerald-700 disabled:opacity-50 ${font}`}
-                >
-                  {markingId === gig.id ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <span>{t("markPaid")}</span>
-                  )}
-                </button>
-              )}
+              {/* Inline quick-edit: change gig status without opening the page */}
+              <div className={`absolute bottom-4 ${isAr ? "left-4" : "right-4"} z-10`}>
+                <GigStatusQuickEdit gigId={gig.id} current={gig.status} locale={locale} />
+              </div>
             </MotionItem>
           ))}
         </MotionList>

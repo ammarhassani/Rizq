@@ -6,6 +6,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Loader2, Edit2, Trash2, CheckCircle, AlertCircle, FileText, ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
@@ -85,22 +86,45 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
     });
   }
 
+  // Reverse a status change (powers Undo). Silent — no nested toast.
+  function revertStatus(prevStatus: string) {
+    startMarkPaidTransition(async () => {
+      const result = await markGigStatus({ id: gig.id, status: prevStatus });
+      if (result.ok) router.refresh();
+      else toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
+    });
+  }
+
   function handleMarkPaid() {
+    const prev = gig.status;
     startMarkPaidTransition(async () => {
       const result = await markGigStatus({ id: gig.id, status: "paid" });
       if (result.ok) {
         track("gig_marked_paid", { locale });
         router.refresh();
+        toast.success(isAr ? "الحالة: مدفوع · يمكنك التراجع" : "Status: Paid · Undo", {
+          duration: 7000,
+          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev) },
+        });
+      } else {
+        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
       }
     });
   }
 
   function handleMarkOverdue() {
+    const prev = gig.status;
     startMarkOverdueTransition(async () => {
       const result = await markGigStatus({ id: gig.id, status: "overdue" });
       if (result.ok) {
         track("gig_marked_overdue", { locale });
         router.refresh();
+        toast.success(isAr ? "الحالة: متأخر · يمكنك التراجع" : "Status: Overdue · Undo", {
+          duration: 7000,
+          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev) },
+        });
+      } else {
+        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
       }
     });
   }
@@ -110,8 +134,12 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       const result = await deleteGig({ id: gig.id });
       if (result.ok) {
         track("gig_deleted", { locale });
+        // Hard delete — irreversible, so a plain confirmation toast (no Undo).
+        toast.success(isAr ? "تم الحذف" : "Deleted");
         router.push("/income" as "/income");
         router.refresh();
+      } else {
+        toast.error(isAr ? "تعذّر الحذف." : "Couldn't delete.");
       }
     });
   }

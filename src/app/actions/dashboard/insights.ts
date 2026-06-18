@@ -1,69 +1,40 @@
 "use server";
 
+import { generateObject } from "ai";
 import { createClient } from "@/lib/supabase/server";
-import { isAIConfigured } from "@/lib/ai/client";
+import { isAIConfigured, deepseek, REASONING_MODEL } from "@/lib/ai/client";
 import { getUpcomingInvoiceDueDates } from "@/lib/invoices/queries";
-import { generateBusinessInsights, buildDeterministicInsights } from "@/lib/ai/businessInsights";
+import {
+  buildDeterministicInsights,
+  buildBusinessInsightsPrompt,
+  BusinessInsightsSchema,
+  stripEmDashes,
+} from "@/lib/ai/businessInsights";
 import type { BusinessInsightsCtx } from "@/lib/ai/businessInsights";
 
-type InsightItem = {
-  ar: string;
-  en: string;
-  kind: "income" | "client" | "proposal" | "deadline" | "general";
-};
-
-type InsightsOkResult = {
-  ok: true;
-  insights: InsightItem[];
-  generated_at: string;
-  cached: boolean;
-  empty?: boolean;
-  /** "ai" = DeepSeek analysis; "summary" = deterministic facts computed from data. */
-  source: "ai" | "summary";
-};
-
-type InsightsErrResult = {
-  ok: false;
-  code: "unauthenticated" | "db_error" | "ai_error";
-};
-
-export type InsightsActionResult = InsightsOkResult | InsightsErrResult;
-
-export async function getBusinessInsightsAction(opts?: {
-  refresh?: boolean;
-}): Promise<InsightsActionResult> {
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return { ok: false, code: "unauthenticated" };
-
-  const userId = userData.user.id;
-  const refresh = opts?.refresh ?? false;
-
-  // --- Read cache ---
-  if (!refresh) {
-    const { data: cache } = await supabase
-      .from("dashboard_insights_cache")
-      .select("insights, generated_at, valid_until")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (cache && cache.valid_until) {
-      const validUntil = new Date(cache.valid_until as string);
-      if (validUntil > new Date()) {
-        const insights = (cache.insights as InsightItem[]) ?? [];
-        return {
-          ok: true,
-          insights,
-          generated_at: cache.generated_at as string,
-          cached: true,
-          empty: insights.length === 0,
-          source: "ai",
-        };
-      }
-    }
-  }
-
-  // --- Aggregate context (last 30d proposals, 3mo gigs, clients, 6mo income, upcoming deadlines) ---
+/**
+ * Shared context aggregator for business insights.
+ *
+ * Aggregates the freelancer's last-30d proposals, last-3mo gigs, clients,
+ * last-6mo monthly income, and upcoming invoice deadlines into the
+ * `BusinessInsightsCtx` shape consumed by both the AI generator and the
+ * deterministic fallback.
+ *
+ * Factored out of `getBusinessInsightsAction` so the action AND the streaming
+ * draft route (`/api/dashboard/insights/draft`) share ONE aggregator and can't
+ * drift. `hasData` mirrors the action's emptiness check.
+ *
+ * Pure read; no caching/AI side effects — callers decide what to do with it.
+ *
+ * Note: this is exported but not a server action (it takes a SupabaseClient
+ * arg and returns a non-serializable-friendly object). It must NOT be called
+ * across the client boundary — only from server actions / route handlers that
+ * pass their own server `supabase` client.
+ */
+export async function buildInsightsContext(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+): Promise<{ ctx: BusinessInsightsCtx; hasData: boolean }> {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -152,8 +123,101 @@ export async function getBusinessInsightsAction(opts?: {
     status: inv.status,
   }));
 
-  // Check if there's enough data to generate insights
   const hasData = proposals.length > 0 || gigs.length > 0 || clients.length > 0 || income.length > 0;
+
+  return { ctx: { proposals, gigs, clients, income, deadlines }, hasData };
+}
+
+type InsightItem = {
+  ar: string;
+  en: string;
+  kind: "income" | "client" | "proposal" | "deadline" | "general";
+};
+
+type InsightsOkResult = {
+  ok: true;
+  insights: InsightItem[];
+  generated_at: string;
+  cached: boolean;
+  empty?: boolean;
+  /** "ai" = DeepSeek analysis; "summary" = deterministic facts computed from data. */
+  source: "ai" | "summary";
+};
+
+type InsightsErrResult = {
+  ok: false;
+  code: "unauthenticated" | "db_error" | "ai_error";
+};
+
+export type InsightsActionResult = InsightsOkResult | InsightsErrResult;
+
+/**
+ * Generate 2-4 insights via DeepSeek (non-streaming). Returns null on any error
+ * so the action falls back to the deterministic summary. Local to this server
+ * module so the server-only DeepSeek client never reaches the client bundle
+ * (the client-safe businessInsights module only carries the schema + helpers).
+ */
+async function generateBusinessInsights(
+  ctx: BusinessInsightsCtx
+): Promise<{ insights: InsightItem[] } | null> {
+  try {
+    const result = await generateObject({
+      model: deepseek(REASONING_MODEL),
+      schema: BusinessInsightsSchema,
+      prompt: buildBusinessInsightsPrompt(ctx),
+      abortSignal: AbortSignal.timeout(20_000),
+    });
+    return {
+      insights: result.object.insights.map((i) => ({
+        ...i,
+        ar: stripEmDashes(i.ar, "ar"),
+        en: stripEmDashes(i.en, "en"),
+      })),
+    };
+  } catch (err) {
+    console.error("[generateBusinessInsights] failed", err);
+    return null;
+  }
+}
+
+export async function getBusinessInsightsAction(opts?: {
+  refresh?: boolean;
+}): Promise<InsightsActionResult> {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return { ok: false, code: "unauthenticated" };
+
+  const userId = userData.user.id;
+  const refresh = opts?.refresh ?? false;
+
+  // --- Read cache ---
+  if (!refresh) {
+    const { data: cache } = await supabase
+      .from("dashboard_insights_cache")
+      .select("insights, generated_at, valid_until")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (cache && cache.valid_until) {
+      const validUntil = new Date(cache.valid_until as string);
+      if (validUntil > new Date()) {
+        const insights = (cache.insights as InsightItem[]) ?? [];
+        return {
+          ok: true,
+          insights,
+          generated_at: cache.generated_at as string,
+          cached: true,
+          empty: insights.length === 0,
+          source: "ai",
+        };
+      }
+    }
+  }
+
+  // --- Aggregate context (shared with the streaming draft route) ---
+  const now = new Date();
+  const { ctx, hasData } = await buildInsightsContext(supabase, userId);
+
   if (!hasData) {
     // Cache empty result
     await supabase.from("dashboard_insights_cache").upsert({
@@ -164,8 +228,6 @@ export async function getBusinessInsightsAction(opts?: {
     });
     return { ok: true, insights: [], generated_at: now.toISOString(), cached: false, empty: true, source: "summary" };
   }
-
-  const ctx: BusinessInsightsCtx = { proposals, gigs, clients, income, deadlines };
 
   // Prefer DeepSeek analysis; fall back to a deterministic, data-derived summary
   // when the provider is unconfigured or the call fails, so the card never breaks.

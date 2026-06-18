@@ -6,6 +6,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import {
   Loader2,
   Edit2,
@@ -21,7 +22,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { archiveClient, addClientNote, logContact } from "@/app/actions/clients/clients";
+import { archiveClient, restoreClient, addClientNote, logContact } from "@/app/actions/clients/clients";
 import {
   generateClientInsightsAction,
   draftFollowupAction,
@@ -81,13 +82,34 @@ export function ClientDetailActions({
 
   // ── Existing handlers ───────────────────────────────────────────────────
 
+  function handleRestore() {
+    startArchiveTransition(async () => {
+      const result = await restoreClient({ id: clientId });
+      if (!result.ok) {
+        toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
+      }
+    });
+  }
+
   function handleArchive() {
     startArchiveTransition(async () => {
       const result = await archiveClient({ id: clientId });
       if (result.ok) {
         track("client_archived", { locale });
+        // Act-now-then-undo: archive runs instantly, leave the page, and offer
+        // a single Undo that restores the client (sonner is globally mounted so
+        // the toast survives the navigation).
+        toast(isAr ? "تمت الأرشفة · يمكنك التراجع" : "Archived · Undo", {
+          duration: 7000,
+          action: {
+            label: isAr ? "تراجع" : "Undo",
+            onClick: () => handleRestore(),
+          },
+        });
         router.push("/clients" as "/clients");
         router.refresh();
+      } else {
+        toast.error(isAr ? "تعذّرت الأرشفة." : "Couldn't archive.");
       }
     });
   }

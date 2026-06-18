@@ -1,7 +1,14 @@
-import "server-only";
-import { generateObject } from "ai";
+/**
+ * Business-insights contract for the dashboard "Rizq Insights" card.
+ *
+ * This module is CLIENT-SAFE: the schema, types, prompt builder, deterministic
+ * fallback, and `stripEmDashes` sanitizer carry no server-only dependency, so
+ * the InsightsWidget can import `BusinessInsightsSchema` + `stripEmDashes` for
+ * its `useObject` streaming pass. The DeepSeek call lives in the server action
+ * (actions/dashboard/insights.ts) and the streaming route, never here, so this
+ * module carries no server-only dependency.
+ */
 import { z } from "zod";
-import { deepseek, REASONING_MODEL } from "@/lib/ai/client";
 
 export type BusinessInsightsCtx = {
   proposals: Array<{ title: string | null; clientName: string | null; status: string; amount: number | null; date: string | null }>;
@@ -13,7 +20,7 @@ export type BusinessInsightsCtx = {
 
 const InsightKind = z.enum(["income", "client", "proposal", "deadline", "general"]);
 
-const BusinessInsightsSchema = z.object({
+export const BusinessInsightsSchema = z.object({
   insights: z.array(
     z.object({
       ar: z.string(),
@@ -172,31 +179,6 @@ ${deadlinesSummary}
 - أعد النتيجة بالعربية (ar) والإنجليزية (en) مع تصنيف kind: income|client|proposal|deadline|general.`;
 }
 
-/**
- * Generates 2–4 business insights for a Saudi freelancer dashboard.
- * Returns null on any error (network, timeout, parse).
- */
-export async function generateBusinessInsights(
-  ctx: BusinessInsightsCtx
-): Promise<BusinessInsightsResult | null> {
-  const prompt = buildBusinessInsightsPrompt(ctx);
-  try {
-    const result = await generateObject({
-      model: deepseek(REASONING_MODEL),
-      schema: BusinessInsightsSchema,
-      prompt,
-      abortSignal: AbortSignal.timeout(20_000),
-    });
-    // Safety net: strip any em/en dashes the model still emits.
-    return {
-      insights: result.object.insights.map((i) => ({
-        ...i,
-        ar: stripEmDashes(i.ar, "ar"),
-        en: stripEmDashes(i.en, "en"),
-      })),
-    };
-  } catch (err) {
-    console.error("[generateBusinessInsights] failed", err);
-    return null;
-  }
-}
+// generateBusinessInsights (the DeepSeek call) lives in the server action
+// (actions/dashboard/insights.ts) so this module stays free of server-only deps
+// and can be imported by the client InsightsWidget for its streaming schema.
