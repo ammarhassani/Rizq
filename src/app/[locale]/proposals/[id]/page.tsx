@@ -16,6 +16,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
 import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles";
 import { PrintButton } from "@/components/proposals/PrintButton";
+import { DownloadWordButton } from "@/components/proposals/DownloadWordButton";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -177,7 +178,20 @@ export default async function ProposalDetailPage({
         <div className="mt-6 space-y-4 print:hidden">
           {artifactData && (
             <div className="print:hidden">
-              <PrintButton label={isAr ? "تنزيل PDF" : "Download PDF"} locale={locale as "ar" | "en"} />
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Word is the deliverable a client expects; PDF/print is secondary. */}
+                <DownloadWordButton
+                  proposalId={id}
+                  label={isAr ? "تنزيل ملف Word" : "Download Word (.docx)"}
+                  locale={locale as "ar" | "en"}
+                />
+                <PrintButton label={isAr ? "PDF / طباعة" : "PDF / Print"} locale={locale as "ar" | "en"} />
+              </div>
+              <p className={`mt-2 text-xs text-rizq-ink-soft/70 ${font}`}>
+                {isAr
+                  ? "ملف Word قابل للتحرير، جاهز لإرساله للعميل."
+                  : "Editable Word file, ready to send to your client."}
+              </p>
             </div>
           )}
           <ProposalDetailActions
