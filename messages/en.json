@@ -1461,6 +1461,7 @@
     "perDay": "SAR/day",
     "perProject": "SAR/project",
     "marketPercentileLabel": "Your market position",
+    "marketBandLabel": "Market range and your rate",
     "percentileDesc": "Your target rate is in the top {pct}% of your market",
     "percentileDescLow": "Your target rate is in the bottom {pct}% of your market",
     "realisticBannerTitle": "Achievable rate",

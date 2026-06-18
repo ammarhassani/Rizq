@@ -118,7 +118,8 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     clients = (data ?? []) as ClientRow[];
   } catch { /* widget shows error state */ }
 
-  // Monthly income (current + previous month)
+  // Monthly income (current + previous month, plus a trailing series for the
+  // sparkline). We fetch the last ~12 months and derive both from one query.
   type MonthlyRow = {
     month: string | null;
     total_sar: number | null;
@@ -127,14 +128,17 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   };
   let currentMonth: MonthlyRow | null = null;
   let prevMonth: MonthlyRow | null = null;
+  let incomeTrend: { label: string; value: number }[] = [];
+  void prevMonthStart;
+  void prevMonthEnd;
   try {
+    const trailingStart = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
     const { data } = await supabase
       .from("monthly_income")
       .select("month, total_sar, paid_sar, pending_sar")
-      .gte("month", prevMonthStart)
-      .lte("month", prevMonthEnd)
+      .gte("month", trailingStart)
       .order("month", { ascending: false })
-      .limit(2);
+      .limit(12);
     const rows = (data ?? []) as MonthlyRow[];
     currentMonth = rows.find((r) => {
       if (!r.month) return false;
@@ -147,6 +151,21 @@ export default async function DashboardPage({ params }: { params: Promise<Params
       const p = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       return d.getFullYear() === p.getFullYear() && d.getMonth() === p.getMonth();
     }) ?? null;
+
+    // Build the trend series in calendar order (oldest → newest), short month
+    // labels in the active locale. Cap at the last 6 months for a clean read.
+    const monthFmt = new Intl.DateTimeFormat(isAr ? "ar-SA-u-ca-gregory" : "en-US", {
+      month: "short",
+    });
+    incomeTrend = rows
+      .filter((r) => r.month)
+      .map((r) => ({
+        d: new Date(r.month as string),
+        value: Number(r.total_sar ?? 0),
+      }))
+      .sort((a, b) => a.d.getTime() - b.d.getTime())
+      .slice(-6)
+      .map((r) => ({ label: monthFmt.format(r.d), value: r.value }));
   } catch { /* widget shows 0 state */ }
 
   // Quick pricing — resolve slugs from the user's onboarding FK ids (if set),
@@ -237,6 +256,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
           <MonthlyIncomeWidget
             current={currentMonth}
             previous={prevMonth}
+            trend={incomeTrend}
             locale={locale as "ar" | "en"}
           />
 

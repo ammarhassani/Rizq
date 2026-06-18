@@ -11,6 +11,7 @@
 import { Link } from "@/i18n/navigation";
 import { RizqSeal } from "@/components/proposals/RizqSeal";
 import { SectionEditor } from "@/components/proposals/SectionEditor";
+import { BandMeter } from "@/components/charts/BandMeter";
 import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
@@ -806,8 +807,6 @@ function PricingSection({
   const depositPct =
     typeof c["depositPct"] === "number" ? (c["depositPct"] as number) : null;
   const font = locale === "ar" ? "font-arabic" : "font-sans";
-  const range = max - min;
-  const anchorPct = range > 0 ? ((anchor - min) / range) * 100 : 50;
 
   return (
     <SectionShell title={t.sections.pricing}>
@@ -824,28 +823,20 @@ function PricingSection({
         </p>
       </div>
 
-      {/* Min–max band */}
+      {/* Min–max band — shared BandMeter (gradient track + cream-ringed anchor pin) */}
       {(min > 0 || max > 0) && (
         <div className="mb-5">
-          <div className="flex justify-between text-xs text-rizq-ink-soft mb-1.5">
-            <span className={font}>{t.min}: {fmtPrice(min, locale)} {t.currency}</span>
-            <span className={font}>{t.max}: {fmtPrice(max, locale)} {t.currency}</span>
-          </div>
-          <div className="relative h-2 rounded-full bg-rizq-gold/15 overflow-hidden">
-            <span
-              aria-hidden
-              className="absolute inset-y-0 left-0 right-0 bg-gradient-to-r from-rizq-gold/30 via-rizq-green/40 to-rizq-gold/30 rounded-full"
-            />
-            <span
-              aria-hidden
-              className="absolute top-1/2 h-4 w-1 bg-rizq-green rounded-full shadow-[0_0_0_3px_rgba(250,245,236,0.9)]"
-              style={{
-                left: `${anchorPct}%`,
-                transform: "translate(-50%, -50%)",
-              }}
-            />
-          </div>
-          <p className={`mt-1 text-[10px] text-rizq-ink-soft/60 ${font}`}>
+          <BandMeter
+            min={min}
+            anchor={anchor}
+            max={max}
+            locale={locale}
+            currency={t.currency}
+            minLabel={t.min}
+            maxLabel={t.max}
+            anchorLabel={t.anchor}
+          />
+          <p className={`mt-1.5 text-[10px] text-rizq-ink-soft/60 ${font}`}>
             {t.priceRange}
           </p>
         </div>

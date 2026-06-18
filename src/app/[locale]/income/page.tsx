@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { IncomeListClient } from "@/components/income/IncomeListClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
+import { TrendChart } from "@/components/charts/TrendChart";
 import type { GigRow } from "@/components/income/GigCard";
 
 type Params = { locale: string };
@@ -90,18 +91,31 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
     client_name: (g.clients as any)?.name ?? null,
   }));
 
-  // Fetch monthly_income for current + previous months
+  // Fetch monthly_income for the trailing 12 months (covers current + previous
+  // for the summary cards, and feeds the trend sparkline).
   const now = new Date();
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+  const trailingStart = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString();
 
   const { data: monthlyRows } = await supabase
     .from("monthly_income")
     .select("month, gig_count, total_sar, paid_sar, pending_sar, overdue_sar, paid_count, pending_count")
-    .gte("month", prevMonthStart)
+    .gte("month", trailingStart)
     .order("month", { ascending: false });
 
   const allMonthly = (monthlyRows ?? []) as MonthlyIncomeRow[];
+
+  // Trend series: calendar order (oldest → newest), short month labels, last 6.
+  const monthShortFmt = new Intl.DateTimeFormat(isAr ? "ar-SA-u-ca-gregory" : "en-US", {
+    month: "short",
+  });
+  const incomeTrend = allMonthly
+    .filter((r) => r.month)
+    .map((r) => ({ d: new Date(r.month as string), value: Number(r.total_sar ?? 0) }))
+    .sort((a, b) => a.d.getTime() - b.d.getTime())
+    .slice(-6)
+    .map((r) => ({ label: monthShortFmt.format(r.d), value: r.value }));
 
   // Find current and previous month rows
   const currentMonthRow = allMonthly.find((r) => {
@@ -209,6 +223,14 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
             </div>
           )}
         </div>
+
+        {/* Monthly income trend */}
+        {incomeTrend.length >= 2 && (
+          <div className={`rounded-3xl border border-rizq-gold/25 bg-white/60 p-6 sm:p-7 mb-8 ${font}`} dir={dir}>
+            <p className="eyebrow mb-4">{isAr ? "اتجاه الدخل" : "Income trend"}</p>
+            <TrendChart points={incomeTrend} locale={locale as "ar" | "en"} height={140} />
+          </div>
+        )}
 
         {/* Previous month summary (compact) */}
         {prevMonthRow && (prevMonthRow.total_sar ?? 0) > 0 && (

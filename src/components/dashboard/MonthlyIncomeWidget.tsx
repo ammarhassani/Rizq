@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { Wallet, Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
+import { TrendChart } from "@/components/charts/TrendChart";
 
 type MonthlyRow = {
   month: string | null;
@@ -9,9 +10,12 @@ type MonthlyRow = {
   pending_sar: number | null;
 };
 
+type TrendPoint = { label: string; value: number };
+
 type Props = {
   current: MonthlyRow | null;
   previous: MonthlyRow | null;
+  trend?: TrendPoint[];
   locale: "ar" | "en";
 };
 
@@ -20,7 +24,7 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function MonthlyIncomeWidget({ current, previous, locale }: Props) {
+export function MonthlyIncomeWidget({ current, previous, trend, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -76,6 +80,12 @@ export function MonthlyIncomeWidget({ current, previous, locale }: Props) {
               </span>
             )}
           </div>
+
+          {trend && trend.length >= 2 && (
+            <div className="pt-3 border-t border-rizq-gold/15">
+              <TrendChart points={trend} locale={locale} height={96} showLatest={false} />
+            </div>
+          )}
 
           {current && (
             <div className="flex gap-4 pt-2 border-t border-rizq-gold/15">

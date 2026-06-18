@@ -17,6 +17,7 @@ import {
   saveRateDefaultsAction,
 } from "@/app/actions/rate/getRatePositioning";
 import { Combobox } from "@/components/ui/Combobox";
+import { BandMeter } from "@/components/charts/BandMeter";
 import type { RateCalculatorOutput, MarketBand } from "@/lib/rate/calculate";
 import type { RatePositioning } from "@/lib/ai/ratePositioning";
 import type {
@@ -400,6 +401,25 @@ export function RateCalculatorClient({
               </p>
             )}
           </div>
+
+          {/* Market band meter — where the user's rate sits min→max */}
+          {market && (market.min > 0 || market.max > 0) && (
+            <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="h-4 w-4 text-rizq-green" />
+                <span className={`text-sm font-medium text-rizq-ink ${font}`}>
+                  {t("marketBandLabel")}
+                </span>
+              </div>
+              <BandMeter
+                min={market.min}
+                anchor={market.anchor}
+                max={market.max}
+                value={output.per_project_rate}
+                locale={locale}
+              />
+            </div>
+          )}
 
           {/* Market percentile bar */}
           {output.market_percentile != null && (
