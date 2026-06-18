@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { ClientCard, type ClientRow } from "./ClientCard";
 
 type FilterChip = "all" | "needs_followup" | "recent" | "individual" | "smb" | "corporate" | "government" | "agency";
@@ -140,11 +141,13 @@ export function ClientListClient({ clients, locale }: Props) {
       {filtered.length === 0 ? (
         <p className={`text-sm text-rizq-ink-soft/70 py-8 text-center ${font}`}>{t("noResults")}</p>
       ) : (
-        <div className="space-y-3">
+        <MotionList className="space-y-3">
           {filtered.map((c) => (
-            <ClientCard key={c.id} client={c} locale={locale} />
+            <MotionItem key={c.id}>
+              <ClientCard client={c} locale={locale} />
+            </MotionItem>
           ))}
-        </div>
+        </MotionList>
       )}
     </div>
   );

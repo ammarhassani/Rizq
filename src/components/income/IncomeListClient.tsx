@@ -4,6 +4,7 @@ import { useState, useMemo, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
 import { markGigStatus } from "@/app/actions/gigs/gigs";
 import { forecastIncomeAction } from "@/app/actions/gigs/incomeAi";
@@ -366,9 +367,9 @@ export function IncomeListClient({ gigs, locale }: Props) {
       {filtered.length === 0 ? (
         <p className={`text-sm text-rizq-ink-soft/70 py-8 text-center ${font}`}>{t("noResults")}</p>
       ) : (
-        <div className="space-y-3">
+        <MotionList className="space-y-3">
           {filtered.map((gig) => (
-            <div key={gig.id} className="relative group/row">
+            <MotionItem key={gig.id} className="relative group/row">
               <GigCard gig={gig} locale={locale} />
               {/* Quick "Mark paid" affordance for non-paid, non-cancelled gigs */}
               {gig.status !== "paid" && gig.status !== "cancelled" && (
@@ -385,9 +386,9 @@ export function IncomeListClient({ gigs, locale }: Props) {
                   )}
                 </button>
               )}
-            </div>
+            </MotionItem>
           ))}
-        </div>
+        </MotionList>
       )}
 
       {/* FAB — Log gig */}

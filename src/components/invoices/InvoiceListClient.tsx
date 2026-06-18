@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
+import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { InvoiceCard, type InvoiceRow } from "./InvoiceCard";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
 import { isOverdue } from "@/lib/invoices/overdue";
@@ -155,9 +156,9 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
           {t("noResults")}
         </p>
       ) : (
-        <div className="space-y-3">
+        <MotionList className="space-y-3">
           {filtered.map((invoice) => (
-            <div key={invoice.id} className="relative group/row">
+            <MotionItem key={invoice.id} className="relative group/row">
               <InvoiceCard invoice={invoice} locale={locale} />
               {/* Quick "Mark paid" affordance for sent/viewed invoices */}
               {(invoice.status === "sent" || invoice.status === "viewed") && (
@@ -177,9 +178,9 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
                   )}
                 </button>
               )}
-            </div>
+            </MotionItem>
           ))}
-        </div>
+        </MotionList>
       )}
 
       {/* FAB — New invoice */}

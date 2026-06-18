@@ -26,6 +26,7 @@ import { FeeDialog } from "@/components/fees/FeeDialog";
 import { SalesHistoryDialog } from "@/components/catalog/SalesHistoryDialog";
 import { setItemsActive, deleteItems, importItems, type CreatedItem } from "@/app/actions/items/items";
 import { setFeePresetsActive, deleteFeePresets, importFeePresets, type CreatedFeePreset } from "@/app/actions/fees/fees";
+import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { toCsv, csvToRecords, parseMoneyCell } from "@/lib/catalog/csv";
 import { cn } from "@/lib/utils";
 
@@ -310,7 +311,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
           font={font}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <MotionList key={tab} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tab === "items"
             ? visibleItems.map((it) => (
                 <Card key={it.id} archived={!it.is_active} selected={selItems.has(it.id)} onToggle={() => toggleSel(it.id)} selectLabel={t("select")} archivedBadge={t("archivedBadge")} font={font}>
@@ -356,7 +357,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                   />
                 </Card>
               ))}
-        </div>
+        </MotionList>
       )}
 
       {/* Dialogs */}
@@ -421,7 +422,7 @@ function Card({
   font: string;
 }) {
   return (
-    <article className={cn(
+    <MotionItem as="article" className={cn(
       "relative flex flex-col rounded-2xl border bg-rizq-cream/70 p-5 transition-all hover:-translate-y-0.5 hover:shadow-sm",
       selected ? "border-rizq-green/50 ring-1 ring-rizq-green/30" : "border-rizq-gold/25 hover:border-rizq-green/30",
       archived && "opacity-70"
@@ -434,7 +435,7 @@ function Card({
         )}
       </div>
       {children}
-    </article>
+    </MotionItem>
   );
 }
 
