@@ -95,7 +95,8 @@ export type UpdateSectionResult =
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-const EDITABLE_STATUSES = new Set(["final", "sent"]);
+// Drafts are editable too (refine before finalizing); accepted/declined lock.
+const EDITABLE_STATUSES = new Set(["draft", "final", "sent"]);
 
 /** Defensively dash-strip a string the user typed. */
 function clean(v: string): string {

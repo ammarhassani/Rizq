@@ -130,8 +130,12 @@ export default async function ProposalDetailPage({
 
   const artifactData = proposal.artifact_json as ArtifactData | null;
   const scopeJson = proposal.scope_json as Scope | null;
+  // Drafts are editable too: the freelancer should refine the title, prose, and
+  // pricing before finalizing/sending. Accepted/declined proposals are locked.
   const canEdit =
-    proposal.status === "final" || proposal.status === "sent";
+    proposal.status === "draft" ||
+    proposal.status === "final" ||
+    proposal.status === "sent";
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="reading">

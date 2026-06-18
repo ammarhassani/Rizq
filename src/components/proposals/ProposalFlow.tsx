@@ -223,11 +223,15 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
       const result = await finalizeProposal({ proposal_id: proposalId });
       if (!result.ok) return;
       track("proposal_finalized", { locale, proposal_id: proposalId });
-      setView((prev) => {
-        if (prev.kind === "artifact") return { ...prev, finalized: true };
-        return prev;
-      });
+      // Land on the full proposal page: per-section refine, rename the project,
+      // and export to Word all live there (this flow is just the generate step).
+      router.push(`/proposals/${proposalId}` as `/proposals/${string}`);
     });
+  }
+
+  /** Open the full proposal page (the edit + export hub) without finalizing. */
+  function openFullProposal(proposalId: string) {
+    router.push(`/proposals/${proposalId}` as `/proposals/${string}`);
   }
 
   // ---------------------------------------------------------------------------
@@ -454,6 +458,15 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
                 )}
               </button>
             )}
+
+            {/* Open the full proposal: per-section refine, rename, Word export */}
+            <button
+              type="button"
+              onClick={() => openFullProposal(view.proposalId)}
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink px-6 py-3 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
+            >
+              {isAr ? "افتح العرض الكامل (تحرير وتصدير Word)" : "Open full proposal (edit + Word export)"}
+            </button>
           </div>
 
           {/* Share links */}
