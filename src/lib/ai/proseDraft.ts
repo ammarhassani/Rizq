@@ -34,6 +34,9 @@ import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
  * deliverables list (same order); the renderer pairs index-for-index.
  */
 export const ProseSchema = z.object({
+  /** A concise project title naming what the proposal is for (fills the cover
+   *  heading + the export filename). 3 to 7 words, the brief's language. */
+  projectTitle: z.string(),
   coverLetter: z.string(),
   understanding: z.string(),
   approach: z
@@ -55,6 +58,7 @@ export type ProseDraft = z.infer<typeof ProseSchema>;
  * A plain `Partial<ProseDraft>` (e.g. from tests) also satisfies it.
  */
 export type DeepPartialProse = {
+  projectTitle?: string;
   coverLetter?: string;
   understanding?: string;
   approach?: Array<{ title?: string; body?: string } | undefined>;
@@ -218,6 +222,7 @@ ${JSON.stringify(
   )}
 
 Produce these sections:
+- projectTitle: a concise 3 to 7 word title naming WHAT this proposal is for, drawn from the brief (e.g. "Brand identity for a coffee roastery", "هوية بصرية لمحمصة قهوة"). No company boilerplate, no price, no the word "proposal".
 - coverLetter: 2 to 4 sentences. Thank the client for the opportunity and frame the value you bring. Do NOT mention a price figure.
 - understanding: 2 to 4 sentences that RESTATE the client's stated needs in your own words, so they feel heard. Reflect only what the brief says.
 - approach: 2 to 5 phases, each with a short title and a 1 to 2 sentence body, describing how the work will be delivered.
@@ -374,6 +379,7 @@ export function mergeProseIntoArtifact(
     return { sections: artifact.sections.map((s) => ({ ...s })) };
   }
 
+  const projectTitle = nonEmptyString(prose.projectTitle);
   const coverLetter = nonEmptyString(prose.coverLetter);
   const understanding = nonEmptyString(prose.understanding);
   const approach = validPhases(prose.approach);
@@ -389,6 +395,13 @@ export function mergeProseIntoArtifact(
     };
 
     switch (section.id) {
+      case "cover": {
+        // Cover is not a prose/AI-badged section; we only fill its title.
+        if (projectTitle != null) {
+          next.content.projectTitle = projectTitle;
+        }
+        return next;
+      }
       case "cover_letter": {
         if (coverLetter != null) {
           next.content.body = coverLetter;

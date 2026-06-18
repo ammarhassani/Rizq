@@ -17,6 +17,7 @@ import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
 import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles";
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { DownloadWordButton } from "@/components/proposals/DownloadWordButton";
+import { CoverTitleEditor } from "@/components/proposals/CoverTitleEditor";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -154,6 +155,20 @@ export default async function ProposalDetailPage({
           >
             {t("expiredNotice")}
           </div>
+        )}
+
+        {/* Project title — AI-drafted, editable before sending (fills the cover
+            heading + the Word export filename). Owner + editable only. */}
+        {canEdit && artifactData && (
+          <CoverTitleEditor
+            proposalId={id}
+            initialTitle={
+              (artifactData.sections.find((s) => s.id === "cover")?.content?.[
+                "projectTitle"
+              ] as string | null) ?? ""
+            }
+            locale={locale as "ar" | "en"}
+          />
         )}
 
         {/* Artifact — editable (per-section inline refine) only for final/sent

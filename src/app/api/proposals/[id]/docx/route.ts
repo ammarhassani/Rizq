@@ -47,7 +47,7 @@ export async function GET(
 
     const { data: proposal, error } = await supabase
       .from("proposals")
-      .select("artifact_json, client_name, brief_language")
+      .select("artifact_json, client_name, brief_language, created_at")
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
@@ -61,6 +61,16 @@ export async function GET(
       return Response.json({ ok: false, code: "no_artifact" }, { status: 422 });
     }
 
+    // Project title comes from the cover section (AI-drafted, owner-editable).
+    const coverContent =
+      (artifact.sections.find((s) => s.id === "cover")?.content as
+        | Record<string, unknown>
+        | undefined) ?? {};
+    const projectTitle =
+      typeof coverContent["projectTitle"] === "string"
+        ? (coverContent["projectTitle"] as string).trim()
+        : "";
+
     // Locale: explicit ?locale wins, else the proposal's brief language, else ar.
     const qLocale = new URL(request.url).searchParams.get("locale");
     const briefLang = proposal.brief_language as string | null;
@@ -73,10 +83,22 @@ export async function GET(
 
     const buffer = await buildProposalDocxBuffer(artifact, locale);
 
-    const clientName = (proposal.client_name as string | null) ?? "";
-    const base = `Rizq-Proposal${clientName ? "-" + asciiSlug(clientName) : "-" + id.slice(0, 8)}`;
-    const niceName = `${clientName ? clientName + " - " : ""}Rizq Proposal.docx`;
-    const asciiName = `${base}.docx`;
+    // Filename: "<project> TO <client> Proposal <creation date>.docx"
+    // (creation date, not export date). Each part is omitted when absent.
+    const clientName = ((proposal.client_name as string | null) ?? "").trim();
+    const createdAt = proposal.created_at as string | null;
+    const dateStr = createdAt ? String(createdAt).slice(0, 10) : "";
+
+    const parts: string[] = [];
+    if (projectTitle) parts.push(projectTitle);
+    if (projectTitle && clientName) parts.push("TO");
+    if (clientName) parts.push(clientName);
+    parts.push("Proposal");
+    if (dateStr) parts.push(dateStr);
+    const niceBase = parts.join(" ") || "Rizq Proposal";
+
+    const niceName = `${niceBase}.docx`;
+    const asciiName = `${asciiSlug(niceBase) || "Rizq-Proposal"}.docx`;
 
     return new Response(new Uint8Array(buffer), {
       status: 200,

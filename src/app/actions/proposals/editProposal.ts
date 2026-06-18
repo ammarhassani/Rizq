@@ -132,6 +132,7 @@ export async function editProposal(
   let validityDays = 30;
   let depositPct = 50;
   let existingIssueDate: string | null = null;
+  let existingProjectTitle: string | null = null;
   if (oldArtifact) {
     const termsSection = oldArtifact.sections?.find(
       (s) => s.id === "terms" || s.id === "terms_footer"
@@ -145,6 +146,10 @@ export async function editProposal(
     }
     if (typeof coverSection?.content?.issueDate === "string") {
       existingIssueDate = coverSection.content.issueDate as string;
+    }
+    // Preserve the AI-drafted / user-edited project title across rebuilds.
+    if (typeof coverSection?.content?.projectTitle === "string") {
+      existingProjectTitle = coverSection.content.projectTitle as string;
     }
     const milestonesSection = oldArtifact.sections?.find(
       (s) => s.id === "milestones"
@@ -180,7 +185,7 @@ export async function editProposal(
     brandColors: brand.brandColors,
     contact: brand.contact,
     clientName: (proposal["client_name"] as string | null) ?? null,
-    projectTitle: null,
+    projectTitle: existingProjectTitle,
     issueDate: existingIssueDate ?? new Date().toISOString(),
     deliverables: (newScope.deliverables as string[]) ?? [],
     projectDescriptionAr,

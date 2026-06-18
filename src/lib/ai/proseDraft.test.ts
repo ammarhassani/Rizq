@@ -98,6 +98,7 @@ function sectionById(a: ArtifactData, id: string) {
 
 describe("ProseSchema", () => {
   const valid = {
+    projectTitle: "هوية بصرية لمتجر",
     coverLetter: "نشكركم على الفرصة.",
     understanding: "فهمنا أنكم تحتاجون هوية بصرية.",
     approach: [
@@ -355,6 +356,16 @@ describe("mergeProseIntoArtifact", () => {
     const merged2 = mergeProseIntoArtifact(freshArtifact(), { coverLetter: "1000-1500 SAR" });
     expect(sectionById(merged2, "cover_letter")!.content.body).toBe("1000-1500 SAR");
   });
+
+  it("fills the cover projectTitle when the prose pass provides one", () => {
+    const merged = mergeProseIntoArtifact(freshArtifact(), { projectTitle: "هوية بصرية لمقهى" });
+    expect(sectionById(merged, "cover")!.content.projectTitle).toBe("هوية بصرية لمقهى");
+  });
+
+  it("leaves cover projectTitle null when the stream omits it", () => {
+    const merged = mergeProseIntoArtifact(freshArtifact(), { coverLetter: "x" });
+    expect(sectionById(merged, "cover")!.content.projectTitle).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -363,6 +374,7 @@ describe("mergeProseIntoArtifact", () => {
 
 describe("pickProseField", () => {
   const full: ProseDraft = {
+    projectTitle: "عنوان المشروع",
     coverLetter: "خطاب",
     understanding: "فهم",
     approach: [
@@ -421,6 +433,7 @@ describe("pickProseField", () => {
 
 describe("selective regen via pickProseField + mergeProseIntoArtifact", () => {
   const full: ProseDraft = {
+    projectTitle: "عنوان جديد",
     coverLetter: "خطاب جديد من النموذج",
     understanding: "فهم جديد من النموذج",
     approach: [

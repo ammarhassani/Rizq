@@ -169,6 +169,11 @@ export async function answerFollowUps(
     typeof oldCover?.content?.["issueDate"] === "string"
       ? (oldCover.content["issueDate"] as string)
       : null;
+  // Preserve the AI-drafted / user-edited project title across rebuilds.
+  const existingProjectTitle =
+    typeof oldCover?.content?.["projectTitle"] === "string"
+      ? (oldCover.content["projectTitle"] as string)
+      : null;
 
   const artifactInput: ArtifactInput = {
     locale: briefLang,
@@ -180,7 +185,7 @@ export async function answerFollowUps(
     brandColors: brand.brandColors,
     contact: brand.contact,
     clientName: (proposal.client_name as string | null) ?? null,
-    projectTitle: null,
+    projectTitle: existingProjectTitle,
     issueDate: existingIssueDate ?? new Date().toISOString(),
     deliverables: updatedScope.deliverables,
     projectDescriptionAr: null,

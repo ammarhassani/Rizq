@@ -266,6 +266,73 @@ export async function updateSection(rawInput: unknown): Promise<UpdateSectionRes
 }
 
 // ---------------------------------------------------------------------------
+// updateProjectTitle — edit the cover's project title (AI-drafted, user-owned)
+// ---------------------------------------------------------------------------
+
+const UpdateTitleSchema = z.object({
+  proposal_id: z.string().uuid(),
+  title: z.string().max(140),
+});
+
+export async function updateProjectTitle(rawInput: unknown): Promise<UpdateSectionResult> {
+  const parsed = UpdateTitleSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+  const { proposal_id, title } = parsed.data;
+
+  const supabase = await createClient();
+
+  const { data: userResult } = await supabase.auth.getUser();
+  if (!userResult.user) return { ok: false, code: "unauthorized" };
+  const userId = userResult.user.id;
+
+  const { data: rawProposal, error: fetchErr } = await supabase
+    .from("proposals")
+    .select("id, status, version, scope_json, price_min, price_anchor, price_max, artifact_json")
+    .eq("id", proposal_id)
+    .eq("user_id", userId)
+    .single();
+
+  if (fetchErr || !rawProposal) return { ok: false, code: "not_found" };
+  const proposal = rawProposal as Record<string, unknown>;
+
+  if (!EDITABLE_STATUSES.has(proposal["status"] as string)) {
+    return { ok: false, code: "status_not_editable" };
+  }
+
+  const artifact = proposal["artifact_json"] as ArtifactData | null;
+  if (!artifact || !Array.isArray(artifact.sections)) {
+    return { ok: false, code: "error" };
+  }
+
+  const cleanTitle = clean(title).trim().slice(0, 140);
+
+  let found = false;
+  const sections: ArtifactSection[] = artifact.sections.map((section) => {
+    if (section.id !== "cover") return section;
+    found = true;
+    return {
+      ...section,
+      content: { ...section.content, projectTitle: cleanTitle || null },
+    };
+  });
+
+  if (!found) return { ok: false, code: "not_found" };
+
+  const result = await bumpAndPersist(
+    supabase,
+    userId,
+    proposal_id,
+    proposal,
+    { sections },
+    "[updateProjectTitle]"
+  );
+  if (!result.ok) return { ok: false, code: "error" };
+
+  revalidateDetail(proposal_id);
+  return { ok: true, version: result.version };
+}
+
+// ---------------------------------------------------------------------------
 // regenerateSection — AI regen of ONE section (non-streaming)
 // ---------------------------------------------------------------------------
 
