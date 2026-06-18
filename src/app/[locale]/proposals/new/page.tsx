@@ -78,37 +78,45 @@ export default async function ProposalNewPage({
     listTemplates(),
     supabase
       .from("clients")
-      .select("id, name")
+      .select("id, name, city")
       .eq("user_id", userData.user.id)
       .eq("is_active", true)
       .order("name", { ascending: true }),
   ]);
   const userTemplates = templatesResult.ok ? templatesResult.templates : [];
+
+  // Match a free-text city to a known city slug (null when no match / no value).
+  const matchCitySlug = (text: string | null): string | null => {
+    if (!text) return null;
+    const m = cities.find(
+      (c) => c.name_ar === text || c.name_en === text || c.slug === text
+    );
+    return m?.slug ?? null;
+  };
+
+  // Carry each client's city (mapped to a slug) so selecting a client can set
+  // the pricing city from the client record (the city field is auto-filled).
   const userClients = (clientsRaw.data ?? []).map((c) => ({
     id: c.id as string,
     name: c.name as string,
+    citySlug: matchCitySlug((c.city as string | null) ?? null),
   }));
 
-  // Load user profile for default city
+  // Load user profile for default city + experience tier (from onboarding /
+  // settings) so the freelancer never re-picks their own experience each time.
   const { data: userProfile } = await supabase
     .from("users")
-    .select("city")
+    .select("city, experience_tier_id")
     .eq("id", userData.user.id)
     .single();
 
-  // Map stored city text to a slug: find the city whose name_ar or name_en
-  // matches the stored value, fall back to first active city.
   const storedCity = (userProfile?.city as string | null) ?? null;
-  const defaultCitySlug = (() => {
-    if (!storedCity) return cities[0]?.slug ?? "";
-    const match = cities.find(
-      (c) =>
-        c.name_ar === storedCity ||
-        c.name_en === storedCity ||
-        c.slug === storedCity
-    );
-    return match?.slug ?? cities[0]?.slug ?? "";
-  })();
+  const defaultCitySlug = matchCitySlug(storedCity) ?? cities[0]?.slug ?? "";
+
+  // Resolve the user's experience tier to a slug; default to "mid" if unset.
+  const userTierId = (userProfile?.experience_tier_id as string | null) ?? null;
+  const defaultTierSlug =
+    (userTierId ? tiers.find((tr) => tr.id === userTierId)?.slug : null) ?? "mid";
 
   // Map to option shape with locale-aware labels
   const cityOptions = cities.map((c) => ({
@@ -141,6 +149,7 @@ export default async function ProposalNewPage({
           cities={cityOptions}
           tiers={tierOptions}
           defaultCitySlug={defaultCitySlug}
+          defaultTierSlug={defaultTierSlug}
           templates={userTemplates.map((t) => ({
             id: t.id,
             name_ar: t.name_ar,

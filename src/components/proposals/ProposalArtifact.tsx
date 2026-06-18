@@ -11,6 +11,7 @@
 import { Link } from "@/i18n/navigation";
 import { RizqSeal } from "@/components/proposals/RizqSeal";
 import { SectionEditor } from "@/components/proposals/SectionEditor";
+import { PriceEditor } from "@/components/proposals/PriceEditor";
 import { BandMeter } from "@/components/charts/BandMeter";
 // Bilingual labels + templated defaults — a pure module shared with the Word
 // (.docx) export builder so preview == deliverable (single source of truth).
@@ -1232,18 +1233,40 @@ export function ProposalArtifact({ data, locale, editable = false, proposalId }:
    */
   function renderSectionWithEditor(s: ArtifactSection) {
     const rendered = renderSection(s, locale);
-    if (!showEditor || !EDITABLE_PROSE_IDS.has(s.id)) return rendered;
-    return (
-      <div key={s.id}>
-        {rendered}
-        <SectionEditor
-          proposalId={proposalId as string}
-          sectionId={s.id as EditableProseId}
-          locale={locale}
-          content={s.content}
-        />
-      </div>
-    );
+    if (!showEditor) return rendered;
+
+    // Prose sections get the inline refine bar (edit / regenerate / tone).
+    if (EDITABLE_PROSE_IDS.has(s.id)) {
+      return (
+        <div key={s.id}>
+          {rendered}
+          <SectionEditor
+            proposalId={proposalId as string}
+            sectionId={s.id as EditableProseId}
+            locale={locale}
+            content={s.content}
+          />
+        </div>
+      );
+    }
+
+    // Pricing gets a manual price override (set any price; range is a guide).
+    if (s.id === "pricing") {
+      return (
+        <div key={s.id}>
+          {rendered}
+          <PriceEditor
+            proposalId={proposalId as string}
+            locale={locale}
+            initialAnchor={num(s.content["anchor"])}
+            min={num(s.content["min"]) || undefined}
+            max={num(s.content["max"]) || undefined}
+          />
+        </div>
+      );
+    }
+
+    return rendered;
   }
 
   return (

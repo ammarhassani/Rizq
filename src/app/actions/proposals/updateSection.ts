@@ -334,6 +334,106 @@ export async function updateProjectTitle(rawInput: unknown): Promise<UpdateSecti
 }
 
 // ---------------------------------------------------------------------------
+// updateProposalPrice — manual price override (freelancer sets their own price)
+// ---------------------------------------------------------------------------
+
+const UpdatePriceSchema = z.object({
+  proposal_id: z.string().uuid(),
+  // Free manual value — the freelancer can price above or below the market
+  // range. The range + citation stay as displayed context (the basis), they are
+  // not the quote. Bounded only to keep the number sane.
+  anchor: z.number().nonnegative().max(100_000_000),
+});
+
+export async function updateProposalPrice(rawInput: unknown): Promise<UpdateSectionResult> {
+  const parsed = UpdatePriceSchema.safeParse(rawInput);
+  if (!parsed.success) return { ok: false, code: "invalid" };
+  const { proposal_id, anchor } = parsed.data;
+
+  const supabase = await createClient();
+
+  const { data: userResult } = await supabase.auth.getUser();
+  if (!userResult.user) return { ok: false, code: "unauthorized" };
+  const userId = userResult.user.id;
+
+  const { data: rawProposal, error: fetchErr } = await supabase
+    .from("proposals")
+    .select("id, status, version, scope_json, price_min, price_anchor, price_max, artifact_json")
+    .eq("id", proposal_id)
+    .eq("user_id", userId)
+    .single();
+
+  if (fetchErr || !rawProposal) return { ok: false, code: "not_found" };
+  const proposal = rawProposal as Record<string, unknown>;
+
+  if (!EDITABLE_STATUSES.has(proposal["status"] as string)) {
+    return { ok: false, code: "status_not_editable" };
+  }
+
+  const artifact = proposal["artifact_json"] as ArtifactData | null;
+  if (!artifact || !Array.isArray(artifact.sections)) {
+    return { ok: false, code: "error" };
+  }
+
+  const rounded = Math.round(anchor);
+
+  let found = false;
+  const sections: ArtifactSection[] = artifact.sections.map((section) => {
+    if (section.id !== "pricing") return section;
+    found = true;
+    return { ...section, content: { ...section.content, anchor: rounded } };
+  });
+  if (!found) return { ok: false, code: "not_found" };
+
+  const oldVersion = Number(proposal["version"]);
+  const newVersion = oldVersion + 1;
+
+  // Snapshot the OLD state (mirrors bumpAndPersist) so price history is kept.
+  const { error: versionErr } = await supabase.from("proposal_versions").insert({
+    proposal_id,
+    user_id: userId,
+    version: oldVersion,
+    scope_json: proposal["scope_json"] as Scope,
+    price_min: Number(proposal["price_min"]),
+    price_anchor: Number(proposal["price_anchor"]),
+    price_max: Number(proposal["price_max"]),
+    changed_by: userId,
+    change_summary: null,
+  });
+  if (versionErr) {
+    console.error("[updateProposalPrice] version insert failed", {
+      code: versionErr.code,
+      message: versionErr.message,
+    });
+    return { ok: false, code: "error" };
+  }
+
+  // Persist the new artifact (pricing.anchor) AND the price_anchor column so the
+  // list, cards, Word export, and invoice-from-proposal all stay consistent.
+  const { error: updateErr } = await supabase
+    .from("proposals")
+    .update({
+      artifact_json: { sections },
+      price_anchor: rounded,
+      version: newVersion,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", proposal_id)
+    .eq("user_id", userId);
+
+  if (updateErr) {
+    console.error("[updateProposalPrice] update failed", {
+      code: updateErr.code,
+      message: updateErr.message,
+    });
+    return { ok: false, code: "error" };
+  }
+
+  revalidateDetail(proposal_id);
+  return { ok: true, version: newVersion };
+}
+
+// ---------------------------------------------------------------------------
 // regenerateSection — AI regen of ONE section (non-streaming)
 // ---------------------------------------------------------------------------
 

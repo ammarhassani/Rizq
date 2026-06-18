@@ -37,7 +37,7 @@ type Option = { slug: string; label: string; hint?: string };
 
 type TemplateOption = { id: string; name_ar: string; name_en: string | null };
 
-type ClientOption = { id: string; name: string };
+type ClientOption = { id: string; name: string; citySlug?: string | null };
 
 type Props = {
   locale: "ar" | "en";
@@ -45,6 +45,8 @@ type Props = {
   cities: Option[];
   tiers: Option[];
   defaultCitySlug: string;
+  /** The user's experience tier (from onboarding / settings); defaults the select. */
+  defaultTierSlug?: string;
   templates?: TemplateOption[];
   clients?: ClientOption[];
 };
@@ -65,7 +67,7 @@ type ViewKind =
 // Main component
 // ---------------------------------------------------------------------------
 
-export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, templates = [], clients = [] }: Props) {
+export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySlug, defaultTierSlug = "mid", templates = [], clients = [] }: Props) {
   const t = useTranslations("Proposals.new");
   const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
@@ -76,11 +78,10 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
 
   // Form state
   const [briefText, setBriefText] = useState("");
-  const [clientName, setClientName] = useState("");
   const [goalsText, setGoalsText] = useState("");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [citySlug, setCitySlug] = useState(defaultCitySlug);
-  const [tierSlug, setTierSlug] = useState("mid");
+  const [tierSlug, setTierSlug] = useState(defaultTierSlug);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   // Main flow transition (generate + followups)
@@ -98,6 +99,13 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
       setView({ kind: "form", error: t("errors.briefRequired") });
       return;
     }
+    if (!selectedClientId) {
+      setView({
+        kind: "form",
+        error: isAr ? "اختر عميلاً أو أضِف عميلاً جديدًا." : "Select a client, or add a new one.",
+      });
+      return;
+    }
     if (!citySlug || !tierSlug) {
       setView({ kind: "form", error: t("errors.selectCityTier") });
       return;
@@ -107,11 +115,9 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
     startFlowTransition(async () => {
       const result = await generateProposal({
         brief_text: briefText.trim(),
-        // When a known client is selected, pass client_id (client_name resolved server-side)
-        // When free-text name is given without a client_id, pass client_name only
-        ...(selectedClientId
-          ? { client_id: selectedClientId }
-          : { client_name: clientName.trim() || undefined }),
+        // Client is mandatory — always a real client from the book (client_name
+        // is resolved server-side from the id).
+        client_id: selectedClientId,
         city_slug: citySlug,
         experience_tier_slug: tierSlug,
         template_id: selectedTemplateId || undefined,
@@ -356,17 +362,16 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
           htmlFor="client-picker"
           className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
         >
-          {t("pickClient")}
-          <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
+          {t("pickClient")} <span className="text-red-500">*</span>
         </label>
         <ClientPicker
           id="client-picker"
           value={selectedClientId}
           onChange={(v) => {
             setSelectedClientId(v);
-            // When switching to "new client" (cleared), the free-text name field
-            // re-appears; when selecting a known client clear any pre-typed name.
-            setClientName("");
+            // Auto-fill the pricing city from the selected client's city (if set).
+            const picked = clients.find((c) => c.id === v);
+            if (picked?.citySlug) setCitySlug(picked.citySlug);
           }}
           clients={clients}
           locale={locale}
@@ -410,27 +415,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
           className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
         />
       </div>
-
-      {/* Client name (optional free-text) — hidden when a known client is selected */}
-      {!selectedClientId && (
-        <div>
-          <label
-            htmlFor="client-name"
-            className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
-          >
-            {t("clientNameLabel")}
-            <span className="ms-1 text-rizq-ink-soft/60 font-normal">({t("optional")})</span>
-          </label>
-          <input
-            id="client-name"
-            type="text"
-            value={clientName}
-            onChange={(e) => setClientName(e.target.value)}
-            placeholder={t("clientNamePlaceholder")}
-            className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
-          />
-        </div>
-      )}
 
       {/* City select */}
       <SelectField
