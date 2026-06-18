@@ -139,7 +139,7 @@ export default async function ProposalDetailPage({
         {/* Back link */}
         <Link
           href="/proposals"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
+          className={`print:hidden inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
         >
           <span className="inline-block ltr:rotate-180">→</span>
           {isAr ? "عروضي" : "My proposals"}
@@ -148,7 +148,7 @@ export default async function ProposalDetailPage({
         {/* Expired notice */}
         {isExpired && (
           <div
-            className={`mb-6 rounded-2xl border border-amber-300/50 bg-amber-50/80 px-5 py-4 text-sm text-amber-800 ${font}`}
+            className={`print:hidden mb-6 rounded-2xl border border-amber-300/50 bg-amber-50/80 px-5 py-4 text-sm text-amber-800 ${font}`}
             role="alert"
           >
             {t("expiredNotice")}
@@ -174,7 +174,7 @@ export default async function ProposalDetailPage({
         )}
 
         {/* Actions */}
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4 print:hidden">
           {artifactData && (
             <div className="print:hidden">
               <PrintButton label={isAr ? "تنزيل PDF" : "Download PDF"} locale={locale as "ar" | "en"} />
@@ -207,7 +207,7 @@ export default async function ProposalDetailPage({
 
         {/* Version history */}
         {versionRows.length > 0 && (
-          <section className="mt-10">
+          <section className="mt-10 print:hidden">
             <h2
               className={`eyebrow mb-4 text-rizq-green ${font}`}
             >

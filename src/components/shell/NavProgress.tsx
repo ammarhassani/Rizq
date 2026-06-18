@@ -137,7 +137,7 @@ export function NavProgress() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[2px]"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[100] h-[2px] print:hidden"
     >
       <div
         className="h-full bg-rizq-green shadow-[0_0_8px_rgba(26,95,63,0.5)]"

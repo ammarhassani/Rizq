@@ -41,7 +41,7 @@ export function AppTopBar({
       <header
         dir={dir}
         className={[
-          "sticky top-0 z-40 flex items-center gap-2 h-14",
+          "sticky top-0 z-40 flex items-center gap-2 h-14 print:hidden",
           "bg-rizq-cream/95 border-b border-rizq-gold/15 px-4 sm:px-6",
         ].join(" ")}
       >

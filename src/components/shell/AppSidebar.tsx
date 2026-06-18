@@ -179,7 +179,7 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
       {/* ── Desktop sidebar (hidden on mobile) ─────────────────────────────── */}
       <aside
         className={[
-          "hidden lg:flex flex-col shrink-0 transition-[width] duration-200 ease-in-out",
+          "hidden lg:flex flex-col shrink-0 transition-[width] duration-200 ease-in-out print:!hidden",
           "sticky top-0 h-screen overflow-y-auto overflow-x-hidden",
           "bg-rizq-cream/98 border-s border-rizq-gold/20",
           sidebarWidth,

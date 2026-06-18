@@ -297,3 +297,52 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+   Print / PDF — app-wide. window.print() (the "Download / Print PDF" button)
+   should output ONLY the document (invoice or proposal artifact) on clean A4,
+   never the app chrome. The shell (sidebar, top bar, nav progress, dot-grid,
+   toasts, command palette) and each page's non-document parts (back links,
+   action panels, version history, edit forms) carry `print:hidden` /
+   `.print-hidden`; the document column carries `.print-region`.
+   ─────────────────────────────────────────────────────────────────────── */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 18mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Belt-and-suspenders chrome removal (Tailwind's print:hidden covers the rest). */
+  .print-hidden,
+  [data-print-hidden],
+  [data-sonner-toaster],
+  [data-rizq-command-palette] {
+    display: none !important;
+  }
+
+  /* The printable document fills the sheet — drop the shell's max-width + padding. */
+  .print-region {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-block: 0 !important;
+    padding-inline: 0 !important;
+  }
+
+  /* Keep document sections + invoice tables intact across page breaks. */
+  .print-region section,
+  .print-region table,
+  .print-region tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* No drop shadows in print — they render as muddy grey boxes. */
+  .print-region * {
+    box-shadow: none !important;
+  }
+}

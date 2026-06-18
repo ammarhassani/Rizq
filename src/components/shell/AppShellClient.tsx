@@ -123,7 +123,7 @@ function ShellFrame({
       {/* Dot-grid backdrop — owned by the shell, not individual pages */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 opacity-[0.45]"
+        className="pointer-events-none fixed inset-0 opacity-[0.45] print:hidden"
         style={{
           backgroundImage:
             "radial-gradient(circle, rgba(200, 169, 81, 0.18) 1px, transparent 1.6px)",
@@ -160,7 +160,7 @@ function ShellFrame({
         <main className="flex-1">
           <AppPageReveal
             className={[
-              "mx-auto w-full px-5 sm:px-8 lg:px-10 py-6 sm:py-8 pb-16",
+              "print-region mx-auto w-full px-5 sm:px-8 lg:px-10 py-6 sm:py-8 pb-16",
               maxWidthClass,
             ].join(" ")}
           >

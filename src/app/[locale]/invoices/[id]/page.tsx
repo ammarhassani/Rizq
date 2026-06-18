@@ -97,7 +97,7 @@ export default async function InvoiceDetailPage({
         {/* Back link */}
         <Link
           href="/invoices"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
+          className={`print:hidden inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
         >
           <span className="inline-block ltr:rotate-180">→</span>
           {isAr ? "الفواتير" : "Invoices"}
@@ -106,7 +106,7 @@ export default async function InvoiceDetailPage({
         {/* Invoice header summary strip */}
         <div
           dir={dir}
-          className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 px-6 py-4 mb-6 ${font}`}
+          className={`print:hidden flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 px-6 py-4 mb-6 ${font}`}
         >
           <div className="flex items-center gap-3 flex-wrap">
             <span className="tabular font-sans text-lg font-bold text-rizq-ink">
@@ -148,7 +148,7 @@ export default async function InvoiceDetailPage({
         )}
 
         {/* Actions island */}
-        <div className="mt-8">
+        <div className="mt-8 print:hidden">
           <InvoiceDetailActions
             locale={locale as "ar" | "en"}
             invoiceId={invoice.id as string}

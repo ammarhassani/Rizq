@@ -187,7 +187,7 @@ export default async function InvoiceSharePage({
         {/* Subtle dot grid — same as /p/[token] */}
         <div
           aria-hidden
-          className="absolute inset-0 opacity-[0.5] pointer-events-none"
+          className="absolute inset-0 opacity-[0.5] pointer-events-none print-hidden"
           style={{
             backgroundImage:
               "radial-gradient(circle, rgba(200, 169, 81, 0.20) 1px, transparent 1.6px)",
