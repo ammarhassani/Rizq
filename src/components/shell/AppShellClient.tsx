@@ -4,6 +4,11 @@ import { useState } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { AppTopBar } from "./AppTopBar";
 import { NavProgress } from "./NavProgress";
+import { CommandPalette } from "./CommandPalette";
+import {
+  CommandPaletteProvider,
+  useCommandPalette,
+} from "./CommandPaletteContext";
 import { AppPageReveal } from "@/components/motion/AppPageReveal";
 import type { AppShellWidth } from "./AppShell";
 
@@ -29,7 +34,22 @@ const MAX_WIDTH_CLASS: Record<AppShellWidth, string> = {
  * between AppTopBar (hamburger) and AppSidebar (Sheet consumer).
  * AppShell (server) renders this with the profile already resolved.
  */
-export function AppShellClient({
+export function AppShellClient(props: Props) {
+  return (
+    <CommandPaletteProvider>
+      <ShellFrame {...props} />
+      <CommandPaletteMount locale={props.locale} />
+    </CommandPaletteProvider>
+  );
+}
+
+/** Reads the lifted open-state and renders the palette once for the shell. */
+function CommandPaletteMount({ locale }: { locale: "ar" | "en" }) {
+  const { open, setOpen } = useCommandPalette();
+  return <CommandPalette open={open} onOpenChange={setOpen} locale={locale} />;
+}
+
+function ShellFrame({
   locale,
   title,
   maxWidth = "wide",

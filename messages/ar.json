@@ -1717,6 +1717,31 @@
       "navigating": "جارٍ الانتقال…"
     }
   },
+  "CommandPalette": {
+    "title": "لوحة الأوامر",
+    "placeholder": "ابحث أو انتقل إلى…",
+    "triggerLabel": "بحث",
+    "triggerAria": "فتح لوحة الأوامر",
+    "noResults": "لا توجد نتائج",
+    "sections": {
+      "navigation": "التنقل",
+      "actions": "إجراءات سريعة",
+      "results": "النتائج"
+    },
+    "actions": {
+      "newProposal": "عرض تقديمي جديد",
+      "newInvoice": "فاتورة جديدة",
+      "newGig": "مشروع جديد",
+      "newClient": "عميل جديد",
+      "studioProfile": "ملف الاستوديو",
+      "methodology": "المنهجية"
+    },
+    "types": {
+      "proposal": "عرض تقديمي",
+      "client": "عميل",
+      "invoice": "فاتورة"
+    }
+  },
   "Landing": {
     "hero": {
       "eyebrow": "منصة المستقل السعودي",

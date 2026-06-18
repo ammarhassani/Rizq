@@ -1717,6 +1717,31 @@
       "navigating": "Navigating…"
     }
   },
+  "CommandPalette": {
+    "title": "Command palette",
+    "placeholder": "Search or jump to…",
+    "triggerLabel": "Search",
+    "triggerAria": "Open command palette",
+    "noResults": "No results",
+    "sections": {
+      "navigation": "Navigation",
+      "actions": "Quick actions",
+      "results": "Results"
+    },
+    "actions": {
+      "newProposal": "New proposal",
+      "newInvoice": "New invoice",
+      "newGig": "New gig",
+      "newClient": "New client",
+      "studioProfile": "Studio profile",
+      "methodology": "Methodology"
+    },
+    "types": {
+      "proposal": "Proposal",
+      "client": "Client",
+      "invoice": "Invoice"
+    }
+  },
   "Landing": {
     "hero": {
       "eyebrow": "The Saudi Freelancer OS",
