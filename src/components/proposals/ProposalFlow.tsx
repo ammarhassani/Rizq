@@ -11,21 +11,17 @@
  */
 
 import { useState, useTransition, useCallback, useEffect, useRef } from "react";
-import { Loader2, Copy, Check, Share2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { generateProposal } from "@/app/actions/proposals/generateProposal";
 import { answerFollowUps } from "@/app/actions/proposals/answerFollowUps";
-import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
-import { setProposalShare } from "@/app/actions/proposals/shareActions";
 import { track } from "@/lib/analytics/track";
 import { useRouter } from "@/i18n/navigation";
 import { ArtifactSkeleton } from "./ArtifactSkeleton";
 import { FollowUpCards } from "./FollowUpCards";
 import { ProposalArtifact } from "./ProposalArtifact";
 import { StreamingProse } from "./StreamingProse";
-import { ToneBar } from "./ToneBar";
-import { ScopeInsight } from "./ScopeInsight";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { ClientPicker } from "@/components/clients/ClientPicker";
 import { Combobox } from "@/components/ui/Combobox";
@@ -58,37 +54,12 @@ type ViewKind =
   | { kind: "loading" }
   | { kind: "followups"; proposalId: string; followUps: FollowUpTemplate[]; artifact: ArtifactData }
   // Phase D: pass-1 artifact (templated defaults + real price) is ready; the AI
-  // prose stream fills narrative sections live before we land on "artifact".
+  // prose stream fills narrative sections live, then we navigate to the detail
+  // page (the single edit + deliver hub) — there is no separate preview step.
   | { kind: "drafting"; proposalId: string; baseArtifact: ArtifactData }
-  | { kind: "artifact"; proposalId: string; artifact: ArtifactData; finalized: boolean; shareToken?: string }
   | { kind: "quota_exhausted" }
   | { kind: "extraction_failed"; briefText: string }
   | { kind: "error"; message: string };
-
-// ---------------------------------------------------------------------------
-// Copy-link button (mini client island)
-// ---------------------------------------------------------------------------
-
-function CopyButton({ text, label, copiedLabel, font }: { text: string; label: string; copiedLabel: string; font: string }) {
-  const [copied, setCopied] = useState(false);
-  async function doCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* silent */ }
-  }
-  return (
-    <button
-      type="button"
-      onClick={doCopy}
-      className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/80 px-4 py-2 text-sm font-medium text-rizq-ink hover:border-rizq-green/50 transition-all ${font}`}
-    >
-      {copied ? <Check size={14} className="text-rizq-green" /> : <Copy size={14} />}
-      <span>{copied ? copiedLabel : label}</span>
-    </button>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -111,10 +82,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   const [citySlug, setCitySlug] = useState(defaultCitySlug);
   const [tierSlug, setTierSlug] = useState("mid");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-
-  // Finalize/share transitions
-  const [isFinalizing, startFinalizeTransition] = useTransition();
-  const [isSharing, startShareTransition] = useTransition();
 
   // Main flow transition (generate + followups)
   const [isFlowPending, startFlowTransition] = useTransition();
@@ -215,63 +182,14 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
   );
 
   // ---------------------------------------------------------------------------
-  // Finalize handler
-  // ---------------------------------------------------------------------------
-
-  function handleFinalize(proposalId: string) {
-    startFinalizeTransition(async () => {
-      const result = await finalizeProposal({ proposal_id: proposalId });
-      if (!result.ok) return;
-      track("proposal_finalized", { locale, proposal_id: proposalId });
-      // Land on the full proposal page: per-section refine, rename the project,
-      // and export to Word all live there (this flow is just the generate step).
-      router.push(`/proposals/${proposalId}` as `/proposals/${string}`);
-    });
-  }
-
-  /** Open the full proposal page (the edit + export hub) without finalizing. */
-  function openFullProposal(proposalId: string) {
-    router.push(`/proposals/${proposalId}` as `/proposals/${string}`);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Share handler
-  // ---------------------------------------------------------------------------
-
-  function handleShare(proposalId: string) {
-    startShareTransition(async () => {
-      const result = await setProposalShare({ proposal_id: proposalId, share: true });
-      if (!result.ok) return;
-      track("proposal_shared", { locale, proposal_id: proposalId });
-      const token = result.token;
-      setView((prev) => {
-        if (prev.kind === "artifact") return { ...prev, shareToken: token };
-        return prev;
-      });
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Tone applied
-  // ---------------------------------------------------------------------------
-
-  const handleToneApplied = useCallback((artifact: ArtifactData) => {
-    setView((prev) => {
-      if (prev.kind === "artifact") return { ...prev, artifact };
-      return prev;
-    });
-  }, []);
-
-  // ---------------------------------------------------------------------------
-  // Drafting complete — land on the artifact. The onFinish DB write is
-  // authoritative, so we refresh server data; the artifact we show is the final
-  // merged client object (server refresh keeps the proposal detail page in sync).
+  // Drafting complete — navigate to the proposal detail page (the single edit +
+  // deliver hub). The AI SDK awaits onFinish (the DB write) before the stream
+  // closes, so the persisted prose is already in place when we land there.
   // ---------------------------------------------------------------------------
 
   const handleDraftDone = useCallback(
-    (proposalId: string, finalArtifact: ArtifactData) => {
-      router.refresh();
-      setView({ kind: "artifact", proposalId, artifact: finalArtifact, finalized: false });
+    (proposalId: string) => {
+      router.push(`/proposals/${proposalId}` as `/proposals/${string}`);
     },
     [router]
   );
@@ -390,136 +308,6 @@ export function ProposalFlow({ locale, specialties, cities, tiers, defaultCitySl
         onDone={handleDraftDone}
         label={t("drafting")}
       />
-    );
-  }
-
-  // ARTIFACT
-  if (view.kind === "artifact") {
-    const shareUrl =
-      view.shareToken
-        ? `${typeof window !== "undefined" ? window.location.origin : ""}/${locale}/p/${view.shareToken}`
-        : null;
-
-    const waUrl = shareUrl
-      ? `https://wa.me/?text=${encodeURIComponent(
-          isAr
-            ? `عرض تقديمي احترافي من رِزق. سعّر بثقة.\n${shareUrl}`
-            : `A professional proposal from Rizq. Price with confidence.\n${shareUrl}`
-        )}`
-      : null;
-
-    return (
-      <div className="space-y-6 animate-fade-in">
-        {/* Artifact */}
-        <ProposalArtifact data={view.artifact} locale={locale} />
-
-        {/* AI Affordances */}
-        <ToneBar locale={locale} proposalId={view.proposalId} onApplied={handleToneApplied} />
-        <ScopeInsight locale={locale} proposalId={view.proposalId} />
-
-        {/* Action row */}
-        <div
-          dir={dir}
-          className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 space-y-4 ${font}`}
-        >
-          <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase">
-            {t("actions")}
-          </p>
-
-          <div className="flex flex-wrap gap-3">
-            {/* Finalize */}
-            {!view.finalized && (
-              <button
-                type="button"
-                onClick={() => handleFinalize(view.proposalId)}
-                disabled={isFinalizing}
-                className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
-              >
-                {isFinalizing ? (
-                  <><Loader2 size={14} className="animate-spin" /> {t("finalizing")}</>
-                ) : (
-                  t("finalize")
-                )}
-              </button>
-            )}
-
-            {/* Share */}
-            {!view.shareToken && (
-              <button
-                type="button"
-                onClick={() => handleShare(view.proposalId)}
-                disabled={isSharing}
-                className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-6 py-3 text-sm font-medium hover:bg-rizq-green/8 transition-all disabled:opacity-70 ${font}`}
-              >
-                {isSharing ? (
-                  <><Loader2 size={14} className="animate-spin" /> {t("sharing")}</>
-                ) : (
-                  <><Share2 size={14} /> {t("share")}</>
-                )}
-              </button>
-            )}
-
-            {/* Open the full proposal: per-section refine, rename, Word export */}
-            <button
-              type="button"
-              onClick={() => openFullProposal(view.proposalId)}
-              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink px-6 py-3 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
-            >
-              {isAr ? "افتح العرض الكامل (تحرير وتصدير Word)" : "Open full proposal (edit + Word export)"}
-            </button>
-          </div>
-
-          {/* Share links */}
-          {shareUrl && (
-            <div className="space-y-2 pt-1">
-              <p className="text-xs text-rizq-ink-soft">{t("shareNote")}</p>
-              <div className="flex flex-wrap gap-2 items-center">
-                <CopyButton
-                  text={shareUrl}
-                  label={t("copyLink")}
-                  copiedLabel={t("copied")}
-                  font={font}
-                />
-                {waUrl && (
-                  <a
-                    href={waUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-full bg-[#25D366] text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity ${font}`}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                      <path d="M7.5.5A7 7 0 0 0 1.27 10.9L.5 14.5l3.7-.75A7 7 0 1 0 7.5.5zm0 12.73a5.73 5.73 0 0 1-3-.84l-.22-.13-2.2.45.47-2.14-.14-.23A5.75 5.75 0 1 1 7.5 13.23zm3.15-4.3c-.17-.09-1-.5-1.17-.55-.16-.06-.28-.09-.4.09-.12.17-.47.55-.57.66-.1.12-.21.13-.38.05-.17-.09-.73-.27-1.4-.86a5.23 5.23 0 0 1-.97-1.2c-.1-.17-.01-.27.08-.36.08-.08.17-.21.26-.32.09-.1.12-.18.18-.3.06-.12.03-.22-.02-.31-.05-.09-.4-1-.55-1.37-.14-.36-.29-.31-.4-.32H5.38c-.12 0-.3.04-.46.21C4.76 5.07 4.3 5.5 4.3 6.4s.63 1.77.72 1.9c.08.12 1.24 1.88 3 2.64.42.18.75.29 1 .37.42.13.8.11 1.1.07.34-.05 1.04-.42 1.18-.83.15-.41.15-.76.1-.83-.04-.08-.16-.12-.34-.21z" fill="currentColor"/>
-                    </svg>
-                    {t("whatsapp")}
-                  </a>
-                )}
-              </div>
-              {/* Display the URL */}
-              <p className="text-xs text-rizq-ink-soft/60 break-all font-sans">{shareUrl}</p>
-            </div>
-          )}
-
-          {/* New proposal */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                setBriefText("");
-                setClientName("");
-                setGoalsText("");
-                setSelectedClientId("");
-                setCitySlug(defaultCitySlug);
-                setTierSlug("mid");
-                setSelectedTemplateId("");
-                setView({ kind: "form" });
-              }}
-              className={`text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors ${font}`}
-            >
-              {t("newProposal")}
-            </button>
-          </div>
-        </div>
-      </div>
     );
   }
 
@@ -767,7 +555,7 @@ function DraftingView({
   locale: "ar" | "en";
   proposalId: string;
   baseArtifact: ArtifactData;
-  onDone: (proposalId: string, finalArtifact: ArtifactData) => void;
+  onDone: (proposalId: string) => void;
   label: string;
 }) {
   const font = locale === "ar" ? "font-arabic" : "font-sans";
@@ -777,14 +565,10 @@ function DraftingView({
     schema: ProseSchema,
   });
 
-  // Latest merged artifact, kept in a ref so completion uses the freshest data
-  // without making the completion effect depend on `object` (which changes on
-  // every streamed chunk). The ref is synced in an effect (never during render).
+  // The artifact rendered live as prose streams in. The final merged object is
+  // persisted server-side in the route's onFinish (the source of truth); when
+  // the stream closes we navigate to the detail page, which reads it back.
   const liveArtifact = mergeProseIntoArtifact(baseArtifact, object);
-  const latestRef = useRef<ArtifactData>(liveArtifact);
-  useEffect(() => {
-    latestRef.current = liveArtifact;
-  }, [liveArtifact]);
 
   // Kick off the stream exactly once on mount.
   const startedRef = useRef(false);
@@ -812,7 +596,7 @@ function DraftingView({
   const finish = useCallback(() => {
     if (doneRef.current) return;
     doneRef.current = true;
-    onDone(proposalId, latestRef.current);
+    onDone(proposalId);
   }, [onDone, proposalId]);
 
   useEffect(() => {

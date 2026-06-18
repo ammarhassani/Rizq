@@ -18,6 +18,7 @@ import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles"
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { DownloadWordButton } from "@/components/proposals/DownloadWordButton";
 import { CoverTitleEditor } from "@/components/proposals/CoverTitleEditor";
+import { ScopeInsight } from "@/components/proposals/ScopeInsight";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -175,9 +176,9 @@ export default async function ProposalDetailPage({
           />
         )}
 
-        {/* Artifact — editable (per-section inline refine) only for final/sent
-            proposals the owner can edit. The public share page passes neither
-            prop, staying strictly read-only. */}
+        {/* Artifact — editable (per-section inline refine) for the owner while
+            the proposal is draft/final/sent. The public share page passes
+            neither prop, staying strictly read-only. */}
         {artifactData ? (
           <ProposalArtifact
             data={artifactData}
@@ -190,6 +191,14 @@ export default async function ProposalDetailPage({
             className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/60 p-8 text-center text-sm text-rizq-ink-soft ${font}`}
           >
             {isAr ? "العرض غير متوفر حاليًا." : "Proposal data is not available."}
+          </div>
+        )}
+
+        {/* Scope insight — "how this scope compares" (shows only with enough
+            past proposals). Moved here from the old generate-flow preview. */}
+        {artifactData && (
+          <div className="print:hidden mt-6">
+            <ScopeInsight locale={locale as "ar" | "en"} proposalId={id} />
           </div>
         )}
 
