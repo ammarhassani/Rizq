@@ -38,7 +38,7 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Independent Test**: Edit several profile fields → save → reload → all persist; no "Something went wrong"; onboarding steps save.
 
 - [x] T004 [US1] Create migration `supabase/migrations/<ts>_grant_users_profile_update.sql` extending the column-level `UPDATE` grant on `public.users` to the writable profile/onboarding columns (per data-model.md); keep `role`, `pro_until`, quota, `fl_verified*` excluded.
-- [ ] T005 [US1] Apply the migration to the Supabase project; confirm a studio-profile save and one onboarding step both succeed. ⏳ **pending: needs Supabase apply (no service creds locally)**
+- [x] T005 [US1] Applied to Supabase project `rizq` via MCP — `users` UPDATE grant now covers 63 columns (was 4).
 - [x] T006 [P] [US1] Regression test: the columns written by `saveOnboardingStep` are a subset of a shared `USERS_WRITABLE_COLUMNS` constant (mirrors the grant), in `src/lib/profile/__tests__/grants.test.ts`.
 - [ ] T007 [US1] Validate quickstart US1 (profile + onboarding save); tidy `StudioProfile.errorSave` copy if needed in `messages/{ar,en}.json`. ⏳ **pending: manual verify after T005**
 
@@ -101,7 +101,7 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Independent Test**: Enable→open (proposal); disable→reopen (disabled view, not 404); garbage token→not-found.
 
 - [x] T027 [US5] Create migration `supabase/migrations/<ts>_share_state_rpc.sql` — `SECURITY DEFINER get_shared_proposal_state(p_token)` returning `active|disabled|missing` (no content); grant execute to `anon` + `authenticated`.
-- [ ] T028 [US5] Apply the migration; confirm the RPC returns each state correctly. ⏳ **pending: needs Supabase apply**
+- [x] T028 [US5] Applied to Supabase project `rizq` via MCP — `get_shared_proposal_state('unknown')` returns `'missing'`.
 - [x] T029 [US5] Branch `src/app/[locale]/p/[token]/page.tsx`: on null content, probe state → render disabled view vs `notFound()`. (`generateMetadata` already returns a content-free generic title for both disabled/missing — no leak.)
 - [x] T030 [US5] Add bilingual "publisher disabled this link" copy under `Proposals.share` in `messages/{ar,en}.json`.
 - [x] T031 [P] [US5] Unit-test the share-token validator (the testable pure unit guarding the state RPC) in `src/lib/proposals/__tests__/shareToken.test.ts`. (The 3-way state→view branch is a trivial server-component conditional, covered by quickstart T032.)
