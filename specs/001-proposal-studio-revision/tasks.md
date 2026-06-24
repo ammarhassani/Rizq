@@ -17,7 +17,7 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Confirm feature branch `001-proposal-studio-revision`, `pnpm install`, and the Supabase migration apply workflow (`supabase/migrations/` + push to the project). Baseline: `pnpm typecheck` clean, `pnpm test` green.
+- [x] T001 Confirm feature branch `001-proposal-studio-revision`, `pnpm install`, and the Supabase migration apply workflow (`supabase/migrations/` + push to the project). Baseline: `pnpm typecheck` clean, `pnpm test` green.
 
 ---
 
@@ -25,8 +25,8 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 
 **⚠️ Shared honesty infrastructure used by the AI stories (US3, US4). Complete before those stories.**
 
-- [ ] T002 Expose a typed AI-editable-section allowlist (`cover_letter`, `understanding`, `approach`, `scope_of_work`, `assumptions`) and an `assertNoProtectedSections(targets)` guard in `src/lib/proposals/sections.ts` (derives from existing `ARTIFACT_SECTIONS.aiEditable`).
-- [ ] T003 [P] Unit-test the allowlist + guard (rejects price/timeline/milestones/terms) in `src/lib/proposals/__tests__/sections.test.ts`.
+- [x] T002 Expose a typed AI-editable-section allowlist (`cover_letter`, `understanding`, `approach`, `scope_of_work`, `assumptions`) and an `assertNoProtectedSections(targets)` guard in `src/lib/proposals/sections.ts` (derives from existing `ARTIFACT_SECTIONS.aiEditable`).
+- [x] T003 [P] Unit-test the allowlist + guard (rejects price/timeline/milestones/terms) in `src/lib/proposals/__tests__/sections.test.ts`.
 
 **Checkpoint**: Foundation ready — all user stories can begin.
 
@@ -37,10 +37,10 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Goal**: Saving the Studio profile (and onboarding steps) persists all fields with no spurious error.
 **Independent Test**: Edit several profile fields → save → reload → all persist; no "Something went wrong"; onboarding steps save.
 
-- [ ] T004 [US1] Create migration `supabase/migrations/<ts>_grant_users_profile_update.sql` extending the column-level `UPDATE` grant on `public.users` to the writable profile/onboarding columns (per data-model.md); keep `role`, `pro_until`, quota, `fl_verified*` excluded.
-- [ ] T005 [US1] Apply the migration to the Supabase project; confirm a studio-profile save and one onboarding step both succeed.
-- [ ] T006 [P] [US1] Regression test: the columns written by `saveOnboardingStep` are a subset of a shared `USERS_WRITABLE_COLUMNS` constant (mirrors the grant), in `src/lib/profile/__tests__/grants.test.ts`.
-- [ ] T007 [US1] Validate quickstart US1 (profile + onboarding save); tidy `StudioProfile.errorSave` copy if needed in `messages/{ar,en}.json`.
+- [x] T004 [US1] Create migration `supabase/migrations/<ts>_grant_users_profile_update.sql` extending the column-level `UPDATE` grant on `public.users` to the writable profile/onboarding columns (per data-model.md); keep `role`, `pro_until`, quota, `fl_verified*` excluded.
+- [ ] T005 [US1] Apply the migration to the Supabase project; confirm a studio-profile save and one onboarding step both succeed. ⏳ **pending: needs Supabase apply (no service creds locally)**
+- [x] T006 [P] [US1] Regression test: the columns written by `saveOnboardingStep` are a subset of a shared `USERS_WRITABLE_COLUMNS` constant (mirrors the grant), in `src/lib/profile/__tests__/grants.test.ts`.
+- [ ] T007 [US1] Validate quickstart US1 (profile + onboarding save); tidy `StudioProfile.errorSave` copy if needed in `messages/{ar,en}.json`. ⏳ **pending: manual verify after T005**
 
 **Checkpoint**: Profile/onboarding saving works — unblocks every downstream profile-dependent feature.
 
@@ -51,9 +51,9 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Goal**: "Create gig from this proposal" navigates to the new gig (no 404).
 **Independent Test**: From a proposal, create a gig → land on `/{locale}/income/{gigId}` (single locale) showing the prefilled gig.
 
-- [ ] T008 [US2] Fix navigation in `src/components/proposals/ProposalDetailActions.tsx`: `router.push(\`/income/${gigId}\`)` (drop the `/${locale}` prefix and the type cast).
-- [ ] T009 [P] [US2] Fix the same doubled-locale pattern in `src/components/calendar/CalendarClient.tsx`.
-- [ ] T010 [US2] Validate quickstart US2 (create-gig navigation).
+- [x] T008 [US2] Fix navigation in `src/components/proposals/ProposalDetailActions.tsx`: `router.push(\`/income/${gigId}\`)` (drop the `/${locale}` prefix and the type cast).
+- [x] T009 [P] [US2] ~~Fix CalendarClient.tsx~~ — **verified NOT a bug**: `CalendarClient.tsx` imports `useRouter` from `next/navigation` (plain router), so its `/${locale}${route}` prefix is correct. No change made.
+- [ ] T010 [US2] Validate quickstart US2 (create-gig navigation). ⏳ **pending: manual verify**
 
 **Checkpoint**: proposal → gig loop restored.
 
