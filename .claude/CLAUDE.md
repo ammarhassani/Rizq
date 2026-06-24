@@ -54,3 +54,10 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
 6. Commit small, atomic changes with clear messages.
 7. Merge gate: `pnpm typecheck` clean and `pnpm test` green.
 8. Never inflate scope beyond the spec without founder approval.
+
+<!-- SPECKIT START -->
+## Active Spec Kit feature
+`specs/001-proposal-studio-revision/` — Proposal Studio revision round (AI clarifying
+questions, conversational editor, share states, profile-save fix, and related polish).
+Plan: `specs/001-proposal-studio-revision/plan.md` · Spec: `specs/001-proposal-studio-revision/spec.md`
+<!-- SPECKIT END -->
