@@ -7,6 +7,7 @@
  */
 
 import { notFound } from "next/navigation";
+import { Lock } from "lucide-react";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -18,6 +19,7 @@ import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles"
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogProposalView } from "@/components/proposals/LogProposalView";
 import type { ArtifactData } from "@/lib/proposals/artifact";
+import { isValidShareToken } from "@/lib/proposals/shareToken";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,10 +39,7 @@ type ProposalRow = {
 // ---------------------------------------------------------------------------
 
 async function fetchPublicProposal(token: string): Promise<ProposalRow | null> {
-  // Basic sanity check — tokens are base64url, 24 chars.
-  if (!token || token.length < 8 || token.length > 64) return null;
-  // Guard against SQL injection patterns (only allow base64url chars).
-  if (!/^[A-Za-z0-9_-]+$/.test(token)) return null;
+  if (!isValidShareToken(token)) return null;
 
   const supabase = await createClient();
   // Public surface = the get_shared_proposal RPC: returns ONLY safe artifact
@@ -51,6 +50,23 @@ async function fetchPublicProposal(token: string): Promise<ProposalRow | null> {
 
   if (error || !Array.isArray(data) || data.length === 0) return null;
   return data[0] as ProposalRow;
+}
+
+/**
+ * Probe the share-link state WITHOUT exposing any proposal content. Lets the page
+ * show a distinct "publisher disabled this link" view instead of a 404 (bug ④).
+ */
+async function fetchPublicProposalState(
+  token: string,
+): Promise<"active" | "disabled" | "missing"> {
+  if (!isValidShareToken(token)) return "missing";
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_shared_proposal_state", {
+    p_token: token,
+  });
+  if (error || typeof data !== "string") return "missing";
+  return data === "active" || data === "disabled" ? data : "missing";
 }
 
 // ---------------------------------------------------------------------------
@@ -160,8 +176,34 @@ export default async function ProposalSharePage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: "Proposals.share" });
+  const font = locale === "ar" ? "font-arabic" : "font-sans";
+  const dir = locale === "ar" ? "rtl" : "ltr";
+
   const row = await fetchPublicProposal(token);
-  if (!row) notFound();
+  if (!row) {
+    // The content fetch filters out disabled links — distinguish an intentionally
+    // disabled link (show access-denied) from one that never existed (404).
+    const state = await fetchPublicProposalState(token);
+    if (state !== "disabled") notFound();
+    return (
+      <div className="relative min-h-screen flex flex-col bg-paper" dir={dir}>
+        <SiteNav locale={locale} />
+        <main className="relative z-10 flex-1 flex items-center justify-center px-6 py-20">
+          <div className={`max-w-md text-center ${font}`}>
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rizq-gold/15 text-rizq-gold-dark">
+              <Lock size={26} strokeWidth={1.8} aria-hidden />
+            </div>
+            <h1 className={`display-3 text-rizq-ink mb-3 ${font}`}>{t("disabledTitle")}</h1>
+            <p className="text-rizq-ink-soft leading-relaxed">{t("disabledBody")}</p>
+            <Link href="/" className="mt-6 inline-block text-sm text-rizq-green hover:underline">
+              {t("generatedBy")}
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const artifact = parseArtifactData(row.artifact_json);
   if (!artifact) notFound();
@@ -170,10 +212,6 @@ export default async function ProposalSharePage({
   // The URL locale controls the UI chrome (nav, action row).
   const artifactLocale: "ar" | "en" =
     row.brief_language === "en" ? "en" : "ar";
-
-  const t = await getTranslations({ locale, namespace: "Proposals.share" });
-  const font = locale === "ar" ? "font-arabic" : "font-sans";
-  const dir = locale === "ar" ? "rtl" : "ltr";
 
   const { email, whatsapp } = buildContactLinks(artifact);
 

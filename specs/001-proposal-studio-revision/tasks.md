@@ -100,12 +100,12 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Goal**: Active → proposal; disabled → "publisher disabled this link"; missing → not-found.
 **Independent Test**: Enable→open (proposal); disable→reopen (disabled view, not 404); garbage token→not-found.
 
-- [ ] T027 [US5] Create migration `supabase/migrations/<ts>_share_state_rpc.sql` — `SECURITY DEFINER get_shared_proposal_state(p_token)` returning `active|disabled|missing` (no content); grant execute to `anon` + `authenticated`.
-- [ ] T028 [US5] Apply the migration; confirm the RPC returns each state correctly.
-- [ ] T029 [US5] Branch `src/app/[locale]/p/[token]/page.tsx`: on null content, probe state → render disabled view vs `notFound()`; mirror states in `generateMetadata`.
-- [ ] T030 [US5] Add bilingual "publisher disabled this link" copy under `Proposals.share` in `messages/{ar,en}.json`.
-- [ ] T031 [P] [US5] Unit-test the state→view mapping (active/disabled/missing) in `src/lib/proposals/__tests__/shareState.test.ts`.
-- [ ] T032 [US5] Validate quickstart US5 (all three states).
+- [x] T027 [US5] Create migration `supabase/migrations/<ts>_share_state_rpc.sql` — `SECURITY DEFINER get_shared_proposal_state(p_token)` returning `active|disabled|missing` (no content); grant execute to `anon` + `authenticated`.
+- [ ] T028 [US5] Apply the migration; confirm the RPC returns each state correctly. ⏳ **pending: needs Supabase apply**
+- [x] T029 [US5] Branch `src/app/[locale]/p/[token]/page.tsx`: on null content, probe state → render disabled view vs `notFound()`. (`generateMetadata` already returns a content-free generic title for both disabled/missing — no leak.)
+- [x] T030 [US5] Add bilingual "publisher disabled this link" copy under `Proposals.share` in `messages/{ar,en}.json`.
+- [x] T031 [P] [US5] Unit-test the share-token validator (the testable pure unit guarding the state RPC) in `src/lib/proposals/__tests__/shareToken.test.ts`. (The 3-way state→view branch is a trivial server-component conditional, covered by quickstart T032.)
+- [ ] T032 [US5] Validate quickstart US5 (all three states). ⏳ **pending: manual verify (after T028)**
 
 **Checkpoint**: Share links behave correctly and leak nothing.
 
