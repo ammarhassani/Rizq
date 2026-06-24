@@ -158,7 +158,8 @@ export function ProposalDetailActions({
         return;
       }
       track("gig_created_from_proposal", { locale, proposal_id: proposalId, gig_id: result.gig_id });
-      router.push(`/${locale}/income/${result.gig_id}` as Parameters<typeof router.push>[0]);
+      // next-intl's localized router prepends the active locale — pass the path UNPREFIXED.
+      router.push(`/income/${result.gig_id}` as `/income/${string}`);
     });
   }
 
