@@ -64,12 +64,12 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 **Goal**: Brief-specific clarifying questions (≤3, skippable, mixed choice/free-text), with graceful fallback.
 **Independent Test**: Two different briefs yield different, relevant questions; detailed brief yields few/none; AI off → template fallback.
 
-- [ ] T011 [US3] Create `src/lib/ai/followups.ts` — `generateFollowUps(brief, scope)` with a Zod schema (per contracts/ai-clarifying-questions.md), DeepSeek `generateObject`, clamp to 3, mixed choice/free-text.
-- [ ] T012 [US3] Add deterministic fallback to `selectFollowUps` (table) when `isAIConfigured()` is false or on error/timeout, inside `followups.ts`.
-- [ ] T013 [US3] Wire `src/app/actions/proposals/generateProposal.ts` to return `generateFollowUps(...)` as `follow_ups` (replace the table selection at the questions step).
-- [ ] T014 [US3] Add a free-text input branch to `src/components/proposals/FollowUpCards.tsx` for questions without `options_json` (keep answers keyed by `field_name`).
-- [ ] T015 [P] [US3] Unit-test post-processing (≤3, valid shape, fallback path) in `src/lib/ai/__tests__/followups.test.ts`.
-- [ ] T016 [US3] Validate quickstart US3 (brief-specific questions, skip, fallback).
+- [x] T011 [US3] Create `src/lib/ai/followups.ts` — `generateFollowUps(brief, scope)` with a Zod schema (per contracts/ai-clarifying-questions.md), DeepSeek `generateObject`, clamp to 3, mixed choice/free-text.
+- [x] T012 [US3] Deterministic fallback to `selectFollowUps` (table) when `isAIConfigured()` is false or the generator returns nothing — wired in `generateProposal.ts`; `generateFollowUps` returns `[]` on error/timeout.
+- [x] T013 [US3] Wire `src/app/actions/proposals/generateProposal.ts` to return `generateFollowUps(...)` as `follow_ups` (replace the table selection at the questions step).
+- [x] T014 [US3] Add a free-text input branch to `src/components/proposals/FollowUpCards.tsx` for questions without `options_json` (keep answers keyed by `field_name`).
+- [x] T015 [P] [US3] Unit-test question shaping (≤3, options→options_json, skippable) in `src/lib/ai/__tests__/followupsShape.test.ts` (pure logic extracted from the server-only generator).
+- [ ] T016 [US3] Validate quickstart US3 (brief-specific questions, skip, fallback). ⏳ **pending: manual verify**
 
 **Checkpoint**: Clarifying questions are contextual and resilient.
 

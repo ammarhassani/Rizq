@@ -111,6 +111,26 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
                 </div>
               )}
 
+              {options.length === 0 && (
+                <input
+                  type="text"
+                  value={typeof currentAnswer === "string" ? currentAnswer : ""}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setAnswers((prev) => {
+                      const next = { ...prev };
+                      if (v.trim()) next[q.field_name] = v;
+                      else delete next[q.field_name];
+                      return next;
+                    });
+                  }}
+                  placeholder={isAr ? "اكتب إجابتك…" : "Type your answer…"}
+                  disabled={pending}
+                  dir={dir}
+                  className="w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors disabled:opacity-50"
+                />
+              )}
+
               {q.allow_skip && (
                 <button
                   type="button"

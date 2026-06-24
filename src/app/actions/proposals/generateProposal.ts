@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { extractScope, aggregateConfidence } from "@/lib/ai/scope";
+import { generateFollowUps } from "@/lib/ai/followups";
+import { isAIConfigured } from "@/lib/ai/client";
 import { resolvePrice } from "@/lib/pricing/resolve";
 import {
   computeProposalPrice,
@@ -440,7 +442,14 @@ export async function generateProposal(
     .order("priority");
 
   const templates = (templateRows ?? []) as FollowUpTemplate[];
-  const followUps = selectFollowUps(scope.field_confidence, templates);
+  // AI-generated, brief-specific questions (US3). Fall back to the deterministic
+  // table selection when AI is unconfigured or returns nothing.
+  let followUps = isAIConfigured()
+    ? await generateFollowUps({ briefText: input.brief_text, scope })
+    : [];
+  if (followUps.length === 0) {
+    followUps = selectFollowUps(scope.field_confidence, templates);
+  }
 
   // 14. Return success
   return {
