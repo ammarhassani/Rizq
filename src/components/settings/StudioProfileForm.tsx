@@ -30,6 +30,9 @@ export type StudioProfileInitial = {
   logo_url: string | null;
   bio_ar: string | null;
   bio_en: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  contact_whatsapp: string | null;
   years_experience: number | null;
   total_projects_completed: number | null;
   notable_clients: string[] | null;
@@ -53,6 +56,9 @@ export function StudioProfileForm({ locale, initial }: Props) {
   const [logoUrl, setLogoUrl] = useState(initial.logo_url ?? "");
   const [bioAr, setBioAr] = useState(initial.bio_ar ?? "");
   const [bioEn, setBioEn] = useState(initial.bio_en ?? "");
+  const [contactPhone, setContactPhone] = useState(initial.contact_phone ?? "");
+  const [contactEmail, setContactEmail] = useState(initial.contact_email ?? "");
+  const [contactWhatsapp, setContactWhatsapp] = useState(initial.contact_whatsapp ?? "");
   const [yearsExperience, setYearsExperience] = useState(
     initial.years_experience?.toString() ?? ""
   );
@@ -113,6 +119,9 @@ export function StudioProfileForm({ locale, initial }: Props) {
           logo_url: logoUrl.trim() || null,
           bio_ar: bioAr.trim() || null,
           bio_en: bioEn.trim() || null,
+          contact_phone: contactPhone.trim() || null,
+          contact_email: contactEmail.trim() || null,
+          contact_whatsapp: contactWhatsapp.trim() || null,
         }),
         saveOnboardingStep("professional", {
           years_experience: yearsNum,
@@ -230,6 +239,43 @@ export function StudioProfileForm({ locale, initial }: Props) {
           maxLength={1000}
           dir="ltr"
         />
+      </div>
+
+      {/* Contact — surfaces on the proposal */}
+      <div>
+        <label className={labelClass}>{t("contactSectionTitle")}</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input
+            type="tel"
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+            placeholder={t("contactPhonePlaceholder")}
+            aria-label={t("contactPhone")}
+            className={`${inputClass} font-sans`}
+            dir="ltr"
+            maxLength={30}
+          />
+          <input
+            type="tel"
+            value={contactWhatsapp}
+            onChange={(e) => setContactWhatsapp(e.target.value)}
+            placeholder={t("contactWhatsappPlaceholder")}
+            aria-label={t("contactWhatsapp")}
+            className={`${inputClass} font-sans`}
+            dir="ltr"
+            maxLength={30}
+          />
+          <input
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder={t("contactEmailPlaceholder")}
+            aria-label={t("contactEmail")}
+            className={`${inputClass} font-sans sm:col-span-2`}
+            dir="ltr"
+            maxLength={200}
+          />
+        </div>
       </div>
 
       {/* Years + total projects */}

@@ -71,7 +71,7 @@ export default async function StudioProfilePage({
   const { data: profileRaw } = await supabase
     .from("users")
     .select(
-      "full_name_ar, brand_name_ar, tagline_ar, logo_url, bio_ar, bio_en, years_experience, total_projects_completed, notable_clients, portfolio_samples"
+      "full_name_ar, brand_name_ar, tagline_ar, logo_url, bio_ar, bio_en, contact_phone, contact_email, contact_whatsapp, years_experience, total_projects_completed, notable_clients, portfolio_samples"
     )
     .eq("id", userData.user.id)
     .maybeSingle();
@@ -87,6 +87,9 @@ export default async function StudioProfilePage({
     logo_url: (p["logo_url"] as string | null) ?? null,
     bio_ar: (p["bio_ar"] as string | null) ?? null,
     bio_en: (p["bio_en"] as string | null) ?? null,
+    contact_phone: (p["contact_phone"] as string | null) ?? null,
+    contact_email: (p["contact_email"] as string | null) ?? null,
+    contact_whatsapp: (p["contact_whatsapp"] as string | null) ?? null,
     years_experience: typeof rawYears === "number" ? rawYears : null,
     total_projects_completed: typeof rawTotal === "number" ? rawTotal : null,
     notable_clients: Array.isArray(p["notable_clients"])
