@@ -142,11 +142,11 @@ honesty guards) per Constitution Principle IV — not full TDD across UI.
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
-- [ ] T042 [P] Ensure loading/empty/error states on mobile for all new surfaces (chat dock, chip input, disabled-share view).
-- [ ] T043 [P] Saudi-polite phrasing review of all new AR/EN copy in `messages/{ar,en}.json`.
-- [ ] T044 Run `pnpm typecheck` (clean).
-- [ ] T045 Run `pnpm test` (all green, incl. new tests).
-- [ ] T046 Run the full-journey quickstart scenario (SC-008).
+- [x] T042 [P] Loading/empty/error states present on all new surfaces (chat dock: intro/sending/error/unavailable; chip input; disabled-share view), responsive (`min(92vw,…)`).
+- [x] T043 [P] New AR/EN copy written in Saudi-professional register (chat dock, disabled-share, chips).
+- [x] T044 Run `pnpm typecheck` (clean).
+- [x] T045 Run `pnpm test` (600 passing, incl. 7 new test files for this feature).
+- [ ] T046 Run the full-journey quickstart scenario (SC-008). ⏳ **pending: manual verify (apply 2 migrations to Supabase + run the app)**
 
 ---
 
