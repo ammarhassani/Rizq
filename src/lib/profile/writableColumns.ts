@@ -1,0 +1,77 @@
+/**
+ * Columns on `public.users` that the `authenticated` role may UPDATE.
+ *
+ * MIRRORS the grant in `supabase/migrations/20260624090000_grant_users_profile_update.sql`.
+ * Keep the two in sync — `grants.test.ts` asserts every column the onboarding /
+ * Studio-profile save writes appears here, which is what prevents the bug ⑧
+ * regression (a profile field added without a matching grant).
+ *
+ * Deliberately EXCLUDES privilege/billing/verification columns: id, email, role,
+ * pro_until, fl_verified, fl_verified_at, fl_document_url, onboarded_at, created_at.
+ */
+export const USERS_WRITABLE_COLUMNS = [
+  "name",
+  "preferred_language",
+  "city",
+  "last_active",
+  "full_name_ar",
+  "full_name_en",
+  "fl_number",
+  "commercial_reg",
+  "vat_registered",
+  "vat_number",
+  "city_id",
+  "primary_specialty_id",
+  "specialties",
+  "experience_tier_id",
+  "years_experience",
+  "languages",
+  "current_hourly_rate_sar",
+  "current_daily_rate_sar",
+  "current_project_rate_range",
+  "previous_year_income_sar",
+  "income_goal_monthly_sar",
+  "rate_confidence",
+  "bahr_profile_url",
+  "mostaql_profile_url",
+  "khamsat_profile_url",
+  "linkedin_url",
+  "behance_url",
+  "personal_website_url",
+  "platform_ratings",
+  "portfolio_samples",
+  "total_projects_completed",
+  "notable_clients",
+  "brand_name",
+  "brand_name_ar",
+  "logo_url",
+  "brand_colors",
+  "tagline_ar",
+  "tagline_en",
+  "bio_ar",
+  "bio_en",
+  "contact_email",
+  "contact_phone",
+  "contact_whatsapp",
+  "contact_city",
+  "default_deposit_pct",
+  "default_revisions",
+  "default_ip_terms",
+  "default_milestone_structure",
+  "default_payment_method",
+  "default_payment_details",
+  "default_warranty_days",
+  "primary_goal",
+  "goals",
+  "uses_bahr",
+  "uses_mostaql",
+  "uses_khamsat",
+  "preferred_tone",
+  "onboarding_step",
+  "onboarding_completed",
+  "onboarding_completed_at",
+  "profile_completeness_pct",
+  "profile_last_updated",
+] as const;
+
+export type UsersWritableColumn = (typeof USERS_WRITABLE_COLUMNS)[number];
