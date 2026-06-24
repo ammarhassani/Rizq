@@ -18,6 +18,8 @@ import { useTranslations } from "next-intl";
 import { Loader2, Plus, Trash2, Check } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { track } from "@/lib/analytics/track";
+import { ChipInput } from "@/components/ui/ChipInput";
+import { normalizeNotableClients } from "@/lib/profile/notableClients";
 
 type PortfolioSample = { title: string; url: string; description: string };
 
@@ -57,8 +59,8 @@ export function StudioProfileForm({ locale, initial }: Props) {
   const [totalProjects, setTotalProjects] = useState(
     initial.total_projects_completed?.toString() ?? ""
   );
-  const [notableClients, setNotableClients] = useState(
-    (initial.notable_clients ?? []).join("، ")
+  const [notableClients, setNotableClients] = useState<string[]>(
+    initial.notable_clients ?? []
   );
   const [samples, setSamples] = useState<PortfolioSample[]>(
     (initial.portfolio_samples ?? []).map((s) => ({
@@ -91,11 +93,7 @@ export function StudioProfileForm({ locale, initial }: Props) {
 
     const yearsNum = yearsExperience ? parseInt(yearsExperience, 10) : null;
     const totalNum = totalProjects ? parseInt(totalProjects, 10) : null;
-    // Split on Arabic OR Latin comma.
-    const notable = notableClients
-      .split(/[,،]/)
-      .map((c) => c.trim())
-      .filter(Boolean);
+    const notable = normalizeNotableClients(notableClients);
     const cleanSamples = samples
       .filter((s) => s.title.trim())
       .map((s) => ({
@@ -266,12 +264,13 @@ export function StudioProfileForm({ locale, initial }: Props) {
       {/* Notable clients */}
       <div>
         <label className={labelClass}>{t("notableClients")}</label>
-        <input
-          type="text"
+        <ChipInput
           value={notableClients}
-          onChange={(e) => setNotableClients(e.target.value)}
+          onChange={setNotableClients}
           placeholder={t("notableClientsPlaceholder")}
-          className={inputClass}
+          inputClassName={inputClass}
+          dir={isAr ? "rtl" : "ltr"}
+          removeLabel={isAr ? "إزالة" : "Remove"}
         />
         <p className={`text-xs text-rizq-ink-soft/60 mt-1 ${font}`}>{t("notableClientsHint")}</p>
       </div>

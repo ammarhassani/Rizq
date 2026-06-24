@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { ChipInput } from "@/components/ui/ChipInput";
+import { normalizeNotableClients } from "@/lib/profile/notableClients";
 import type { StepProps } from "./types";
 
 interface Sample {
@@ -29,8 +31,8 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
   const [totalProjects, setTotalProjects] = useState(
     profile.total_projects_completed?.toString() ?? ""
   );
-  const [notableClients, setNotableClients] = useState(
-    (profile.notable_clients ?? []).join(", ")
+  const [notableClients, setNotableClients] = useState<string[]>(
+    profile.notable_clients ?? []
   );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -63,11 +65,8 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
             description: s.description || undefined,
           })),
         total_projects_completed: totalProjects ? parseInt(totalProjects, 10) : null,
-        notable_clients: notableClients
-          ? notableClients
-              .split(",")
-              .map((c) => c.trim())
-              .filter(Boolean)
+        notable_clients: normalizeNotableClients(notableClients).length
+          ? normalizeNotableClients(notableClients)
           : null,
       });
       if (result.ok) {
@@ -162,12 +161,13 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
       {/* Notable clients */}
       <div>
         <label className={labelCls}>{t("notableClients")}</label>
-        <input
-          type="text"
+        <ChipInput
           value={notableClients}
-          onChange={(e) => setNotableClients(e.target.value)}
+          onChange={setNotableClients}
           placeholder={t("notableClientsPlaceholder")}
-          className={inputCls}
+          inputClassName={inputCls}
+          dir={isAr ? "rtl" : "ltr"}
+          removeLabel={isAr ? "إزالة" : "Remove"}
         />
       </div>
 
