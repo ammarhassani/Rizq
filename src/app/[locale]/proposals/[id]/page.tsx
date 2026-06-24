@@ -21,6 +21,7 @@ import { CoverTitleEditor } from "@/components/proposals/CoverTitleEditor";
 import { ScopeInsight } from "@/components/proposals/ScopeInsight";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
+import { ProposalChatDock } from "@/components/proposals/ProposalChatDock";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
 
@@ -289,6 +290,10 @@ export default async function ProposalDetailPage({
               ))}
             </div>
           </section>
+        )}
+        {/* Hovering conversational editor — owner + editable only */}
+        {canEdit && artifactData && (
+          <ProposalChatDock proposalId={id} locale={locale as "ar" | "en"} />
         )}
       </div>
     </AppShell>
