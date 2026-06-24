@@ -149,7 +149,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
               className={`mt-4 pt-4 border-t border-rizq-gold/20 flex flex-wrap gap-3 ${font}`}
             >
               <Link
-                href="/onboarding"
+                href="/proposals/profile"
                 className={`text-sm text-rizq-green hover:underline ${font}`}
               >
                 {t("editProfileLink")}
