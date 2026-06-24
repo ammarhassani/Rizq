@@ -1059,6 +1059,18 @@ function NextStepsSection({
                 </a>
               </p>
             )}
+            {contact.phone && (
+              <p>
+                {locale === "ar" ? "الهاتف" : "Phone"}:{" "}
+                <a
+                  href={`tel:${contact.phone.replace(/\s+/g, "")}`}
+                  dir="ltr"
+                  className="text-rizq-green hover:underline"
+                >
+                  {contact.phone}
+                </a>
+              </p>
+            )}
             {contact.whatsapp && (
               <p>
                 <a
