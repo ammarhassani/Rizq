@@ -1962,7 +1962,7 @@
     "totalProjectsPlaceholder": "e.g. 42",
     "notableClients": "Notable clients",
     "notableClientsPlaceholder": "Type a client name and press Enter",
-    "notableClientsHint": "Press Enter after each name, or paste a comma-separated list.",
+    "notableClientsHint": "Press Enter or , after each name, or paste a comma-separated list.",
     "contactSectionTitle": "Contact (shown on your proposals)",
     "contactPhone": "Phone",
     "contactPhonePlaceholder": "e.g. +966 5X XXX XXXX",

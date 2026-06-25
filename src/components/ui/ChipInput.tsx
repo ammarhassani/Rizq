@@ -62,7 +62,7 @@ export function ChipInput({
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       add(draft);
     } else if (e.key === "Backspace" && draft === "" && value.length > 0) {
