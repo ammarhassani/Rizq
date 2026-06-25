@@ -22,7 +22,7 @@ import { proposalChat } from "@/app/actions/proposals/proposalChat";
 // Types
 // ---------------------------------------------------------------------------
 
-type Reply = { text: string; meta?: string };
+type Reply = { id: number; text: string; meta?: string };
 
 const SECTION_LABELS: Record<string, { ar: string; en: string }> = {
   cover_letter: { ar: "الخطاب التعريفي", en: "cover letter" },
@@ -64,6 +64,7 @@ export function ProposalChatDock({
       const res = await proposalChat({ proposal_id: proposalId, message: msg });
       if (!res.ok) {
         setReply({
+          id: Date.now(),
           text:
             res.code === "ai_unconfigured" ? t("unavailable") : t("error"),
         });
@@ -78,7 +79,7 @@ export function ProposalChatDock({
                 .join(isAr ? "، " : ", "),
             })
           : undefined;
-      setReply({ text: replyText, meta });
+      setReply({ id: Date.now(), text: replyText, meta });
       if (res.modified.length > 0) router.refresh();
     });
   }
@@ -92,7 +93,7 @@ export function ProposalChatDock({
       <AnimatePresence mode="wait">
         {reply && (
           <motion.div
-            key={reply.text}
+            key={reply.id}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 5 }}
@@ -107,7 +108,7 @@ export function ProposalChatDock({
             </span>
             <div>
               <p className="mb-1 text-[11px] font-semibold leading-none text-rizq-green">
-                Rizq AI
+                {t("aiLabel")}
               </p>
               <p
                 className="text-[13.5px] leading-relaxed text-rizq-ink"
@@ -148,7 +149,7 @@ export function ProposalChatDock({
             placeholder={t("placeholder")}
             disabled={pending}
             dir="auto"
-            aria-label={t("placeholder")}
+            aria-label={t("inputLabel")}
             className="flex-1 border-none bg-transparent text-sm text-rizq-ink outline-none placeholder:text-[#595959] disabled:opacity-60"
           />
           <button

@@ -920,6 +920,8 @@
       "title": "Refine this proposal",
       "intro": "Tell me what changed and I'll update the right sections. I won't touch prices, dates, or terms.",
       "placeholder": "e.g. The client now also wants a mobile app",
+      "inputLabel": "Request a revision to this proposal",
+      "aiLabel": "Rizq AI",
       "send": "Send",
       "sending": "Working…",
       "updated": "Updated: {sections}",
