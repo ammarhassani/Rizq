@@ -3,11 +3,11 @@
 /**
  * ProposalChatDock — always-visible aurora bar (feature 001 / US4 redesign).
  *
- * Fixed to the bottom-right of the viewport so the proposal content can sit
- * to its left. No launcher button — the input is always present. The last AI
- * reply appears as an aurora-bordered chip above the input bar.
+ * Fixed to the inline-end + bottom of the viewport (right in LTR, left in RTL —
+ * the side away from the RTL sidebar). No launcher button — the input is always
+ * present. The last AI reply appears as an aurora-bordered chip above the bar.
  *
- * Layout companion: the proposal page adds pr-[336px] to its content div when
+ * Layout companion: the proposal page adds lg:pe-[360px] to its content div when
  * canEdit so text never slides under the dock.
  *
  * WCAG 2.1 AA: placeholder #595959 on frosted cream ≈5.9:1, body text 17:1,
@@ -89,7 +89,7 @@ export function ProposalChatDock({
 
   return (
     <div
-      className={`print:hidden fixed bottom-7 right-5 z-50 w-80 ${font}`}
+      className={`print:hidden fixed bottom-7 end-5 z-50 w-80 ${font}`}
       dir={isAr ? "rtl" : "ltr"}
     >
       {/* Last AI reply — aurora chip above the input bar */}
