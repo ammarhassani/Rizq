@@ -305,6 +305,7 @@
   );
   animation: aurora-spin 9s linear infinite;
   box-shadow: 0 0 12px rgba(26, 95, 63, 0.18), 0 6px 28px rgba(0, 0, 0, 0.1);
+  will-change: background;
 }
 
 /* Inner content — frosted glass, no opaque card */
@@ -339,6 +340,9 @@
   .ai-aurora-border {
     animation: none !important;
     background-position: 0 0 !important;
+  }
+  .ai-aurora-border {
+    background: #1a5f3f;
   }
   *,
   *::before,
