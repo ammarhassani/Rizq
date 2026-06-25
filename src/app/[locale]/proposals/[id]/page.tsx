@@ -18,7 +18,6 @@ import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles"
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { DownloadWordButton } from "@/components/proposals/DownloadWordButton";
 import { CoverTitleEditor } from "@/components/proposals/CoverTitleEditor";
-import { ScopeInsight } from "@/components/proposals/ScopeInsight";
 import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActions";
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import { ProposalChatDock } from "@/components/proposals/ProposalChatDock";
@@ -191,14 +190,6 @@ export default async function ProposalDetailPage({
             className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/60 p-8 text-center text-sm text-rizq-ink-soft ${font}`}
           >
             {isAr ? "العرض غير متوفر حاليًا." : "Proposal data is not available."}
-          </div>
-        )}
-
-        {/* Scope insight — "how this scope compares" (shows only with enough
-            past proposals). Moved here from the old generate-flow preview. */}
-        {artifactData && (
-          <div className="print:hidden mt-6">
-            <ScopeInsight locale={locale as "ar" | "en"} proposalId={id} />
           </div>
         )}
 

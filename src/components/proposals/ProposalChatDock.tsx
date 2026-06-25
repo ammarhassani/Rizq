@@ -272,7 +272,7 @@ export function ProposalChatDock({
       {/* CSS grid (not flex): minmax(0,1fr) lets the proposal track shrink
           without ever forcing horizontal overflow. Two columns only at xl,
           where there is genuine room for both. */}
-      <div className="mx-auto w-full max-w-[1400px] xl:grid xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start xl:gap-8">
+      <div className="mx-auto w-full max-w-[1400px] xl:grid xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-8">
         {/* Proposal column */}
         <div className="min-w-0">{children}</div>
 

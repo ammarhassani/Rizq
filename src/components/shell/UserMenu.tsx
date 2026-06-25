@@ -80,8 +80,9 @@ export function UserMenu({ locale, name, email }: Props) {
         <div
           role="menu"
           className={[
-            "absolute top-full mt-1 z-[60]",
-            locale === "ar" ? "end-0" : "start-0",
+            // The trigger lives at the inline-end of the top bar, so the menu
+            // aligns to end-0 in both directions — it always opens inward.
+            "absolute top-full end-0 mt-1 z-[60]",
             "w-52 rounded-xl border border-rizq-gold/20 bg-rizq-cream/98 shadow-lg py-1",
             font,
           ].join(" ")}
