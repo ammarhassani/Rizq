@@ -10,7 +10,6 @@
 
 import { Link } from "@/i18n/navigation";
 import { RizqSeal } from "@/components/proposals/RizqSeal";
-import { SectionEditor } from "@/components/proposals/SectionEditor";
 import { PriceEditor } from "@/components/proposals/PriceEditor";
 import { BandMeter } from "@/components/charts/BandMeter";
 // Bilingual labels + templated defaults — a pure module shared with the Word
@@ -26,29 +25,14 @@ type Props = {
   data: ArtifactData;
   locale: "ar" | "en";
   /**
-   * When true (owner detail page only) AND proposalId is provided, an inline
-   * SectionEditor control bar is rendered after each editable prose section.
-   * Defaults to false so the PUBLIC share page stays strictly read-only.
+   * When true (owner detail page only) AND proposalId is provided, the manual
+   * price override is rendered after the pricing section. Prose editing lives in
+   * the side-docked AI panel. Defaults to false so the PUBLIC share page stays
+   * strictly read-only.
    */
   editable?: boolean;
   proposalId?: string;
 };
-
-/** Prose sections that carry an inline refine control bar when editable. */
-type EditableProseId =
-  | "cover_letter"
-  | "understanding"
-  | "approach"
-  | "scope_of_work"
-  | "assumptions";
-
-const EDITABLE_PROSE_IDS = new Set<string>([
-  "cover_letter",
-  "understanding",
-  "approach",
-  "scope_of_work",
-  "assumptions",
-]);
 
 // ---------------------------------------------------------------------------
 // i18n strings (inline — avoids "use client" / async boundary for translations
@@ -1240,27 +1224,13 @@ export function ProposalArtifact({ data, locale, editable = false, proposalId }:
   const sections = [...data.sections].sort((a, b) => a.order - b.order);
 
   /**
-   * Render a section and, when editing is enabled and it is an editable prose
-   * section, append its inline SectionEditor control bar directly after it.
+   * Render a section and, when editing is enabled, append the manual price
+   * override after the pricing section. Prose editing now lives entirely in the
+   * side-docked AI panel (the old per-section Edit/Regenerate/Tone bar is gone).
    */
   function renderSectionWithEditor(s: ArtifactSection) {
     const rendered = renderSection(s, locale);
     if (!showEditor) return rendered;
-
-    // Prose sections get the inline refine bar (edit / regenerate / tone).
-    if (EDITABLE_PROSE_IDS.has(s.id)) {
-      return (
-        <div key={s.id}>
-          {rendered}
-          <SectionEditor
-            proposalId={proposalId as string}
-            sectionId={s.id as EditableProseId}
-            locale={locale}
-            content={s.content}
-          />
-        </div>
-      );
-    }
 
     // Pricing gets a manual price override (set any price; range is a guide).
     if (s.id === "pricing") {

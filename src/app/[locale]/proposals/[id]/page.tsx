@@ -139,18 +139,8 @@ export default async function ProposalDetailPage({
     proposal.status === "final" ||
     proposal.status === "sent";
 
-  return (
-    <AppShell
-      locale={locale as "ar" | "en"}
-      title={isAr ? "عرض سعر" : "Proposal"}
-      maxWidth={canEdit ? "full" : "reading"}
-    >
-      {/* Two-column on the editor: the proposal fills the width while the AI
-          panel reserves a fixed gutter on the inline-end (lg:pe-[360px]). The
-          gutter reservation lives OUTSIDE the readability cap so the proposal
-          never gets squeezed. */}
-      <div dir={isAr ? "rtl" : "ltr"} className={canEdit ? "lg:pe-[360px]" : ""}>
-        <div className={canEdit ? "max-w-4xl" : ""}>
+  const proposalBody = (
+    <>
         {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
         <ProposalPrintStyles />
         {/* Back link */}
@@ -300,14 +290,26 @@ export default async function ProposalDetailPage({
             </div>
           </section>
         )}
-        </div>
-      </div>
+    </>
+  );
 
-      {/* Side-docked conversational AI panel — owner + editable only. Full-height
-          column fixed to the inline-end (sibling of the content, not nested in
-          the readability cap). */}
-      {canEdit && artifactData && (
-        <ProposalChatDock proposalId={id} locale={locale as "ar" | "en"} />
+  return (
+    <AppShell
+      locale={locale as "ar" | "en"}
+      title={isAr ? "عرض سعر" : "Proposal"}
+      maxWidth={canEdit ? "full" : "reading"}
+    >
+      {/* Editor: the proposal body becomes the left column of a two-column
+          workspace with the sticky AI panel on the inline-end. Read-only views
+          (accepted / declined / non-owner) render a centered reading column. */}
+      {canEdit && artifactData ? (
+        <ProposalChatDock proposalId={id} locale={locale as "ar" | "en"}>
+          <div dir={isAr ? "rtl" : "ltr"}>{proposalBody}</div>
+        </ProposalChatDock>
+      ) : (
+        <div dir={isAr ? "rtl" : "ltr"} className="mx-auto max-w-3xl">
+          {proposalBody}
+        </div>
       )}
     </AppShell>
   );

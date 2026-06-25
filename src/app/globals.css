@@ -289,37 +289,40 @@
   to { --aurora-angle: 360deg; }
 }
 
-/* Outer shell — 1.5 px animated border via padding + conic-gradient bg */
+/* Outer shell — animated border via padding + conic-gradient bg. The 2px
+   padding IS the visible border; the inner element masks the center. */
 .ai-aurora-border {
-  border-radius: 18px;
-  padding: 1.5px;
+  border-radius: 19px;
+  padding: 1.75px;
   background: conic-gradient(
     from var(--aurora-angle),
     #1a5f3f   0%,
-    #2a8a58  20%,
-    #1a5f3f  35%,
-    #9c7e2e  50%,
-    #1a5f3f  65%,
-    #347a52  80%,
+    #2f8f5e  18%,
+    #1a5f3f  34%,
+    #a98f3f  50%,
+    #1a5f3f  66%,
+    #338057  82%,
     #1a5f3f 100%
   );
-  animation: aurora-spin 9s linear infinite;
-  box-shadow: 0 0 12px rgba(26, 95, 63, 0.18), 0 6px 28px rgba(0, 0, 0, 0.1);
+  animation: aurora-spin 8s linear infinite;
+  box-shadow:
+    0 1px 2px rgba(26, 95, 63, 0.08),
+    0 8px 30px rgba(26, 95, 63, 0.12);
   will-change: background;
 }
 
-/* Inner content — frosted glass, no opaque card */
+/* Inner content — one cohesive frosted-cream pill (a real widget surface) */
 .ai-aurora-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-radius: 16.5px;
-  padding-block: 10px;
+  gap: 12px;
+  border-radius: 17.25px;
+  padding-block: 11px;
   padding-inline-start: 16px; /* logical — flips for RTL automatically */
-  padding-inline-end: 10px;
-  background: rgba(250, 245, 236, 0.55);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  padding-inline-end: 11px;
+  background: rgba(250, 245, 236, 0.86);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
 }
 
 /* Keyboard focus ring (WCAG 2.4.7 / 2.4.11) */
@@ -330,11 +333,26 @@
 
 /* Reply chip — solid background so it reads over any proposal content */
 .ai-aurora-reply {
-  border-radius: 16.5px;
-  padding: 10px 14px;
+  border-radius: 17.25px;
+  padding: 11px 14px;
   background: rgba(250, 245, 236, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* Typewriter caret for the animated placeholder */
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.ai-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-inline-start: 1px;
+  vertical-align: text-bottom;
+  background: rgba(26, 95, 63, 0.55);
+  animation: caret-blink 1.05s steps(1) infinite;
 }
 
 /* ── WCAG 2.1 — reduced motion ─────────────────────────────────────────────
@@ -346,7 +364,8 @@
   .animate-shimmer,
   [style*="shimmer"],
   [class*="shimmer"],
-  .ai-aurora-border {
+  .ai-aurora-border,
+  .ai-caret {
     animation: none !important;
     background-position: 0 0 !important;
   }

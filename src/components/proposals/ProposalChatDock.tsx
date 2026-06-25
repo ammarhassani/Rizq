@@ -1,32 +1,40 @@
 "use client";
 
 /**
- * ProposalChatDock — side-docked conversational AI panel (feature 001 / US4).
+ * ProposalChatDock — proposal editor workspace + conversational AI (US4).
  *
- * On lg+ this is a full-height column fixed to the inline-end of the viewport
- * (right in LTR, left in RTL — the side away from the RTL sidebar): a "Rizq AI"
- * header, a scrollable message history, and the aurora input bar pinned at the
- * bottom. The proposal page reserves the gutter with lg:pe-[360px].
+ * Wraps the proposal body as `children` and lays it out as a two-column
+ * workspace on lg+: the proposal fills the left, a sticky full-height "Rizq AI"
+ * panel sits on the inline-end (right in LTR, left in RTL — away from the RTL
+ * sidebar). Because the panel is IN-FLOW (not fixed), the proposal grows to meet
+ * it — no dead channel. Below lg the panel collapses to a bottom composer bar.
  *
- * Below lg there is no room for a column, so it collapses to a compact bottom
- * bar showing the latest reply chip + the same composer.
+ * The composer is a single aurora-bordered widget. While empty + unfocused its
+ * placeholder cycles example prompts with a typewriter-in / swoosh-out loop.
  *
- * AI replies render as aurora-bordered chips; the freelancer's own turns are
- * solid green bubbles. Price/dates/terms are never touched by the action.
+ * AI replies render as aurora chips; the freelancer's turns are green bubbles.
+ * Price/dates/terms are never touched by the action.
  *
- * WCAG 2.1 AA: placeholder #595959 on frosted cream ≈5.9:1, body text 17:1,
- * send icon 7.5:1. Focus ring via .ai-aurora-inner:focus-within in globals.css.
+ * WCAG 2.1 AA: placeholder #595959 ≈5.9:1, body text 17:1, send icon 7.5:1.
+ * Focus ring via .ai-aurora-inner:focus-within. Typewriter honors reduced motion.
  */
 
-import { useState, useTransition, useRef, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useTransition,
+  type ReactNode,
+  type KeyboardEvent,
+} from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, ArrowUp, Loader2 } from "lucide-react";
 import { proposalChat } from "@/app/actions/proposals/proposalChat";
 
 // ---------------------------------------------------------------------------
-// Types
+// Types + helpers
 // ---------------------------------------------------------------------------
 
 type Msg = { id: number; role: "user" | "ai"; text: string; meta?: string };
@@ -42,7 +50,79 @@ const SECTION_LABELS: Record<string, { ar: string; en: string }> = {
 let seq = 0;
 const nextId = () => ++seq;
 
-/** AI reply rendered as an aurora-bordered chip. */
+// ---------------------------------------------------------------------------
+// Animated placeholder — typewriter in, hold 6–9s, swoosh out, next, loop
+// ---------------------------------------------------------------------------
+
+function AnimatedPlaceholder({ phrases }: { phrases: string[] }) {
+  const reduce = useReducedMotion();
+  const [index, setIndex] = useState(0);
+  const [typed, setTyped] = useState("");
+
+  useEffect(() => {
+    const phrase = phrases[index] ?? "";
+    // Hold time varies 6–8.4s so the cycle feels organic, not metronomic.
+    const hold = 6000 + (index % 3) * 1200;
+
+    if (reduce) {
+      const show = setTimeout(() => setTyped(phrase), 0);
+      const advance = setTimeout(
+        () => setIndex((i) => (i + 1) % phrases.length),
+        hold
+      );
+      return () => {
+        clearTimeout(show);
+        clearTimeout(advance);
+      };
+    }
+
+    const speed = 42;
+    let char = 0;
+    let typer: ReturnType<typeof setInterval> | undefined;
+    // Small delay lets the swoosh-in settle before characters start; the blank
+    // reset happens here (not synchronously) to avoid a cascading render.
+    const startDelay = setTimeout(() => {
+      setTyped("");
+      typer = setInterval(() => {
+        char += 1;
+        setTyped(phrase.slice(0, char));
+        if (char >= phrase.length && typer) clearInterval(typer);
+      }, speed);
+    }, 240);
+    const advance = setTimeout(
+      () => setIndex((i) => (i + 1) % phrases.length),
+      240 + phrase.length * speed + hold
+    );
+
+    return () => {
+      clearTimeout(startDelay);
+      if (typer) clearInterval(typer);
+      clearTimeout(advance);
+    };
+  }, [index, phrases, reduce]);
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.span
+        key={index}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -7 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        className="flex min-w-0 items-center text-sm text-[#595959]"
+        dir="auto"
+      >
+        <span className="truncate">{typed}</span>
+        {!reduce && <span className="ai-caret shrink-0" aria-hidden="true" />}
+      </motion.span>
+    </AnimatePresence>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// AI reply chip
+// ---------------------------------------------------------------------------
+
 function AiChip({ text, meta, aiLabel }: { text: string; meta?: string; aiLabel: string }) {
   return (
     <div className="ai-aurora-border self-start max-w-[88%]">
@@ -61,27 +141,38 @@ function AiChip({ text, meta, aiLabel }: { text: string; meta?: string; aiLabel:
 }
 
 // ---------------------------------------------------------------------------
-// Component
+// Workspace + AI
 // ---------------------------------------------------------------------------
 
 export function ProposalChatDock({
   proposalId,
   locale,
+  children,
 }: {
   proposalId: string;
   locale: "ar" | "en";
+  children: ReactNode;
 }) {
   const t = useTranslations("Proposals.chat");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const router = useRouter();
 
+  const prompts: string[] = (() => {
+    try {
+      const raw = t.raw("prompts");
+      return Array.isArray(raw) ? (raw as string[]) : [];
+    } catch {
+      return [];
+    }
+  })();
+
   const [draft, setDraft] = useState("");
+  const [focused, setFocused] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [pending, startTransition] = useTransition();
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Keep the history scrolled to the newest turn.
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, pending]);
@@ -120,42 +211,51 @@ export function ProposalChatDock({
     });
   }
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       send();
     }
   }
 
-  // -------------------------------------------------------------------------
-  // Shared sub-renders
-  // -------------------------------------------------------------------------
+  const aiLabel = t("aiLabel");
+  const lastAi = [...messages].reverse().find((m) => m.role === "ai");
+  const showPlaceholder = draft === "" && !focused && prompts.length > 0;
 
   const composer = (
     <div className="ai-aurora-border">
       <div className="ai-aurora-inner">
         <Sparkles
-          size={17}
+          size={18}
           strokeWidth={2.2}
           className="shrink-0 text-rizq-green"
           aria-hidden="true"
         />
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={t("placeholder")}
-          disabled={pending}
-          dir="auto"
-          aria-label={t("inputLabel")}
-          className="flex-1 border-none bg-transparent text-sm text-rizq-ink outline-none placeholder:text-[#595959] disabled:opacity-60"
-        />
+        <div className="relative min-w-0 flex-1">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={onKeyDown}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder=""
+            disabled={pending}
+            dir="auto"
+            aria-label={t("inputLabel")}
+            className="w-full border-none bg-transparent text-sm text-rizq-ink outline-none disabled:opacity-60"
+          />
+          {showPlaceholder && (
+            <div className="pointer-events-none absolute inset-0 flex items-center overflow-hidden">
+              <AnimatedPlaceholder phrases={prompts} />
+            </div>
+          )}
+        </div>
         <button
           type="button"
           onClick={send}
           disabled={pending || !draft.trim()}
           aria-label={t("send")}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-rizq-green text-white transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rizq-green text-white transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
         >
           {pending ? (
             <Loader2 size={15} className="animate-spin" aria-hidden="true" />
@@ -167,72 +267,75 @@ export function ProposalChatDock({
     </div>
   );
 
-  const aiLabel = t("aiLabel");
-  const lastAi = [...messages].reverse().find((m) => m.role === "ai");
-
-  // -------------------------------------------------------------------------
-  // Render
-  // -------------------------------------------------------------------------
-
   return (
-    <div dir={isAr ? "rtl" : "ltr"} className={`print:hidden ${font}`}>
-      {/* Full-height side column (lg and up) */}
-      <aside
-        aria-label={t("title")}
-        className="hidden lg:flex fixed top-14 bottom-0 end-0 z-40 w-[340px] flex-col gap-3 px-5 py-5"
-      >
-        <header className="flex items-center gap-2 text-rizq-green">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rizq-green" aria-hidden="true">
-            <Sparkles size={13} strokeWidth={2.2} className="text-white" />
-          </span>
-          <span className="text-sm font-semibold">{t("aiLabel")}</span>
-        </header>
+    <div dir={isAr ? "rtl" : "ltr"} className={font}>
+      {/* CSS grid (not flex): minmax(0,1fr) lets the proposal track shrink
+          without ever forcing horizontal overflow. Two columns only at xl,
+          where there is genuine room for both. */}
+      <div className="mx-auto w-full max-w-[1400px] xl:grid xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start xl:gap-8">
+        {/* Proposal column */}
+        <div className="min-w-0">{children}</div>
 
-        <div ref={listRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pe-1">
-          {messages.length === 0 && (
-            <p className="text-[13px] leading-relaxed text-rizq-ink-soft">{t("intro")}</p>
-          )}
-          {messages.map((m) =>
-            m.role === "ai" ? (
-              <motion.div
-                key={m.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.22, ease: "easeOut" }}
-                className="flex flex-col"
+        {/* Sticky full-height AI panel (xl and up) */}
+        <aside aria-label={aiLabel} className="hidden xl:block min-w-0">
+          <div className="sticky top-20 flex h-[calc(100vh-6rem)] flex-col gap-3 print:hidden">
+            <header className="flex items-center gap-2 text-rizq-green">
+              <span
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-rizq-green"
+                aria-hidden="true"
               >
-                <AiChip text={m.text} meta={m.meta} aiLabel={aiLabel} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key={m.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="flex justify-end"
-              >
-                <p
-                  className="max-w-[88%] rounded-2xl bg-rizq-green px-3.5 py-2 text-[13px] leading-snug text-white"
-                  dir="auto"
-                >
-                  {m.text}
-                </p>
-              </motion.div>
-            )
-          )}
-          {pending && (
-            <div className="flex items-center gap-2 text-xs text-rizq-ink-soft">
-              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-              <span>{t("sending")}</span>
+                <Sparkles size={14} strokeWidth={2.2} className="text-white" />
+              </span>
+              <span className="text-sm font-semibold">{aiLabel}</span>
+            </header>
+
+            <div ref={listRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pe-1">
+              {messages.length === 0 && (
+                <p className="text-[13px] leading-relaxed text-rizq-ink-soft">{t("intro")}</p>
+              )}
+              {messages.map((m) =>
+                m.role === "ai" ? (
+                  <motion.div
+                    key={m.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.22, ease: "easeOut" }}
+                    className="flex flex-col"
+                  >
+                    <AiChip text={m.text} meta={m.meta} aiLabel={aiLabel} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={m.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="flex justify-end"
+                  >
+                    <p
+                      className="max-w-[88%] rounded-2xl bg-rizq-green px-3.5 py-2 text-[13px] leading-snug text-white"
+                      dir="auto"
+                    >
+                      {m.text}
+                    </p>
+                  </motion.div>
+                )
+              )}
+              {pending && (
+                <div className="flex items-center gap-2 text-xs text-rizq-ink-soft">
+                  <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                  <span>{t("sending")}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {composer}
-      </aside>
+            {composer}
+          </div>
+        </aside>
+      </div>
 
-      {/* Compact bottom bar (below lg) */}
-      <div className="lg:hidden fixed inset-x-4 bottom-4 z-40 flex flex-col gap-2">
+      {/* Compact bottom composer (below xl) */}
+      <div className="xl:hidden fixed inset-x-4 bottom-4 z-40 flex flex-col gap-2 print:hidden">
         {lastAi && (
           <motion.div
             key={lastAi.id}
