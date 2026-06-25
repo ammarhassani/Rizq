@@ -18,13 +18,15 @@ import { AppShellClient } from "./AppShellClient";
 
 /**
  * Content max-width preset for the shell's centered content column.
+ *   - "full" (max-w-none)  → full-bleed pages that manage their own columns
+ *     (e.g. the proposal editor with its side-docked AI panel).
  *   - "wide" (max-w-5xl)  → list / grid / overview pages (dashboard, proposals,
  *     clients, income, invoices, calendar, documents).
  *   - "reading" (max-w-3xl) → reading / form / detail pages.
  *   - "form" (max-w-2xl)  → narrow single-column forms (rate calculator).
  * Default is "wide" — most app pages are dashboards/lists.
  */
-export type AppShellWidth = "wide" | "reading" | "form";
+export type AppShellWidth = "full" | "wide" | "reading" | "form";
 
 export type AppShellProps = {
   locale: "ar" | "en";

@@ -140,8 +140,17 @@ export default async function ProposalDetailPage({
     proposal.status === "sent";
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="wide">
-      <div dir={isAr ? "rtl" : "ltr"} className={canEdit ? "lg:pe-[360px] pb-44" : "max-w-3xl mx-auto"}>
+    <AppShell
+      locale={locale as "ar" | "en"}
+      title={isAr ? "عرض سعر" : "Proposal"}
+      maxWidth={canEdit ? "full" : "reading"}
+    >
+      {/* Two-column on the editor: the proposal fills the width while the AI
+          panel reserves a fixed gutter on the inline-end (lg:pe-[360px]). The
+          gutter reservation lives OUTSIDE the readability cap so the proposal
+          never gets squeezed. */}
+      <div dir={isAr ? "rtl" : "ltr"} className={canEdit ? "lg:pe-[360px]" : ""}>
+        <div className={canEdit ? "max-w-4xl" : ""}>
         {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
         <ProposalPrintStyles />
         {/* Back link */}
@@ -291,11 +300,15 @@ export default async function ProposalDetailPage({
             </div>
           </section>
         )}
-        {/* Hovering conversational editor — owner + editable only */}
-        {canEdit && artifactData && (
-          <ProposalChatDock proposalId={id} locale={locale as "ar" | "en"} />
-        )}
+        </div>
       </div>
+
+      {/* Side-docked conversational AI panel — owner + editable only. Full-height
+          column fixed to the inline-end (sibling of the content, not nested in
+          the readability cap). */}
+      {canEdit && artifactData && (
+        <ProposalChatDock proposalId={id} locale={locale as "ar" | "en"} />
+      )}
     </AppShell>
   );
 }

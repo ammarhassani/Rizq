@@ -1,23 +1,27 @@
 "use client";
 
 /**
- * ProposalChatDock — always-visible aurora bar (feature 001 / US4 redesign).
+ * ProposalChatDock — side-docked conversational AI panel (feature 001 / US4).
  *
- * Fixed to the inline-end + bottom of the viewport (right in LTR, left in RTL —
- * the side away from the RTL sidebar). No launcher button — the input is always
- * present. The last AI reply appears as an aurora-bordered chip above the bar.
+ * On lg+ this is a full-height column fixed to the inline-end of the viewport
+ * (right in LTR, left in RTL — the side away from the RTL sidebar): a "Rizq AI"
+ * header, a scrollable message history, and the aurora input bar pinned at the
+ * bottom. The proposal page reserves the gutter with lg:pe-[360px].
  *
- * Layout companion: the proposal page adds lg:pe-[360px] to its content div when
- * canEdit so text never slides under the dock.
+ * Below lg there is no room for a column, so it collapses to a compact bottom
+ * bar showing the latest reply chip + the same composer.
+ *
+ * AI replies render as aurora-bordered chips; the freelancer's own turns are
+ * solid green bubbles. Price/dates/terms are never touched by the action.
  *
  * WCAG 2.1 AA: placeholder #595959 on frosted cream ≈5.9:1, body text 17:1,
  * send icon 7.5:1. Focus ring via .ai-aurora-inner:focus-within in globals.css.
  */
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Sparkles, ArrowUp, Loader2 } from "lucide-react";
 import { proposalChat } from "@/app/actions/proposals/proposalChat";
 
@@ -25,7 +29,7 @@ import { proposalChat } from "@/app/actions/proposals/proposalChat";
 // Types
 // ---------------------------------------------------------------------------
 
-type Reply = { id: number; text: string; meta?: string };
+type Msg = { id: number; role: "user" | "ai"; text: string; meta?: string };
 
 const SECTION_LABELS: Record<string, { ar: string; en: string }> = {
   cover_letter: { ar: "الخطاب التعريفي", en: "cover letter" },
@@ -34,6 +38,27 @@ const SECTION_LABELS: Record<string, { ar: string; en: string }> = {
   scope_of_work: { ar: "نطاق العمل", en: "scope of work" },
   assumptions: { ar: "الافتراضات", en: "assumptions" },
 };
+
+let seq = 0;
+const nextId = () => ++seq;
+
+/** AI reply rendered as an aurora-bordered chip. */
+function AiChip({ text, meta, aiLabel }: { text: string; meta?: string; aiLabel: string }) {
+  return (
+    <div className="ai-aurora-border self-start max-w-[88%]">
+      <div className="ai-aurora-reply">
+        <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-rizq-green">
+          <Sparkles size={10} strokeWidth={2.5} aria-hidden="true" />
+          {aiLabel}
+        </p>
+        <p className="text-[13px] leading-snug text-rizq-ink" dir="auto">
+          {text}
+        </p>
+        {meta && <p className="mt-1 text-[11px] text-rizq-green">{meta}</p>}
+      </div>
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -52,8 +77,14 @@ export function ProposalChatDock({
   const router = useRouter();
 
   const [draft, setDraft] = useState("");
-  const [reply, setReply] = useState<Reply | null>(null);
+  const [messages, setMessages] = useState<Msg[]>([]);
   const [pending, startTransition] = useTransition();
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Keep the history scrolled to the newest turn.
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, pending]);
 
   function labelFor(id: string): string {
     return SECTION_LABELS[id]?.[isAr ? "ar" : "en"] ?? id;
@@ -63,102 +94,157 @@ export function ProposalChatDock({
     const msg = draft.trim();
     if (!msg || pending) return;
     setDraft("");
+    setMessages((m) => [...m, { id: nextId(), role: "user", text: msg }]);
     startTransition(async () => {
       const res = await proposalChat({ proposal_id: proposalId, message: msg });
       if (!res.ok) {
-        setReply({
-          id: Date.now(),
-          text:
-            res.code === "ai_unconfigured" ? t("unavailable") : t("error"),
-        });
+        setMessages((m) => [
+          ...m,
+          {
+            id: nextId(),
+            role: "ai",
+            text: res.code === "ai_unconfigured" ? t("unavailable") : t("error"),
+          },
+        ]);
         return;
       }
       const replyText = isAr ? res.reply_ar : res.reply_en;
       const meta =
         res.modified.length > 0
           ? t("updated", {
-              sections: res.modified
-                .map(labelFor)
-                .join(isAr ? "، " : ", "),
+              sections: res.modified.map(labelFor).join(isAr ? "، " : ", "),
             })
           : undefined;
-      setReply({ id: Date.now(), text: replyText, meta });
+      setMessages((m) => [...m, { id: nextId(), role: "ai", text: replyText, meta }]);
       if (res.modified.length > 0) router.refresh();
     });
   }
 
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Shared sub-renders
+  // -------------------------------------------------------------------------
+
+  const composer = (
+    <div className="ai-aurora-border">
+      <div className="ai-aurora-inner">
+        <Sparkles
+          size={17}
+          strokeWidth={2.2}
+          className="shrink-0 text-rizq-green"
+          aria-hidden="true"
+        />
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={t("placeholder")}
+          disabled={pending}
+          dir="auto"
+          aria-label={t("inputLabel")}
+          className="flex-1 border-none bg-transparent text-sm text-rizq-ink outline-none placeholder:text-[#595959] disabled:opacity-60"
+        />
+        <button
+          type="button"
+          onClick={send}
+          disabled={pending || !draft.trim()}
+          aria-label={t("send")}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-rizq-green text-white transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
+        >
+          {pending ? (
+            <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+          ) : (
+            <ArrowUp size={15} strokeWidth={2.5} aria-hidden="true" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
+  const aiLabel = t("aiLabel");
+  const lastAi = [...messages].reverse().find((m) => m.role === "ai");
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+
   return (
-    <div
-      className={`print:hidden fixed bottom-7 end-5 z-50 w-80 ${font}`}
-      dir={isAr ? "rtl" : "ltr"}
-    >
-      {/* Last AI reply — aurora chip above the input bar */}
-      <AnimatePresence mode="wait">
-        {reply && (
+    <div dir={isAr ? "rtl" : "ltr"} className={`print:hidden ${font}`}>
+      {/* Full-height side column (lg and up) */}
+      <aside
+        aria-label={t("title")}
+        className="hidden lg:flex fixed top-14 bottom-0 end-0 z-40 w-[340px] flex-col gap-3 px-5 py-5"
+      >
+        <header className="flex items-center gap-2 text-rizq-green">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rizq-green" aria-hidden="true">
+            <Sparkles size={13} strokeWidth={2.2} className="text-white" />
+          </span>
+          <span className="text-sm font-semibold">{t("aiLabel")}</span>
+        </header>
+
+        <div ref={listRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pe-1">
+          {messages.length === 0 && (
+            <p className="text-[13px] leading-relaxed text-rizq-ink-soft">{t("intro")}</p>
+          )}
+          {messages.map((m) =>
+            m.role === "ai" ? (
+              <motion.div
+                key={m.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="flex flex-col"
+              >
+                <AiChip text={m.text} meta={m.meta} aiLabel={aiLabel} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key={m.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="flex justify-end"
+              >
+                <p
+                  className="max-w-[88%] rounded-2xl bg-rizq-green px-3.5 py-2 text-[13px] leading-snug text-white"
+                  dir="auto"
+                >
+                  {m.text}
+                </p>
+              </motion.div>
+            )
+          )}
+          {pending && (
+            <div className="flex items-center gap-2 text-xs text-rizq-ink-soft">
+              <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+              <span>{t("sending")}</span>
+            </div>
+          )}
+        </div>
+
+        {composer}
+      </aside>
+
+      {/* Compact bottom bar (below lg) */}
+      <div className="lg:hidden fixed inset-x-4 bottom-4 z-40 flex flex-col gap-2">
+        {lastAi && (
           <motion.div
-            key={reply.id}
+            key={lastAi.id}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="mb-2"
+            className="flex flex-col"
           >
-            <div className="ai-aurora-border">
-              <div className="ai-aurora-reply">
-                <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-rizq-green">
-                  <Sparkles size={10} strokeWidth={2.5} aria-hidden="true" />
-                  {t("aiLabel")}
-                </p>
-                <p className="text-[13px] leading-snug text-rizq-ink">
-                  {reply.text}
-                </p>
-                {reply.meta && (
-                  <p className="mt-1 text-[11px] text-rizq-green">{reply.meta}</p>
-                )}
-              </div>
-            </div>
+            <AiChip text={lastAi.text} meta={lastAi.meta} aiLabel={aiLabel} />
           </motion.div>
         )}
-      </AnimatePresence>
-
-      {/* Aurora border shell + frosted input bar */}
-      <div className="ai-aurora-border">
-        <div className="ai-aurora-inner">
-          <Sparkles
-            size={17}
-            strokeWidth={2.2}
-            className="shrink-0 text-rizq-green"
-            aria-hidden="true"
-          />
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
-            }}
-            placeholder={t("placeholder")}
-            disabled={pending}
-            dir="auto"
-            aria-label={t("inputLabel")}
-            className="flex-1 border-none bg-transparent text-sm text-rizq-ink outline-none placeholder:text-[#595959] disabled:opacity-60"
-          />
-          <button
-            type="button"
-            onClick={send}
-            disabled={pending || !draft.trim()}
-            aria-label={t("send")}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px] bg-rizq-green text-white transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
-          >
-            {pending ? (
-              <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-            ) : (
-              <ArrowUp size={15} strokeWidth={2.5} aria-hidden="true" />
-            )}
-          </button>
-        </div>
+        {composer}
       </div>
     </div>
   );

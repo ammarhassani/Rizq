@@ -25,6 +25,7 @@ type Props = {
 
 /** Tailwind max-width class per content width preset. */
 const MAX_WIDTH_CLASS: Record<AppShellWidth, string> = {
+  full: "max-w-none",
   wide: "max-w-5xl",
   reading: "max-w-3xl",
   form: "max-w-2xl",
