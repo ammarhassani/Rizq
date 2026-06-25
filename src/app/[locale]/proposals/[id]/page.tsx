@@ -140,8 +140,8 @@ export default async function ProposalDetailPage({
     proposal.status === "sent";
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="reading">
-      <div dir={isAr ? "rtl" : "ltr"}>
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض سعر" : "Proposal"} maxWidth="wide">
+      <div dir={isAr ? "rtl" : "ltr"} className={canEdit ? "max-w-3xl pr-[336px]" : "max-w-3xl mx-auto"}>
         {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
         <ProposalPrintStyles />
         {/* Back link */}

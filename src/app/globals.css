@@ -328,6 +328,15 @@
   outline-offset: 3px;
 }
 
+/* Reply chip — solid background so it reads over any proposal content */
+.ai-aurora-reply {
+  border-radius: 16.5px;
+  padding: 10px 14px;
+  background: rgba(250, 245, 236, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
 /* ── WCAG 2.1 — reduced motion ─────────────────────────────────────────────
    Neutralize CSS-driven motion (the shimmer skeleton, fade/slide keyframes,
    and any decorative transitions) for users who ask for reduced motion.

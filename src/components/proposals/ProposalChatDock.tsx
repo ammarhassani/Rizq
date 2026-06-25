@@ -3,9 +3,12 @@
 /**
  * ProposalChatDock — always-visible aurora bar (feature 001 / US4 redesign).
  *
- * Floats center-bottom over the proposal page. No launcher button — the input
- * is always present. The last AI reply appears above the bar as bare text with
- * a cream text-shadow for legibility; it is replaced on every new send.
+ * Fixed to the bottom-right of the viewport so the proposal content can sit
+ * to its left. No launcher button — the input is always present. The last AI
+ * reply appears as an aurora-bordered chip above the input bar.
+ *
+ * Layout companion: the proposal page adds pr-[336px] to its content div when
+ * canEdit so text never slides under the dock.
  *
  * WCAG 2.1 AA: placeholder #595959 on frosted cream ≈5.9:1, body text 17:1,
  * send icon 7.5:1. Focus ring via .ai-aurora-inner:focus-within in globals.css.
@@ -86,43 +89,33 @@ export function ProposalChatDock({
 
   return (
     <div
-      className={`print:hidden fixed bottom-7 left-1/2 z-50 w-[min(600px,calc(100vw-48px))] -translate-x-1/2 ${font}`}
+      className={`print:hidden fixed bottom-7 right-5 z-50 w-80 ${font}`}
       dir={isAr ? "rtl" : "ltr"}
     >
-      {/* Last AI reply — floats above bar, no card bg */}
+      {/* Last AI reply — aurora chip above the input bar */}
       <AnimatePresence mode="wait">
         {reply && (
           <motion.div
             key={reply.id}
-            initial={{ opacity: 0, y: 5 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-            className="mb-2.5 flex items-start gap-2 px-1"
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="mb-2"
           >
-            <span
-              className="mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-rizq-green"
-              aria-hidden="true"
-            >
-              <Sparkles size={11} strokeWidth={2} className="text-white" />
-            </span>
-            <div>
-              <p className="mb-1 text-[11px] font-semibold leading-none text-rizq-green">
-                {t("aiLabel")}
-              </p>
-              <p
-                className="text-[13.5px] leading-relaxed text-rizq-ink"
-                style={{
-                  textShadow: "0 0 20px #FAF5EC, 0 0 16px #FAF5EC",
-                }}
-              >
-                {reply.text}
+            <div className="ai-aurora-border">
+              <div className="ai-aurora-reply">
+                <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-rizq-green">
+                  <Sparkles size={10} strokeWidth={2.5} aria-hidden="true" />
+                  {t("aiLabel")}
+                </p>
+                <p className="text-[13px] leading-snug text-rizq-ink">
+                  {reply.text}
+                </p>
                 {reply.meta && (
-                  <span className="mt-0.5 block text-[11px] text-rizq-green">
-                    {reply.meta}
-                  </span>
+                  <p className="mt-1 text-[11px] text-rizq-green">{reply.meta}</p>
                 )}
-              </p>
+              </div>
             </div>
           </motion.div>
         )}
