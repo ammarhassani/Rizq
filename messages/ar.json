@@ -1962,7 +1962,7 @@
     "totalProjectsPlaceholder": "مثال: ٤٢",
     "notableClients": "عملاء بارزون",
     "notableClientsPlaceholder": "اكتب اسم العميل ثم اضغط Enter",
-    "notableClientsHint": "أضِف العملاء واحدًا تلو الآخر (تُحفظ الفاصلة داخل الاسم).",
+    "notableClientsHint": "اضغط Enter بعد كل اسم، أو الصق قائمة مفصولة بفواصل.",
     "contactSectionTitle": "بيانات التواصل (تظهر في عروضك)",
     "contactPhone": "الهاتف",
     "contactPhonePlaceholder": "مثال: +966 5X XXX XXXX",

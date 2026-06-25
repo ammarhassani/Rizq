@@ -9,7 +9,7 @@
  * RTL-aware; entries render with dir="auto" so Arabic and Latin names both read right.
  */
 
-import { useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent, type ClipboardEvent } from "react";
 import { X } from "lucide-react";
 
 type Props = {
@@ -49,6 +49,18 @@ export function ChipInput({
     onChange(value.filter((_, i) => i !== idx));
   }
 
+  function onPaste(e: ClipboardEvent<HTMLInputElement>) {
+    const text = e.clipboardData.getData("text");
+    if (!text.includes(",")) return; // single value — let the browser paste normally
+    e.preventDefault();
+    const candidates = text.split(",").map((s) => s.trim()).filter(Boolean);
+    const deduped = candidates.filter((c) => !value.includes(c));
+    const slots = maxItems - value.length;
+    if (deduped.length === 0 || slots <= 0) return;
+    onChange([...value, ...deduped.slice(0, slots).map((c) => c.slice(0, maxLength))]);
+    setDraft("");
+  }
+
   function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -86,6 +98,7 @@ export function ChipInput({
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={onKeyDown}
+        onPaste={onPaste}
         onBlur={() => add(draft)}
         placeholder={placeholder}
         className={inputClassName}
