@@ -37,8 +37,8 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 - [X] T005 [P] Write migration `supabase/migrations/20260626120200_project_integrations.sql`: create `public.project_integrations` per data-model.md (registry shape, `config jsonb`, `unique(project_id,provider,external_url)`, NO credentials column); owner-scoped RLS; index `(project_id)`. Idempotent.
 - [X] T006 [P] Extract the gig-status → project-status mapping into a pure helper `src/lib/projects/statusMapping.ts` (`gigStatusToProjectStatus(s): ProjectStatus`) so the backfill rule is unit-testable and reused by actions.
 - [X] T007 [P] Unit test `src/lib/projects/statusMapping.test.ts`: every `gig_status` value maps to the documented `project_status` (paid→completed, cancelled→cancelled, else→active) — guards SC-001/SC-002 mapping.
-- [ ] T008 Apply migrations 1–3 to the Supabase dev project (MCP `apply_migration`, in order), then run `get_advisors` and confirm no new RLS/security warnings on `projects`/`project_integrations`/changed FK columns.
-- [ ] T009 Verify backfill (quickstart V1/V2 SQL checks via MCP `execute_sql`): `gigs where project_id is null` = 0; `count(projects)` = pre-migration `count(gigs)`; `invoices where gig_id is not null and project_id is null` = 0; re-running migration 2 is a no-op; snapshot-compare `monthly_income`/`client_gig_summary` rows unchanged.
+- [X] T008 Apply migrations 1–3 to the Supabase dev project (MCP `apply_migration`, in order), then run `get_advisors` and confirm no new RLS/security warnings on `projects`/`project_integrations`/changed FK columns.
+- [X] T009 Verify backfill (quickstart V1/V2 SQL checks via MCP `execute_sql`): `gigs where project_id is null` = 0; `count(projects)` = pre-migration `count(gigs)`; `invoices where gig_id is not null and project_id is null` = 0; re-running migration 2 is a no-op; snapshot-compare `monthly_income`/`client_gig_summary` rows unchanged.
 
 **Checkpoint**: Projects exist for all data; schema ready. User stories can proceed.
 
@@ -114,7 +114,7 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify (quickstart) that backfill set `proposal_role='origin'` + `project_id` for every proposal that spawned a gig, and that the `origin_proposal_id` on each project matches; add a query check to quickstart results.
+- [X] T027 [US4] Verify (quickstart) that backfill set `proposal_role='origin'` + `project_id` for every proposal that spawned a gig, and that the `origin_proposal_id` on each project matches; add a query check to quickstart results.
 - [X] T028 [P] [US4] Surface the origin proposal on the project page as the canonical "origin" (label it), leaving change-order/sub-scope as schema-only (documented as a later release in spec Assumptions) — no new UI to create them yet.
 
 **Checkpoint**: PMO-grade proposal roles are modeled and origin is live.
@@ -126,7 +126,7 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 - [X] T029 [P] Update `docs/domain-model.md`: flip "Direction → Stage 2" to "done", document the `projects` parent + `project_integrations` registry + role discriminator and the retained `gig_id`/`proposal_id` links.
 - [X] T030 [P] Extend the PDPL data-export (`src/app/actions/account/dataExport.ts`) and account-delete RPC to include `projects` + `project_integrations` (owner-scoped), so export/delete stays complete (Constitution VI).
 - [X] T031 Run the merge gate: `pnpm typecheck` clean and `pnpm test` green (incl. new tests T007/T010/T015/T016); fix any fallout.
-- [ ] T032 Run quickstart.md V1–V7 end-to-end against the dev project and record results; confirm `get_advisors` clean.
+- [X] T032 Run quickstart.md V1–V7 end-to-end against the dev project and record results; confirm `get_advisors` clean.
 
 ---
 
