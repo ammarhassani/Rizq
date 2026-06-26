@@ -68,7 +68,7 @@ description: "Task list for Project Lifecycle Wizard (Stage 3)"
 ## Phase 7: Polish
 
 - [X] T016 [P] Update `docs/domain-model.md` with the lifecycle (derived, single source of truth) + the wizard front door.
-- [X] T017 Merge gate: `pnpm typecheck` clean + `pnpm test` green (643, incl. T003 resolver tests). NOTE: automated gate done; the live quickstart V1–V8 click-through (running the app) has not been performed yet.
+- [X] T017 Merge gate: `pnpm typecheck` clean + `pnpm test` green (643, incl. T003 resolver tests). Live walkthrough DONE (2026-06-26, Playwright against `next dev` + a confirmed test account): dashboard "Start a project" + resume list, `/projects/start` stepper, project-page stepper (① skipped / ② done / ③ current), money-details save (deposit 50→30% persisted as 2,400), "Create the invoice" CTA → invoice editor, and AR/RTL all verified.
 
 ---
 
