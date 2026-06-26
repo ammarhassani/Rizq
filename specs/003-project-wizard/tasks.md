@@ -41,7 +41,7 @@ description: "Task list for Project Lifecycle Wizard (Stage 3)"
 ## Phase 4: US2 — Proposal → set-up project (P1) 🎯 MVP
 
 - [X] T008 [US2] ①→② CTA "Set up the project" calls existing `createProjectFromProposal` (already quota-guarded + rolls back shell); route to `/projects/[id]`. Dedup: if a project already exists for the proposal, show stage ② done (no second project).
-- [X] T009 [US2] Stage ② money details: pre-filled deposit %/delivery/payment form saving via the existing gig update action (deposit/remaining recompute via existing trigger). Reuse, don't rebuild.
+- [ ] T009 [US2] Stage ② money details: pre-filled deposit %/delivery/payment form saving via the existing gig update action. **NOT DONE** — the project's gig is currently created with defaults (deposit 50%, no delivery date) and edited via the existing income edit form; a dedicated in-context money-details step on the project page is still to add.
 
 **Checkpoint**: brief → proposal → live project (demoable MVP).
 
@@ -68,7 +68,7 @@ description: "Task list for Project Lifecycle Wizard (Stage 3)"
 ## Phase 7: Polish
 
 - [X] T016 [P] Update `docs/domain-model.md` with the lifecycle (derived, single source of truth) + the wizard front door.
-- [X] T017 Merge gate: `pnpm typecheck` + `pnpm test` green (incl. T003 resolver tests); quickstart V1–V8 walkthrough.
+- [X] T017 Merge gate: `pnpm typecheck` clean + `pnpm test` green (643, incl. T003 resolver tests). NOTE: automated gate done; the live quickstart V1–V8 click-through (running the app) has not been performed yet.
 
 ---
 
