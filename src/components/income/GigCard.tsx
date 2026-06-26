@@ -14,6 +14,7 @@ export type GigRow = {
   ai_anomaly_flag: boolean | null;
   client_id: string | null;
   client_name?: string | null; // joined in
+  project_id?: string | null; // feature 002 — link the card to its project hub
 };
 
 type Props = {
@@ -82,7 +83,11 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
 
   return (
     <Link
-      href={`/income/${gig.id}` as `/income/${string}`}
+      href={
+        (gig.project_id
+          ? `/projects/${gig.project_id}`
+          : `/income/${gig.id}`) as `/projects/${string}` | `/income/${string}`
+      }
       className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">

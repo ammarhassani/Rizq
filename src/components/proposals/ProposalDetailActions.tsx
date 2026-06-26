@@ -15,7 +15,7 @@ import { useRouter } from "@/i18n/navigation";
 import { finalizeProposal } from "@/app/actions/proposals/finalizeProposal";
 import { markStatus } from "@/app/actions/proposals/markStatus";
 import { saveTemplateFromProposal } from "@/app/actions/proposals/templates";
-import { createGigFromProposal } from "@/app/actions/gigs/createGigFromProposal";
+import { createProjectFromProposal } from "@/app/actions/projects/createProjectFromProposal";
 import { createInvoiceFromProposal } from "@/app/actions/invoices/createInvoiceFromProposal";
 import { track } from "@/lib/analytics/track";
 import { ShareModal } from "./ShareModal";
@@ -148,18 +148,23 @@ export function ProposalDetailActions({
   function handleCreateGig() {
     setCreateGigError(null);
     startCreateGigTransition(async () => {
-      const result = await createGigFromProposal({ proposal_id: proposalId });
+      const result = await createProjectFromProposal({ proposal_id: proposalId });
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
-          setCreateGigError(isAr ? "وصلت للحد المجاني للمشاريع. ترقَّ للاحترافي." : "Free gig limit reached. Upgrade to Pro.");
+          setCreateGigError(isAr ? "وصلت للحد المجاني للمشاريع. ترقَّ للاحترافي." : "Free project limit reached. Upgrade to Pro.");
         } else {
           setCreateGigError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
         }
         return;
       }
-      track("gig_created_from_proposal", { locale, proposal_id: proposalId, gig_id: result.gig_id });
+      track("project_created_from_proposal", {
+        locale,
+        proposal_id: proposalId,
+        project_id: result.project_id,
+        gig_id: result.gig_id,
+      });
       // next-intl's localized router prepends the active locale — pass the path UNPREFIXED.
-      router.push(`/income/${result.gig_id}` as `/income/${string}`);
+      router.push(`/projects/${result.project_id}` as `/projects/${string}`);
     });
   }
 

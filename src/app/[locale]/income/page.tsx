@@ -73,7 +73,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
   // Fetch gigs with optional client name join (ordered by delivery_date desc)
   const { data: gigsRaw } = await supabase
     .from("gigs")
-    .select("id, title, amount_sar, deposit_sar, remaining_sar, status, delivery_date, ai_anomaly_flag, client_id, clients(name)")
+    .select("id, title, amount_sar, deposit_sar, remaining_sar, status, delivery_date, ai_anomaly_flag, client_id, project_id, clients(name)")
     .order("delivery_date", { ascending: false });
 
   // Flatten the join
@@ -87,6 +87,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
     delivery_date: g.delivery_date ?? null,
     ai_anomaly_flag: g.ai_anomaly_flag ?? null,
     client_id: g.client_id ?? null,
+    project_id: g.project_id ?? null,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     client_name: (g.clients as any)?.name ?? null,
   }));
