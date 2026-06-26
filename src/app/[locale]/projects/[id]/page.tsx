@@ -167,6 +167,11 @@ export default async function ProjectDetailPage({
         <LifecycleStepper
           lifecycle={lifecycle}
           locale={locale as "ar" | "en"}
+          targets={{
+            proposal: originProposal ? `/proposals/${originProposal.id}` : undefined,
+            project: `/projects/${id}`,
+            invoice: latestInvoiceId ? `/invoices/${latestInvoiceId}` : undefined,
+          }}
           cta={
             <ProjectLifecycleCta
               locale={locale as "ar" | "en"}
