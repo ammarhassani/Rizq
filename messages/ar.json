@@ -1166,6 +1166,27 @@
     "deleteError": "تعذّر حذف المشروع. حاول مرة أخرى.",
     "notFound": "المشروع غير موجود."
   },
+  "Wizard": {
+    "startProject": "ابدأ مشروعاً",
+    "continueTitle": "أكمِل من حيث توقفت",
+    "continueEmpty": "لا توجد مشاريع قيد التنفيذ.",
+    "stageProposalTitle": "سعّر واعرض",
+    "stageProjectTitle": "جهّز العمل",
+    "stageInvoiceTitle": "اقبض رزقك",
+    "stateDone": "مكتمل",
+    "stateCurrent": "قيد التنفيذ",
+    "stateNext": "التالي",
+    "stateSkipped": "تم تخطّيه",
+    "complete": "اكتملت دورة المشروع",
+    "ctaFinalizeProposal": "اعتمد العرض",
+    "ctaSetUpProject": "جهّز المشروع",
+    "ctaCreateInvoice": "أنشئ الفاتورة",
+    "ctaSendInvoice": "أرسل الفاتورة",
+    "ctaMarkPaid": "اقبض الدفعة",
+    "ctaContinue": "متابعة",
+    "working": "جارٍ التنفيذ…",
+    "error": "حدث خطأ. حاول مرة أخرى."
+  },
   "Invoices": {
     "list": {
       "eyebrow": "دفتر الفواتير",

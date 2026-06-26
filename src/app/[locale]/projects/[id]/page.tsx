@@ -11,6 +11,9 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { getProject } from "@/app/actions/projects/getProject";
+import { resolveLifecycle } from "@/lib/projects/lifecycle";
+import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
+import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
@@ -44,6 +47,16 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
 
   const clientId = (project.client_id as string | null) ?? null;
 
+  // Derive the lifecycle from the data already loaded (no extra fetch).
+  const lifecycle = resolveLifecycle({
+    proposal: originProposal ? { status: originProposal.status as string } : null,
+    hasProject: true,
+    projectHasOriginProposal: !!project.origin_proposal_id,
+    gig: gig ? { amount_sar: Number(gig.amount_sar), status: gig.status as string } : null,
+    invoices: (invoices ?? []).map((inv) => ({ status: inv.status as string })),
+  });
+  const latestInvoiceId = (invoices?.[0]?.id as string | undefined) ?? null;
+
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
       <div dir={dir}>
@@ -60,6 +73,21 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
         <h1 className={`text-2xl font-bold text-rizq-ink leading-snug mb-6 ${font}`}>
           {project.title}
         </h1>
+
+        {/* Lifecycle progress (derived) */}
+        <LifecycleStepper
+          lifecycle={lifecycle}
+          locale={locale as "ar" | "en"}
+          cta={
+            <ProjectLifecycleCta
+              locale={locale as "ar" | "en"}
+              nextAction={lifecycle.nextAction}
+              projectId={id}
+              gigId={(gig?.id as string | undefined) ?? null}
+              invoiceId={latestInvoiceId}
+            />
+          }
+        />
 
         {/* Money (single-project view) */}
         <ProjectMoneyPanel gig={gig} locale={locale as "ar" | "en"} />
