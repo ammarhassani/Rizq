@@ -87,6 +87,12 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
   // ---------------------------------------------------------------------------
 
   function handleSubmit(e: React.FormEvent) {
+    // Defense-in-depth: ignore submit events that bubbled up from a nested or
+    // portaled child form (the client "+ Add" dialog). React bubbles submit
+    // events through the component tree including portals, so without this a
+    // dialog submit would also fire generateProposal (phantom submit). Only
+    // this form's own submit should generate a proposal.
+    if (e.target !== e.currentTarget) return;
     e.preventDefault();
     if (!briefText.trim()) {
       setView({ kind: "form", error: t("errors.briefRequired") });

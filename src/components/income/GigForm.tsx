@@ -117,6 +117,10 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
 
   // ── Submit ───────────────────────────────────────────────────────────────
   function handleSubmit(e: React.FormEvent) {
+    // Defense-in-depth: ignore submit events bubbled from a nested/portaled
+    // child form (the client "+ Add" dialog). Only this form's own submit
+    // should save the project. (Same guard as the invoice/proposal forms.)
+    if (e.target !== e.currentTarget) return;
     e.preventDefault();
     if (!title.trim()) {
       setError(t("errors.titleRequired"));
