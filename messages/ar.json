@@ -1145,6 +1145,27 @@
       "anomalyBanner": "تنبيه: سعر غير معتاد لهذا التصنيف."
     }
   },
+  "Projects": {
+    "backToIncome": "دفتر الدخل",
+    "moneyTitle": "المال",
+    "originProposalTitle": "العرض الأصلي",
+    "originProposalRole": "الأصل",
+    "viewProposal": "عرض العرض التقديمي",
+    "invoicesTitle": "الفواتير",
+    "invoicesEmpty": "لا توجد فواتير لهذا المشروع حتى الآن.",
+    "viewInvoice": "عرض الفاتورة",
+    "integrationsTitle": "التكاملات",
+    "integrationsComingSoon": "قريبًا",
+    "integrationsHint": "اربط أدوات عملك بهذا المشروع. روابط مزوّدي الخدمة قادمة قريبًا — لا يوجد أي ربط بعد.",
+    "delete": "حذف المشروع",
+    "deleteConfirm": "حذف هذا المشروع؟ إذا كان يحتوي على مال أو فواتير فسيُؤرشَف (يبقى محفوظًا، ويُخفى من القوائم النشطة)، ولن يُحذف نهائيًا.",
+    "deleteConfirmBtn": "تأكيد",
+    "cancel": "إلغاء",
+    "archivedToast": "تمت أرشفة المشروع. تم الاحتفاظ بأمواله وفواتيره.",
+    "deletedToast": "تم حذف المشروع.",
+    "deleteError": "تعذّر حذف المشروع. حاول مرة أخرى.",
+    "notFound": "المشروع غير موجود."
+  },
   "Invoices": {
     "list": {
       "eyebrow": "دفتر الفواتير",

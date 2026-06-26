@@ -1145,6 +1145,27 @@
       "anomalyBanner": "Alert: unusual price for this category."
     }
   },
+  "Projects": {
+    "backToIncome": "Income Ledger",
+    "moneyTitle": "Money",
+    "originProposalTitle": "Origin proposal",
+    "originProposalRole": "Origin",
+    "viewProposal": "View proposal",
+    "invoicesTitle": "Invoices",
+    "invoicesEmpty": "No invoices for this project yet.",
+    "viewInvoice": "View invoice",
+    "integrationsTitle": "Integrations",
+    "integrationsComingSoon": "Coming soon",
+    "integrationsHint": "Connect your work tools to this project. Provider connections are coming soon — nothing is linked yet.",
+    "delete": "Delete project",
+    "deleteConfirm": "Delete this project? If it has money or invoices it will be archived (kept, hidden from active lists), never erased.",
+    "deleteConfirmBtn": "Confirm",
+    "cancel": "Cancel",
+    "archivedToast": "Project archived. Its money and invoices were kept.",
+    "deletedToast": "Project deleted.",
+    "deleteError": "Could not delete the project. Try again.",
+    "notFound": "Project not found."
+  },
   "Invoices": {
     "list": {
       "eyebrow": "Invoice Book",
