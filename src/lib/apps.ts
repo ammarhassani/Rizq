@@ -18,6 +18,7 @@ import {
   BookOpen,
   Settings,
   Sparkles,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 
@@ -42,6 +43,14 @@ export const APPS: AppDef[] = [
     sidebar: true,
   },
   // ── work ───────────────────────────────────────────────────────────────────
+  {
+    // The umbrella: a project owns its proposal, money, invoices, files, tasks.
+    id: "projects",
+    href: "/projects",
+    icon: Briefcase,
+    group: "work",
+    sidebar: true,
+  },
   {
     id: "proposals",
     href: "/proposals",

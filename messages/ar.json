@@ -1146,6 +1146,14 @@
     }
   },
   "Projects": {
+    "indexEyebrow": "المشاريع",
+    "indexTitle": "مشاريعك.",
+    "indexSubtitle": "كل مشروع — العرض، المال، الفواتير، الملفات — في مكان واحد.",
+    "indexEmptyTitle": "لا توجد مشاريع بعد.",
+    "indexEmptySubtitle": "ابدأ مشروعاً ويرافقك رِزق من العرض حتى القبض.",
+    "resume": "متابعة",
+    "openProject": "فتح",
+    "lifecycleComplete": "مكتمل",
     "backToIncome": "دفتر الدخل",
     "moneyTitle": "المال",
     "originProposalTitle": "العرض الأصلي",
@@ -1782,6 +1790,10 @@
       "dashboard": {
         "name": "لوحة التحكم",
         "tagline": "نظرة شاملة على عملك"
+      },
+      "projects": {
+        "name": "المشاريع",
+        "tagline": "كل مشروع من البداية للنهاية"
       },
       "proposals": {
         "name": "عروضي",

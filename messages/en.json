@@ -1146,6 +1146,14 @@
     }
   },
   "Projects": {
+    "indexEyebrow": "Projects",
+    "indexTitle": "Your projects.",
+    "indexSubtitle": "Every engagement — proposal, money, invoices, files — in one place.",
+    "indexEmptyTitle": "No projects yet.",
+    "indexEmptySubtitle": "Start a project and Rizq walks you from proposal to paid.",
+    "resume": "Resume",
+    "openProject": "Open",
+    "lifecycleComplete": "Complete",
     "backToIncome": "Income Ledger",
     "moneyTitle": "Money",
     "originProposalTitle": "Origin proposal",
@@ -1782,6 +1790,10 @@
       "dashboard": {
         "name": "Dashboard",
         "tagline": "Your at-a-glance overview"
+      },
+      "projects": {
+        "name": "Projects",
+        "tagline": "Every engagement, end to end"
       },
       "proposals": {
         "name": "Proposals",
