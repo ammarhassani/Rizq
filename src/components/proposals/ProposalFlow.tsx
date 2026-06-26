@@ -491,13 +491,12 @@ function DraftingView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Abort the in-flight request if the user navigates away mid-stream.
-  useEffect(() => {
-    return () => {
-      if (!doneRef.current) stop();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // NOTE: we deliberately do NOT abort the stream on unmount. React StrictMode
+  // (on in dev) double-invokes effects — an abort-on-unmount cleanup fired
+  // during the transient unmount and, combined with the run-once `startedRef`
+  // guard, killed the request before it was sent (the draft POST never reached
+  // the server → stuck on "writing…"). The stream is short and the server's
+  // onFinish persists regardless, so letting it run to completion is safe.
 
   // Complete on the loading falling-edge OR on error. Fire onDone once.
   const finish = useCallback(() => {
@@ -505,6 +504,20 @@ function DraftingView({
     doneRef.current = true;
     onDone(proposalId);
   }, [onDone, proposalId]);
+
+  // Watchdog: never let the drafting view hang. If the stream hasn't completed
+  // shortly after the server's 45s abort window, stop and move on to the detail
+  // page (which renders whatever prose persisted + templated defaults).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!doneRef.current) {
+        try { stop(); } catch { /* ignore */ }
+        finish();
+      }
+    }, 55_000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
