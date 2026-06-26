@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { generateProposal } from "@/app/actions/proposals/generateProposal";
 import { answerFollowUps } from "@/app/actions/proposals/answerFollowUps";
+import { linkProposalToProject } from "@/app/actions/projects/linkProposalToProject";
 import { track } from "@/lib/analytics/track";
 import { useRouter } from "@/i18n/navigation";
 import { ArtifactSkeleton } from "./ArtifactSkeleton";
@@ -44,6 +45,9 @@ type Props = {
   specialties: Option[];
   templates?: TemplateOption[];
   clients?: ClientOption[];
+  /** Guided flow: when set, the generated proposal is linked back to this
+   *  existing project as its origin (backfilling a skipped proposal step). */
+  forProjectId?: string;
 };
 
 type ViewKind =
@@ -62,7 +66,7 @@ type ViewKind =
 // Main component
 // ---------------------------------------------------------------------------
 
-export function ProposalFlow({ locale, specialties, templates = [], clients = [] }: Props) {
+export function ProposalFlow({ locale, specialties, templates = [], clients = [], forProjectId }: Props) {
   const t = useTranslations("Proposals.new");
   const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
@@ -141,6 +145,12 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
         confidence: result.confidence,
         price_anchor: result.price.anchor,
       });
+
+      // Guided flow: backfill this proposal as the origin of the project whose
+      // proposal step was skipped (best-effort; doesn't block the draft flow).
+      if (forProjectId) {
+        linkProposalToProject({ proposal_id: result.proposal_id, project_id: forProjectId }).catch(() => {});
+      }
 
       if (result.follow_ups.length > 0) {
         setView({

@@ -16,6 +16,8 @@ import { createClient } from "@/lib/supabase/server";
 import { listTemplates } from "@/app/actions/proposals/templates";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
+import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
+import { resolveLifecycle } from "@/lib/projects/lifecycle";
 
 // Studio's generateProposal Server Action runs the heaviest AI call (scope
 // extraction: large few-shot prompt + complex schema). Give it room so Vercel
@@ -48,10 +50,13 @@ export async function generateMetadata({
 
 export default async function ProposalNewPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<{ for_project?: string }>;
 }) {
   const { locale } = await params;
+  const { for_project: forProjectId } = await searchParams;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -90,6 +95,18 @@ export default async function ProposalNewPage({
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض جديد" : "New Proposal"} maxWidth="reading">
+      {forProjectId && (
+        <GuidedFlowOverlay
+          locale={locale as "ar" | "en"}
+          lifecycle={resolveLifecycle({
+            proposal: null,
+            hasProject: true, // the project exists; we're backfilling its proposal
+            projectHasOriginProposal: false,
+            gig: null,
+            invoices: [],
+          })}
+        />
+      )}
       <div>
         {/* Header */}
         <div className="mb-6 sm:mb-8">
