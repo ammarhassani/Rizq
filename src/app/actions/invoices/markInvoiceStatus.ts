@@ -113,7 +113,7 @@ export async function markInvoiceStatus(
   const { data: invoice, error: fetchErr } = await supabase
     .from("invoices")
     .select(
-      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id, gig_id"
     )
     .eq("id", invoice_id)
     .eq("user_id", userId)
@@ -207,6 +207,41 @@ export async function markInvoiceStatus(
     }
   }
 
+  // ── Close the loop: paying the invoice marks its linked gig paid too, so the
+  // Income Ledger reflects reality without a second manual step. Forward-only
+  // and idempotent — reversing an invoice does NOT un-pay the gig (the gig may
+  // have been settled independently), and a gig already paid/cancelled is left
+  // untouched. Best-effort: a failure here never blocks the invoice update.
+  const gigId = invoice.gig_id as string | null;
+  if (targetStatus === "paid" && gigId) {
+    try {
+      const { data: gig } = await supabase
+        .from("gigs")
+        .select("status, completed_date")
+        .eq("id", gigId)
+        .eq("user_id", userId)
+        .single();
+
+      if (gig && gig.status !== "paid" && gig.status !== "cancelled") {
+        const nowIso = new Date().toISOString();
+        const gigUpdate: Record<string, unknown> = {
+          status: "paid",
+          final_paid_at: nowIso,
+          updated_at: nowIso,
+        };
+        if (!gig.completed_date) gigUpdate.completed_date = nowIso.split("T")[0];
+
+        await supabase
+          .from("gigs")
+          .update(gigUpdate)
+          .eq("id", gigId)
+          .eq("user_id", userId);
+      }
+    } catch (err) {
+      console.warn("[markInvoiceStatus] gig paid-sync failed", err);
+    }
+  }
+
   // ── Rebuild artifact_json (status changed) ───────────────────────────────
   const artifactRow: InvoiceRowForArtifact = {
     id: invoice_id,
@@ -246,6 +281,11 @@ export async function markInvoiceStatus(
 
   revalidatePath("/[locale]/invoices", "page");
   revalidatePath("/[locale]/invoices/[id]", "page");
+  // A linked gig may have flipped to paid above — refresh the Income Ledger too.
+  if (targetStatus === "paid" && gigId) {
+    revalidatePath("/[locale]/income", "page");
+    revalidatePath(`/[locale]/income/${gigId}`, "page");
+  }
 
   return { ok: true, status: targetStatus };
 }
