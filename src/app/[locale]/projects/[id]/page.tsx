@@ -22,8 +22,10 @@ import { DeliverablesTab } from "@/components/projects/DeliverablesTab";
 import { getProjectDeliverables } from "@/app/actions/projects/deliverables";
 import { TasksTab } from "@/components/projects/TasksTab";
 import { getProjectTasks } from "@/app/actions/projects/tasks";
+import { IntegrationsTab } from "@/components/projects/IntegrationsTab";
+import { listProviderConnections } from "@/app/actions/projects/integrations/connect";
+import { isGithubConfigured } from "@/lib/integrations/github";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
-import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
 
 type Params = { locale: string; id: string };
@@ -41,14 +43,11 @@ export default async function ProjectDetailPage({
 }) {
   const { locale, id } = await params;
   const { tab: tabParam } = await searchParams;
-  const tab: "overview" | "files" | "deliverables" | "tasks" =
-    tabParam === "files"
-      ? "files"
-      : tabParam === "deliverables"
-        ? "deliverables"
-        : tabParam === "tasks"
-          ? "tasks"
-          : "overview";
+  const VALID_TABS = ["files", "deliverables", "tasks", "integrations"] as const;
+  const tab: "overview" | "files" | "deliverables" | "tasks" | "integrations" =
+    (VALID_TABS as readonly string[]).includes(tabParam ?? "")
+      ? (tabParam as "files" | "deliverables" | "tasks" | "integrations")
+      : "overview";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -106,6 +105,10 @@ export default async function ProjectDetailPage({
   const tasksResult = tab === "tasks" ? await getProjectTasks(id) : null;
   const tasksBundle = tasksResult?.ok ? tasksResult.bundle : { tasks: [], milestones: [] };
 
+  // Integrations tab data (only when active).
+  const connections = tab === "integrations" ? await listProviderConnections() : [];
+  const githubConfigured = isGithubConfigured();
+
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
       <div dir={dir}>
@@ -128,7 +131,7 @@ export default async function ProjectDetailPage({
           locale={locale as "ar" | "en"}
           projectId={id}
           current={tab}
-          tabs={["overview", "files", "deliverables", "tasks"]}
+          tabs={["overview", "files", "deliverables", "tasks", "integrations"]}
         />
 
         {tab === "files" && (
@@ -145,6 +148,16 @@ export default async function ProjectDetailPage({
             projectId={id}
             tasks={tasksBundle.tasks}
             milestones={tasksBundle.milestones}
+          />
+        )}
+
+        {tab === "integrations" && (
+          <IntegrationsTab
+            locale={locale as "ar" | "en"}
+            projectId={id}
+            githubConfigured={githubConfigured}
+            connections={connections}
+            links={integrations ?? []}
           />
         )}
 
@@ -216,9 +229,6 @@ export default async function ProjectDetailPage({
 
         {/* Invoices */}
         <ProjectInvoicesList invoices={invoices} locale={locale as "ar" | "en"} />
-
-        {/* Integrations (stub) */}
-        <ProjectIntegrationsSlot integrations={integrations} locale={locale as "ar" | "en"} />
 
         {/* Danger zone */}
         <div className="mt-8 pt-6 border-t border-rizq-gold/20">

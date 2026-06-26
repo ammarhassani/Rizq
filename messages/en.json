@@ -1209,7 +1209,22 @@
     "addMilestone": "Add milestone",
     "milestonePlaceholder": "e.g. Phase 1",
     "ungrouped": "Tasks",
-    "milestoneProgress": "{done}/{total} done"
+    "milestoneProgress": "{done}/{total} done",
+    "tabIntegrations": "Integrations",
+    "connectGithub": "Connect GitHub",
+    "connectionsTitle": "Connected accounts",
+    "connectedAs": "as {login}",
+    "statusActive": "Connected",
+    "statusRevoked": "Disconnected",
+    "statusExpired": "Reconnect needed",
+    "revokeConnection": "Disconnect",
+    "githubNotConfiguredHint": "Provider connections aren't configured on this deployment yet. You can still attach links below.",
+    "addLinkTitle": "Attach a link",
+    "linkUrlPlaceholder": "https://… (Figma, GitHub, Drive…)",
+    "linkLabelPlaceholder": "Label",
+    "addLinkBtn": "Attach",
+    "linkedResources": "Linked resources",
+    "removeLink": "Remove"
   },
   "Wizard": {
     "startProject": "Start a project",

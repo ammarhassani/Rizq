@@ -1209,7 +1209,22 @@
     "addMilestone": "أضِف مرحلة",
     "milestonePlaceholder": "مثال: المرحلة الأولى",
     "ungrouped": "المهام",
-    "milestoneProgress": "{done}/{total} مُنجَز"
+    "milestoneProgress": "{done}/{total} مُنجَز",
+    "tabIntegrations": "التكاملات",
+    "connectGithub": "اربط GitHub",
+    "connectionsTitle": "الحسابات المرتبطة",
+    "connectedAs": "باسم {login}",
+    "statusActive": "مرتبط",
+    "statusRevoked": "غير مرتبط",
+    "statusExpired": "يلزم إعادة الربط",
+    "revokeConnection": "فصل",
+    "githubNotConfiguredHint": "روابط مزوّدي الخدمة غير مُهيّأة على هذا الإصدار بعد. لا يزال بإمكانك إرفاق روابط أدناه.",
+    "addLinkTitle": "إرفاق رابط",
+    "linkUrlPlaceholder": "https://… (Figma، GitHub، Drive…)",
+    "linkLabelPlaceholder": "التسمية",
+    "addLinkBtn": "إرفاق",
+    "linkedResources": "الموارد المرتبطة",
+    "removeLink": "إزالة"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",

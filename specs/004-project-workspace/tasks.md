@@ -62,12 +62,12 @@ description: "Task list for Project Workspace (Stage 4)"
 
 ## Phase 5: US4 — Integrations real OAuth (P3) ⛔ SECURITY-GATED
 
-- [ ] T021 **GATE** — Produce and pass a written halal/PDPL/security review for provider connections: token storage/encryption mechanism, minimal read-only scope, revocation, export-exclusion, no-client-grant RLS. **No task below starts until this is approved.** (SC-009)
-- [ ] T022 Migration `..._provider_connections.sql`: `provider_connection_status` enum; `provider_connections` (encrypted token columns) with **no anon/authenticated grant**; `project_integrations.connection_id`. Verify via `get_advisors` that the table has no client SELECT.
-- [ ] T023 [US4] GitHub read-only OAuth: `startProviderConnection` + callback route (server-side token exchange, encrypted at rest, never returned to client).
-- [ ] T024 [US4] `linkProviderResource` + `revokeProviderConnection` (honest `disconnected` on revoke); manual-link path preserved.
-- [ ] T025 [US4] `IntegrationsTab.tsx`: "Connect GitHub" + linked-resource list + revoke; manual link still works with no connection.
-- [ ] T026 [US4] Assert invariants: export contains no token (extend a test/check), connection excluded from `exportMyDataAction`, account-delete cascade; quickstart V11–V14.
+- [X] T021 **GATE** — Produce and pass a written halal/PDPL/security review for provider connections: token storage/encryption mechanism, minimal read-only scope, revocation, export-exclusion, no-client-grant RLS. **No task below starts until this is approved.** (SC-009)
+- [X] T022 Migration `..._provider_connections.sql`: `provider_connection_status` enum; `provider_connections` (encrypted token columns) with **no anon/authenticated grant**; `project_integrations.connection_id`. Verify via `get_advisors` that the table has no client SELECT.
+- [X] T023 [US4] GitHub read-only OAuth: `startProviderConnection` + callback route (server-side token exchange, encrypted at rest, never returned to client).
+- [X] T024 [US4] `linkProviderResource` + `revokeProviderConnection` (honest `disconnected` on revoke); manual-link path preserved.
+- [X] T025 [US4] `IntegrationsTab.tsx`: "Connect GitHub" + linked-resource list + revoke; manual link still works with no connection.
+- [X] T026 [US4] Assert invariants: export contains no token (extend a test/check), connection excluded from `exportMyDataAction`, account-delete cascade; quickstart V11–V14.
 
 ---
 

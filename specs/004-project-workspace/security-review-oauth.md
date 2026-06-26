@@ -1,7 +1,7 @@
 # Security / Halal / PDPL Review — Provider Connections (OAuth)
 
 **Feature**: 004 Project Workspace · Phase 5 (Integrations real OAuth) · Task T021 (the gate)
-**Status**: DRAFT — awaiting founder approval. **No Phase 5 code (T022–T026) may begin until this is approved.** (SC-009)
+**Status**: ✅ APPROVED by founder 2026-06-26 (app-layer envelope encryption chosen). Phase 5 implemented on this basis.
 **First provider**: GitHub, **read-only** scopes.
 
 This document is the gate. It states how third-party provider connections will be handled so that secrets are never exposed, the feature stays PDPL- and halal-compliant, and the blast radius of a compromise is bounded.

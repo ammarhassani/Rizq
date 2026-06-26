@@ -19,6 +19,7 @@ const InputSchema = z.object({
   provider: z.string(),
   external_url: z.string(),
   display_label: z.string(),
+  connection_id: z.string().uuid().optional(), // links a real provider connection (Phase 5)
 });
 
 export type AddProjectIntegrationResult =
@@ -62,6 +63,7 @@ export async function addProjectIntegration(
       external_url: validation.value.external_url,
       display_label: validation.value.display_label,
       status: "linked",
+      ...(parsed.data.connection_id ? { connection_id: parsed.data.connection_id } : {}),
     })
     .select("id")
     .single();
