@@ -130,6 +130,17 @@ Why this framing wins:
    credentials are stored (OAuth deferred to a future connection table); the UI is a labeled
    "coming soon" stub. Real provider OAuth is the next stage.
 
+### Stage 3 — the Project Lifecycle Wizard (feature 003)
+
+A guided **"Start a project"** front door (dashboard → `/projects/start`) walks the
+freelancer **brief → AI proposal → project → invoice** in three stages. It is a pure
+**orchestration layer** — no new tables. The lifecycle stage is **derived** from real data
+by `resolveLifecycle` (`src/lib/projects/lifecycle.ts`): ① proposal status, ② project + its
+money child, ③ invoice status. Each project page shows a `LifecycleStepper` (done / current /
+next / **skipped**) with one "continue" CTA that reuses the existing conversion actions; the
+dashboard surfaces in-progress lifecycles (incl. draft-only proposals) to resume. Billing
+directly (no proposal) shows ① as *skipped*, derived from the absence of an origin proposal.
+
 #### FK map additions (Stage 2)
 
 ```

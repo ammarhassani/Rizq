@@ -18,6 +18,8 @@ import { ActiveClientsWidget } from "@/components/dashboard/ActiveClientsWidget"
 import { MonthlyIncomeWidget } from "@/components/dashboard/MonthlyIncomeWidget";
 import { QuickPricingWidget } from "@/components/dashboard/QuickPricingWidget";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
+import { StartProjectButton } from "@/components/wizard/StartProjectButton";
+import { ContinueLifecycleList } from "@/components/wizard/ContinueLifecycleList";
 import type { UpcomingInvoice } from "@/lib/invoices/queries";
 
 // Give the insights Server Action room to reach DeepSeek without Vercel killing
@@ -214,6 +216,12 @@ export default async function DashboardPage({ params }: { params: Promise<Params
               ? (isAr ? `أهلًا، ${userName}` : `Welcome, ${userName}`)
               : (isAr ? "أهلًا بك في رِزق" : "Welcome to Rizq")}
           </h1>
+        </div>
+
+        {/* Lifecycle: start a project + resume in-progress */}
+        <div className="mb-6 space-y-4">
+          <StartProjectButton locale={locale as "ar" | "en"} />
+          <ContinueLifecycleList locale={locale as "ar" | "en"} />
         </div>
 
         {/* Widget grid */}
