@@ -56,13 +56,14 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
 8. Never inflate scope beyond the spec without founder approval.
 
 <!-- SPECKIT START -->
-## Active Spec Kit feature
-`specs/003-project-wizard/` — Project Lifecycle Wizard (Stage 3 of the Project reframe):
-a guided "Start a project" front door walking brief → AI proposal → project → invoice in
-three resumable, guided-but-skippable stages. Pure **orchestration layer** over feature 002
-+ existing Proposal/invoice surfaces — **no new tables/migrations**; lifecycle stage is
-**derived** from real data (proposal status, project+gig, invoice status). Plan stops for
-review before tasks/implement.
-Plan: `specs/003-project-wizard/plan.md` · Spec: `specs/003-project-wizard/spec.md`
-(Prior: `specs/002-project-hub/` — the projects DB hub, shipped & applied.)
+## Project reframe — spec stack (all planned; implementation next, in order)
+- `specs/002-project-hub/` — projects DB hub. ✅ **SHIPPED** (code + migrations applied).
+- `specs/003-project-wizard/` — Project Lifecycle Wizard: guided "Start a project" (brief →
+  AI proposal → project → invoice), 3 resumable stages. Pure **orchestration**, **no migrations**;
+  lifecycle stage **derived**. spec+plan+tasks done → **implement first** (the MVP).
+- `specs/004-project-workspace/` — tabbed project workspace: Files (Document Vault scoped),
+  Deliverables (curated view), Tasks/milestones (money deferred), and real GitHub-first OAuth
+  integrations as a **security-gated** final phase (secrets server-only, never exported).
+  spec+plan+tasks done → implement after 003.
+Active (`.specify/feature.json`): **003**.
 <!-- SPECKIT END -->
