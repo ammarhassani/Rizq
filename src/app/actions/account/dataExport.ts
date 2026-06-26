@@ -141,6 +141,22 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
         .order("created_at", { ascending: false })
     );
 
+    // ── 7d. Project tasks & milestones (feature 004) ──
+    const projectTasks = await safeFetch(() =>
+      supabase
+        .from("project_tasks")
+        .select("id, project_id, milestone_id, title, status, due_date, sort_order, created_at, updated_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+    );
+    const projectMilestones = await safeFetch(() =>
+      supabase
+        .from("project_milestones")
+        .select("id, project_id, name, target_date, sort_order, created_at, updated_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+    );
+
     // ── 8. Invoices ──
     const invoices = await safeFetch(() =>
       supabase
@@ -224,6 +240,8 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
       gigs,
       projects,
       project_integrations: projectIntegrations,
+      project_tasks: projectTasks,
+      project_milestones: projectMilestones,
       income_projections: incomeProjections,
       invoices,
       documents,

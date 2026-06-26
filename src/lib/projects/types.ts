@@ -35,6 +35,9 @@ export type ProjectDocKind = (typeof PROJECT_DOC_KINDS_T)[number];
 export const DELIVERABLE_STATES = ["draft", "ready", "sent"] as const;
 export type DeliverableState = (typeof DELIVERABLE_STATES)[number];
 
+export const TASK_STATUSES = ["todo", "doing", "done"] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+
 /** gig_status values that exist today (source for the backfill mapping). */
 export type GigStatus =
   | "pending"

@@ -20,6 +20,8 @@ import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { ProjectFilesClient } from "@/components/projects/ProjectFilesClient";
 import { DeliverablesTab } from "@/components/projects/DeliverablesTab";
 import { getProjectDeliverables } from "@/app/actions/projects/deliverables";
+import { TasksTab } from "@/components/projects/TasksTab";
+import { getProjectTasks } from "@/app/actions/projects/tasks";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
@@ -39,8 +41,14 @@ export default async function ProjectDetailPage({
 }) {
   const { locale, id } = await params;
   const { tab: tabParam } = await searchParams;
-  const tab: "overview" | "files" | "deliverables" =
-    tabParam === "files" ? "files" : tabParam === "deliverables" ? "deliverables" : "overview";
+  const tab: "overview" | "files" | "deliverables" | "tasks" =
+    tabParam === "files"
+      ? "files"
+      : tabParam === "deliverables"
+        ? "deliverables"
+        : tabParam === "tasks"
+          ? "tasks"
+          : "overview";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -94,6 +102,10 @@ export default async function ProjectDetailPage({
   const deliverablesResult = tab === "deliverables" ? await getProjectDeliverables(id) : null;
   const deliverables = deliverablesResult?.ok ? deliverablesResult.items : [];
 
+  // Tasks tab data (only when active).
+  const tasksResult = tab === "tasks" ? await getProjectTasks(id) : null;
+  const tasksBundle = tasksResult?.ok ? tasksResult.bundle : { tasks: [], milestones: [] };
+
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
       <div dir={dir}>
@@ -116,7 +128,7 @@ export default async function ProjectDetailPage({
           locale={locale as "ar" | "en"}
           projectId={id}
           current={tab}
-          tabs={["overview", "files", "deliverables"]}
+          tabs={["overview", "files", "deliverables", "tasks"]}
         />
 
         {tab === "files" && (
@@ -125,6 +137,15 @@ export default async function ProjectDetailPage({
 
         {tab === "deliverables" && (
           <DeliverablesTab locale={locale as "ar" | "en"} items={deliverables} />
+        )}
+
+        {tab === "tasks" && (
+          <TasksTab
+            locale={locale as "ar" | "en"}
+            projectId={id}
+            tasks={tasksBundle.tasks}
+            milestones={tasksBundle.milestones}
+          />
         )}
 
         {tab === "overview" && (

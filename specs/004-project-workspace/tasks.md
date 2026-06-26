@@ -48,13 +48,13 @@ description: "Task list for Project Workspace (Stage 4)"
 
 ## Phase 4: US3 — Tasks & milestones (P2)
 
-- [ ] T014 Migration `..._project_tasks_milestones.sql`: `task_status` enum; `project_milestones` + `project_tasks` tables (owner RLS, updated_at trigger, indexes). **No money columns** (deferred).
-- [ ] T015 [P] Pure `src/lib/projects/taskStatus.ts` + `taskStatus.test.ts`.
-- [ ] T016 [US3] Task actions: `createTask`, `updateTask` (status via rule), `reorderTasks`, `deleteTask` (owner-scoped, no quota).
-- [ ] T017 [P] [US3] Milestone actions: `createMilestone`, `assignTaskToMilestone`.
-- [ ] T018 [US3] `TasksTab.tsx`: task list with status + reorder; optional milestone grouping (target date + completion); empty/error states.
-- [ ] T019 [US3] Extend data export with `project_tasks` + `project_milestones` sections; confirm account-delete cascade.
-- [ ] T020 [US3] Apply migration, advisors clean; quickstart V8–V10.
+- [X] T014 Migration `..._project_tasks_milestones.sql`: `task_status` enum; `project_milestones` + `project_tasks` tables (owner RLS, updated_at trigger, indexes). **No money columns** (deferred).
+- [X] T015 [P] Pure `src/lib/projects/taskStatus.ts` + `taskStatus.test.ts`.
+- [X] T016 [US3] Task actions: `createTask`, `updateTask` (status via rule), `reorderTasks`, `deleteTask` (owner-scoped, no quota).
+- [X] T017 [P] [US3] Milestone actions: `createMilestone`, `assignTaskToMilestone`.
+- [X] T018 [US3] `TasksTab.tsx`: task list with status + reorder; optional milestone grouping (target date + completion); empty/error states.
+- [X] T019 [US3] Extend data export with `project_tasks` + `project_milestones` sections; confirm account-delete cascade.
+- [X] T020 [US3] Apply migration, advisors clean; quickstart V8–V10.
 
 **Checkpoint**: PMO tasks/milestones live; money-free, schema-ready.
 

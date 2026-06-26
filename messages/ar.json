@@ -1197,7 +1197,19 @@
     "markSent": "اجعله مُرسَلاً",
     "openLink": "فتح الرابط",
     "deliverableFile": "ملف",
-    "deliverableLink": "رابط"
+    "deliverableLink": "رابط",
+    "tabTasks": "المهام",
+    "tasksEmpty": "لا توجد مهام بعد. أضِف أول جزء من العمل.",
+    "addTask": "أضِف مهمة",
+    "taskPlaceholder": "مثال: مخططات أولية، مسودة أولى، تعديلات",
+    "statusTodo": "للتنفيذ",
+    "statusDoing": "قيد التنفيذ",
+    "statusDone": "مُنجَز",
+    "deleteTask": "حذف",
+    "addMilestone": "أضِف مرحلة",
+    "milestonePlaceholder": "مثال: المرحلة الأولى",
+    "ungrouped": "المهام",
+    "milestoneProgress": "{done}/{total} مُنجَز"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",

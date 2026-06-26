@@ -1197,7 +1197,19 @@
     "markSent": "Mark sent",
     "openLink": "Open link",
     "deliverableFile": "File",
-    "deliverableLink": "Link"
+    "deliverableLink": "Link",
+    "tabTasks": "Tasks",
+    "tasksEmpty": "No tasks yet. Add the first piece of work.",
+    "addTask": "Add task",
+    "taskPlaceholder": "e.g. Wireframes, first draft, revisions",
+    "statusTodo": "To do",
+    "statusDoing": "Doing",
+    "statusDone": "Done",
+    "deleteTask": "Delete",
+    "addMilestone": "Add milestone",
+    "milestonePlaceholder": "e.g. Phase 1",
+    "ungrouped": "Tasks",
+    "milestoneProgress": "{done}/{total} done"
   },
   "Wizard": {
     "startProject": "Start a project",
