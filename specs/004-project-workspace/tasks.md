@@ -36,11 +36,11 @@ description: "Task list for Project Workspace (Stage 4)"
 
 ## Phase 3: US2 — Deliverables (P2)
 
-- [ ] T009 Migration `..._project_integration_handover.sql` (or fold into T003's file): add `project_integrations.handover_state`.
-- [ ] T010 [P] Pure `src/lib/projects/deliverableState.ts` + `deliverableState.test.ts`: `draft→ready→sent` forward-only, `sent` terminal, illegal jumps rejected.
-- [ ] T011 [US2] Deliverables view loader (union of deliverable docs + project integration links per project) — read-only.
-- [ ] T012 [US2] `setDeliverableState.ts` action (validates via the pure rule; writes handover_state on the right underlying row; `invalid_transition`).
-- [ ] T013 [US2] `DeliverablesTab.tsx`: unified list + per-item state control; deleting underlying file/link removes the entry; quickstart V5–V7.
+- [X] T009 Migration `..._project_integration_handover.sql` (or fold into T003's file): add `project_integrations.handover_state`.
+- [X] T010 [P] Pure `src/lib/projects/deliverableState.ts` + `deliverableState.test.ts`: `draft→ready→sent` forward-only, `sent` terminal, illegal jumps rejected.
+- [X] T011 [US2] Deliverables view loader (union of deliverable docs + project integration links per project) — read-only.
+- [X] T012 [US2] `setDeliverableState.ts` action (validates via the pure rule; writes handover_state on the right underlying row; `invalid_transition`).
+- [X] T013 [US2] `DeliverablesTab.tsx`: unified list + per-item state control; deleting underlying file/link removes the entry; quickstart V5–V7.
 
 **Checkpoint**: "What I'm handing over" in one place with states.
 

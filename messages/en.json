@@ -1187,7 +1187,17 @@
     "fileRequired": "Pick a file and enter a title.",
     "openFile": "Open",
     "markAsInput": "Mark as input",
-    "markAsDeliverable": "Mark as deliverable"
+    "markAsDeliverable": "Mark as deliverable",
+    "tabDeliverables": "Deliverables",
+    "deliverablesEmpty": "Nothing to hand over yet. Tag a file as a deliverable or attach a link.",
+    "stateDraft": "Draft",
+    "stateReady": "Ready",
+    "stateSent": "Sent",
+    "markReady": "Mark ready",
+    "markSent": "Mark sent",
+    "openLink": "Open link",
+    "deliverableFile": "File",
+    "deliverableLink": "Link"
   },
   "Wizard": {
     "startProject": "Start a project",

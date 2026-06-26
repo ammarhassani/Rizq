@@ -1187,7 +1187,17 @@
     "fileRequired": "اختر ملفاً وأدخل عنواناً.",
     "openFile": "فتح",
     "markAsInput": "اجعله مدخلاً",
-    "markAsDeliverable": "اجعله تسليماً"
+    "markAsDeliverable": "اجعله تسليماً",
+    "tabDeliverables": "التسليمات",
+    "deliverablesEmpty": "لا يوجد ما يُسلَّم بعد. اجعل ملفاً تسليماً أو أرفق رابطاً.",
+    "stateDraft": "مسودة",
+    "stateReady": "جاهز",
+    "stateSent": "مُرسَل",
+    "markReady": "اجعله جاهزاً",
+    "markSent": "اجعله مُرسَلاً",
+    "openLink": "فتح الرابط",
+    "deliverableFile": "ملف",
+    "deliverableLink": "رابط"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",

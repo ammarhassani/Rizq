@@ -8,11 +8,12 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
-export type ProjectTabKey = "overview" | "files";
+export type ProjectTabKey = "overview" | "files" | "deliverables";
 
 const TAB_LABEL: Record<ProjectTabKey, string> = {
   overview: "tabOverview",
   files: "tabFiles",
+  deliverables: "tabDeliverables",
 };
 
 export function ProjectTabs({

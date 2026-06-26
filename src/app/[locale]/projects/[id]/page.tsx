@@ -18,6 +18,8 @@ import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { ProjectFilesClient } from "@/components/projects/ProjectFilesClient";
+import { DeliverablesTab } from "@/components/projects/DeliverablesTab";
+import { getProjectDeliverables } from "@/app/actions/projects/deliverables";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
@@ -37,7 +39,8 @@ export default async function ProjectDetailPage({
 }) {
   const { locale, id } = await params;
   const { tab: tabParam } = await searchParams;
-  const tab: "overview" | "files" = tabParam === "files" ? "files" : "overview";
+  const tab: "overview" | "files" | "deliverables" =
+    tabParam === "files" ? "files" : tabParam === "deliverables" ? "deliverables" : "overview";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -87,6 +90,10 @@ export default async function ProjectDetailPage({
     }));
   }
 
+  // Deliverables tab data (only when active).
+  const deliverablesResult = tab === "deliverables" ? await getProjectDeliverables(id) : null;
+  const deliverables = deliverablesResult?.ok ? deliverablesResult.items : [];
+
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
       <div dir={dir}>
@@ -105,10 +112,19 @@ export default async function ProjectDetailPage({
         </h1>
 
         {/* Tabs */}
-        <ProjectTabs locale={locale as "ar" | "en"} projectId={id} current={tab} tabs={["overview", "files"]} />
+        <ProjectTabs
+          locale={locale as "ar" | "en"}
+          projectId={id}
+          current={tab}
+          tabs={["overview", "files", "deliverables"]}
+        />
 
         {tab === "files" && (
           <ProjectFilesClient locale={locale as "ar" | "en"} projectId={id} docs={files} />
+        )}
+
+        {tab === "deliverables" && (
+          <DeliverablesTab locale={locale as "ar" | "en"} items={deliverables} />
         )}
 
         {tab === "overview" && (
