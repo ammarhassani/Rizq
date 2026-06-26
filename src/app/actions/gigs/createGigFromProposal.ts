@@ -10,6 +10,9 @@ import { revalidatePath } from "next/cache";
 
 const InputSchema = z.object({
   proposal_id: z.string().uuid(),
+  // Optional parent project (feature 002). When present, the gig becomes the
+  // money child of that project. Omitted by the legacy direct-create path.
+  project_id: z.string().uuid().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -47,7 +50,7 @@ export async function createGigFromProposal(
 ): Promise<CreateGigFromProposalResult> {
   const parsed = InputSchema.safeParse(rawInput);
   if (!parsed.success) return { ok: false, code: "invalid" };
-  const { proposal_id } = parsed.data;
+  const { proposal_id, project_id } = parsed.data;
 
   const supabase = await createClient();
 
@@ -104,6 +107,7 @@ export async function createGigFromProposal(
       status: "pending",
       delivery_date: null,
       payment_method: "bank_transfer",
+      ...(project_id ? { project_id } : {}),
     })
     .select("id")
     .single();
