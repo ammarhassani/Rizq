@@ -16,6 +16,8 @@ import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
 import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
+import { ProjectTabs } from "@/components/projects/ProjectTabs";
+import { ProjectFilesClient } from "@/components/projects/ProjectFilesClient";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
@@ -26,8 +28,16 @@ export async function generateMetadata() {
   return { title: "مشروع · رِزق" };
 }
 
-export default async function ProjectDetailPage({ params }: { params: Promise<Params> }) {
+export default async function ProjectDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<Params>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { locale, id } = await params;
+  const { tab: tabParam } = await searchParams;
+  const tab: "overview" | "files" = tabParam === "files" ? "files" : "overview";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -58,6 +68,25 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
   });
   const latestInvoiceId = (invoices?.[0]?.id as string | undefined) ?? null;
 
+  // Files tab data (only when active).
+  type ProjectFile = { id: string; title: string; file_name: string; kind: "input" | "deliverable" };
+  let files: ProjectFile[] = [];
+  if (tab === "files") {
+    const { data: docs } = await supabase
+      .from("documents")
+      .select("id, title_ar, file_name, project_doc_kind")
+      .eq("project_id", id)
+      .eq("user_id", userData.user.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+    files = (docs ?? []).map((d) => ({
+      id: d.id as string,
+      title: (d.title_ar as string) ?? (d.file_name as string),
+      file_name: (d.file_name as string) ?? "",
+      kind: (d.project_doc_kind as "input" | "deliverable") ?? "input",
+    }));
+  }
+
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
       <div dir={dir}>
@@ -71,10 +100,19 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
         </Link>
 
         {/* Title */}
-        <h1 className={`text-2xl font-bold text-rizq-ink leading-snug mb-6 ${font}`}>
+        <h1 className={`text-2xl font-bold text-rizq-ink leading-snug mb-4 ${font}`}>
           {project.title}
         </h1>
 
+        {/* Tabs */}
+        <ProjectTabs locale={locale as "ar" | "en"} projectId={id} current={tab} tabs={["overview", "files"]} />
+
+        {tab === "files" && (
+          <ProjectFilesClient locale={locale as "ar" | "en"} projectId={id} docs={files} />
+        )}
+
+        {tab === "overview" && (
+        <>
         {/* Lifecycle progress (derived) */}
         <LifecycleStepper
           lifecycle={lifecycle}
@@ -149,6 +187,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
         <div className="mt-8 pt-6 border-t border-rizq-gold/20">
           <ProjectDeleteControl locale={locale as "ar" | "en"} projectId={id} />
         </div>
+        </>
+        )}
       </div>
     </AppShell>
   );

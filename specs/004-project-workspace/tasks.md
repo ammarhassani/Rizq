@@ -16,19 +16,19 @@ description: "Task list for Project Workspace (Stage 4)"
 
 ## Phase 1: Setup & shell
 
-- [ ] T001 Add the tab shell `src/components/projects/tabs/ProjectTabs.tsx` (URL-addressable `?tab=`, Overview default, mobile segmented control, RTL) and mount it in `src/app/[locale]/projects/[id]/page.tsx`, moving today's content under the Overview tab.
-- [ ] T002 [P] Add `Workspace.*` i18n keys (AR primary + EN) to `messages/ar.json` + `messages/en.json`: tab labels (Overview/Files/Deliverables/Tasks/Integrations), file input/deliverable groups + upload, deliverable states (draft/ready/sent), task statuses + milestone copy, integrations connect/disconnect/coming-soon, empty/error states.
+- [X] T001 Tab shell `src/components/projects/ProjectTabs.tsx` (URL-addressable `?tab=`, Overview default, RTL) mounted on the project page; Overview holds the existing content. SCOPE NOTE: tab set is currently **Overview + Files**; Deliverables/Tasks (and an Integrations tab) are added in their phases (additive).
+- [X] T002 [P] i18n keys (AR primary + EN) for the **Files phase** (tab labels Overview/Files, input/deliverable groups, upload, kind toggle, open, empty/error) added to the `Projects` namespace. Deliverable-state / task / OAuth-integration copy is added in those later phases.
 
 ---
 
 ## Phase 2: US1 — Files (P1, foundation) 🎯
 
-- [ ] T003 Write migration `..._project_documents.sql`: enums `project_doc_kind`, `deliverable_state`; add `documents.project_id` (set null), `project_doc_kind`, `handover_state`; index `idx_documents_project`. Additive/idempotent. (Reuses existing documents RLS/quota/soft-delete.)
-- [ ] T004 [P] Pure rule `src/lib/projects/docKind.ts` + `docKind.test.ts`: a doc has exactly one kind; input↔deliverable toggle; leaving deliverable clears handover_state (rule only).
-- [ ] T005 [US1] `src/app/actions/projects/documents/attachDocumentToProject.ts` + `setDocumentKind.ts` (owner-scoped; pass-through to existing upload for new files).
-- [ ] T006 [US1] `FilesTab.tsx` reusing the Document Vault upload/list, grouped input vs deliverable, with kind toggle; empty/error states; RTL.
-- [ ] T007 [US1] Extend `src/app/actions/account/dataExport.ts` document select to include `project_id`, `project_doc_kind`.
-- [ ] T008 [US1] Apply migration (MCP), `get_advisors` clean; quickstart V1–V4.
+- [X] T003 Write migration `..._project_documents.sql`: enums `project_doc_kind`, `deliverable_state`; add `documents.project_id` (set null), `project_doc_kind`, `handover_state`; index `idx_documents_project`. Additive/idempotent. (Reuses existing documents RLS/quota/soft-delete.)
+- [X] T004 [P] Pure rule `src/lib/projects/docKind.ts` + `docKind.test.ts`: a doc has exactly one kind; input↔deliverable toggle; leaving deliverable clears handover_state (rule only).
+- [X] T005 [US1] `src/app/actions/projects/documents/attachDocumentToProject.ts` + `setDocumentKind.ts` (owner-scoped; pass-through to existing upload for new files).
+- [X] T006 [US1] `FilesTab.tsx` reusing the Document Vault upload/list, grouped input vs deliverable, with kind toggle; empty/error states; RTL.
+- [X] T007 [US1] Extend `src/app/actions/account/dataExport.ts` document select to include `project_id`, `project_doc_kind`.
+- [X] T008 [US1] Apply migration (MCP), `get_advisors` clean; quickstart V1–V4.
 
 **Checkpoint**: Files tab usable; standalone Vault unaffected.
 

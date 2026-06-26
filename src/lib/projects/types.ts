@@ -28,6 +28,13 @@ export type ProjectIntegrationProvider = (typeof PROJECT_INTEGRATION_PROVIDERS)[
 export const PROJECT_INTEGRATION_STATUSES = ["linked", "disconnected", "error"] as const;
 export type ProjectIntegrationStatus = (typeof PROJECT_INTEGRATION_STATUSES)[number];
 
+// ── Project Workspace (spec 004) ──
+export const PROJECT_DOC_KINDS_T = ["input", "deliverable"] as const;
+export type ProjectDocKind = (typeof PROJECT_DOC_KINDS_T)[number];
+
+export const DELIVERABLE_STATES = ["draft", "ready", "sent"] as const;
+export type DeliverableState = (typeof DELIVERABLE_STATES)[number];
+
 /** gig_status values that exist today (source for the backfill mapping). */
 export type GigStatus =
   | "pending"

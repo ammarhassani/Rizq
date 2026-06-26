@@ -157,7 +157,7 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
       supabase
         .from("documents")
         .select(
-          "id, client_id, title_ar, title_en, description_ar, file_name, file_size, file_type, category, category_auto, category_confidence, expiry_date, expiry_detected_by, reminder_days_before, tags, created_at, updated_at"
+          "id, client_id, project_id, project_doc_kind, handover_state, title_ar, title_en, description_ar, file_name, file_size, file_type, category, category_auto, category_confidence, expiry_date, expiry_detected_by, reminder_days_before, tags, created_at, updated_at"
         )
         .eq("user_id", uid)
         .is("deleted_at", null)

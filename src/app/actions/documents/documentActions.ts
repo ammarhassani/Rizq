@@ -15,6 +15,9 @@ const UploadSchema = z.object({
   tags: z.string().optional(),   // comma-separated
   expiry_date: z.string().optional(),
   client_id: z.string().uuid().optional(),
+  // Feature 004 — scope an upload to a project as an input or deliverable doc.
+  project_id: z.string().uuid().optional(),
+  project_doc_kind: z.enum(["input", "deliverable"]).optional(),
 });
 
 type UploadResult =
@@ -32,7 +35,7 @@ export async function uploadDocument(formData: FormData): Promise<UploadResult> 
 
   const parsed = UploadSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) return { ok: false, code: "error" };
-  const { title_ar, category, description, tags, expiry_date, client_id } = parsed.data;
+  const { title_ar, category, description, tags, expiry_date, client_id, project_id, project_doc_kind } = parsed.data;
 
   // Safe filename: strip non-ascii/special chars
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -67,6 +70,8 @@ export async function uploadDocument(formData: FormData): Promise<UploadResult> 
   if (description) insertPayload.description_ar = description;
   if (expiry_date) insertPayload.expiry_date = expiry_date;
   if (client_id) insertPayload.client_id = client_id;
+  if (project_id) insertPayload.project_id = project_id;
+  if (project_doc_kind) insertPayload.project_doc_kind = project_doc_kind;
 
   const { data: row, error: insertErr } = await supabase
     .from("documents")
@@ -86,6 +91,7 @@ export async function uploadDocument(formData: FormData): Promise<UploadResult> 
 
   revalidatePath("/ar/documents");
   revalidatePath("/en/documents");
+  if (project_id) revalidatePath("/[locale]/projects/[id]", "page");
   return { ok: true, id: (row as { id: string }).id };
 }
 
