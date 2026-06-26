@@ -141,6 +141,29 @@ next / **skipped**) with one "continue" CTA that reuses the existing conversion 
 dashboard surfaces in-progress lifecycles (incl. draft-only proposals) to resume. Billing
 directly (no proposal) shows ① as *skipped*, derived from the absence of an origin proposal.
 
+### Stage 4 — the Project Workspace (feature 004)
+
+The project page (`/projects/[id]`) is now a **tabbed workspace**: Overview · Files ·
+Deliverables · Tasks (· Integrations, gated). All additive; the money engine is untouched.
+
+- **Files** — the Document Vault (`documents`) scoped to a project via `documents.project_id`
+  + a `project_doc_kind` (`input` | `deliverable`). Reuses the vault's storage/RLS/quota
+  (free 10 / pro 50)/soft-delete; non-project documents are unchanged.
+- **Deliverables** — a *curated view* (no new store): deliverable-kind documents ∪ the
+  project's integration links, each carrying a `handover_state` (`draft → ready → sent`,
+  forward-only, `sent` terminal). `handover_state` lives on `documents` and `project_integrations`.
+- **Tasks & milestones** — `project_tasks` (status `todo|doing|done`, optional `milestone_id`,
+  `sort_order`) + `project_milestones` (name, target_date). Owner-scoped RLS. **Money-free**;
+  a milestone is schema-ready to carry its own amount/gig link later (not built).
+- **Integrations (real OAuth)** — *planned, security-gated (Phase 5)*. A future
+  `provider_connections` table will hold encrypted tokens with **no client grant at all**
+  (server-only via SECURITY DEFINER / service role), referenced by `project_integrations.connection_id`.
+  Secrets are **never** client-readable and **never** in the PDPL export. GitHub read-only first.
+  Does not begin until a written halal/PDPL/security review passes.
+
+All workspace data (documents+kind, tasks, milestones) is included in the PDPL export and the
+account-delete cascade; provider-connection secrets will be excluded from the export by design.
+
 #### FK map additions (Stage 2)
 
 ```

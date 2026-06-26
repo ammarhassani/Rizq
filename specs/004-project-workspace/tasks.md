@@ -73,8 +73,8 @@ description: "Task list for Project Workspace (Stage 4)"
 
 ## Phase 6: Polish
 
-- [ ] T027 [P] Update `docs/domain-model.md` with the workspace facets (files/deliverables/tasks/connections) + the provider-connections secret-isolation note.
-- [ ] T028 Merge gate: `pnpm typecheck` + `pnpm test` green (incl. T004/T010/T015 tests); `get_advisors` clean across all applied migrations.
+- [X] T027 [P] Update `docs/domain-model.md` with the workspace facets (files/deliverables/tasks/connections) + the provider-connections secret-isolation note.
+- [X] T028 Merge gate: `pnpm typecheck` + `pnpm test` green (incl. T004/T010/T015 tests); `get_advisors` clean across all applied migrations.
 
 ---
 
