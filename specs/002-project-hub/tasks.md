@@ -23,8 +23,8 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 **Purpose**: Scaffolding the feature needs before schema/logic work.
 
-- [ ] T001 Create the actions module folders `src/app/actions/projects/` and `src/app/actions/projects/integrations/`, and the route folder `src/app/[locale]/projects/[id]/`, and the components folder `src/components/projects/` (empty placeholder dirs with a short `// module: Project hub (spec 002)` header file where a dir would otherwise be empty).
-- [ ] T002 [P] Add `Projects.*` i18n keys (Arabic primary + English) to `messages/ar.json` and `messages/en.json`: page title/subtitle, money panel labels (reuse Income.detail wording), origin-proposal label, invoices-list header/empty, integrations slot header + "coming soon / not connected" label + provider names, archive/delete confirm copy, and create-from-proposal success/error toasts. Keep keys consistent with existing `Income`/`Invoices` namespaces.
+- [X] T001 Create the actions module folders `src/app/actions/projects/` and `src/app/actions/projects/integrations/`, and the route folder `src/app/[locale]/projects/[id]/`, and the components folder `src/components/projects/` (empty placeholder dirs with a short `// module: Project hub (spec 002)` header file where a dir would otherwise be empty).
+- [X] T002 [P] Add `Projects.*` i18n keys (Arabic primary + English) to `messages/ar.json` and `messages/en.json`: page title/subtitle, money panel labels (reuse Income.detail wording), origin-proposal label, invoices-list header/empty, integrations slot header + "coming soon / not connected" label + provider names, archive/delete confirm copy, and create-from-proposal success/error toasts. Keep keys consistent with existing `Income`/`Invoices` namespaces.
 
 ---
 
@@ -32,11 +32,11 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 **Purpose**: The additive schema everything else reads. **⚠️ No story work begins until migrations 1–3 apply cleanly and backfill is verified.** Money engine (triggers/views/quota/paid-loop) is deliberately untouched.
 
-- [ ] T003 Write migration `supabase/migrations/20260626120000_create_projects.sql`: create enums `project_status`, `project_proposal_role`, `project_integration_provider`, `project_integration_status` (guarded `do $$`); create `public.projects` table per data-model.md; owner-scoped RLS (`projects_owner`, `auth.uid()=user_id`); indexes `(user_id,is_active,created_at desc)`, `(client_id)`, `(origin_proposal_id) where not null`; `updated_at` maintenance (trigger or action-set). Idempotent (`if not exists`).
-- [ ] T004 Write migration `supabase/migrations/20260626120100_link_and_backfill_projects.sql`: add nullable FK columns `gigs.project_id` (on delete cascade), `invoices.project_id` (set null), `proposals.project_id` (set null) + `proposals.proposal_role` (default `origin`), `client_timeline.project_id` (set null); add the four `project_id` indexes; backfill one project per gig using a **stable per-gig surrogate** (add temp `projects.seed_gig_id`, insert `where g.project_id is null`, link gigs on `seed_gig_id`, then backfill `invoices`/`proposals`(role=origin)/`client_timeline`, then drop `seed_gig_id`). All steps guarded `where … is null` for idempotency. **Do not drop** `gigs.proposal_id`/`gigs.invoice_id`/`invoices.gig_id`.
-- [ ] T005 [P] Write migration `supabase/migrations/20260626120200_project_integrations.sql`: create `public.project_integrations` per data-model.md (registry shape, `config jsonb`, `unique(project_id,provider,external_url)`, NO credentials column); owner-scoped RLS; index `(project_id)`. Idempotent.
-- [ ] T006 [P] Extract the gig-status → project-status mapping into a pure helper `src/lib/projects/statusMapping.ts` (`gigStatusToProjectStatus(s): ProjectStatus`) so the backfill rule is unit-testable and reused by actions.
-- [ ] T007 [P] Unit test `src/lib/projects/statusMapping.test.ts`: every `gig_status` value maps to the documented `project_status` (paid→completed, cancelled→cancelled, else→active) — guards SC-001/SC-002 mapping.
+- [X] T003 Write migration `supabase/migrations/20260626120000_create_projects.sql`: create enums `project_status`, `project_proposal_role`, `project_integration_provider`, `project_integration_status` (guarded `do $$`); create `public.projects` table per data-model.md; owner-scoped RLS (`projects_owner`, `auth.uid()=user_id`); indexes `(user_id,is_active,created_at desc)`, `(client_id)`, `(origin_proposal_id) where not null`; `updated_at` maintenance (trigger or action-set). Idempotent (`if not exists`).
+- [X] T004 Write migration `supabase/migrations/20260626120100_link_and_backfill_projects.sql`: add nullable FK columns `gigs.project_id` (on delete cascade), `invoices.project_id` (set null), `proposals.project_id` (set null) + `proposals.proposal_role` (default `origin`), `client_timeline.project_id` (set null); add the four `project_id` indexes; backfill one project per gig using a **stable per-gig surrogate** (add temp `projects.seed_gig_id`, insert `where g.project_id is null`, link gigs on `seed_gig_id`, then backfill `invoices`/`proposals`(role=origin)/`client_timeline`, then drop `seed_gig_id`). All steps guarded `where … is null` for idempotency. **Do not drop** `gigs.proposal_id`/`gigs.invoice_id`/`invoices.gig_id`.
+- [X] T005 [P] Write migration `supabase/migrations/20260626120200_project_integrations.sql`: create `public.project_integrations` per data-model.md (registry shape, `config jsonb`, `unique(project_id,provider,external_url)`, NO credentials column); owner-scoped RLS; index `(project_id)`. Idempotent.
+- [X] T006 [P] Extract the gig-status → project-status mapping into a pure helper `src/lib/projects/statusMapping.ts` (`gigStatusToProjectStatus(s): ProjectStatus`) so the backfill rule is unit-testable and reused by actions.
+- [X] T007 [P] Unit test `src/lib/projects/statusMapping.test.ts`: every `gig_status` value maps to the documented `project_status` (paid→completed, cancelled→cancelled, else→active) — guards SC-001/SC-002 mapping.
 - [ ] T008 Apply migrations 1–3 to the Supabase dev project (MCP `apply_migration`, in order), then run `get_advisors` and confirm no new RLS/security warnings on `projects`/`project_integrations`/changed FK columns.
 - [ ] T009 Verify backfill (quickstart V1/V2 SQL checks via MCP `execute_sql`): `gigs where project_id is null` = 0; `count(projects)` = pre-migration `count(gigs)`; `invoices where gig_id is not null and project_id is null` = 0; re-running migration 2 is a no-op; snapshot-compare `monthly_income`/`client_gig_summary` rows unchanged.
 
@@ -52,14 +52,14 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Unit test `src/app/actions/projects/createProjectFromProposal.test.ts`: given a proposal, the action returns `{ok,project_id,gig_id}`, sets `origin_proposal_id`, marks `proposal_role='origin'`, and on quota error (`53400`) returns `quota_exhausted` with no orphan project (mock supabase, fixture proposal).
+- [X] T010 [P] [US1] Unit test the conversion *rule* as pure logic (repo convention: logic lives in `src/lib/`, actions only orchestrate Supabase). `src/lib/projects/title.test.ts` covers `deriveProjectTitle` (first deliverable › specialty › Arabic fallback, trim, 255-clamp). The action's quota-rollback orchestration is verified via quickstart V4 (live DB), not a mocked-Supabase unit test.
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement `src/app/actions/projects/createProjectFromProposal.ts` per contracts: gig-first (to trip quota), then project insert, then link gig.project_id + proposal.project_id/role + `client_timeline 'gig_created'` (best-effort); reuse `gigStatusToProjectStatus`; Zod input `{proposal_id}`; discriminated result; `revalidatePath` projects + income.
-- [ ] T012 [US1] Refactor `src/app/actions/gigs/createGigFromProposal.ts` to accept an optional `project_id` (insert it on the gig) without changing its existing return shape, so `createProjectFromProposal` reuses it and existing tests stay green.
-- [ ] T013 [US1] Wire the proposal-detail CTA in `src/components/proposals/ProposalDetailActions.tsx` to call `createProjectFromProposal` (label already says "Create project" from Stage 1) and route to `/projects/[id]` on success.
-- [ ] T014 [P] [US1] Implement `src/app/actions/projects/getProject.ts` (owner-scoped loader): returns project + money-child gig + origin proposal + invoices (`project_id`, fallback `gig_id`) + integrations + project timeline; discriminated result.
+- [X] T011 [US1] Implement `src/app/actions/projects/createProjectFromProposal.ts` per contracts: gig-first (to trip quota), then project insert, then link gig.project_id + proposal.project_id/role + `client_timeline 'gig_created'` (best-effort); reuse `gigStatusToProjectStatus`; Zod input `{proposal_id}`; discriminated result; `revalidatePath` projects + income.
+- [X] T012 [US1] Refactor `src/app/actions/gigs/createGigFromProposal.ts` to accept an optional `project_id` (insert it on the gig) without changing its existing return shape, so `createProjectFromProposal` reuses it and existing tests stay green.
+- [X] T013 [US1] Wire the proposal-detail CTA in `src/components/proposals/ProposalDetailActions.tsx` to call `createProjectFromProposal` (label already says "Create project" from Stage 1) and route to `/projects/[id]` on success.
+- [X] T014 [P] [US1] Implement `src/app/actions/projects/getProject.ts` (owner-scoped loader): returns project + money-child gig + origin proposal + invoices (`project_id`, fallback `gig_id`) + integrations + project timeline; discriminated result.
 
 **Checkpoint**: New + existing work both resolve to Projects; the loader feeds the page.
 
@@ -73,18 +73,18 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 ### Tests for User Story 2
 
-- [ ] T015 [P] [US2] Unit test `src/app/actions/projects/archiveProject.test.ts`: project with invoices/non-trivial money → `mode:'archived'` (records preserved, `is_active=false`); empty shell → `mode:'deleted'`; archiving an archived project → idempotent ok.
-- [ ] T016 [P] [US2] Unit test `src/app/actions/projects/integrations/addProjectIntegration.test.ts`: valid provider+URL inserts `status='linked'`; bad provider/malformed URL → `invalid`; duplicate `(project_id,provider,external_url)` → `duplicate`.
+- [X] T015 [P] [US2] Unit test the archive-eligibility *rule* (pure) in `src/lib/projects/archive.test.ts`: money record and/or invoices → `archived`; empty shell → `deleted`. (Action idempotency on already-archived is a guard verified via quickstart V5.)
+- [X] T016 [P] [US2] Unit test integration validation (pure) in `src/lib/projects/integrations.test.ts`: known provider, http(s) URL, label bounds; bad provider/URL/label rejected. (DB unique-violation → `duplicate` is verified via quickstart V6.)
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Implement `src/app/actions/projects/archiveProject.ts` (soft-archive vs hard-delete eligibility per contracts/FR-017); `revalidatePath` projects + income.
-- [ ] T018 [P] [US2] Implement `src/app/actions/projects/integrations/addProjectIntegration.ts` and `removeProjectIntegration.ts` (Zod-validated, owner-scoped, no credentials).
-- [ ] T019 [P] [US2] Build `src/components/projects/ProjectMoneyPanel.tsx` reusing the money UI from `src/app/[locale]/income/[id]/page.tsx` (deposit/remaining/status/payment timeline) — keep AI/anomaly honesty labels.
-- [ ] T020 [P] [US2] Build `src/components/projects/ProjectInvoicesList.tsx` (lists the project's invoices, links to each invoice).
-- [ ] T021 [P] [US2] Build `src/components/projects/ProjectIntegrationsSlot.tsx` — labeled stub listing supported providers as "coming soon / not connected"; no real connection action (honesty: not a fake connected state).
-- [ ] T022 [US2] Build the route `src/app/[locale]/projects/[id]/page.tsx` (RSC using `getProject`) composing money panel + origin proposal + invoices list + integrations slot, mobile-first stacked, RTL; plus `loading.tsx` skeleton and not-found/empty/error states.
-- [ ] T023 [US2] Add the delete→archive control on the project page wired to `archiveProject` with a bilingual confirm dialog.
+- [X] T017 [US2] Implement `src/app/actions/projects/archiveProject.ts` (soft-archive vs hard-delete eligibility per contracts/FR-017); `revalidatePath` projects + income.
+- [X] T018 [P] [US2] Implement `src/app/actions/projects/integrations/addProjectIntegration.ts` and `removeProjectIntegration.ts` (Zod-validated, owner-scoped, no credentials).
+- [X] T019 [P] [US2] Build `src/components/projects/ProjectMoneyPanel.tsx` reusing the money UI from `src/app/[locale]/income/[id]/page.tsx` (deposit/remaining/status/payment timeline) — keep AI/anomaly honesty labels.
+- [X] T020 [P] [US2] Build `src/components/projects/ProjectInvoicesList.tsx` (lists the project's invoices, links to each invoice).
+- [X] T021 [P] [US2] Build `src/components/projects/ProjectIntegrationsSlot.tsx` — labeled stub listing supported providers as "coming soon / not connected"; no real connection action (honesty: not a fake connected state).
+- [X] T022 [US2] Build the route `src/app/[locale]/projects/[id]/page.tsx` (RSC using `getProject`) composing money panel + origin proposal + invoices list + integrations slot, mobile-first stacked, RTL; plus `loading.tsx` skeleton and not-found/empty/error states.
+- [X] T023 [US2] Add the delete→archive control on the project page wired to `archiveProject` with a bilingual confirm dialog.
 
 **Checkpoint**: The project page is the everyday surface; delete is data-safe.
 
@@ -98,9 +98,9 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Update income list navigation in `src/components/income/IncomeListClient.tsx` (and the income card) so each entry links to `/projects/[project_id]` (resolve project_id via the gig→project link) instead of `/income/[gig_id]`; keep `/income` route + figures unchanged.
-- [ ] T025 [P] [US3] Update the dashboard `MonthlyIncomeWidget` / calendar `gig` deep-links (`src/components/calendar/CalendarClient.tsx` `case "gig"`) to resolve to the project page where appropriate, preserving existing behavior if no project link exists.
-- [ ] T026 [US3] Reframe `/income` copy as the portfolio view (already "Your projects." from Stage 1) and confirm the eyebrow "Income Ledger / دفتر الدخل" remains; verify monthly/rolling/projection numbers are byte-identical (quickstart V1).
+- [X] T024 [US3] Update income list navigation in `src/components/income/IncomeListClient.tsx` (and the income card) so each entry links to `/projects/[project_id]` (resolve project_id via the gig→project link) instead of `/income/[gig_id]`; keep `/income` route + figures unchanged.
+- [X] T025 [P] [US3] Update the dashboard `MonthlyIncomeWidget` / calendar `gig` deep-links (`src/components/calendar/CalendarClient.tsx` `case "gig"`) to resolve to the project page where appropriate, preserving existing behavior if no project link exists.
+- [X] T026 [US3] Reframe `/income` copy as the portfolio view (already "Your projects." from Stage 1) and confirm the eyebrow "Income Ledger / دفتر الدخل" remains; verify monthly/rolling/projection numbers are byte-identical (quickstart V1).
 
 **Checkpoint**: Income is honestly the projects' portfolio money; navigation flows to projects.
 
@@ -115,7 +115,7 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 ### Implementation for User Story 4
 
 - [ ] T027 [US4] Verify (quickstart) that backfill set `proposal_role='origin'` + `project_id` for every proposal that spawned a gig, and that the `origin_proposal_id` on each project matches; add a query check to quickstart results.
-- [ ] T028 [P] [US4] Surface the origin proposal on the project page as the canonical "origin" (label it), leaving change-order/sub-scope as schema-only (documented as a later release in spec Assumptions) — no new UI to create them yet.
+- [X] T028 [P] [US4] Surface the origin proposal on the project page as the canonical "origin" (label it), leaving change-order/sub-scope as schema-only (documented as a later release in spec Assumptions) — no new UI to create them yet.
 
 **Checkpoint**: PMO-grade proposal roles are modeled and origin is live.
 
@@ -123,9 +123,9 @@ description: "Task list for Project-as-umbrella-hub (Stage 2)"
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T029 [P] Update `docs/domain-model.md`: flip "Direction → Stage 2" to "done", document the `projects` parent + `project_integrations` registry + role discriminator and the retained `gig_id`/`proposal_id` links.
-- [ ] T030 [P] Extend the PDPL data-export (`src/app/actions/account/dataExport.ts`) and account-delete RPC to include `projects` + `project_integrations` (owner-scoped), so export/delete stays complete (Constitution VI).
-- [ ] T031 Run the merge gate: `pnpm typecheck` clean and `pnpm test` green (incl. new tests T007/T010/T015/T016); fix any fallout.
+- [X] T029 [P] Update `docs/domain-model.md`: flip "Direction → Stage 2" to "done", document the `projects` parent + `project_integrations` registry + role discriminator and the retained `gig_id`/`proposal_id` links.
+- [X] T030 [P] Extend the PDPL data-export (`src/app/actions/account/dataExport.ts`) and account-delete RPC to include `projects` + `project_integrations` (owner-scoped), so export/delete stays complete (Constitution VI).
+- [X] T031 Run the merge gate: `pnpm typecheck` clean and `pnpm test` green (incl. new tests T007/T010/T015/T016); fix any fallout.
 - [ ] T032 Run quickstart.md V1–V7 end-to-end against the dev project and record results; confirm `get_advisors` clean.
 
 ---

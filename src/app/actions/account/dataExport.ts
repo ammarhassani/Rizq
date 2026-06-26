@@ -121,6 +121,26 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
         .eq("user_id", uid)
     );
 
+    // ── 7b. Projects (feature 002 — the umbrella hub) ──
+    const projects = await safeFetch(() =>
+      supabase
+        .from("projects")
+        .select(
+          "id, client_id, origin_proposal_id, title, status, is_active, archived_at, created_at, updated_at"
+        )
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+    );
+
+    // ── 7c. Project integrations ──
+    const projectIntegrations = await safeFetch(() =>
+      supabase
+        .from("project_integrations")
+        .select("id, project_id, provider, external_url, display_label, status, config, created_at, updated_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+    );
+
     // ── 8. Invoices ──
     const invoices = await safeFetch(() =>
       supabase
@@ -202,6 +222,8 @@ export async function exportMyDataAction(): Promise<ExportMyDataResult> {
       clients,
       client_timeline: clientTimeline,
       gigs,
+      projects,
+      project_integrations: projectIntegrations,
       income_projections: incomeProjections,
       invoices,
       documents,

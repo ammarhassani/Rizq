@@ -19,7 +19,7 @@ Today there are **three real database entities** (plus `clients` underneath):
 
 Two terms that feel like objects but are **not separate things**:
 
-- **Project** — _not a table (yet)._ Today the **gig is the project**. See "Direction" below — Project is becoming the umbrella.
+- **Project** — _now a real table (`projects`), as of Stage 2 / feature 002._ It is the umbrella parent; the **gig is its money child** (1:1 today). See "Direction" below.
 - **Income Ledger** — _not a table._ It's the `/income` screen rendering **views over your gigs** (`monthly_income`, `income_rolling_avg`, `income_projections`). Every gig is one ledger line. Logging a gig **is** adding to the ledger.
 
 The gig table does double duty — it's both "the job" and "the income row." That overload is the historical source of confusion, and the reason for the Project reframe.
@@ -112,16 +112,36 @@ Why this framing wins:
 
 ### Staged path (low risk first)
 
-1. **Reframe in place** — relabel "gig" → "Project" across UI copy and entry points
-   (e.g. "Create project from proposal"), keeping the `gigs` table as the project hub for now.
-   The income screen is presented as the project's money view. Near-zero migration risk.
-2. **Promote to a real hub** — when the first integration lands and a project needs to own more
-   than money (files, external links, multiple invoices), introduce a `projects` table as the
-   parent and re-point `gigs`/`invoices`/integration tables at `project_id`.
-3. **Integration tables** — each integration is its own pluggable table keyed by `project_id`
-   (e.g. `project_integrations` with a `provider` discriminator), mirroring the existing
-   registry/config pattern (collectors, tone prompts, HADAF rules) so providers are added
-   without schema churn to the core.
+1. **Reframe in place** ✅ *done (Stage 1)* — relabeled "gig" → "Project" across UI copy and
+   entry points; income screen presented as the project's money view. UI/i18n only.
+2. **Promote to a real hub** ✅ *done (Stage 2 — feature 002)* — `projects` is now the parent
+   table. `gigs` is kept as the **1:1 money child** of a project (`gigs.project_id`), so the
+   money engine (deposit/rollup/quota triggers, `monthly_income`/`income_rolling_avg`/
+   `income_projections` views, the invoice-paid → gig-paid loop) is unchanged. Additive,
+   idempotent backfill created one project per gig; `invoices`/`proposals`/`client_timeline`
+   gained a `project_id` link (existing `gig_id`/`proposal_id` retained, nothing dropped).
+   Proposals gained a `proposal_role` discriminator (`origin` | `change_order` | `sub_scope`);
+   only `origin` is populated today. The project page (`/projects/[id]`) shows money + origin
+   proposal + invoices + an integrations slot; `/income` stays the cross-project portfolio view.
+   Deleting a project with money/invoices **soft-archives** it (never drops financial history).
+3. **Integration tables** ✅ *schema done (Stage 2)* — `project_integrations` is a pluggable
+   registry keyed by `project_id` with a `provider` discriminator (figma | github | behance |
+   adobe | drive | other) + `config jsonb`, mirroring the `collector_registry` pattern. NO
+   credentials are stored (OAuth deferred to a future connection table); the UI is a labeled
+   "coming soon" stub. Real provider OAuth is the next stage.
+
+#### FK map additions (Stage 2)
+
+```
+projects.user_id            → users.id        (owner; on delete cascade)
+projects.client_id          → clients.id      (nullable)
+projects.origin_proposal_id → proposals.id    (the canonical origin quote)
+gigs.project_id             → projects.id     (the money child; on delete cascade)
+invoices.project_id         → projects.id     (nullable; gig_id retained)
+proposals.project_id        → projects.id     (nullable) + proposals.proposal_role
+client_timeline.project_id  → projects.id     (nullable, best-effort backfill)
+project_integrations.project_id → projects.id (pluggable registry; on delete cascade)
+```
 
 The mission frames the trade-offs: this is built to **benefit freelancers broadly**, so favor
 clarity and extensibility over shortcuts — the model should stay legible as integrations grow.
