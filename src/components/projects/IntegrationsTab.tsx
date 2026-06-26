@@ -8,7 +8,8 @@
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Link2, Plus, ExternalLink, X, Unplug } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Loader2, Link2, Plus, ExternalLink, X, Unplug, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
@@ -53,10 +54,15 @@ export function IntegrationsTab({
   const [, start] = useTransition();
   const fieldCls = `rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
+  const integrationStatus = useSearchParams().get("integration");
+
   function connect() {
     setBusy("connect");
     start(async () => {
-      const r = await startProviderConnection({ provider: "github" });
+      const r = await startProviderConnection({
+        provider: "github",
+        return_to: `/${locale}/projects/${projectId}?tab=integrations`,
+      });
       setBusy(null);
       if (r.ok) window.location.href = r.url;
     });
@@ -91,6 +97,18 @@ export function IntegrationsTab({
 
   return (
     <div dir={dir} className={`space-y-6 ${font}`}>
+      {/* Connection result banner (from the OAuth callback redirect) */}
+      {integrationStatus === "connected" && (
+        <div className={`flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ${font}`}>
+          <CheckCircle2 size={16} /> {t("connectedBanner")}
+        </div>
+      )}
+      {(integrationStatus === "error" || integrationStatus === "not_configured") && (
+        <div role="alert" className={`rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 ${font}`}>
+          {t("connectErrorBanner")}
+        </div>
+      )}
+
       {/* Connect / connections */}
       <section>
         <h3 className={`text-sm font-semibold text-rizq-ink mb-3 ${font}`}>{t("connectionsTitle")}</h3>

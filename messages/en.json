@@ -1224,7 +1224,9 @@
     "linkLabelPlaceholder": "Label",
     "addLinkBtn": "Attach",
     "linkedResources": "Linked resources",
-    "removeLink": "Remove"
+    "removeLink": "Remove",
+    "connectedBanner": "GitHub connected.",
+    "connectErrorBanner": "Couldn't complete the connection. Please try again."
   },
   "Wizard": {
     "startProject": "Start a project",

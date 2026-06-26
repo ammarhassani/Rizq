@@ -18,7 +18,7 @@ export type StartConnectionResult =
   | { ok: false; code: "unauthorized" | "not_configured" | "unsupported" };
 
 export async function startProviderConnection(rawInput: unknown): Promise<StartConnectionResult> {
-  const parsed = z.object({ provider: z.string() }).safeParse(rawInput);
+  const parsed = z.object({ provider: z.string(), return_to: z.string().optional() }).safeParse(rawInput);
   if (!parsed.success) return { ok: false, code: "unsupported" };
   if (parsed.data.provider !== "github") return { ok: false, code: "unsupported" };
   if (!isGithubConfigured()) return { ok: false, code: "not_configured" };
@@ -29,13 +29,20 @@ export async function startProviderConnection(rawInput: unknown): Promise<StartC
 
   const state = crypto.randomUUID();
   const store = await cookies();
-  store.set("gh_oauth_state", state, {
+  const cookieOpts = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 600,
-  });
+  };
+  store.set("gh_oauth_state", state, cookieOpts);
+
+  // Remember where to send the user back (relative path only — no open redirect).
+  const ret = parsed.data.return_to;
+  if (ret && ret.startsWith("/") && !ret.startsWith("//")) {
+    store.set("gh_oauth_return", ret, cookieOpts);
+  }
 
   return { ok: true, url: githubAuthorizeUrl(state) };
 }

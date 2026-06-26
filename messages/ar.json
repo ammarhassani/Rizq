@@ -1224,7 +1224,9 @@
     "linkLabelPlaceholder": "التسمية",
     "addLinkBtn": "إرفاق",
     "linkedResources": "الموارد المرتبطة",
-    "removeLink": "إزالة"
+    "removeLink": "إزالة",
+    "connectedBanner": "تم ربط GitHub.",
+    "connectErrorBanner": "تعذّر إكمال الربط. حاول مرة أخرى."
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",
