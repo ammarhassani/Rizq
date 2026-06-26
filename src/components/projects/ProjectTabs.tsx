@@ -6,6 +6,7 @@
  * added as their facets ship. Mobile-friendly, RTL-aware.
  */
 import { useTranslations } from "next-intl";
+import { LayoutDashboard, FolderOpen, PackageCheck, ListChecks, Plug } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 export type ProjectTabKey = "overview" | "files" | "deliverables" | "tasks" | "integrations";
@@ -16,6 +17,14 @@ const TAB_LABEL: Record<ProjectTabKey, string> = {
   deliverables: "tabDeliverables",
   tasks: "tabTasks",
   integrations: "tabIntegrations",
+};
+
+const TAB_ICON: Record<ProjectTabKey, typeof LayoutDashboard> = {
+  overview: LayoutDashboard,
+  files: FolderOpen,
+  deliverables: PackageCheck,
+  tasks: ListChecks,
+  integrations: Plug,
 };
 
 export function ProjectTabs({
@@ -44,16 +53,18 @@ export function ProjectTabs({
           tab === "overview"
             ? (`/projects/${projectId}` as `/projects/${string}`)
             : (`/projects/${projectId}?tab=${tab}` as `/projects/${string}`);
+        const Icon = TAB_ICON[tab];
         return (
           <Link
             key={tab}
             href={href}
-            className={`whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            className={`inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
               active
                 ? "border-rizq-green text-rizq-green"
                 : "border-transparent text-rizq-ink-soft hover:text-rizq-ink"
             } ${font}`}
           >
+            <Icon size={15} strokeWidth={1.8} />
             {t(TAB_LABEL[tab])}
           </Link>
         );

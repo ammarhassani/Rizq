@@ -24,7 +24,6 @@ import { TasksTab } from "@/components/projects/TasksTab";
 import { getProjectTasks } from "@/app/actions/projects/tasks";
 import { IntegrationsTab } from "@/components/projects/IntegrationsTab";
 import { listProviderConnections } from "@/app/actions/projects/integrations/connect";
-import { isGithubConfigured } from "@/lib/integrations/github";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
 
@@ -105,9 +104,10 @@ export default async function ProjectDetailPage({
   const tasksResult = tab === "tasks" ? await getProjectTasks(id) : null;
   const tasksBundle = tasksResult?.ok ? tasksResult.bundle : { tasks: [], milestones: [] };
 
-  // Integrations tab data (only when active).
+  // Integrations tab data (only when active). The connection is account-level;
+  // here we just read its status to enable repo-attaching.
   const connections = tab === "integrations" ? await listProviderConnections() : [];
-  const githubConfigured = isGithubConfigured();
+  const githubConn = connections.find((c) => c.provider === "github" && c.status === "active") ?? null;
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
@@ -155,8 +155,8 @@ export default async function ProjectDetailPage({
           <IntegrationsTab
             locale={locale as "ar" | "en"}
             projectId={id}
-            githubConfigured={githubConfigured}
-            connections={connections}
+            githubConnected={!!githubConn}
+            githubLogin={githubConn?.external_login ?? null}
             links={integrations ?? []}
           />
         )}

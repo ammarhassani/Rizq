@@ -1226,7 +1226,12 @@
     "linkedResources": "الموارد المرتبطة",
     "removeLink": "إزالة",
     "connectedBanner": "تم ربط GitHub.",
-    "connectErrorBanner": "تعذّر إكمال الربط. حاول مرة أخرى."
+    "connectErrorBanner": "تعذّر إكمال الربط. حاول مرة أخرى.",
+    "browseRepos": "تصفّح مستودعاتي",
+    "connectInSettings": "اربط من الإعدادات",
+    "noRepos": "لا توجد مستودعات عامة.",
+    "attach": "إرفاق",
+    "attached": "مُرفَق"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",
@@ -2019,6 +2024,8 @@
     "eyebrow": "حسابك",
     "pageSubtitle": "إدارة حسابك والخصوصية وبياناتك.",
     "backToDashboard": "العودة للحساب",
+    "integrationsSectionTitle": "التكاملات",
+    "integrationsGithubBlurb": "اربط مرة واحدة لحسابك كله — ثم اربط المستودعات بأي مشروع.",
     "profileSectionTitle": "ملف المستخدم",
     "profileTierLabel": "الباقة",
     "profileMemberSinceLabel": "تاريخ الانضمام",

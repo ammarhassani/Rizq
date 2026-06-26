@@ -11,6 +11,9 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { SettingsClient } from "@/components/settings/SettingsClient";
+import { AccountIntegrations } from "@/components/settings/AccountIntegrations";
+import { listProviderConnections } from "@/app/actions/projects/integrations/connect";
+import { isGithubConfigured } from "@/lib/integrations/github";
 import { User, Crown, Calendar, ArrowLeft } from "lucide-react";
 
 type Params = { locale: string };
@@ -166,6 +169,12 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
           </div>
         </section>
 
+        {/* ── Integrations (account-level) ────────────────────────────── */}
+        <AccountIntegrations
+          locale={locale as "ar" | "en"}
+          githubConfigured={isGithubConfigured()}
+          connections={await listProviderConnections()}
+        />
 
         {/* ── PDPL: Privacy & data + Danger zone ─────────────────────── */}
         <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">

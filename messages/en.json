@@ -1226,7 +1226,12 @@
     "linkedResources": "Linked resources",
     "removeLink": "Remove",
     "connectedBanner": "GitHub connected.",
-    "connectErrorBanner": "Couldn't complete the connection. Please try again."
+    "connectErrorBanner": "Couldn't complete the connection. Please try again.",
+    "browseRepos": "Browse my repos",
+    "connectInSettings": "Connect in Settings",
+    "noRepos": "No public repositories found.",
+    "attach": "Attach",
+    "attached": "Attached"
   },
   "Wizard": {
     "startProject": "Start a project",
@@ -2019,6 +2024,8 @@
     "eyebrow": "Your account",
     "pageSubtitle": "Manage your account, privacy, and data.",
     "backToDashboard": "Back to account",
+    "integrationsSectionTitle": "Integrations",
+    "integrationsGithubBlurb": "Connect once for your whole account — then link repos to any project.",
     "profileSectionTitle": "Profile",
     "profileTierLabel": "Plan",
     "profileMemberSinceLabel": "Member since",
