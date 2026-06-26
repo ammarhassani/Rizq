@@ -57,10 +57,12 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
 
 <!-- SPECKIT START -->
 ## Active Spec Kit feature
-`specs/002-project-hub/` — Promote "Project" to a real database hub (Stage 2 of the
-Project reframe): `projects` parent table, `gigs` kept as 1:1 money child, origin
-proposal + role discriminator, invoices/timeline re-pointed to `project_id`, pluggable
-`project_integrations` registry (schema + stub UI, OAuth deferred), Income Ledger as
-portfolio view. Additive/non-destructive migrations; soft-archive on delete.
-Plan: `specs/002-project-hub/plan.md` · Spec: `specs/002-project-hub/spec.md`
+`specs/003-project-wizard/` — Project Lifecycle Wizard (Stage 3 of the Project reframe):
+a guided "Start a project" front door walking brief → AI proposal → project → invoice in
+three resumable, guided-but-skippable stages. Pure **orchestration layer** over feature 002
++ existing Proposal/invoice surfaces — **no new tables/migrations**; lifecycle stage is
+**derived** from real data (proposal status, project+gig, invoice status). Plan stops for
+review before tasks/implement.
+Plan: `specs/003-project-wizard/plan.md` · Spec: `specs/003-project-wizard/spec.md`
+(Prior: `specs/002-project-hub/` — the projects DB hub, shipped & applied.)
 <!-- SPECKIT END -->
