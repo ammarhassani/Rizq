@@ -17,6 +17,7 @@ import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
+import { GigStatusQuickEdit } from "@/components/income/GigStatusQuickEdit";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { ProjectFilesClient } from "@/components/projects/ProjectFilesClient";
 import { DeliverablesTab } from "@/components/projects/DeliverablesTab";
@@ -190,12 +191,21 @@ export default async function ProjectDetailPage({
         {/* Money (single-project view) */}
         <ProjectMoneyPanel gig={gig} locale={locale as "ar" | "en"} />
 
-        {/* Stage ② money details — deposit %, delivery, payment method */}
+        {/* Status control (mark paid / delivered / overdue …) */}
+        {gig && (
+          <div dir={dir} className="mb-6 flex items-center gap-3">
+            <span className={`text-xs text-rizq-ink-soft/70 ${font}`}>{isAr ? "الحالة" : "Status"}</span>
+            <GigStatusQuickEdit gigId={gig.id as string} current={gig.status as string} locale={locale as "ar" | "en"} />
+          </div>
+        )}
+
+        {/* Stage ② money details — amount, deposit %, delivery, payment method */}
         {gig && (
           <ProjectMoneyDetails
             locale={locale as "ar" | "en"}
             gigId={gig.id as string}
             initial={{
+              amount_sar: gig.amount_sar ?? null,
               deposit_pct: gig.deposit_pct ?? null,
               delivery_date: gig.delivery_date ?? null,
               payment_method: gig.payment_method ?? null,

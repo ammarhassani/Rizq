@@ -22,6 +22,7 @@ type Props = {
   locale: Locale;
   gigId: string;
   initial: {
+    amount_sar: number | null;
     deposit_pct: number | null;
     delivery_date: string | null;
     payment_method: string | null;
@@ -38,6 +39,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
   const dir = isAr ? "rtl" : "ltr";
   const font = isAr ? "font-arabic" : "font-sans";
 
+  const [amount, setAmount] = useState<number>(initial.amount_sar ?? 0);
   const [depositPct, setDepositPct] = useState<number>(initial.deposit_pct ?? 50);
   const [deliveryDate, setDeliveryDate] = useState<string>(initial.delivery_date ?? "");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
@@ -54,6 +56,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
       const result = await updateGig({
         id: gigId,
         patch: {
+          ...(amount > 0 ? { amount_sar: amount } : {}),
           deposit_pct: depositPct,
           delivery_date: deliveryDate || null,
           payment_method: paymentMethod,
@@ -74,7 +77,20 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
     <section dir={dir} className="mb-6">
       <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("moneyDetailsTitle")}</h2>
       <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 p-5 space-y-4 ${font}`}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="amount-sar" className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
+              {tForm("amountLabel")}
+            </label>
+            <input
+              id="amount-sar"
+              type="number"
+              min={1}
+              value={amount}
+              onChange={(e) => setAmount(Math.max(0, Number(e.target.value) || 0))}
+              className={`${fieldCls} tabular`}
+            />
+          </div>
           <div>
             <label htmlFor="deposit-pct" className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
               {t("depositPctLabel")}

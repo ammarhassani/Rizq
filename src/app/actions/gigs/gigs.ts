@@ -65,10 +65,29 @@ export async function createGig(input: unknown): Promise<GigActionResult> {
   const d = parsed.data;
   const today = new Date().toISOString().split("T")[0];
 
+  // Every gig is the money child of a Project (the umbrella). Create the parent
+  // project first, then the gig linked to it — so logged income always appears
+  // in /projects and has a workspace, never an orphan.
+  const { data: project, error: projectErr } = await supabase
+    .from("projects")
+    .insert({
+      user_id: userData.user.id,
+      title: d.title.trim(),
+      status: "active",
+      client_id: d.client_id ?? null,
+    })
+    .select("id")
+    .single();
+
+  if (projectErr || !project) {
+    return { ok: false, code: "error", message: projectErr?.message };
+  }
+
   const { data, error } = await supabase
     .from("gigs")
     .insert({
       user_id: userData.user.id,
+      project_id: project.id,
       title: d.title.trim(),
       amount_sar: d.amount_sar,
       client_id: d.client_id ?? null,
@@ -82,6 +101,8 @@ export async function createGig(input: unknown): Promise<GigActionResult> {
     .single();
 
   if (error) {
+    // Roll back the orphan project so quota stays the single source of truth.
+    await supabase.from("projects").delete().eq("id", project.id).eq("user_id", userData.user.id);
     if (error.code === "53400") return { ok: false, code: "quota_exhausted" };
     return { ok: false, code: "error", message: error.message };
   }
@@ -102,6 +123,7 @@ export async function createGig(input: unknown): Promise<GigActionResult> {
   }
 
   revalidatePath("/[locale]/income", "page");
+  revalidatePath("/[locale]/projects", "page");
   return { ok: true, id: data.id };
 }
 
@@ -198,6 +220,8 @@ export async function markGigStatus(input: unknown): Promise<SimpleActionResult>
 
   revalidatePath("/[locale]/income", "page");
   revalidatePath(`/[locale]/income/${id}`, "page");
+  revalidatePath("/[locale]/projects", "page");
+  revalidatePath("/[locale]/projects/[id]", "page");
   return { ok: true };
 }
 

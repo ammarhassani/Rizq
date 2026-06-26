@@ -101,6 +101,12 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
 
   if (gigErr || !gig) notFound();
 
+  // Canonicalize on the project workspace (UX audit Finding #3). Every gig has a
+  // parent project now, so this old gig-detail route just forwards there.
+  if (gig.project_id) {
+    redirect(`/${locale}/projects/${gig.project_id}`);
+  }
+
   // If the gig already has a linked invoice, fetch its number + status for the chip
   let linkedInvoice: LinkedInvoice | null = null;
   const gigInvoiceId = (gig.invoice_id as string | null) ?? null;
