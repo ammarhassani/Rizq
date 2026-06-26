@@ -20,7 +20,7 @@ export function QuickActionsWidget({ locale }: Props) {
       href: "/income/new" as const,
       icon: PlusCircle,
       labelAr: "سجّل مشروع",
-      labelEn: "Log Gig",
+      labelEn: "Log Project",
       color: "text-emerald-600",
     },
     {

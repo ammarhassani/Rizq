@@ -90,7 +90,7 @@ export function ClientCard({ client, locale, prioritySlot }: Props) {
           {prioritySlot}
           {client.total_gigs != null && client.total_gigs > 0 && (
             <span className={`text-xs text-rizq-ink-soft ${font}`}>
-              {client.total_gigs} {isAr ? "مشروع" : "gigs"}
+              {client.total_gigs} {isAr ? "مشروع" : "projects"}
             </span>
           )}
           {client.rating && (

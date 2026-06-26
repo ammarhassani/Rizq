@@ -47,7 +47,7 @@ export default async function IncomeNewPage({ params }: { params: Promise<Params
   }));
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "سجّل مشروع" : "Log a Gig"} maxWidth="form">
+    <AppShell locale={locale as "ar" | "en"} title={isAr ? "سجّل مشروع" : "Log a Project"} maxWidth="form">
       <div dir={isAr ? "rtl" : "ltr"}>
         <Link
           href="/income"

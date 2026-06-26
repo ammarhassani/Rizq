@@ -60,7 +60,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale }: Props)
             className={`inline-flex items-center gap-1 text-sm text-rizq-green hover:underline ${font}`}
           >
             <Plus className="h-3 w-3" />
-            {isAr ? "سجّل مشروع" : "Log a gig"}
+            {isAr ? "سجّل مشروع" : "Log a project"}
           </Link>
         </div>
       ) : (
