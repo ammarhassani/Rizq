@@ -1235,6 +1235,9 @@
   },
   "Wizard": {
     "startProject": "Start a project",
+    "guidedTitle": "Guided setup",
+    "guidedStepOf": "Step {current} of {total}",
+    "guidedDismiss": "Dismiss guide",
     "continueTitle": "Pick up where you left off",
     "continueEmpty": "No projects in progress.",
     "stageProposalTitle": "Price & propose",

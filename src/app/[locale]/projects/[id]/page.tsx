@@ -13,6 +13,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { getProject } from "@/app/actions/projects/getProject";
 import { resolveLifecycle } from "@/lib/projects/lifecycle";
 import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
+import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
@@ -111,6 +112,7 @@ export default async function ProjectDetailPage({
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
+      <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} />
       <div dir={dir}>
         {/* Back to portfolio */}
         <Link

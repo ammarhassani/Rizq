@@ -1235,6 +1235,9 @@
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",
+    "guidedTitle": "إعداد موجَّه",
+    "guidedStepOf": "الخطوة {current} من {total}",
+    "guidedDismiss": "إخفاء الدليل",
     "continueTitle": "أكمِل من حيث توقفت",
     "continueEmpty": "لا توجد مشاريع قيد التنفيذ.",
     "stageProposalTitle": "سعّر واعرض",

@@ -17,6 +17,7 @@ import { listTemplates } from "@/app/actions/proposals/templates";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalFlow } from "@/components/proposals/ProposalFlow";
 import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
+import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { resolveLifecycle } from "@/lib/projects/lifecycle";
 
 export const maxDuration = 60;
@@ -66,6 +67,7 @@ export default async function ProjectStartPage({ params }: { params: Promise<Par
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={t("startProject")} maxWidth="reading">
+      <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} />
       <div>
         <div className="mb-6">
           <h1 className={`display-2 text-rizq-ink ${font}`}>{t("startProject")}</h1>
