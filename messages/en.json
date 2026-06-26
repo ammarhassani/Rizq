@@ -202,7 +202,7 @@
     "s2Title": "2 · How the range is built",
     "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is a real market range, not a softened average.",
     "s3Title": "3 · Why median, not mean",
-    "s3Body": "A mean is pulled around by outliers: one luxury project or one underpriced gig distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
+    "s3Body": "A mean is pulled around by outliers: a single luxury or underpriced project distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
     "s4Title": "4 · Sample size and confidence",
     "s4Body": "Every result shows \"based on N Saudi freelancers\". N matters: 5 records is our floor. Under that we say \"insufficient data\" rather than guess. As N grows, the range narrows and confidence rises. We don't hide thin samples behind round numbers.",
     "s5Title": "5 · What we don't yet model",
@@ -551,7 +551,7 @@
     "incomeTitle": "Monthly Income",
     "incomeViewAll": "View all →",
     "incomeEmpty": "No income logged this month.",
-    "incomeEmptyCta": "Log a gig",
+    "incomeEmptyCta": "Log a project",
     "incomePaid": "Paid",
     "incomePending": "Pending",
     "incomeThisMonth": "SAR this month",
@@ -563,7 +563,7 @@
     "quickPricingQueryMore": "Query with more details",
     "quickActionsTitle": "Quick Actions",
     "quickActionNewProposal": "New Proposal",
-    "quickActionLogGig": "Log Gig",
+    "quickActionLogGig": "Log Project",
     "quickActionAddClient": "Add Client",
     "quickActionNewInvoice": "New Invoice"
   },
@@ -980,7 +980,7 @@
       "declineConfirm": "Confirm decline",
       "cancel": "Cancel",
       "saveAsTemplate": "Save as template",
-      "createGig": "Create gig from this proposal",
+      "createGig": "Create project from this proposal",
       "creatingGig": "Creating…",
       "edit": {
         "edit": "Edit / تعديل",
@@ -1061,7 +1061,7 @@
   "Income": {
     "list": {
       "eyebrow": "Income Ledger",
-      "title": "Your gigs.",
+      "title": "Your projects.",
       "subtitle": "Every project, every payment, every month in one place.",
       "summaryLine": "{total} SAR from {n} projects ({pending} pending payment)",
       "vsLastMonth": "vs last month",
@@ -1080,15 +1080,15 @@
       "sortAmount": "Amount",
       "sortStatus": "Status",
       "noResults": "No results.",
-      "logGig": "Log gig",
+      "logGig": "Log project",
       "markPaid": "Mark paid",
-      "emptyTitle": "No gigs logged yet.",
-      "emptyBody": "Log your first gig and start tracking your income.",
-      "emptyCta": "Log your first gig"
+      "emptyTitle": "No projects logged yet.",
+      "emptyBody": "Log your first project and start tracking your income.",
+      "emptyCta": "Log your first project"
     },
     "form": {
-      "addTitle": "Log a new gig",
-      "editTitle": "Edit gig",
+      "addTitle": "Log a new project",
+      "editTitle": "Edit project",
       "optional": "optional",
       "amountLabel": "Amount",
       "amountPlaceholder": "0",
@@ -1107,13 +1107,13 @@
       "paymentMethod_other": "Other",
       "notesLabel": "Payment notes",
       "notesPlaceholder": "Any payment-related details",
-      "save": "Save gig",
+      "save": "Save project",
       "saveChanges": "Save changes",
       "saving": "Saving…",
       "errors": {
         "titleRequired": "Project name is required.",
         "amountRequired": "Enter a valid amount greater than zero.",
-        "quotaExhausted": "Free limit reached (20 gigs/month). Upgrade to Pro.",
+        "quotaExhausted": "Free limit reached (20 projects/month). Upgrade to Pro.",
         "generic": "Something went wrong. Try again."
       }
     },
@@ -1131,8 +1131,8 @@
       "edit": "Edit",
       "markPaid": "Mark as paid",
       "markOverdue": "Mark overdue",
-      "delete": "Delete gig",
-      "deleteConfirm": "Permanently delete this gig? This cannot be undone.",
+      "delete": "Delete project",
+      "deleteConfirm": "Permanently delete this project? This cannot be undone.",
       "deleteConfirmBtn": "Confirm delete",
       "deleting": "Deleting…",
       "cancel": "Cancel"
@@ -1380,7 +1380,7 @@
       "whatsapp": "WhatsApp",
       "upgradeHint": "This is a Pro feature. Upgrade to use it.",
       "loading": "Processing…",
-      "personaNeeds3Gigs": "Generating a persona requires at least 3 gigs with this client."
+      "personaNeeds3Gigs": "Generating a persona requires at least 3 projects with this client."
     }
   },
   "Calendar": {
@@ -1415,13 +1415,13 @@
     "sourceFilters": {
       "all": "All",
       "proposal": "Proposals",
-      "gig": "Gigs",
+      "gig": "Projects",
       "invoice": "Invoices",
       "client": "Clients"
     },
     "eventTypes": {
       "proposal": "Proposal",
-      "gig": "Gig",
+      "gig": "Project",
       "invoice": "Invoice",
       "client": "Client follow-up"
     },
@@ -1541,7 +1541,7 @@
     "featureClientAiInsights": "Client AI insights",
     "featureClientAiInsightsFree": "Pro only",
     "featureClientAiInsightsPro": "Included",
-    "featureGigs": "Gigs",
+    "featureGigs": "Projects",
     "featureGigsFree": "20 / month",
     "featureGigsPro": "Unlimited",
     "featureIncomeForecast": "Income forecasting (AI)",
@@ -1578,7 +1578,7 @@
         "benefit1": "30 proposals/month instead of 2",
         "benefit2": "Clean PDF, no watermark",
         "benefit3": "Unlimited tone AI",
-        "benefit4": "Link proposals to clients and gigs"
+        "benefit4": "Link proposals to clients and projects"
       },
       "clients": {
         "headline": "You've reached your client limit",
@@ -1588,17 +1588,17 @@
         "benefit4": "Full sales-history tracking"
       },
       "gigs": {
-        "headline": "You've reached your monthly gig limit",
-        "benefit1": "Unlimited gigs per month",
+        "headline": "You've reached your monthly project limit",
+        "benefit1": "Unlimited projects per month",
         "benefit2": "Income forecasting (AI)",
         "benefit3": "CSV export of your income log",
-        "benefit4": "Per-gig payment status tracking"
+        "benefit4": "Per-project payment status tracking"
       },
       "invoices": {
         "headline": "You've reached your monthly invoice limit",
         "benefit1": "30 invoices/month instead of 3",
         "benefit2": "Professional PDF, no watermark",
-        "benefit3": "Link invoices to gigs and clients",
+        "benefit3": "Link invoices to projects and clients",
         "benefit4": "Automatic payment-status tracking"
       },
       "documents": {
@@ -1685,7 +1685,7 @@
       },
       "income": {
         "name": "Income Ledger",
-        "tagline": "Track your gigs and payments"
+        "tagline": "Track your projects and payments"
       },
       "invoices": {
         "name": "Invoices",
@@ -1758,7 +1758,7 @@
     "actions": {
       "newProposal": "New proposal",
       "newInvoice": "New invoice",
-      "newGig": "New gig",
+      "newGig": "New project",
       "newClient": "New client",
       "studioProfile": "Studio profile",
       "methodology": "Methodology"
@@ -1833,7 +1833,7 @@
       "heading": "Everything connected.",
       "caption": "Everything connected, no double entry. From proposal to dashboard, your data moves with you, step by step.",
       "node_proposal": "Proposal",
-      "node_gig": "Gig",
+      "node_gig": "Project",
       "node_invoice": "Invoice",
       "node_calendar": "Calendar",
       "node_dashboard": "Dashboard"
@@ -1926,7 +1926,7 @@
     "studioProfileTitle": "Studio profile",
     "studioProfileDescription": "The bio, portfolio, and testimonials that appear on your proposals.",
     "privacySectionTitle": "Privacy & data (PDPL)",
-    "exportDescription": "Download a copy of everything Rizq holds about you (proposals, clients, gigs, invoices, and documents) as a single JSON file.",
+    "exportDescription": "Download a copy of everything Rizq holds about you (proposals, clients, projects, invoices, and documents) as a single JSON file.",
     "exportButton": "Export my data",
     "exportLoading": "Exporting…",
     "exportErrorUnauthorized": "You must be signed in to export your data.",
@@ -1939,7 +1939,7 @@
     "dangerZoneDescription": "Account deletion is permanent and cannot be undone. All your data will be permanently erased.",
     "deleteButton": "Delete account",
     "deleteDialogTitle": "Confirm account deletion",
-    "deleteDialogBody": "This is permanent and cannot be undone. Everything will be deleted: proposals, clients, gigs, invoices, and documents. There is no recovery.",
+    "deleteDialogBody": "This is permanent and cannot be undone. Everything will be deleted: proposals, clients, projects, invoices, and documents. There is no recovery.",
     "deleteDialogInputLabel": "Type \"{phrase}\" to confirm",
     "deleteDialogConfirmBtn": "Permanently delete my account",
     "deleteDialogDeleting": "Deleting…",
