@@ -1164,7 +1164,12 @@
     "archivedToast": "Project archived. Its money and invoices were kept.",
     "deletedToast": "Project deleted.",
     "deleteError": "Could not delete the project. Try again.",
-    "notFound": "Project not found."
+    "notFound": "Project not found.",
+    "moneyDetailsTitle": "Money details",
+    "depositPctLabel": "Deposit %",
+    "saveMoneyDetails": "Save money details",
+    "savedMoneyDetails": "Saved",
+    "savingMoneyDetails": "Saving…"
   },
   "Wizard": {
     "startProject": "Start a project",

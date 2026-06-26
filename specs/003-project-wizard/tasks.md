@@ -41,7 +41,7 @@ description: "Task list for Project Lifecycle Wizard (Stage 3)"
 ## Phase 4: US2 — Proposal → set-up project (P1) 🎯 MVP
 
 - [X] T008 [US2] ①→② CTA "Set up the project" calls existing `createProjectFromProposal` (already quota-guarded + rolls back shell); route to `/projects/[id]`. Dedup: if a project already exists for the proposal, show stage ② done (no second project).
-- [ ] T009 [US2] Stage ② money details: pre-filled deposit %/delivery/payment form saving via the existing gig update action. **NOT DONE** — the project's gig is currently created with defaults (deposit 50%, no delivery date) and edited via the existing income edit form; a dedicated in-context money-details step on the project page is still to add.
+- [X] T009 [US2] Stage ② money details: pre-filled deposit %/delivery/payment form on the project page (`ProjectMoneyDetails`) saving via `updateGig` (added `deposit_pct` to its patch; the `gig_compute_before` trigger recomputes deposit/remaining). Reuses Income.form payment labels.
 
 **Checkpoint**: brief → proposal → live project (demoable MVP).
 

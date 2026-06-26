@@ -15,6 +15,7 @@ import { resolveLifecycle } from "@/lib/projects/lifecycle";
 import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
 import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
+import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
 import { ProjectInvoicesList } from "@/components/projects/ProjectInvoicesList";
 import { ProjectIntegrationsSlot } from "@/components/projects/ProjectIntegrationsSlot";
 import { ProjectDeleteControl } from "@/components/projects/ProjectDeleteControl";
@@ -91,6 +92,19 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
 
         {/* Money (single-project view) */}
         <ProjectMoneyPanel gig={gig} locale={locale as "ar" | "en"} />
+
+        {/* Stage ② money details — deposit %, delivery, payment method */}
+        {gig && (
+          <ProjectMoneyDetails
+            locale={locale as "ar" | "en"}
+            gigId={gig.id as string}
+            initial={{
+              deposit_pct: gig.deposit_pct ?? null,
+              delivery_date: gig.delivery_date ?? null,
+              payment_method: gig.payment_method ?? null,
+            }}
+          />
+        )}
 
         {/* Origin proposal */}
         {originProposal && (

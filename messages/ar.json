@@ -1164,7 +1164,12 @@
     "archivedToast": "تمت أرشفة المشروع. تم الاحتفاظ بأمواله وفواتيره.",
     "deletedToast": "تم حذف المشروع.",
     "deleteError": "تعذّر حذف المشروع. حاول مرة أخرى.",
-    "notFound": "المشروع غير موجود."
+    "notFound": "المشروع غير موجود.",
+    "moneyDetailsTitle": "تفاصيل المال",
+    "depositPctLabel": "نسبة الدفعة المقدمة ٪",
+    "saveMoneyDetails": "حفظ تفاصيل المال",
+    "savedMoneyDetails": "تم الحفظ",
+    "savingMoneyDetails": "جارٍ الحفظ…"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",

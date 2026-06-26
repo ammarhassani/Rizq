@@ -25,6 +25,7 @@ const UpdateGigSchema = z.object({
   patch: z.object({
     title: z.string().min(1).max(255).optional(),
     amount_sar: z.number().positive().optional(),
+    deposit_pct: z.number().int().min(0).max(100).optional(), // trigger recomputes deposit/remaining
     client_id: z.string().uuid().nullable().optional(),
     status: GigStatusEnum.optional(),
     delivery_date: z.string().nullable().optional(),
@@ -131,6 +132,7 @@ export async function updateGig(input: unknown): Promise<SimpleActionResult> {
 
   revalidatePath("/[locale]/income", "page");
   revalidatePath(`/[locale]/income/${id}`, "page");
+  revalidatePath("/[locale]/projects/[id]", "page"); // money child may be shown on its project
   return { ok: true };
 }
 
