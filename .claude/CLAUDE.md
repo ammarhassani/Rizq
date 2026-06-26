@@ -57,7 +57,10 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
 
 <!-- SPECKIT START -->
 ## Active Spec Kit feature
-`specs/001-proposal-studio-revision/` — Proposal Studio revision round (AI clarifying
-questions, conversational editor, share states, profile-save fix, and related polish).
-Plan: `specs/001-proposal-studio-revision/plan.md` · Spec: `specs/001-proposal-studio-revision/spec.md`
+`specs/002-project-hub/` — Promote "Project" to a real database hub (Stage 2 of the
+Project reframe): `projects` parent table, `gigs` kept as 1:1 money child, origin
+proposal + role discriminator, invoices/timeline re-pointed to `project_id`, pluggable
+`project_integrations` registry (schema + stub UI, OAuth deferred), Income Ledger as
+portfolio view. Additive/non-destructive migrations; soft-archive on delete.
+Plan: `specs/002-project-hub/plan.md` · Spec: `specs/002-project-hub/spec.md`
 <!-- SPECKIT END -->
