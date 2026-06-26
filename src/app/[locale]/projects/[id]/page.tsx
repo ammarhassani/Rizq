@@ -168,7 +168,8 @@ export default async function ProjectDetailPage({
           lifecycle={lifecycle}
           locale={locale as "ar" | "en"}
           targets={{
-            proposal: originProposal ? `/proposals/${originProposal.id}` : undefined,
+            // Skipped proposal (billed directly) → go write one; else open the origin quote.
+            proposal: originProposal ? `/proposals/${originProposal.id}` : `/proposals/new`,
             project: `/projects/${id}`,
             invoice: latestInvoiceId ? `/invoices/${latestInvoiceId}` : undefined,
           }}

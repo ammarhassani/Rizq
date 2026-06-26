@@ -19,11 +19,14 @@ const STAGE_TITLE_KEY: Record<LifecycleStageKey, string> = {
   invoice: "stageInvoiceTitle",
 };
 
-const STATE_BADGE: Record<LifecycleStageState, { key: string; cls: string; mark: string; breathe: boolean }> = {
-  done: { key: "stateDone", cls: "bg-emerald-100 text-emerald-700", mark: "✓", breathe: false },
-  current: { key: "stateCurrent", cls: "bg-[#C8A951]/30 text-amber-800 animate-breathe-amber", mark: "●", breathe: true },
-  next: { key: "stateNext", cls: "bg-[#C8A951]/15 text-amber-700/80 animate-breathe-amber", mark: "○", breathe: true },
-  skipped: { key: "stateSkipped", cls: "bg-rizq-ink/8 text-rizq-ink-soft", mark: "⤼", breathe: false },
+// "current" (in progress) is rendered distinctly — a solid amber dot with a
+// live pulsing halo (animate-ping) — so it reads as the active step, not just a
+// darker shade of "next". "next" softly breathes amber; done/skipped are calm.
+const STATE_BADGE: Record<LifecycleStageState, { key: string; cls: string; mark: string }> = {
+  done: { key: "stateDone", cls: "bg-emerald-100 text-emerald-700", mark: "✓" },
+  current: { key: "stateCurrent", cls: "", mark: "" },
+  next: { key: "stateNext", cls: "bg-[#C8A951]/15 text-amber-700/80 animate-breathe-amber", mark: "○" },
+  skipped: { key: "stateSkipped", cls: "bg-rizq-ink/8 text-rizq-ink-soft", mark: "⤼" },
 };
 
 export async function LifecycleStepper({
@@ -49,19 +52,43 @@ export async function LifecycleStepper({
         {lifecycle.stages.map((s, i) => {
           const badge = STATE_BADGE[s.state];
           const href = targets[s.key];
+          const isCurrent = s.state === "current";
+          const dot = isCurrent ? (
+            // Active step: solid amber dot + a live pulsing halo.
+            <span className="relative flex-shrink-0 h-7 w-7" aria-hidden>
+              <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
+              <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white shadow-[0_0_10px_2px_rgba(245,158,11,0.5)]">
+                ◆
+              </span>
+            </span>
+          ) : (
+            <span
+              className={`flex-shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-xs font-medium ${badge.cls}`}
+              aria-hidden
+            >
+              {badge.mark}
+            </span>
+          );
           const inner = (
             <>
-              <span
-                className={`flex-shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-xs font-medium ${badge.cls}`}
-                aria-hidden
-              >
-                {badge.mark}
-              </span>
+              {dot}
               <span className="min-w-0">
-                <span className={`block text-sm font-semibold text-rizq-ink leading-tight ${font}`}>
+                <span
+                  className={`block text-sm leading-tight ${font} ${
+                    isCurrent ? "font-bold text-amber-900" : "font-semibold text-rizq-ink"
+                  }`}
+                >
                   {t(STAGE_TITLE_KEY[s.key])}
                 </span>
-                <span className={`block text-xs ${badge.breathe ? "text-amber-700" : "text-rizq-ink-soft/70"} ${font}`}>
+                <span
+                  className={`block text-xs ${font} ${
+                    isCurrent
+                      ? "font-medium text-amber-700"
+                      : s.state === "next"
+                        ? "text-amber-700/70"
+                        : "text-rizq-ink-soft/70"
+                  }`}
+                >
                   {t(badge.key)}
                 </span>
               </span>
