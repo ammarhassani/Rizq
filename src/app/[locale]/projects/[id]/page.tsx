@@ -40,10 +40,11 @@ export default async function ProjectDetailPage({
   searchParams,
 }: {
   params: Promise<Params>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; guided?: string }>;
 }) {
   const { locale, id } = await params;
-  const { tab: tabParam } = await searchParams;
+  const { tab: tabParam, guided: guidedParam } = await searchParams;
+  const guidedRun = guidedParam === "1";
   const VALID_TABS = ["files", "deliverables", "tasks", "integrations"] as const;
   const tab: "overview" | "files" | "deliverables" | "tasks" | "integrations" =
     (VALID_TABS as readonly string[]).includes(tabParam ?? "")
@@ -113,7 +114,7 @@ export default async function ProjectDetailPage({
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
-      <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} />
+      <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} active={guidedRun && tab === "overview"} />
       <div dir={dir}>
         {/* Back to portfolio */}
         <Link

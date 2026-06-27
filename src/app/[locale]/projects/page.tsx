@@ -85,8 +85,8 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
               return (
                 <li key={p.id}>
                   <Link
-                    href={`/projects/${p.id}` as `/projects/${string}`}
-                    className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 transition-all p-5 ${font}`}
+                    href={`/projects/${p.id}${lc.complete ? "" : "?guided=1"}` as `/projects/${string}`}
+                    className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 transition motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
                   >
                     <div dir={dir} className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

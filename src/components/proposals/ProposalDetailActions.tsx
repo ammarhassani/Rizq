@@ -164,7 +164,8 @@ export function ProposalDetailActions({
         gig_id: result.gig_id,
       });
       // next-intl's localized router prepends the active locale — pass the path UNPREFIXED.
-      router.push(`/projects/${result.project_id}` as `/projects/${string}`);
+      // Enter guided mode: this is the first time landing on the new project.
+      router.push(`/projects/${result.project_id}?guided=1` as `/projects/${string}`);
     });
   }
 

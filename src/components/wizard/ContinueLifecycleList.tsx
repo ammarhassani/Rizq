@@ -38,8 +38,8 @@ export async function ContinueLifecycleList({ locale }: { locale: "ar" | "en" })
         {result.items.map((item) => (
           <li key={`${item.anchorKind}-${item.id}`}>
             <Link
-              href={item.href as `/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-rizq-cream/50 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              href={`${item.href}${item.href.includes("?") ? "&" : "?"}guided=1` as `/${string}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-rizq-cream/50 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
             >
               <span className="min-w-0">
                 <span className={`block text-sm font-medium text-rizq-ink truncate ${font}`}>{item.title}</span>
