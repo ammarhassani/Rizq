@@ -224,6 +224,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
         <span className="text-xs text-rizq-ink-soft/60">{t("sortLabel")}</span>
         <select
           value={sort}
+          aria-label={t("sortLabel")}
           onChange={(e) => setSort(e.target.value as SortKey)}
           className={`rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-1.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-1 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`}
         >
