@@ -373,16 +373,6 @@ export function IncomeListClient({ gigs, locale }: Props) {
         </MotionList>
       )}
 
-      {/* FAB — Log gig */}
-      <div className={`fixed bottom-8 ${isAr ? "left-6" : "right-6"} z-50`}>
-        <Link
-          href="/income/new"
-          className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream shadow-lg px-5 py-3.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
-        >
-          <span className="text-lg leading-none">+</span>
-          {t("logGig")}
-        </Link>
-      </div>
     </div>
     </>
   );

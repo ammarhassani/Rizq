@@ -84,13 +84,25 @@ export default async function InvoicesPage({ params }: { params: Promise<Params>
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "الفواتير" : "Invoices"} maxWidth="wide">
       <div dir={dir}>
-        {/* Page header */}
-        <div className="mb-6 sm:mb-8">
-          <p className="eyebrow mb-3">{t("eyebrow")}</p>
-          <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
-          <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>
-            {t("subtitle")}
-          </p>
+        {/* Page header — primary action lives top-start, consistent with the
+            other list pages (Projects/Proposals/Clients). (Audit P2) */}
+        <div className="mb-6 sm:mb-8 flex items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow mb-3">{t("eyebrow")}</p>
+            <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
+            <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>
+              {t("subtitle")}
+            </p>
+          </div>
+          {invoices.length > 0 && (
+            <Link
+              href="/invoices/new"
+              className={`shrink-0 inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-3 text-sm font-medium hover:bg-rizq-green-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+            >
+              <span className="text-lg leading-none">+</span>
+              {t("newInvoice")}
+            </Link>
+          )}
         </div>
 
         {/* Empty state */}
