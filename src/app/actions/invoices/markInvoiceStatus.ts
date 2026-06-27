@@ -28,6 +28,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
+import { contributeBenchmarkFromProject } from "@/app/actions/pricing/contributeBenchmark";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -217,7 +218,7 @@ export async function markInvoiceStatus(
     try {
       const { data: gig } = await supabase
         .from("gigs")
-        .select("status, completed_date")
+        .select("status, completed_date, project_id")
         .eq("id", gigId)
         .eq("user_id", userId)
         .single();
@@ -237,8 +238,13 @@ export async function markInvoiceStatus(
           .eq("id", gigId)
           .eq("user_id", userId);
       }
+
+      // Feed the benchmark flywheel: a paid project is ground-truth price data.
+      // Consent + k-anonymity are enforced server-side; best-effort, never blocks.
+      const projectId = (gig?.project_id as string | null) ?? null;
+      if (projectId) await contributeBenchmarkFromProject(projectId);
     } catch (err) {
-      console.warn("[markInvoiceStatus] gig paid-sync failed", err);
+      console.warn("[markInvoiceStatus] gig paid-sync / benchmark contribution failed", err);
     }
   }
 

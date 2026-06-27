@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { aggregate, type AggRow, type ProvenanceSource } from "./aggregate";
 import { buildCitation } from "./citation";
+import { applyKAnonymity } from "./contribution";
 import type { BenchmarkProvenance } from "./provenance";
 
 export type ResolveInput = {
@@ -96,7 +97,7 @@ async function fetchRows(
 ): Promise<AggRow[]> {
   let query = supabase
     .from("benchmark_records")
-    .select("price_sar, provenance, confidence, captured_at, recorded_at")
+    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id")
     .eq("specialty_id", args.specialty_id)
     .eq("experience_tier_id", args.experience_tier_id)
     .eq("active", true)
@@ -109,21 +110,25 @@ async function fetchRows(
 
   const { data, error } = await query;
   if (error || !data) return [];
-  return data
-    .map((r) => {
-      const price = Number((r as { price_sar: number }).price_sar);
-      const conf = Number((r as { confidence: number | null }).confidence ?? 0.5);
-      const captured =
-        (r as { captured_at: string | null }).captured_at ??
-        (r as { recorded_at: string | null }).recorded_at ??
-        new Date().toISOString();
-      return {
-        price_sar: price,
-        provenance: (r as { provenance: BenchmarkProvenance }).provenance,
-        confidence: conf,
-        captured_at: captured,
-      } satisfies AggRow;
-    })
+  const mapped = data.map((r) => {
+    const price = Number((r as { price_sar: number }).price_sar);
+    const conf = Number((r as { confidence: number | null }).confidence ?? 0.5);
+    const captured =
+      (r as { captured_at: string | null }).captured_at ??
+      (r as { recorded_at: string | null }).recorded_at ??
+      new Date().toISOString();
+    return {
+      price_sar: price,
+      provenance: (r as { provenance: BenchmarkProvenance }).provenance,
+      confidence: conf,
+      captured_at: captured,
+      source_user_id: (r as { source_user_id: string | null }).source_user_id ?? null,
+    };
+  });
+  // k-anonymity: submitted rows surface only with ≥ K distinct contributors, so a
+  // single freelancer's price never forms a band (PDPL / data-strategy Tier 3).
+  return applyKAnonymity(mapped)
+    .map(({ source_user_id: _omit, ...rest }) => rest as AggRow)
     // Keep only rows aggregate() will actually use: finite, non-negative price,
     // and non-zero confidence (a 0-confidence row contributes 0 weight and must
     // not count toward MIN_SAMPLE, or an all-zero-confidence cell would yield a
