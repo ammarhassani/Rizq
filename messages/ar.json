@@ -119,7 +119,12 @@
     "signup": "أنشئ حساب",
     "openMenu": "افتح القائمة",
     "closeMenu": "أغلق القائمة",
-    "upgrade": "ترقية"
+    "upgrade": "ترقية",
+    "project": "المشروع",
+    "projects": "المشاريع",
+    "income": "دفتر الدخل",
+    "clients": "العملاء",
+    "proposals": "العروض"
   },
   "Documents": {
     "pageTitle": "خزنة الوثائق",

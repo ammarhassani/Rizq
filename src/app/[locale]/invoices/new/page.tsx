@@ -7,13 +7,15 @@ import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { getPathname, Link } from "@/i18n/navigation";
+import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { InvoiceForm } from "@/components/invoices/InvoiceForm";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 
 type Params = { locale: string };
-type SearchParams = { gig?: string };
+type SearchParams = { gig?: string; from?: string; guided?: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
@@ -29,7 +31,10 @@ export default async function InvoicesNewPage({
   searchParams: Promise<SearchParams>;
 }) {
   const { locale } = await params;
-  const { gig: gigId } = await searchParams;
+  const sp = await searchParams;
+  const gigId = sp.gig;
+  const origin = parseOrigin(sp);
+  const guided = sp.guided === "1";
 
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
@@ -115,13 +120,13 @@ export default async function InvoicesNewPage({
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "فاتورة جديدة" : "New Invoice"} maxWidth="form">
       <div dir={isAr ? "rtl" : "ltr"}>
-        <Link
-          href="/invoices"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "الفواتير" : "Invoices"}
-        </Link>
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/invoices"
+          fallbackKey="invoices"
+          guided={guided}
+        />
         <InvoiceForm
           locale={locale as "ar" | "en"}
           clients={clientOptions}

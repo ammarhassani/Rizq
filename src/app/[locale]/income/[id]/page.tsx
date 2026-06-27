@@ -7,6 +7,8 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { GigDetailActions } from "@/components/income/GigDetailActions";
@@ -75,8 +77,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
   return { title: "مشروع · رِزق" };
 }
 
-export default async function GigDetailPage({ params }: { params: Promise<Params> }) {
+export default async function GigDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<Params>;
+  searchParams: Promise<{ from?: string; guided?: string }>;
+}) {
   const { locale, id } = await params;
+  const sp = await searchParams;
+  const origin = parseOrigin(sp);
+  const guided = sp.guided === "1";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -153,13 +164,13 @@ export default async function GigDetailPage({ params }: { params: Promise<Params
     <AppShell locale={locale as "ar" | "en"} title={gig.title as string} maxWidth="reading">
       <div dir={dir}>
         {/* Back */}
-        <Link
-          href="/income"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "دفتر الدخل" : "Income Ledger"}
-        </Link>
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/income"
+          fallbackKey="income"
+          guided={guided}
+        />
 
         {/* Anomaly banner */}
         {gig.ai_anomaly_flag && gig.ai_anomaly_reason && (

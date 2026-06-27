@@ -10,7 +10,9 @@ import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { getPathname, Link } from "@/i18n/navigation";
+import { getPathname } from "@/i18n/navigation";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
@@ -75,10 +77,15 @@ function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {
 
 export default async function ProposalDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<{ from?: string; guided?: string }>;
 }) {
   const { locale, id } = await params;
+  const sp = await searchParams;
+  const origin = parseOrigin(sp);
+  const guided = sp.guided === "1";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -143,13 +150,13 @@ export default async function ProposalDetailPage({
         {/* Shared print/PDF stylesheet (A4, cover page, hide chrome, brand footer) */}
         <ProposalPrintStyles />
         {/* Back link */}
-        <Link
-          href="/proposals"
-          className={`print:hidden inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "عروضي" : "My proposals"}
-        </Link>
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/proposals"
+          fallbackKey="proposals"
+          guided={guided}
+        />
 
         {/* Expired notice */}
         {isExpired && (

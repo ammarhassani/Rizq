@@ -18,6 +18,8 @@ import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
 import { GigStatusQuickEdit } from "@/components/income/GigStatusQuickEdit";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 import { ProjectTabs } from "@/components/projects/ProjectTabs";
 import { ProjectFilesClient } from "@/components/projects/ProjectFilesClient";
 import { DeliverablesTab } from "@/components/projects/DeliverablesTab";
@@ -40,11 +42,13 @@ export default async function ProjectDetailPage({
   searchParams,
 }: {
   params: Promise<Params>;
-  searchParams: Promise<{ tab?: string; guided?: string }>;
+  searchParams: Promise<{ tab?: string; guided?: string; from?: string }>;
 }) {
   const { locale, id } = await params;
-  const { tab: tabParam, guided: guidedParam } = await searchParams;
+  const spAll = await searchParams;
+  const { tab: tabParam, guided: guidedParam } = spAll;
   const guidedRun = guidedParam === "1";
+  const origin = parseOrigin(spAll);
   const VALID_TABS = ["files", "deliverables", "tasks", "integrations"] as const;
   const tab: "overview" | "files" | "deliverables" | "tasks" | "integrations" =
     (VALID_TABS as readonly string[]).includes(tabParam ?? "")
@@ -117,13 +121,12 @@ export default async function ProjectDetailPage({
       <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} active={guidedRun && tab === "overview"} />
       <div dir={dir}>
         {/* Back to portfolio */}
-        <Link
-          href="/income"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {t("backToIncome")}
-        </Link>
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/projects"
+          fallbackKey="projects"
+        />
 
         {/* Title */}
         <h1 className={`text-2xl font-bold text-rizq-ink leading-snug mb-4 ${font}`}>

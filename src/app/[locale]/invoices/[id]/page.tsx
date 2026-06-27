@@ -6,9 +6,11 @@ import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { getPathname, Link } from "@/i18n/navigation";
+import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
@@ -23,10 +25,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
 
 export default async function InvoiceDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<Params>;
+  searchParams: Promise<{ from?: string; guided?: string }>;
 }) {
   const { locale, id } = await params;
+  const sp = await searchParams;
+  const origin = parseOrigin(sp);
+  const guided = sp.guided === "1";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -94,14 +101,14 @@ export default async function InvoiceDetailPage({
   return (
     <AppShell locale={locale as "ar" | "en"} title={invoice.invoice_number as string} maxWidth="reading">
       <div dir={dir}>
-        {/* Back link */}
-        <Link
-          href="/invoices"
-          className={`print:hidden inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "الفواتير" : "Invoices"}
-        </Link>
+        {/* Back link — returns to the project pane when opened in a project context */}
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/invoices"
+          fallbackKey="invoices"
+          guided={guided}
+        />
 
         {/* Invoice header summary strip */}
         <div

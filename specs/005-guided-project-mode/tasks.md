@@ -13,14 +13,14 @@ desktop + 390px). Commit small + atomic; sync to `main` (no PR).
 
 ## Phase 1: Setup
 
-- [ ] T001 Add a `Nav` i18n namespace skeleton (back-link default labels, breadcrumb separators) to `messages/ar.json` and `messages/en.json` (keys: `Nav.back`, `Nav.backTo`, plus per-list defaults `Nav.invoices`/`proposals`/`income`/`clients`/`projects`).
+- [X] T001 Add a `Nav` i18n namespace skeleton (back-link default labels, breadcrumb separators) to `messages/ar.json` and `messages/en.json` (keys: `Nav.back`, `Nav.backTo`, plus per-list defaults `Nav.invoices`/`proposals`/`income`/`clients`/`projects`).
 
 ## Phase 2: Foundational (blocks US1–US3)
 
 **The navigation-origin convention — everything in US1/US2/US3 depends on it.**
 
-- [ ] T002 [P] Create the pure origin util in `src/lib/nav/origin.ts`: `NavigationOrigin` type, `parseOrigin(sp)`, `serializeOrigin(o)`, `withOrigin(href, o?, guided?)`, `resolveBack(o, fallbackHref, projectTitle?, opts?)` per `contracts/nav-and-actions.md` (UUID-validate id; unknown type/malformed → null; append params safely when href already has a query).
-- [ ] T003 [P] Unit tests in `src/lib/nav/origin.test.ts`: valid `project:{uuid}` parses; missing/non-uuid/unknown-type → null; `resolveBack` with origin → project href (+tab/guided) & title label; without origin → fallback href & default label; `withOrigin` appends correctly with/without existing query.
+- [X] T002 [P] Create the pure origin util in `src/lib/nav/origin.ts`: `NavigationOrigin` type, `parseOrigin(sp)`, `serializeOrigin(o)`, `withOrigin(href, o?, guided?)`, `resolveBack(o, fallbackHref, projectTitle?, opts?)` per `contracts/nav-and-actions.md` (UUID-validate id; unknown type/malformed → null; append params safely when href already has a query).
+- [X] T003 [P] Unit tests in `src/lib/nav/origin.test.ts`: valid `project:{uuid}` parses; missing/non-uuid/unknown-type → null; `resolveBack` with origin → project href (+tab/guided) & title label; without origin → fallback href & default label; `withOrigin` appends correctly with/without existing query.
 
 **Checkpoint**: origin util + tests green → US1/2/3 can proceed.
 
@@ -34,15 +34,15 @@ default list otherwise). Fixes the reported invoice→project bug.
 **Independent test**: invoice created from a project → back reads "← {project}" → returns to the
 project; invoice opened from the list → back → `/invoices`.
 
-- [ ] T004 [US1] Create `src/components/nav/ContextualBackLink.tsx` (server-friendly) — props per contract; renders one back affordance via `resolveBack`; RTL-aware arrow; `focus-visible` ring; bilingual fallback label from the `Nav` namespace.
-- [ ] T005 [P] [US1] Replace the hardcoded back link in `src/app/[locale]/invoices/[id]/page.tsx` with `<ContextualBackLink>` (read `from` via `parseOrigin(searchParams)`; fallback `/invoices`).
-- [ ] T006 [P] [US1] Same swap in `src/app/[locale]/invoices/new/page.tsx`.
-- [ ] T007 [P] [US1] Same swap in `src/app/[locale]/proposals/[id]/page.tsx` (fallback `/proposals`).
-- [ ] T008 [P] [US1] Same swap in `src/app/[locale]/income/[id]/page.tsx` (fallback `/income`).
-- [ ] T009 [P] [US1] Same swap in `src/app/[locale]/income/new/page.tsx`.
-- [ ] T010 [P] [US1] Same swap in `src/app/[locale]/clients/[id]/page.tsx` and `src/app/[locale]/clients/new/page.tsx` (fallback `/clients`).
-- [ ] T011 [P] [US1] Same swap in `src/app/[locale]/projects/[id]/page.tsx` (fallback `/projects` — replaces today's `/income` back; preserve `?tab`/`?guided`).
-- [ ] T012 [US1] Verify live (AR+EN, mobile): from a project create an invoice → back returns to the project; from the Invoices list open an invoice → back → `/invoices`; refresh the in-context editor → origin survives. `pnpm typecheck` + `pnpm test`.
+- [X] T004 [US1] Create `src/components/nav/ContextualBackLink.tsx` (server-friendly) — props per contract; renders one back affordance via `resolveBack`; RTL-aware arrow; `focus-visible` ring; bilingual fallback label from the `Nav` namespace.
+- [X] T005 [P] [US1] Replace the hardcoded back link in `src/app/[locale]/invoices/[id]/page.tsx` with `<ContextualBackLink>` (read `from` via `parseOrigin(searchParams)`; fallback `/invoices`).
+- [X] T006 [P] [US1] Same swap in `src/app/[locale]/invoices/new/page.tsx`.
+- [X] T007 [P] [US1] Same swap in `src/app/[locale]/proposals/[id]/page.tsx` (fallback `/proposals`).
+- [X] T008 [P] [US1] Same swap in `src/app/[locale]/income/[id]/page.tsx` (fallback `/income`).
+- [X] T009 [P] [US1] Same swap in `src/app/[locale]/income/new/page.tsx`.
+- [X] T010 [P] [US1] Same swap in `src/app/[locale]/clients/[id]/page.tsx` and `src/app/[locale]/clients/new/page.tsx` (fallback `/clients`).
+- [X] T011 [P] [US1] Same swap in `src/app/[locale]/projects/[id]/page.tsx` (fallback `/projects` — replaces today's `/income` back; preserve `?tab`/`?guided`).
+- [X] T012 [US1] Verify live (AR+EN, mobile): from a project create an invoice → back returns to the project; from the Invoices list open an invoice → back → `/invoices`; refresh the in-context editor → origin survives. `pnpm typecheck` + `pnpm test`.
 
 **Checkpoint**: US1 shippable on its own — the reported bug is fixed, standalone unaffected.
 

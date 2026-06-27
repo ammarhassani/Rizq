@@ -119,7 +119,12 @@
     "signup": "Sign up",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "upgrade": "Upgrade"
+    "upgrade": "Upgrade",
+    "project": "Project",
+    "projects": "Projects",
+    "income": "Income Ledger",
+    "clients": "Clients",
+    "proposals": "Proposals"
   },
   "Documents": {
     "pageTitle": "Document Vault",

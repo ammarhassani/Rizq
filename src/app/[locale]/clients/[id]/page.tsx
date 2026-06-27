@@ -8,6 +8,8 @@ import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
+import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { parseOrigin } from "@/lib/nav/origin";
 import { ClientDetailActions } from "@/components/clients/ClientDetailActions";
 import { ClientContactLinks } from "@/components/clients/ClientContactLinks";
 import { ClientGigHistory } from "@/components/clients/ClientGigHistory";
@@ -70,8 +72,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
   return { title: "عميل · رِزق" };
 }
 
-export default async function ClientDetailPage({ params }: { params: Promise<Params> }) {
+export default async function ClientDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<Params>;
+  searchParams: Promise<{ from?: string; guided?: string }>;
+}) {
   const { locale, id } = await params;
+  const sp = await searchParams;
+  const origin = parseOrigin(sp);
+  const guided = sp.guided === "1";
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
@@ -131,13 +142,13 @@ export default async function ClientDetailPage({ params }: { params: Promise<Par
     <AppShell locale={locale as "ar" | "en"} title={client.name as string} maxWidth="reading">
       <div dir={dir}>
         {/* Back */}
-        <Link
-          href="/clients"
-          className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
-        >
-          <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "دفتر العملاء" : "Client Book"}
-        </Link>
+        <ContextualBackLink
+          locale={locale as "ar" | "en"}
+          origin={origin}
+          fallbackHref="/clients"
+          fallbackKey="clients"
+          guided={guided}
+        />
 
         {/* Header */}
         <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 mb-6 ${font}`}>
