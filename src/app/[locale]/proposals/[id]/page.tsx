@@ -12,7 +12,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { ContextBreadcrumb } from "@/components/nav/ContextBreadcrumb";
 import { parseOrigin } from "@/lib/nav/origin";
+import { getProject } from "@/app/actions/projects/getProject";
+import { resolveLifecycle } from "@/lib/projects/lifecycle";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
@@ -89,6 +92,27 @@ export default async function ProposalDetailPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  // Guided framing (feature 005, US3) — when opened inside a project.
+  let projectCtx: { title: string; stepNo: number; total: number } | null = null;
+  if (origin) {
+    const pj = await getProject(origin.id);
+    if (pj.ok) {
+      const lc = resolveLifecycle({
+        proposal: pj.bundle.originProposal ? { status: pj.bundle.originProposal.status as string } : null,
+        hasProject: true,
+        projectHasOriginProposal: !!pj.bundle.project.origin_proposal_id,
+        gig: pj.bundle.gig ? { amount_sar: Number(pj.bundle.gig.amount_sar), status: pj.bundle.gig.status as string } : null,
+        invoices: (pj.bundle.invoices ?? []).map((i) => ({ status: i.status as string })),
+      });
+      const idx = lc.stages.findIndex((s) => s.key === lc.currentStageKey);
+      projectCtx = {
+        title: (pj.bundle.project.title as string) ?? "",
+        stepNo: lc.complete ? lc.stages.length : idx >= 0 ? idx + 1 : lc.stages.length,
+        total: lc.stages.length,
+      };
+    }
+  }
+
   // Auth gate
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -155,8 +179,20 @@ export default async function ProposalDetailPage({
           origin={origin}
           fallbackHref="/proposals"
           fallbackKey="proposals"
+          projectTitle={projectCtx?.title}
           guided={guided}
         />
+
+        {origin && projectCtx && (
+          <ContextBreadcrumb
+            locale={locale as "ar" | "en"}
+            projectId={origin.id}
+            projectTitle={projectCtx.title}
+            stepNo={projectCtx.stepNo}
+            totalSteps={projectCtx.total}
+            guided={guided}
+          />
+        )}
 
         {/* Expired notice */}
         {isExpired && (

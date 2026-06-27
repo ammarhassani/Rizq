@@ -10,7 +10,10 @@ import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
+import { ContextBreadcrumb } from "@/components/nav/ContextBreadcrumb";
 import { parseOrigin } from "@/lib/nav/origin";
+import { getProject } from "@/app/actions/projects/getProject";
+import { resolveLifecycle } from "@/lib/projects/lifecycle";
 import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
@@ -42,6 +45,28 @@ export default async function InvoiceDetailPage({
   if (!userData.user) {
     const loginPath = getPathname({ href: "/login", locale: locale as "ar" | "en" });
     redirect(loginPath);
+  }
+
+  // Guided framing: when opened inside a project, fetch its title + lifecycle
+  // position so the editor is framed for the engagement (feature 005, US3).
+  let projectCtx: { title: string; stepNo: number; total: number } | null = null;
+  if (origin) {
+    const pj = await getProject(origin.id);
+    if (pj.ok) {
+      const lc = resolveLifecycle({
+        proposal: pj.bundle.originProposal ? { status: pj.bundle.originProposal.status as string } : null,
+        hasProject: true,
+        projectHasOriginProposal: !!pj.bundle.project.origin_proposal_id,
+        gig: pj.bundle.gig ? { amount_sar: Number(pj.bundle.gig.amount_sar), status: pj.bundle.gig.status as string } : null,
+        invoices: (pj.bundle.invoices ?? []).map((i) => ({ status: i.status as string })),
+      });
+      const idx = lc.stages.findIndex((s) => s.key === lc.currentStageKey);
+      projectCtx = {
+        title: (pj.bundle.project.title as string) ?? "",
+        stepNo: lc.complete ? lc.stages.length : idx >= 0 ? idx + 1 : lc.stages.length,
+        total: lc.stages.length,
+      };
+    }
   }
 
   const isAr = locale === "ar";
@@ -107,8 +132,21 @@ export default async function InvoiceDetailPage({
           origin={origin}
           fallbackHref="/invoices"
           fallbackKey="invoices"
+          projectTitle={projectCtx?.title}
           guided={guided}
         />
+
+        {/* Guided framing: this invoice belongs to a project */}
+        {origin && projectCtx && (
+          <ContextBreadcrumb
+            locale={locale as "ar" | "en"}
+            projectId={origin.id}
+            projectTitle={projectCtx.title}
+            stepNo={projectCtx.stepNo}
+            totalSteps={projectCtx.total}
+            guided={guided}
+          />
+        )}
 
         {/* Invoice header summary strip */}
         <div

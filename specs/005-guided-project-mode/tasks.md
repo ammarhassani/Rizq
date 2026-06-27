@@ -73,10 +73,10 @@ with the lifecycle advanced; the same action standalone stays in the invoices ar
 **Independent test**: open an editor with `from=project` → project breadcrumb + "Step N of 3";
 open it standalone → no framing.
 
-- [ ] T019 [US3] Create `src/components/nav/ContextBreadcrumb.tsx` — "{project title} → {screen}" crumb + compact progress (reuse the lifecycle position; not the full stepper); RTL; links back to the project.
-- [ ] T020 [P] [US3] Render `<ContextBreadcrumb>` when `from=project` on `src/app/[locale]/invoices/[id]/page.tsx` and `src/app/[locale]/proposals/[id]/page.tsx` (needs the project title + lifecycle position; fetch minimal project context only when `from` is present).
-- [ ] T021 [P] [US3] Add `Nav.breadcrumb*` i18n keys (AR+EN) for the crumb + progress label.
-- [ ] T022 [US3] Verify live (AR+EN, mobile): framing shows in-context, absent standalone. Gate green.
+- [X] T019 [US3] Create `src/components/nav/ContextBreadcrumb.tsx` — "{project title} → {screen}" crumb + compact progress (reuse the lifecycle position; not the full stepper); RTL; links back to the project.
+- [X] T020 [P] [US3] Render `<ContextBreadcrumb>` when `from=project` on `src/app/[locale]/invoices/[id]/page.tsx` and `src/app/[locale]/proposals/[id]/page.tsx` (needs the project title + lifecycle position; fetch minimal project context only when `from` is present).
+- [X] T021 [P] [US3] Add `Nav.breadcrumb*` i18n keys (AR+EN) for the crumb + progress label.
+- [X] T022 [US3] Verify live (AR+EN, mobile): framing shows in-context, absent standalone. Gate green.
 
 ---
 
