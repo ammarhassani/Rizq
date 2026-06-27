@@ -65,5 +65,11 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   Deliverables (curated view), Tasks/milestones (money deferred), and real GitHub-first OAuth
   integrations as a **security-gated** final phase (secrets server-only, never exported).
   spec+plan+tasks done → implement after 003.
-Active (`.specify/feature.json`): **003**.
+- `specs/005-guided-project-mode/` — **Guided Project Mode**: make the whole app honor guided
+  project context (a URL `from=project:{id}` origin + a shared contextual back/return + context
+  framing) **without cloning screens**, plus a 3-way Project Start chooser (use existing proposal /
+  create new / set up directly = money-free blank). **No migration**; reuses `resolveLifecycle` +
+  `createProjectFromProposal`. spec+plan done (4 phases: P1 nav-origin → P2 continuity → P3 framing
+  → P4 chooser) → **tasks next**.
+Active (`.specify/feature.json`): **005**.
 <!-- SPECKIT END -->
