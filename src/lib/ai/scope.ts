@@ -212,6 +212,35 @@ Expected JSON:
     "language_preference": 0.93
   }
 }
+
+=== Example 6: Brand Identity — logo PLUS extras ⇒ graphic-design (NOT logo-design) ===
+Brief:
+"مرحبا، عندي مقهى جديد بالرياض وأبي هوية كاملة: شعار، ألوان، خطوط، تصميم المنيو، تغليف، ولوحة المحل. أبيها تكون راقية. خلال ٦ أسابيع."
+
+Expected JSON:
+{
+  "specialty": "graphic-design",
+  "deliverables": ["شعار", "لوحة ألوان", "خطوط", "تصميم منيو", "تغليف", "لوحة المحل"],
+  "deliverable_count": 6,
+  "revisions": null,
+  "urgency": "standard_1_4_weeks",
+  "complexity_signals": ["هوية بصرية كاملة", "تطبيقات متعددة (منيو، تغليف، لافتة)", "هوية راقية"],
+  "client_type": "smb",
+  "geography_target": "ksa_local",
+  "language_preference": "ar",
+  "budget_mentioned": null,
+  "ip_transfer": null,
+  "field_confidence": {
+    "specialty": 0.95,
+    "deliverables": 0.9,
+    "deliverable_count": 0.92,
+    "urgency": 0.8,
+    "complexity_signals": 0.88,
+    "client_type": 0.7,
+    "geography_target": 0.85,
+    "language_preference": 0.9
+  }
+}
 `;
 
 export function buildScopePrompt(briefText: string, ctx: ScopeCtx): string {
@@ -221,8 +250,27 @@ Cities: ${ctx.cityLines}
 Experience tiers: ${ctx.tierLines}
 
 Rules:
-- Choose the single best-fit specialty slug from the list.
+- Choose the single best-fit specialty slug from the list. Use the guide below — the
+  deliverables decide the specialty, not just a keyword like "logo" or "design".
 - Fill every field you can infer; use null when the brief doesn't say.
+
+Specialty guide (mind these overlaps — they are the common mistakes):
+- logo-design = a logo ONLY (marks/wordmarks, a few concepts + file formats). If the brief
+  ALSO wants a color palette, typography/fonts, business cards, letterhead, brand guidelines,
+  social templates, or multiple brand applications → graphic-design (full identity), NOT logo-design.
+- graphic-design = visual design beyond one logo: full brand identity, social-media designs,
+  print, packaging, menus, marketing collateral.
+- ui-ux-design = designing digital screens/flows (app or website UI, wireframes, prototypes,
+  Figma) — NOT building/coding it.
+- web-dev = building/coding a website (responsive site, e-commerce, CMS). Design-only / Figma
+  mockups with no build → ui-ux-design.
+- mobile-dev = building a mobile app (iOS/Android/Flutter). App screens with no code → ui-ux-design.
+- content-writing = writing ORIGINAL text (articles, SEO, copy). translation = converting
+  EXISTING text between Arabic↔English (no original writing).
+- digital-marketing = running campaigns / ads / social-media management / SEO / strategy
+  (managing, not designing). Designing the posts only, no management → graphic-design.
+- video-editing = editing/producing video · voice-over = voice recording/narration ·
+  photography = shooting photos · data-entry = data entry / transcription / spreadsheet admin.
 - field_confidence: 0..1 per field you populated (how sure you are).
 - complexity_signals: short phrases from the brief that affect effort/price.
 - Never invent a budget; budget_mentioned only if the client states one.
