@@ -1061,8 +1061,9 @@
   "Income": {
     "list": {
       "eyebrow": "Income Ledger",
-      "title": "Your projects.",
-      "subtitle": "Every project, every payment, every month in one place.",
+      "title": "Your income.",
+      "subtitle": "Every payment, month by month — your full income picture.",
+      "transactionsTitle": "Payments",
       "summaryLine": "{total} SAR from {n} projects ({pending} pending payment)",
       "vsLastMonth": "vs last month",
       "paid": "Paid",
@@ -1080,11 +1081,11 @@
       "sortAmount": "Amount",
       "sortStatus": "Status",
       "noResults": "No results.",
-      "logGig": "Log project",
+      "logGig": "Log income",
       "markPaid": "Mark paid",
-      "emptyTitle": "No projects logged yet.",
-      "emptyBody": "Log your first project and start tracking your income.",
-      "emptyCta": "Log your first project"
+      "emptyTitle": "No income logged yet.",
+      "emptyBody": "Log your first payment and start tracking your income.",
+      "emptyCta": "Log income"
     },
     "form": {
       "addTitle": "Log a new project",

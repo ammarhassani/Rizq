@@ -262,7 +262,10 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
             </Link>
           </div>
         ) : (
-          <IncomeListClient gigs={gigs} locale={locale as "ar" | "en"} />
+          <>
+            <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("transactionsTitle")}</h2>
+            <IncomeListClient gigs={gigs} locale={locale as "ar" | "en"} />
+          </>
         )}
       </div>
     </AppShell>
