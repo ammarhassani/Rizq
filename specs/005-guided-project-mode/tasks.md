@@ -55,12 +55,12 @@ project; invoice opened from the list → back → `/invoices`.
 **Independent test**: complete an invoice from a guided project → land back on the project pane
 with the lifecycle advanced; the same action standalone stays in the invoices area.
 
-- [ ] T013 [US2] In `src/components/projects/ProjectLifecycleCta.tsx`, append `from=project:{projectId}&guided=1` (via `withOrigin`) to the invoice-editor pushes (`create_invoice`, `send_invoice`, `mark_paid`).
-- [ ] T014 [US2] Thread context onto the redirects of `createInvoiceFromGig`/`createInvoiceFromProposal` callers (the lifecycle CTA + proposal detail "create invoice") so the invoice editor receives `from`/`guided`.
-- [ ] T015 [US2] In `src/components/proposals/ProposalFlow.tsx`, when in a guided run (`forProjectId` / `guided`), carry `from`/`guided` through finalize so the resulting proposal/project keeps context.
-- [ ] T016 [US2] Add return-to-pane on guided success: after an in-context invoice action completes, route to `/projects/{id}?guided=1` (use origin) instead of staying on the invoice. Implement in the invoice detail actions (`src/components/invoices/InvoiceDetailActions.tsx`) reading `from`.
-- [ ] T017 [P] [US2] Update resume/continue links to also carry `from=project:{id}`: `src/components/wizard/ContinueLifecycleList.tsx` and the Projects index card link in `src/app/[locale]/projects/page.tsx` (they already add `guided=1`).
-- [ ] T018 [US2] Verify live: guided invoice round-trip returns to the project pane, lifecycle advanced; standalone invoice flow unchanged. Gate green.
+- [X] T013 [US2] In `src/components/projects/ProjectLifecycleCta.tsx`, append `from=project:{projectId}&guided=1` (via `withOrigin`) to the invoice-editor pushes (`create_invoice`, `send_invoice`, `mark_paid`).
+- [X] T014 [US2] Thread context onto the redirects of `createInvoiceFromGig`/`createInvoiceFromProposal` callers (the lifecycle CTA + proposal detail "create invoice") so the invoice editor receives `from`/`guided`.
+- [X] T015 [US2] In `src/components/proposals/ProposalFlow.tsx`, when in a guided run (`forProjectId` / `guided`), carry `from`/`guided` through finalize so the resulting proposal/project keeps context.
+- [X] T016 [US2] Add return-to-pane on guided success: after an in-context invoice action completes, route to `/projects/{id}?guided=1` (use origin) instead of staying on the invoice. Implement in the invoice detail actions (`src/components/invoices/InvoiceDetailActions.tsx`) reading `from`.
+- [X] T017 [P] [US2] Update resume/continue links to also carry `from=project:{id}`: `src/components/wizard/ContinueLifecycleList.tsx` and the Projects index card link in `src/app/[locale]/projects/page.tsx` (they already add `guided=1`).
+- [X] T018 [US2] Verify live: guided invoice round-trip returns to the project pane, lifecycle advanced; standalone invoice flow unchanged. Gate green.
 
 **Checkpoint**: US2 builds on US1; guided runs no longer strand the user on a list.
 

@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createInvoiceFromGig } from "@/app/actions/invoices/createInvoiceFromGig";
 import { track } from "@/lib/analytics/track";
+import { withOrigin } from "@/lib/nav/origin";
 import type { LifecycleNextAction } from "@/lib/projects/lifecycle";
 
 type Props = {
@@ -43,6 +44,10 @@ export function ProjectLifecycleCta({ locale, nextAction, projectId, gigId, invo
 
   if (!nextAction) return null;
 
+    // Carry the project context into the invoice editor so its back/return
+    // stays in the guided flow (feature 005, US2).
+    const origin = { type: "project" as const, id: projectId };
+
   function handle() {
     setError(null);
     startTransition(async () => {
@@ -53,11 +58,11 @@ export function ProjectLifecycleCta({ locale, nextAction, projectId, gigId, invo
           return;
         }
         track("lifecycle_create_invoice", { locale, project_id: projectId, invoice_id: result.invoice_id });
-        router.push(`/invoices/${result.invoice_id}` as `/invoices/${string}`);
+        router.push(withOrigin(`/invoices/${result.invoice_id}`, origin, true) as `/invoices/${string}`);
         return;
       }
       if ((nextAction === "send_invoice" || nextAction === "mark_paid") && invoiceId) {
-        router.push(`/invoices/${invoiceId}` as `/invoices/${string}`);
+        router.push(withOrigin(`/invoices/${invoiceId}`, origin, true) as `/invoices/${string}`);
         return;
       }
       // Fallbacks (rare on an existing project page): nudge to the relevant area.

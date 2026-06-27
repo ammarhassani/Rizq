@@ -29,6 +29,9 @@ type Props = {
   shareToken: string | null;
   /** Pass true when the invoice looks overdue (sent/viewed/overdue) — UI hint only; action re-checks the ≥7-day gate */
   looksOverdue?: boolean;
+  /** When opened in a guided project context, a successful status change returns
+   *  here (the project pane) instead of refreshing in place (feature 005, US2). */
+  returnTo?: string;
 };
 
 // Allowed transitions (mirrors markInvoiceStatus server action)
@@ -48,6 +51,7 @@ export function InvoiceDetailActions({
   publicShare,
   shareToken,
   looksOverdue = false,
+  returnTo,
 }: Props) {
   const t = useTranslations("Invoices.detail");
   const tAi = useTranslations("Invoices.ai");
@@ -106,7 +110,9 @@ export function InvoiceDetailActions({
     start(async () => {
       const result = await markInvoiceStatus({ invoice_id: invoiceId, status: next });
       if (result.ok) {
-        router.refresh();
+        // Guided continuity: return to the project pane on success; else refresh in place.
+        if (returnTo) router.push(returnTo as `/projects/${string}`);
+        else router.refresh();
         const label = isAr ? STATUS_LABEL_AR[next] : STATUS_LABEL_EN[next];
         toast.success(isAr ? `الحالة: ${label} · يمكنك التراجع` : `Marked ${label} · Undo`, {
           duration: 7000,

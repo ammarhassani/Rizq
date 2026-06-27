@@ -163,6 +163,7 @@ export default async function InvoiceDetailPage({
             publicShare={(invoice.public_share as boolean | null) ?? false}
             shareToken={(invoice.share_token as string | null) ?? null}
             looksOverdue={looksOverdue}
+            returnTo={origin ? `/projects/${origin.id}?guided=1` : undefined}
           />
         </div>
       </div>
