@@ -1,8 +1,27 @@
-# Published-reference benchmarks — DRAFT for sign-off (2026-06-28)
+# Published-reference benchmarks — VALIDATED & LIVE (2026-06-28)
 
-**Status: NOT live.** This is the Tier-2 (`published_ref`) seed for review. Once the two
-assumptions below are confirmed, I implement the `publishedRef` collector with the final table
-and run it (→ live, `verified`, weight 0.6, auto-upgrading as flywheel/partner data arrives).
+**Status: ✅ LIVE.** Validated against real Saudi published prices (research below) and seeded
+(`migrations/20260628130000_seed_published_ref_benchmarks.sql`, 1,260 rows, `published_ref`,
+weight 0.6, auto-upgrading as flywheel/partner data arrives). `saudi_factor = 0.60` confirmed.
+
+## Validation vs real Saudi market (researched 2026-06-28)
+| Specialty | Real Saudi published | Seeded band (mid · Riyadh) | Verdict |
+|---|---|---|---|
+| Logo (standalone) | 500–2,000 SAR | **800–1,650** | ✓ (lowered: hours 20→12) |
+| Brand identity (full) | 5,000–25,000 | graphic 3,200–6,700 × complexity → ~5–15k | ✓ |
+| Website (simple→custom) | 1,200–4,000 → 40k–120k | web 5,250–10,950 (×tiers) | ✓ |
+| Mobile app | 15,000–150,000 | mobile 15,800–32,800 (×tiers) | ✓ |
+| Digital-marketing retainer | 3,000–15,000/mo | 3,500–7,300 (×tiers→10k) | ✓ |
+| Translation project | small | 650–1,350 | ✓ |
+
+Sources: [Qemma Soft (logo/identity cost KSA)](https://qemma-soft.com/ar/blog/logo-brand-identity-design-cost-saudi-arabia-2026) ·
+[smartcontract.sa (logo/website/app prices)](https://smartcontract.sa/logo-design-prices-in-ksa/) ·
+[khelj.com (website cost KSA)](https://khelj.com/blogs/48) ·
+[freelancing in Saudi 2026 (Qemma)](https://qemma-soft.com/en/blog/freelancing-guide-saudi-arabia-2026) ·
+plus the global references below.
+
+Calibration applied vs the original draft: `logo-design` hours 20→12, `web-dev` hours 80→60;
+all others confirmed. Tier multipliers: beginner 0.6 · junior 0.8 · mid 1.0 · senior 1.4 · expert 1.8.
 
 ## Why a method, not just numbers
 The cited reports give **global hourly** rates by specialty × seniority. Rizq prices a **Saudi
