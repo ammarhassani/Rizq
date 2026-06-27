@@ -115,14 +115,15 @@ the *only* signal (they pair with text labels today — good, keep that).
 3. ✅ **P2 — Overview density**: money-details collapse behind Edit; Delete demoted to a quiet trigger (keeps confirm). *(Shipped, verified.)*
 4. ✅ **P2 — Dashboard**: insights capped to 3 with show-all. *(Shipped, verified.)*
 5. ✅ **P3 — File-input label**: styled picker, no English leak; native input sr-only. *(Shipped, verified.)*
-6. ⬜ **P2 — Unify "＋ New" placement** across list pages (projects/proposals/clients top button vs invoices floating).
-7. ⬜ **P3 — Proposal card titles** (first deliverable → client + brief summary).
-8. ⬜ **P3 — Mobile-nav consistency** (header entry point differs list vs detail).
-9. ⬜ **P3 — Accessibility pass** — best done with axe-core / Lighthouse (gold-on-cream + muted-text contrast, focus order). Recommend wiring the tooling first.
+6. ✅ **P2 — Unify "＋ New" placement**: Income + Invoices moved from a bottom FAB to a top header button, matching Projects/Proposals/Clients. *(Shipped, verified.)*
+7. ✅ **P3 — Proposal card titles**: lead with the client, deliverable as secondary. *(Shipped, verified.)*
+8. ✅ **P3 — Mobile-nav consistency**: **verified a non-issue** — the hamburger is rendered unconditionally in `AppTopBar` on every page; all mobile pages show the same 5 header controls and the drawer opens consistently. Original finding was a screenshot misread (the title is `hidden sm:block`). No code change.
+9. ✅ **P3 — Accessibility pass**: ran axe (WCAG 2a/2aa/21aa) across 7 surfaces via `scripts/a11y-audit.mjs`. Found + fixed 2 critical `select-name` violations (unlabeled sort dropdowns). **No color-contrast violations** — gold-on-cream passes AA. axe now clean.
 
-Cross-cutting cleanups applied opportunistically while fixing the above (per Vercel
-Web Interface Guidelines): replaced `transition-all` with curated transitions, added
-`focus-visible` rings on card links/controls, and `prefers-reduced-motion` guards.
+Cross-cutting cleanups applied throughout (per Vercel Web Interface Guidelines, now
+vendored as a project skill at `.claude/skills/web-interface-guidelines/`): replaced
+`transition-all` with curated transitions, added `focus-visible` rings on card links/
+controls, and `prefers-reduced-motion` guards.
 
-None are regressions from this week's work; they're the seams of a fast-evolved UI.
-1–5 (the high-leverage set) are done; 6–9 remain (one P2, three P3s).
+**All 9 findings addressed.** Tooling wired: WIG audit skill, Playwright + shadcn MCP
+(`.mcp.json`, activate next session), axe a11y harness (`scripts/a11y-audit.mjs`).
