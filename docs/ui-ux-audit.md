@@ -108,14 +108,21 @@ the *only* signal (they pair with text labels today — good, keep that).
 
 ---
 
-## Priority order
+## Priority order & status
 
-1. **P1 — Guided overlay**: gate to active guided run + Overview-only + mobile docking. *(Stops it covering tabs/title.)*
-2. **P1 — Income identity**: re-headline + money-first layout so it ≠ Projects.
-3. **P2 — Overview density**: collapse money-details, group cards, demote Delete.
-4. **P2 — Dashboard**: trim insights, prioritize widgets.
-5. **P2 — Unify "＋ New" placement.**
-6. **P3 — File-input label, proposal titles, mobile-nav consistency, a11y pass.**
+1. ✅ **P1 — Guided overlay**: gated to `?guided=1` + Overview-only; mobile docks to a bottom bar (safe-area), reduced-motion honored. *(Shipped, verified.)*
+2. ✅ **P1 — Income identity**: re-headlined "دخلك."/"Your income." + "الدفعات"/"Payments" section; Projects stays the engagement lens. *(Shipped, verified.)*
+3. ✅ **P2 — Overview density**: money-details collapse behind Edit; Delete demoted to a quiet trigger (keeps confirm). *(Shipped, verified.)*
+4. ✅ **P2 — Dashboard**: insights capped to 3 with show-all. *(Shipped, verified.)*
+5. ✅ **P3 — File-input label**: styled picker, no English leak; native input sr-only. *(Shipped, verified.)*
+6. ⬜ **P2 — Unify "＋ New" placement** across list pages (projects/proposals/clients top button vs invoices floating).
+7. ⬜ **P3 — Proposal card titles** (first deliverable → client + brief summary).
+8. ⬜ **P3 — Mobile-nav consistency** (header entry point differs list vs detail).
+9. ⬜ **P3 — Accessibility pass** — best done with axe-core / Lighthouse (gold-on-cream + muted-text contrast, focus order). Recommend wiring the tooling first.
 
-None are regressions from this week's work; they're the seams of a fast-evolved UI. 1–3
-are the high-leverage ones and map onto fixes already scoped in `docs/ux-wiring-audit.md`.
+Cross-cutting cleanups applied opportunistically while fixing the above (per Vercel
+Web Interface Guidelines): replaced `transition-all` with curated transitions, added
+`focus-visible` rings on card links/controls, and `prefers-reduced-motion` guards.
+
+None are regressions from this week's work; they're the seams of a fast-evolved UI.
+1–5 (the high-leverage set) are done; 6–9 remain (one P2, three P3s).
