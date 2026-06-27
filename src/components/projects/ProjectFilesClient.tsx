@@ -32,6 +32,7 @@ export function ProjectFilesClient({
   const font = isAr ? "font-arabic" : "font-sans";
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState("");
   const [title, setTitle] = useState("");
   const [kind, setKind] = useState<Kind>("input");
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,7 @@ export function ProjectFilesClient({
         return;
       }
       setTitle("");
+      setFileName("");
       if (fileRef.current) fileRef.current.value = "";
       router.refresh();
     });
@@ -126,7 +128,24 @@ export function ProjectFilesClient({
       {/* Upload */}
       <div className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/60 p-5 mb-6 space-y-3 ${font}`}>
         <p className={`text-sm font-semibold text-rizq-ink ${font}`}>{t("filesUploadTitle")}</p>
-        <input ref={fileRef} type="file" className={`${fieldCls} file:mr-3 file:rounded-full file:border-0 file:bg-rizq-green/10 file:px-3 file:py-1 file:text-rizq-green`} />
+        {/* Styled picker — hides the browser-default (English, LTR) "No file chosen". */}
+        <div dir={dir} className="flex items-center gap-3">
+          <label
+            className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-rizq-green/10 text-rizq-green px-4 py-2 text-sm font-medium cursor-pointer hover:bg-rizq-green/15 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${font}`}
+          >
+            <Upload size={14} aria-hidden />
+            {t("filesChoose")}
+            <input
+              ref={fileRef}
+              type="file"
+              className="sr-only"
+              onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+            />
+          </label>
+          <span className={`min-w-0 truncate text-sm ${fileName ? "text-rizq-ink" : "text-rizq-ink-soft/60"} ${font}`}>
+            {fileName || t("filesNone")}
+          </span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
             type="text"

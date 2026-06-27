@@ -1185,6 +1185,8 @@
     "filesDeliverables": "تسليمات",
     "filesEmpty": "لا توجد ملفات في هذا المشروع بعد.",
     "filesUploadTitle": "رفع ملف",
+    "filesChoose": "اختر ملفًا",
+    "filesNone": "لم يُختر ملف",
     "fileNameLabel": "العنوان",
     "fileKindLabel": "النوع",
     "kindInput": "مدخل (موجز، عقد، ملاحظات)",

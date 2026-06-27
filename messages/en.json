@@ -1185,6 +1185,8 @@
     "filesDeliverables": "Deliverables",
     "filesEmpty": "No files in this project yet.",
     "filesUploadTitle": "Upload a file",
+    "filesChoose": "Choose a file",
+    "filesNone": "No file chosen",
     "fileNameLabel": "Title",
     "fileKindLabel": "Type",
     "kindInput": "Input (brief, contract, notes)",
