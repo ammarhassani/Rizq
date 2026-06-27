@@ -176,7 +176,7 @@ export default async function ProposalDetailPage({
         {/* Back link */}
         <ContextualBackLink
           locale={locale as "ar" | "en"}
-          origin={origin}
+          origin={projectCtx ? origin : null}
           fallbackHref="/proposals"
           fallbackKey="proposals"
           projectTitle={projectCtx?.title}

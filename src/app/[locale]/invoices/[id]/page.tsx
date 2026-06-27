@@ -129,7 +129,7 @@ export default async function InvoiceDetailPage({
         {/* Back link — returns to the project pane when opened in a project context */}
         <ContextualBackLink
           locale={locale as "ar" | "en"}
-          origin={origin}
+          origin={projectCtx ? origin : null}
           fallbackHref="/invoices"
           fallbackKey="invoices"
           projectTitle={projectCtx?.title}
