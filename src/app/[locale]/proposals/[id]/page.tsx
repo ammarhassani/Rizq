@@ -13,9 +13,10 @@ import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
 import { ContextBreadcrumb } from "@/components/nav/ContextBreadcrumb";
+import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { parseOrigin } from "@/lib/nav/origin";
 import { getProject } from "@/app/actions/projects/getProject";
-import { resolveLifecycle } from "@/lib/projects/lifecycle";
+import { resolveLifecycle, type Lifecycle } from "@/lib/projects/lifecycle";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
@@ -93,7 +94,7 @@ export default async function ProposalDetailPage({
   setRequestLocale(locale);
 
   // Guided framing (feature 005, US3) — when opened inside a project.
-  let projectCtx: { title: string; stepNo: number; total: number } | null = null;
+  let projectCtx: { title: string; stepNo: number; total: number; lifecycle: Lifecycle } | null = null;
   if (origin) {
     const pj = await getProject(origin.id);
     if (pj.ok) {
@@ -109,6 +110,7 @@ export default async function ProposalDetailPage({
         title: (pj.bundle.project.title as string) ?? "",
         stepNo: lc.complete ? lc.stages.length : idx >= 0 ? idx + 1 : lc.stages.length,
         total: lc.stages.length,
+        lifecycle: lc,
       };
     }
   }
@@ -333,6 +335,10 @@ export default async function ProposalDetailPage({
       title={isAr ? "عرض سعر" : "Proposal"}
       maxWidth={canEdit ? "full" : "reading"}
     >
+      {/* Guided step indicator — shows here (the "price & propose" action), not on the project hub */}
+      {projectCtx && (
+        <GuidedFlowOverlay lifecycle={projectCtx.lifecycle} locale={locale as "ar" | "en"} active={guided} />
+      )}
       {/* Editor: the proposal body becomes the left column of a two-column
           workspace with the sticky AI panel on the inline-end. Read-only views
           (accepted / declined / non-owner) render a centered reading column. */}

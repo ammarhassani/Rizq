@@ -11,9 +11,10 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
 import { ContextBreadcrumb } from "@/components/nav/ContextBreadcrumb";
+import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { parseOrigin } from "@/lib/nav/origin";
 import { getProject } from "@/app/actions/projects/getProject";
-import { resolveLifecycle } from "@/lib/projects/lifecycle";
+import { resolveLifecycle, type Lifecycle } from "@/lib/projects/lifecycle";
 import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
@@ -49,7 +50,7 @@ export default async function InvoiceDetailPage({
 
   // Guided framing: when opened inside a project, fetch its title + lifecycle
   // position so the editor is framed for the engagement (feature 005, US3).
-  let projectCtx: { title: string; stepNo: number; total: number } | null = null;
+  let projectCtx: { title: string; stepNo: number; total: number; lifecycle: Lifecycle } | null = null;
   if (origin) {
     const pj = await getProject(origin.id);
     if (pj.ok) {
@@ -65,6 +66,7 @@ export default async function InvoiceDetailPage({
         title: (pj.bundle.project.title as string) ?? "",
         stepNo: lc.complete ? lc.stages.length : idx >= 0 ? idx + 1 : lc.stages.length,
         total: lc.stages.length,
+        lifecycle: lc,
       };
     }
   }
@@ -125,6 +127,10 @@ export default async function InvoiceDetailPage({
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={invoice.invoice_number as string} maxWidth="reading">
+      {/* Guided step indicator — shows here (the "get paid" action), not on the project hub */}
+      {projectCtx && (
+        <GuidedFlowOverlay lifecycle={projectCtx.lifecycle} locale={locale as "ar" | "en"} active={guided} />
+      )}
       <div dir={dir}>
         {/* Back link — returns to the project pane when opened in a project context */}
         <ContextualBackLink

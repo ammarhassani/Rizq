@@ -119,7 +119,13 @@ export default async function ProjectDetailPage({
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={project.title as string} maxWidth="reading">
-      <GuidedFlowOverlay lifecycle={lifecycle} locale={locale as "ar" | "en"} active={guidedRun && tab === "overview"} />
+      {/* Step indicator on the hub ONLY during the "set up the work" step (its action
+          lives here). For other steps it shows on the proposal/invoice screens. */}
+      <GuidedFlowOverlay
+        lifecycle={lifecycle}
+        locale={locale as "ar" | "en"}
+        active={guidedRun && tab === "overview" && lifecycle.currentStageKey === "project"}
+      />
       <div dir={dir}>
         {/* Back to portfolio */}
         <ContextualBackLink
