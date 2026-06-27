@@ -303,3 +303,32 @@ describe("computeProposalPrice — output shape", () => {
     expect(r.modifiers).toHaveProperty("complexity");
   });
 });
+
+describe("computeProposalPrice — deliverable_count complexity (scope-size lever)", () => {
+  const b = band(670, 1000, 1340);
+  it("1 or null deliverables leaves the band unchanged (no single-item regression)", () => {
+    const one = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 1 }, []);
+    const none = computeProposalPrice(b, { ...NO_MODS, deliverable_count: null }, []);
+    expect(one.max).toBe(1340);
+    expect(none.max).toBe(1340);
+    expect(one.modifiers.complexity).toBe(1.0);
+  });
+  it("more deliverables scale the band up and lift the anchor", () => {
+    const small = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 1 }, []);
+    const big = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 5 }, []);
+    expect(big.modifiers.complexity).toBeCloseTo(1.4, 5);
+    expect(big.max).toBeGreaterThan(small.max);
+    expect(big.anchor).toBeGreaterThan(small.anchor);
+    expect(big.min).toBeGreaterThan(small.min);
+  });
+  it("caps complexity at +60% (sublinear, never runs away)", () => {
+    const huge = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 50 }, []);
+    expect(huge.modifiers.complexity).toBe(1.6);
+    expect(huge.max).toBe(2140); // round10(1340 * 1.6)
+  });
+  it("keeps min <= anchor <= max after scaling", () => {
+    const r = computeProposalPrice(b, { urgency: "rush_under_1_week", client_type: "corporate", ip_transfer: "full_transfer", deliverable_count: 6 }, []);
+    expect(r.min).toBeLessThanOrEqual(r.anchor);
+    expect(r.anchor).toBeLessThanOrEqual(r.max);
+  });
+});

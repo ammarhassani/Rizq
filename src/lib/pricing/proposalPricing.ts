@@ -3,6 +3,8 @@ export type PricingModifierInput = {
   urgency: "rush_under_1_week" | "standard_1_4_weeks" | "long_term" | null;
   client_type: "individual" | "smb" | "corporate" | "government" | "agency" | null;
   ip_transfer: "full_transfer" | "license" | "unclear" | null;
+  /** How many deliverables the scope covers — scales the band (more work → higher). */
+  deliverable_count?: number | null;
 };
 
 /** The market band from resolvePrice (already rounded). */
@@ -41,6 +43,17 @@ function ipMod(ip: PricingModifierInput["ip_transfer"]): number {
   if (ip === "license") return 0.95;
   return 1.0;
 }
+/**
+ * Scope-size lever: the market band is for a typical (≈single-deliverable)
+ * engagement, so a multi-deliverable scope is more work and should price higher.
+ * Sublinear (+10% per extra deliverable) and capped at +60% so it never runs
+ * away. 1 (or unknown) deliverable → 1.0 (no change; single-item proposals are
+ * unaffected). This is the previously-reserved `complexity` modifier.
+ */
+function complexityMod(deliverableCount: PricingModifierInput["deliverable_count"]): number {
+  const n = typeof deliverableCount === "number" && deliverableCount > 0 ? deliverableCount : 1;
+  return clamp(1 + 0.1 * (n - 1), 1.0, 1.6);
+}
 
 /** Personal weight by the freelancer's proposal count N (spec M1.7 step 2, cap 0.5). */
 export function personalWeight(n: number): number {
@@ -61,17 +74,19 @@ export function computeProposalPrice(
   mods: PricingModifierInput,
   pastAnchors: number[]
 ): ProposalPrice {
-  const min = round10(market.min);
-  const max = round10(market.max);
-
   const m = {
     urgency: urgencyMod(mods.urgency),
     client_type: clientMod(mods.client_type),
     ip: ipMod(mods.ip_transfer),
-    complexity: 1.0, // reserved (column exists); spec M1.7 step 1 lists urgency/client/ip
+    complexity: complexityMod(mods.deliverable_count),
   };
-  const combined = m.urgency * m.client_type * m.ip * m.complexity;
-  const modifiedAnchor = clamp(market.anchor * combined, min, max);
+
+  // Complexity scales the whole band (scope size); urgency/client/ip then move
+  // the anchor *within* that band. Keeps min ≤ anchor ≤ max and a consistent meter.
+  const min = round10(market.min * m.complexity);
+  const max = round10(market.max * m.complexity);
+  const combined = m.urgency * m.client_type * m.ip;
+  const modifiedAnchor = clamp(market.anchor * m.complexity * combined, min, max);
 
   const w = personalWeight(pastAnchors.length);
   const personalAnchor = median(pastAnchors);

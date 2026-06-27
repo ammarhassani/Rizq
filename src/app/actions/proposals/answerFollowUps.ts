@@ -131,6 +131,7 @@ export async function answerFollowUps(
       urgency: updatedScope.urgency,
       client_type: updatedScope.client_type,
       ip_transfer: updatedScope.ip_transfer,
+      deliverable_count: updatedScope.deliverable_count,
     },
     pastAnchors
   );

@@ -268,6 +268,7 @@ export async function generateProposal(
       urgency: scope.urgency,
       client_type: scope.client_type,
       ip_transfer: scope.ip_transfer,
+      deliverable_count: scope.deliverable_count,
     },
     pastAnchors
   );
