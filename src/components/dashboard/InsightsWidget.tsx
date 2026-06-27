@@ -51,6 +51,7 @@ export function InsightsWidget({ locale }: Props) {
   const [votes, setVotes] = useState<Record<number, "up" | "down">>({});
   const [refreshing, setRefreshing] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const collapseMounted = useRef(false);
 
   // Streaming state. When `streaming` is true the cards render from the live
@@ -230,6 +231,12 @@ export function InsightsWidget({ locale }: Props) {
         .filter((i): i is InsightItem => i !== null)
     : insights;
 
+  // Density: lead with the top 3; the rest are one tap away. Always show all
+  // while streaming so the live arrival isn't truncated. (Audit P2.)
+  const VISIBLE = 3;
+  const canTruncate = !streaming && displayInsights.length > VISIBLE;
+  const shownInsights = showAll || !canTruncate ? displayInsights : displayInsights.slice(0, VISIBLE);
+
   if (status === "loading") {
     return (
       <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">
@@ -326,7 +333,7 @@ export function InsightsWidget({ locale }: Props) {
         <div id="rizq-insights-body" className="animate-fade-in motion-reduce:animate-none" aria-live="polite">
           {displayInsights.length > 0 && (
             <ul className="divide-y divide-rizq-gold/15">
-              {displayInsights.map((insight, i) => (
+              {shownInsights.map((insight, i) => (
                 <li key={i} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
                   <span
                     aria-hidden
@@ -364,6 +371,21 @@ export function InsightsWidget({ locale }: Props) {
               <div className="h-4 w-3/4 rounded bg-rizq-gold/10 animate-pulse" />
               <div className="h-4 w-2/3 rounded bg-rizq-gold/10 animate-pulse" />
             </div>
+          )}
+
+          {/* Show the rest on demand — keeps the dashboard's heaviest block short. */}
+          {canTruncate && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              aria-expanded={showAll}
+              className={`mt-3 inline-flex items-center gap-1 text-xs font-medium text-rizq-green hover:text-rizq-green-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 rounded ${font}`}
+            >
+              {showAll
+                ? isAr ? "عرض أقل" : "Show less"
+                : isAr ? `عرض الكل (${displayInsights.length})` : `Show all (${displayInsights.length})`}
+              <ChevronDown size={13} className={`transition-transform ${showAll ? "rotate-180" : ""}`} aria-hidden />
+            </button>
           )}
 
           {/* Single honesty + timestamp footer for the whole banner. */}
