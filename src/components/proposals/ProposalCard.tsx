@@ -149,7 +149,12 @@ export function ProposalCard({ proposal, locale }: Props) {
   const dir = isAr ? "rtl" : "ltr";
 
   const title = deriveTitle(proposal.scope_json, locale, t.fallbackTitle);
-  const clientLabel = proposal.client_name?.trim() || t.newClient;
+  // Lead with the client (what a freelancer recognizes); the derived
+  // deliverable/brief becomes the secondary line. Falls back to the title when
+  // no client is set yet. (UI/UX audit P3.)
+  const hasClient = !!proposal.client_name?.trim();
+  const primaryLabel = hasClient ? proposal.client_name!.trim() : title;
+  const secondaryLabel = hasClient ? title : t.newClient;
   const statusKey = (proposal.status ?? "draft") as StatusKey;
   const statusLabel = t.status[statusKey] ?? t.status.draft;
   const dateLabel = relativeDate(proposal.created_at, t);
@@ -158,16 +163,16 @@ export function ProposalCard({ proposal, locale }: Props) {
   return (
     <Link
       href={`/proposals/${proposal.id}` as `/proposals/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition duration-200 motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
-        {/* Left: title + client */}
+        {/* Left: client (primary) + deliverable/brief (secondary) */}
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold text-rizq-ink leading-snug group-hover:text-rizq-green transition-colors truncate">
-            {title}
+            {primaryLabel}
           </p>
           <p className="mt-1 text-sm text-rizq-ink-soft truncate">
-            {clientLabel}
+            {secondaryLabel}
           </p>
         </div>
 
