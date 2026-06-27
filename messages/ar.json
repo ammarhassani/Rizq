@@ -1271,7 +1271,21 @@
     "ctaMarkPaid": "اقبض الدفعة",
     "ctaContinue": "متابعة",
     "working": "جارٍ التنفيذ…",
-    "error": "حدث خطأ. حاول مرة أخرى."
+    "error": "حدث خطأ. حاول مرة أخرى.",
+    "chooserQuestion": "هل لديك عرض لهذا المشروع؟",
+    "chooserExisting": "لديّ عرض جاهز",
+    "chooserExistingDesc": "اختر من عروضك واربط المشروع به.",
+    "chooserNew": "أنشئ عرضاً جديداً",
+    "chooserNewDesc": "ابدأ من استوديو العروض.",
+    "chooserDirect": "ابدأ مباشرة",
+    "chooserDirectDesc": "مشروع بلا عرض — أضِف العرض أو الفاتورة لاحقاً.",
+    "chooserBack": "الخيارات",
+    "pickerSearch": "ابحث في عروضك…",
+    "pickerEmpty": "لا توجد عروض غير مرتبطة بمشروع.",
+    "pickerEmptyCta": "أنشئ عرضاً جديداً",
+    "pickerNoResults": "لا توجد نتائج.",
+    "setUpValue": "حدّد قيمة العمل",
+    "setUpValueDesc": "أضِف مبلغ المشروع لتبدأ الفوترة."
   },
   "Invoices": {
     "list": {

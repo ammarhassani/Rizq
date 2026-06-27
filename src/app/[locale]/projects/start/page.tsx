@@ -15,7 +15,7 @@ import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listTemplates } from "@/app/actions/proposals/templates";
 import { AppShell } from "@/components/shell/AppShell";
-import { ProposalFlow } from "@/components/proposals/ProposalFlow";
+import { ProjectStartChooser } from "@/components/projects/ProjectStartChooser";
 import { LifecycleStepper } from "@/components/projects/LifecycleStepper";
 import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { resolveLifecycle } from "@/lib/projects/lifecycle";
@@ -75,12 +75,13 @@ export default async function ProjectStartPage({ params }: { params: Promise<Par
 
         <LifecycleStepper lifecycle={lifecycle} locale={locale as "ar" | "en"} />
 
-        <ProposalFlow
-          locale={locale as "ar" | "en"}
-          specialties={[]}
-          templates={userTemplates.map((tpl) => ({ id: tpl.id, name_ar: tpl.name_ar, name_en: tpl.name_en }))}
-          clients={userClients}
-        />
+        <div className="mt-6">
+          <ProjectStartChooser
+            locale={locale as "ar" | "en"}
+            templates={userTemplates.map((tpl) => ({ id: tpl.id, name_ar: tpl.name_ar, name_en: tpl.name_en }))}
+            clients={userClients}
+          />
+        </div>
       </div>
     </AppShell>
   );

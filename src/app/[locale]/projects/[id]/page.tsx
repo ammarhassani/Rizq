@@ -17,6 +17,7 @@ import { GuidedFlowOverlay } from "@/components/projects/GuidedFlowOverlay";
 import { ProjectLifecycleCta } from "@/components/projects/ProjectLifecycleCta";
 import { ProjectMoneyPanel } from "@/components/projects/ProjectMoneyPanel";
 import { ProjectMoneyDetails } from "@/components/projects/ProjectMoneyDetails";
+import { SetUpValuePanel } from "@/components/projects/SetUpValuePanel";
 import { GigStatusQuickEdit } from "@/components/income/GigStatusQuickEdit";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
 import { parseOrigin } from "@/lib/nav/origin";
@@ -192,8 +193,12 @@ export default async function ProjectDetailPage({
           }
         />
 
-        {/* Money (single-project view) */}
-        <ProjectMoneyPanel gig={gig} locale={locale as "ar" | "en"} />
+        {/* Money (single-project view) — or, for a blank project, set up the value */}
+        {gig ? (
+          <ProjectMoneyPanel gig={gig} locale={locale as "ar" | "en"} />
+        ) : (
+          <SetUpValuePanel locale={locale as "ar" | "en"} projectId={id} />
+        )}
 
         {/* Status control (mark paid / delivered / overdue …) */}
         {gig && (

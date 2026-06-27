@@ -1271,7 +1271,21 @@
     "ctaMarkPaid": "Mark as paid",
     "ctaContinue": "Continue",
     "working": "Working…",
-    "error": "Something went wrong. Try again."
+    "error": "Something went wrong. Try again.",
+    "chooserQuestion": "Do you have a proposal for this project?",
+    "chooserExisting": "Use an existing proposal",
+    "chooserExistingDesc": "Pick from your proposals and anchor the project to it.",
+    "chooserNew": "Create a new proposal",
+    "chooserNewDesc": "Start in the Proposal Studio.",
+    "chooserDirect": "Set up directly",
+    "chooserDirectDesc": "A project with no proposal — add a proposal or invoice later.",
+    "chooserBack": "Options",
+    "pickerSearch": "Search your proposals…",
+    "pickerEmpty": "No proposals that aren't already anchored to a project.",
+    "pickerEmptyCta": "Create a new proposal",
+    "pickerNoResults": "No results.",
+    "setUpValue": "Set the value",
+    "setUpValueDesc": "Add the project amount to start invoicing."
   },
   "Invoices": {
     "list": {

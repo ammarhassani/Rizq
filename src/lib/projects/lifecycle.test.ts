@@ -121,3 +121,22 @@ describe("resolveLifecycle — shape & totality", () => {
     expect(() => resolveLifecycle({ invoices: null, hasProject: false })).not.toThrow();
   });
 });
+
+describe("resolveLifecycle — blank project (feature 005, US4)", () => {
+  it("proposal skipped, project current, set_up_project next (no proposal, no gig)", () => {
+    const input: LifecycleInput = {
+      ...base,
+      hasProject: true,
+      projectHasOriginProposal: false,
+      gig: null,
+      invoices: [],
+    };
+    expect(stateOf(input, "proposal")).toBe("skipped");
+    expect(stateOf(input, "project")).toBe("current");
+    expect(stateOf(input, "invoice")).toBe("next");
+    const r = resolveLifecycle(input);
+    expect(r.currentStageKey).toBe("project");
+    expect(r.complete).toBe(false);
+    expect(r.nextAction).toBe("set_up_project");
+  });
+});

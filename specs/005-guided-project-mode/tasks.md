@@ -89,17 +89,17 @@ set up directly; money-free blank project; standalone proposal offers optional g
 right lifecycle stage; chosen proposal leaves the picker (no double-anchor); blank project is
 money-free with a working "Set up the value".
 
-- [ ] T023 [P] [US4] Unit tests `src/lib/projects/lifecycle.test.ts` (extend): blank project (`hasProject:true, projectHasOriginProposal:false, proposal:null, gig:null, invoices:[]`) → proposal=skipped, project=current, nextAction=`set_up_project`.
-- [ ] T024 [P] [US4] Create `src/app/actions/projects/createBlankProject.ts` — owner-scoped insert into `projects` (default title per D6, status active; no gig, no proposal); returns `{ project_id }`; revalidate `/projects`.
-- [ ] T025 [P] [US4] Create `src/app/actions/projects/listProposalsForAnchor.ts` — owner proposals where `project_id IS NULL`, ordered accepted›sent›viewed›draft then `created_at` desc; returns `AnchorProposal[]` (id, derived title, clientName, priceAnchor, status, createdAt).
-- [ ] T026 [P] [US4] Unit tests `src/app/actions/projects/listProposalsForAnchor` ordering/filter as pure helper in `src/lib/projects/anchorSort.ts` (+ `anchorSort.test.ts`): unanchored-only; status-priority then recency. (Keep the orderable logic pure + tested.)
-- [ ] T027 [US4] Create `src/components/projects/ProposalAnchorPicker.tsx` — searchable list (reuse card visual language: client primary, deliverable secondary, status pill, price); select → `createProjectFromProposal(proposal_id)` → route `/projects/{id}?guided=1`; loading/empty/error states; empty → CTA to "create new".
-- [ ] T028 [US4] Create `src/components/projects/ProjectStartChooser.tsx` — 3 options (AR-first, ≤1 screen): use existing → picker; create new → `ProposalFlow`; set up directly → `createBlankProject` → `/projects/{id}?guided=1`. Mobile-first, `focus-visible`, reduced-motion.
-- [ ] T029 [US4] Wire `src/app/[locale]/projects/start/page.tsx` to render `ProjectStartChooser` (replace the forced `ProposalFlow`); preserve the new-proposal branch via the chooser.
-- [ ] T030 [US4] Blank-project "Set up the value" (D4): on a gig-less project, make the project-page stage-② action create the gig via existing `createGig({ project_id, ... })` (reuse `ProjectMoneyDetails` fields) instead of the current `set_up_project` no-op in `ProjectLifecycleCta` / `src/app/[locale]/projects/[id]/page.tsx`.
+- [X] T023 [P] [US4] Unit tests `src/lib/projects/lifecycle.test.ts` (extend): blank project (`hasProject:true, projectHasOriginProposal:false, proposal:null, gig:null, invoices:[]`) → proposal=skipped, project=current, nextAction=`set_up_project`.
+- [X] T024 [P] [US4] Create `src/app/actions/projects/createBlankProject.ts` — owner-scoped insert into `projects` (default title per D6, status active; no gig, no proposal); returns `{ project_id }`; revalidate `/projects`.
+- [X] T025 [P] [US4] Create `src/app/actions/projects/listProposalsForAnchor.ts` — owner proposals where `project_id IS NULL`, ordered accepted›sent›viewed›draft then `created_at` desc; returns `AnchorProposal[]` (id, derived title, clientName, priceAnchor, status, createdAt).
+- [X] T026 [P] [US4] Unit tests `src/app/actions/projects/listProposalsForAnchor` ordering/filter as pure helper in `src/lib/projects/anchorSort.ts` (+ `anchorSort.test.ts`): unanchored-only; status-priority then recency. (Keep the orderable logic pure + tested.)
+- [X] T027 [US4] Create `src/components/projects/ProposalAnchorPicker.tsx` — searchable list (reuse card visual language: client primary, deliverable secondary, status pill, price); select → `createProjectFromProposal(proposal_id)` → route `/projects/{id}?guided=1`; loading/empty/error states; empty → CTA to "create new".
+- [X] T028 [US4] Create `src/components/projects/ProjectStartChooser.tsx` — 3 options (AR-first, ≤1 screen): use existing → picker; create new → `ProposalFlow`; set up directly → `createBlankProject` → `/projects/{id}?guided=1`. Mobile-first, `focus-visible`, reduced-motion.
+- [X] T029 [US4] Wire `src/app/[locale]/projects/start/page.tsx` to render `ProjectStartChooser` (replace the forced `ProposalFlow`); preserve the new-proposal branch via the chooser.
+- [X] T030 [US4] Blank-project "Set up the value" (D4): on a gig-less project, make the project-page stage-② action create the gig via existing `createGig({ project_id, ... })` (reuse `ProjectMoneyDetails` fields) instead of the current `set_up_project` no-op in `ProjectLifecycleCta` / `src/app/[locale]/projects/[id]/page.tsx`.
 - [ ] T031 [P] [US4] Reframe the standalone proposal "Create project" CTA in `src/components/proposals/ProposalDetailActions.tsx` as an OPTIONAL "Won it? Start the project" (copy only; never forced).
-- [ ] T032 [P] [US4] Add all US4 i18n (AR+EN): chooser options + question, picker labels/empty state, "Set up the value", optional-graduate CTA copy.
-- [ ] T033 [US4] Verify live (AR+EN, mobile): each of the three branches; anchor a real existing proposal; confirm no double-anchor; blank project money-free then "Set up the value" → invoice unlocks. Gate green.
+- [X] T032 [P] [US4] Add all US4 i18n (AR+EN): chooser options + question, picker labels/empty state, "Set up the value", optional-graduate CTA copy.
+- [X] T033 [US4] Verify live (AR+EN, mobile): each of the three branches; anchor a real existing proposal; confirm no double-anchor; blank project money-free then "Set up the value" → invoice unlocks. Gate green.
 
 ---
 
