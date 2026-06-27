@@ -30,6 +30,52 @@ export function selectFollowUps(
 }
 
 /**
+ * Coerce follow-up answers onto the typed scope schema before merging.
+ *
+ * AI-generated questions return option `value`s as STRINGS (e.g. "3 rounds"),
+ * but structured scope fields are typed: `revisions`/`deliverable_count` are
+ * numbers and `ip_transfer` is an enum. Without coercion a string answer never
+ * applies (it fails the `typeof === "number"` read and falls back to a default).
+ * This maps the known fields to their proper types and drops unrepresentable
+ * values; unknown fields pass through unchanged. Pure. (feature 001 / 005)
+ */
+const INT_FIELDS = new Set(["revisions", "deliverable_count"]);
+
+function coerceInt(v: unknown): number | undefined {
+  if (typeof v === "number" && Number.isFinite(v)) return Math.trunc(v);
+  if (typeof v === "string") {
+    const m = v.match(/\d+/);
+    if (m) return parseInt(m[0], 10);
+  }
+  return undefined; // e.g. "unlimited" / free text → not representable, keep the default
+}
+
+function coerceIpTransfer(v: unknown): "full_transfer" | "license" | "unclear" | undefined {
+  if (typeof v !== "string") return undefined;
+  const s = v.trim().toLowerCase();
+  if (s === "full_transfer" || /full[_\s-]?transfer|نقل كامل|ملكية كاملة|تنازل/.test(s)) return "full_transfer";
+  if (s === "license" || /licen[cs]e|ترخيص|استخدام/.test(s)) return "license";
+  if (s === "unclear") return "unclear";
+  return undefined;
+}
+
+export function normalizeAnswers(answers: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...answers };
+  for (const key of Object.keys(out)) {
+    if (INT_FIELDS.has(key)) {
+      const n = coerceInt(out[key]);
+      if (n === undefined) delete out[key];
+      else out[key] = key === "revisions" ? Math.max(0, Math.min(20, n)) : Math.max(1, n);
+    } else if (key === "ip_transfer") {
+      const ip = coerceIpTransfer(out[key]);
+      if (ip === undefined) delete out[key];
+      else out[key] = ip;
+    }
+  }
+  return out;
+}
+
+/**
  * Merge the freelancer's quick-answers back into a scope-like object: set each
  * answered field to its value and bump that field's confidence to 1.0.
  * Returns a new object (does not mutate input).

@@ -8,7 +8,7 @@ import {
   buildArtifactData,
   type ArtifactInput,
 } from "@/lib/proposals/artifact";
-import { applyAnswers } from "@/lib/proposals/followUp";
+import { applyAnswers, normalizeAnswers } from "@/lib/proposals/followUp";
 import { loadRefContext } from "@/lib/proposals/refContext";
 import { loadUserBrandDefaults, loadTestimonials } from "@/lib/proposals/brand";
 import type { Scope } from "@/lib/ai/scope";
@@ -71,9 +71,10 @@ export async function answerFollowUps(
   if (fetchErr || !rawProposal) return { ok: false, code: "not_found" };
   const proposal = rawProposal as Record<string, unknown>;
 
-  // Merge answers into scope
+  // Merge answers into scope — coerce AI string answers onto the typed scope
+  // schema first (e.g. "3 rounds" → revisions: 3) so they actually apply.
   const oldScope = proposal["scope_json"] as Scope;
-  const updatedScope = applyAnswers(oldScope, answers);
+  const updatedScope = applyAnswers(oldScope, normalizeAnswers(answers));
 
   // Re-resolve the market band using the stored IDs (look up slugs via ref ctx)
   const refCtx = await loadRefContext();

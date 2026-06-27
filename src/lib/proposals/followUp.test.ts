@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   selectFollowUps,
   applyAnswers,
+  normalizeAnswers,
   type FollowUpTemplate,
 } from "./followUp";
 
@@ -162,5 +163,35 @@ describe("applyAnswers", () => {
     };
     const result = applyAnswers(scope, { new_field: "value" });
     expect(result.field_confidence.new_field).toBe(1.0);
+  });
+});
+
+describe("normalizeAnswers (feature 005 fix — AI string answers → typed scope)", () => {
+  it("parses revisions from a string like '3 rounds' → 3", () => {
+    expect(normalizeAnswers({ revisions: "3 rounds" })).toEqual({ revisions: 3 });
+  });
+  it("keeps a numeric revisions and clamps to 0..20", () => {
+    expect(normalizeAnswers({ revisions: 2 })).toEqual({ revisions: 2 });
+    expect(normalizeAnswers({ revisions: "99" })).toEqual({ revisions: 20 });
+  });
+  it("drops an unrepresentable revisions answer (e.g. 'unlimited') so the default holds", () => {
+    expect(normalizeAnswers({ revisions: "unlimited" })).toEqual({});
+  });
+  it("coerces deliverable_count and enforces >= 1", () => {
+    expect(normalizeAnswers({ deliverable_count: "5 items" })).toEqual({ deliverable_count: 5 });
+  });
+  it("maps ip_transfer tokens to the enum", () => {
+    expect(normalizeAnswers({ ip_transfer: "full_transfer" })).toEqual({ ip_transfer: "full_transfer" });
+    expect(normalizeAnswers({ ip_transfer: "Usage license" })).toEqual({ ip_transfer: "license" });
+    expect(normalizeAnswers({ ip_transfer: "نقل كامل" })).toEqual({ ip_transfer: "full_transfer" });
+  });
+  it("drops an unmappable ip_transfer value", () => {
+    expect(normalizeAnswers({ ip_transfer: "maybe later" })).toEqual({});
+  });
+  it("passes unknown fields through unchanged", () => {
+    expect(normalizeAnswers({ brand_personality: "playful", revisions: "2" })).toEqual({
+      brand_personality: "playful",
+      revisions: 2,
+    });
   });
 });
