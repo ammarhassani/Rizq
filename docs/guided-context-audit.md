@@ -1,5 +1,8 @@
 # Guided-flow context audit — "the whole app should serve the guided flow" (2026-06-27)
 
+> ✅ **SHIPPED** as feature `005-guided-project-mode` (US1 contextual back · US2 continuity /
+> return-to-pane · US3 framing · US4 entry chooser + anchor + blank project). All verified live.
+
 ## Founder signal
 > When I'm in guided flow (project initiation), the *whole app* should serve that flow.
 > Today I create an invoice for a project and "back" returns me to the **invoice route**,

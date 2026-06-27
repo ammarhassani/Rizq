@@ -97,7 +97,7 @@ money-free with a working "Set up the value".
 - [X] T028 [US4] Create `src/components/projects/ProjectStartChooser.tsx` — 3 options (AR-first, ≤1 screen): use existing → picker; create new → `ProposalFlow`; set up directly → `createBlankProject` → `/projects/{id}?guided=1`. Mobile-first, `focus-visible`, reduced-motion.
 - [X] T029 [US4] Wire `src/app/[locale]/projects/start/page.tsx` to render `ProjectStartChooser` (replace the forced `ProposalFlow`); preserve the new-proposal branch via the chooser.
 - [X] T030 [US4] Blank-project "Set up the value" (D4): on a gig-less project, make the project-page stage-② action create the gig via existing `createGig({ project_id, ... })` (reuse `ProjectMoneyDetails` fields) instead of the current `set_up_project` no-op in `ProjectLifecycleCta` / `src/app/[locale]/projects/[id]/page.tsx`.
-- [ ] T031 [P] [US4] Reframe the standalone proposal "Create project" CTA in `src/components/proposals/ProposalDetailActions.tsx` as an OPTIONAL "Won it? Start the project" (copy only; never forced).
+- [X] T031 [P] [US4] Reframe the standalone proposal "Create project" CTA in `src/components/proposals/ProposalDetailActions.tsx` as an OPTIONAL "Won it? Start the project" (copy only; never forced).
 - [X] T032 [P] [US4] Add all US4 i18n (AR+EN): chooser options + question, picker labels/empty state, "Set up the value", optional-graduate CTA copy.
 - [X] T033 [US4] Verify live (AR+EN, mobile): each of the three branches; anchor a real existing proposal; confirm no double-anchor; blank project money-free then "Set up the value" → invoice unlocks. Gate green.
 
@@ -105,9 +105,9 @@ money-free with a working "Set up the value".
 
 ## Phase 7: Polish & cross-cutting
 
-- [ ] T034 [P] Run `node scripts/a11y-audit.mjs` across touched surfaces (chooser, picker, back links, breadcrumb) — all new controls named/labeled; axe clean.
-- [ ] T035 [P] Standalone regression sweep: with no `from`/`guided`, every touched screen behaves exactly as before (back → own list; no framing; no overlay).
-- [ ] T036 Update `docs/guided-vs-standalone-brainstorm.md` + `docs/guided-context-audit.md` status notes to "shipped"; final `pnpm typecheck` + `pnpm test` + quickstart walkthrough.
+- [X] T034 [P] Run `node scripts/a11y-audit.mjs` across touched surfaces (chooser, picker, back links, breadcrumb) — all new controls named/labeled; axe clean.
+- [X] T035 [P] Standalone regression sweep: with no `from`/`guided`, every touched screen behaves exactly as before (back → own list; no framing; no overlay).
+- [X] T036 Update `docs/guided-vs-standalone-brainstorm.md` + `docs/guided-context-audit.md` status notes to "shipped"; final `pnpm typecheck` + `pnpm test` + quickstart walkthrough.
 
 ---
 

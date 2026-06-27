@@ -1,5 +1,9 @@
 # Guided flow vs standalone components — brainstorm & audit (2026-06-27)
 
+> ✅ **SHIPPED** as feature `005-guided-project-mode` — the 3-way Project Start chooser (use
+> existing proposal · create new · set up directly = money-free blank) + guided context
+> threading. See `specs/005-guided-project-mode/` and `docs/guided-context-audit.md`.
+
 ## The problem (founder)
 > The app should do **both**: standalone components (make a proposal to win a quick
 > settlement — maybe never a project) **and** a guided project that threads all the
