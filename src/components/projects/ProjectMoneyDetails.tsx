@@ -10,7 +10,7 @@
  */
 
 import { useState, useTransition } from "react";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { updateGig } from "@/app/actions/gigs/gigs";
@@ -48,6 +48,8 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  // Collapsed by default — the Overview is for reading status; editing is opt-in. (Audit P2)
+  const [open, setOpen] = useState(false);
 
   function handleSave() {
     setError(null);
@@ -75,7 +77,19 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
 
   return (
     <section dir={dir} className="mb-6">
-      <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("moneyDetailsTitle")}</h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className={`eyebrow text-rizq-green ${font}`}>{t("moneyDetailsTitle")}</h2>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-white/60 px-3 py-1.5 text-xs font-medium text-rizq-ink-soft hover:text-rizq-ink hover:border-rizq-green/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+        >
+          <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
+          {open ? (isAr ? "إغلاق" : "Close") : (isAr ? "تعديل" : "Edit")}
+        </button>
+      </div>
+      {open && (
       <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 p-5 space-y-4 ${font}`}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -158,6 +172,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
           )}
         </div>
       </div>
+      )}
     </section>
   );
 }
