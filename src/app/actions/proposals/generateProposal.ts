@@ -6,6 +6,7 @@ import { extractScope, aggregateConfidence } from "@/lib/ai/scope";
 import { generateFollowUps } from "@/lib/ai/followups";
 import { isAIConfigured } from "@/lib/ai/client";
 import { resolvePrice } from "@/lib/pricing/resolve";
+import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
 import {
   computeProposalPrice,
 } from "@/lib/pricing/proposalPricing";
@@ -149,11 +150,12 @@ export async function generateProposal(
   // the freelancer's saved city + experience tier (from onboarding / settings).
   const { data: ownerProfile } = await supabase
     .from("users")
-    .select("city, experience_tier_id")
+    .select("city, experience_tier_id, years_experience")
     .eq("id", userId)
     .maybeSingle();
   const ownerCity = (ownerProfile?.city as string | null) ?? null;
   const ownerTierId = (ownerProfile?.experience_tier_id as string | null) ?? null;
+  const ownerYears = (ownerProfile?.years_experience as number | null) ?? null;
 
   // 2d. Load template defaults when template_id is provided
   let templateDefaults: PricingJson | null = null;
@@ -219,11 +221,15 @@ export async function generateProposal(
   const tierFromProfile = ownerTierId
     ? refCtx.tiers.find((tr) => tr.id === ownerTierId)?.slug ?? null
     : null;
+  // If the explicit tier isn't set, derive it from the years of experience we
+  // already have on the profile — never silently default to "mid".
+  const tierFromYears = tierFromProfile ? null : tierSlugFromYears(ownerYears, refCtx.tiers);
   const tierSlug =
     (input.experience_tier_slug && refCtx.tierIdBySlug.has(input.experience_tier_slug)
       ? input.experience_tier_slug
       : null) ??
     tierFromProfile ??
+    tierFromYears ??
     (refCtx.tierIdBySlug.has("mid") ? "mid" : null) ??
     refCtx.tiers[0]?.slug ??
     "";
