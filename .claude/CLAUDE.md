@@ -70,6 +70,12 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   framing) **without cloning screens**, plus a 3-way Project Start chooser (use existing proposal /
   create new / set up directly = money-free blank). **No migration**; reuses `resolveLifecycle` +
   `createProjectFromProposal`. spec+plan done (4 phases: P1 nav-origin → P2 continuity → P3 framing
-  → P4 chooser) → **tasks next**.
-Active (`.specify/feature.json`): **005**.
+  → P4 chooser) → **tasks next**. ✅ **SHIPPED** (all 4 phases live).
+- `specs/006-profile-source-of-truth/` — **Profile as Source of Truth + Onboarding Re-engineering**:
+  the ~70-field profile becomes a typed `FreelancerProfile` loaded once and **passed as a parameter**
+  to every engine (defaults from profile; AI fills only brief-specific gaps) — retiring downstream
+  patches (specialty disambiguation, years→tier). **No migration** (schema already holds it).
+  4 phases: P1 specialty prior + stated-rate anchor → P2 brand/defaults/VAT→invoices + goal/tone →
+  P3 onboarding strength-meter + resumable → P4 smart prefill + live preview. spec+plan done.
+Active (`.specify/feature.json`): **006**.
 <!-- SPECKIT END -->
