@@ -260,6 +260,7 @@
         "passwordRequired": "Enter a password.",
         "passwordTooShort": "Password must be at least 8 characters.",
         "emailTaken": "This email is already registered. Sign in instead.",
+        "emailUndeliverable": "This email can't receive mail. Use a real address (e.g. Gmail).",
         "weakPassword": "Weak password. Mix letters, numbers, and symbols.",
         "rateLimited": "Easy there. Try again in a few minutes."
       }

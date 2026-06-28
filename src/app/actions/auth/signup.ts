@@ -14,7 +14,7 @@ const InputSchema = z.object({
 
 export type SignupResult =
   | { ok: true; needsVerification: boolean }
-  | { ok: false; code: "invalid" | "email_taken" | "weak_password" | "rate_limited" | "error" };
+  | { ok: false; code: "invalid" | "invalid_email" | "email_taken" | "weak_password" | "rate_limited" | "error" };
 
 async function getClientIp(): Promise<string> {
   const h = await headers();
@@ -60,6 +60,11 @@ export async function signUp(input: unknown): Promise<SignupResult> {
     }
     if (msg.includes("rate limit") || msg.includes("too many")) {
       return { ok: false, code: "rate_limited" };
+    }
+    // GoTrue rejects addresses it can't deliver to (e.g. @test.com / @example.com).
+    // Surface it on the email field instead of a generic "something went wrong".
+    if (error.code === "email_address_invalid" || (msg.includes("invalid") && msg.includes("email"))) {
+      return { ok: false, code: "invalid_email" };
     }
     console.error("[signup] error", { code: error.code });
     return { ok: false, code: "error" };

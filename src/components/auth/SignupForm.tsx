@@ -65,6 +65,7 @@ export function SignupForm({ locale }: Props) {
 
       const messages: Record<string, string> = {
         email_taken: t("errors.emailTaken"),
+        invalid_email: t("errors.emailUndeliverable"),
         weak_password: t("errors.weakPassword"),
         rate_limited: t("errors.rateLimited"),
         invalid: t("errors.emailInvalid"),
