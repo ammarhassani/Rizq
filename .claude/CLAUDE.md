@@ -76,6 +76,9 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   to every engine (defaults from profile; AI fills only brief-specific gaps) — retiring downstream
   patches (specialty disambiguation, years→tier). **No migration** (schema already holds it).
   4 phases: P1 specialty prior + stated-rate anchor → P2 brand/defaults/VAT→invoices + goal/tone →
-  P3 onboarding strength-meter + resumable → P4 smart prefill + live preview. spec+plan done.
+  P3 onboarding strength-meter + resumable → P4 smart prefill + live preview.
+  ✅ **SHIPPED** (P1–P4): specialty prior + stated-rate anchor; invoice VAT/terms;
+  dashboard income-goal bar; onboarding meter + payoff + URL prefill + live brand
+  preview. Live **price** preview deferred (needs a pricing action + provenance).
 Active (`.specify/feature.json`): **006**.
 <!-- SPECKIT END -->
