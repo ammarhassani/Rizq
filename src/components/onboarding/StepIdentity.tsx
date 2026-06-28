@@ -16,7 +16,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
   const [fullNameAr, setFullNameAr] = useState(profile.full_name_ar ?? "");
   const [fullNameEn, setFullNameEn] = useState(profile.full_name_en ?? "");
   const [flNumber, setFlNumber] = useState(profile.fl_number ?? "");
-  const [commercialReg, setCommercialReg] = useState(profile.commercial_reg ?? "");
   const [vatRegistered, setVatRegistered] = useState(profile.vat_registered ?? false);
   const [vatNumber, setVatNumber] = useState(profile.vat_number ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +31,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
         full_name_ar: fullNameAr || null,
         full_name_en: fullNameEn || null,
         fl_number: flNumber || null,
-        commercial_reg: commercialReg || null,
         vat_registered: vatRegistered,
         vat_number: vatNumber || null,
       });
@@ -99,20 +97,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       {/* FL Document upload — DEFERRED */}
       <div className="rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40 px-4 py-3">
         <p className="text-sm text-rizq-ink-soft">{t("flUploadDeferred")}</p>
-      </div>
-
-      {/* Commercial registration */}
-      <div>
-        <label className={labelCls}>{t("commercialReg")}</label>
-        <input
-          type="text"
-          value={commercialReg}
-          onChange={(e) => setCommercialReg(e.target.value)}
-          placeholder={t("commercialRegPlaceholder")}
-          className={inputCls}
-          maxLength={40}
-          dir="ltr"
-        />
       </div>
 
       {/* VAT */}
