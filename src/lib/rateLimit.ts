@@ -45,6 +45,17 @@ export function checkRateLimit(
   };
 }
 
+/**
+ * Give back one hit on a key — used when an attempt failed for a benign reason
+ * (e.g. a typo'd / undeliverable email, or an already-registered address) that
+ * created nothing and isn't abuse. Keeps honest users from locking themselves
+ * out while fixing a mistake. No-op if the window already expired.
+ */
+export function refundRateLimit(key: string) {
+  const b = buckets.get(key);
+  if (b && b.count > 0) b.count -= 1;
+}
+
 // Sweep stale entries occasionally so the Map doesn't grow unbounded
 // in a long-lived process. Cheap O(n) walk; we expect <1k keys.
 let lastSweep = Date.now();

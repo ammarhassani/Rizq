@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { cookies, headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
+import { checkRateLimit, refundRateLimit, maybeSweep } from "@/lib/rateLimit";
 
 const InputSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(320),
@@ -29,7 +29,8 @@ export async function signUp(input: unknown): Promise<SignupResult> {
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const ip = await getClientIp();
-  const rl = checkRateLimit(`signup:${ip}`, 5, 5 * 60 * 1000);
+  const rlKey = `signup:${ip}`;
+  const rl = checkRateLimit(rlKey, 5, 5 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();
@@ -53,9 +54,11 @@ export async function signUp(input: unknown): Promise<SignupResult> {
   if (error) {
     const msg = error.message.toLowerCase();
     if (msg.includes("already registered") || msg.includes("already been registered")) {
+      refundRateLimit(rlKey); // benign — created nothing, don't count it
       return { ok: false, code: "email_taken" };
     }
     if (msg.includes("weak") || msg.includes("password should")) {
+      refundRateLimit(rlKey);
       return { ok: false, code: "weak_password" };
     }
     if (msg.includes("rate limit") || msg.includes("too many")) {
@@ -64,6 +67,7 @@ export async function signUp(input: unknown): Promise<SignupResult> {
     // GoTrue rejects addresses it can't deliver to (e.g. @test.com / @example.com).
     // Surface it on the email field instead of a generic "something went wrong".
     if (error.code === "email_address_invalid" || (msg.includes("invalid") && msg.includes("email"))) {
+      refundRateLimit(rlKey); // typo'd / undeliverable email isn't abuse
       return { ok: false, code: "invalid_email" };
     }
     console.error("[signup] error", { code: error.code });
