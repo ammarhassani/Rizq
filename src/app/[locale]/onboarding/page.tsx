@@ -19,6 +19,7 @@ import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
+import { OnboardingAurora } from "@/components/onboarding/OnboardingAurora";
 import type { ProfileSnapshot } from "@/components/onboarding/types";
 import type { OnboardingStep } from "@/components/onboarding/types";
 
@@ -174,7 +175,10 @@ export default async function OnboardingPage({
   const initialStep = snapshot.onboarding_step > 0 ? snapshot.onboarding_step : 1;
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-6 py-10 sm:py-14">
+    <div className="relative min-h-screen flex items-center justify-center px-6 py-10 sm:py-14 overflow-hidden">
+      {/* Living aurora + drifting brand glyphs (feature 006) */}
+      <OnboardingAurora />
+
       {/* Dot-grid background */}
       <div
         aria-hidden
