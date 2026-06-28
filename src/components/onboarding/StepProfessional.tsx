@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { SPECIALTIES } from "@/lib/refData";
 import { Combobox } from "@/components/ui/Combobox";
@@ -53,6 +53,13 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
           : yrs < 10
             ? tiers[2]
             : tiers[3];
+
+  // Custom stepper (the native number spinner was unreliable on hover).
+  const stepYears = (delta: number) => {
+    const cur = yearsExperience === "" ? 0 : parseInt(yearsExperience, 10);
+    const next = Math.max(0, Math.min(60, (Number.isNaN(cur) ? 0 : cur) + delta));
+    setYearsExperience(String(next));
+  };
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
@@ -107,15 +114,37 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
           animated underscript derived from the value. */}
       <div>
         <label className={labelCls}>{t("yearsExperience")}</label>
-        <input
-          type="text"
-          inputMode="numeric"
-          value={yearsExperience}
-          onChange={(e) => setYearsExperience(e.target.value.replace(/\D/g, "").slice(0, 2))}
-          placeholder={t("yearsExperiencePlaceholder")}
-          className={inputCls}
+        <div
           dir="ltr"
-        />
+          className="flex items-stretch overflow-hidden rounded-xl border border-[#8f7e48] bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 focus-within:border-rizq-green"
+        >
+          <input
+            type="text"
+            inputMode="numeric"
+            value={yearsExperience}
+            onChange={(e) => setYearsExperience(e.target.value.replace(/\D/g, "").slice(0, 2))}
+            placeholder={t("yearsExperiencePlaceholder")}
+            className="flex-1 min-w-0 bg-transparent px-4 py-3 text-base text-rizq-ink tabular focus:outline-none"
+          />
+          <div className="flex flex-col border-s border-[#8f7e48]">
+            <button
+              type="button"
+              onClick={() => stepYears(1)}
+              aria-label={isAr ? "زيادة" : "Increase"}
+              className="flex flex-1 items-center justify-center px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
+            >
+              <ChevronUp size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => stepYears(-1)}
+              aria-label={isAr ? "إنقاص" : "Decrease"}
+              className="flex flex-1 items-center justify-center border-t border-[#8f7e48] px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
+            >
+              <ChevronDown size={14} />
+            </button>
+          </div>
+        </div>
         <div className="mt-1.5 min-h-[18px] overflow-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.p
