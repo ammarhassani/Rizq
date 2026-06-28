@@ -243,12 +243,18 @@ Expected JSON:
 }
 `;
 
-export function buildScopePrompt(briefText: string, ctx: ScopeCtx): string {
+export type SpecialtyPrior = { primarySlug: string | null; listedSlugs?: string[] };
+
+export function buildScopePrompt(briefText: string, ctx: ScopeCtx, prior?: SpecialtyPrior | null): string {
+  const priorLine =
+    prior?.primarySlug
+      ? `\nThis freelancer's discipline is "${prior.primarySlug}"${prior.listedSlugs && prior.listedSlugs.length > 1 ? ` (they also offer: ${prior.listedSlugs.join(", ")})` : ""}. Default the specialty to their discipline UNLESS the brief is clearly a different service they offer.\n`
+      : "";
   return `You extract a structured pricing scope from a Saudi freelancer's client brief (Arabic, English, or mixed).
 Valid specialties: ${ctx.specialtyLines}
 Cities: ${ctx.cityLines}
 Experience tiers: ${ctx.tierLines}
-
+${priorLine}
 Rules:
 - Choose the single best-fit specialty slug from the list. Use the guide below — the
   deliverables decide the specialty, not just a keyword like "logo" or "design".
@@ -284,7 +290,8 @@ Now extract the scope for this brief:
 /** Returns the extracted scope + provenance, or null on failure (caller degrades to a manual form). */
 export async function extractScope(
   briefText: string,
-  ctx: ScopeCtx
+  ctx: ScopeCtx,
+  prior?: SpecialtyPrior | null
 ): Promise<{
   scope: Scope;
   model: string;
@@ -292,7 +299,7 @@ export async function extractScope(
   confidence: number;
   raw: unknown;
 } | null> {
-  const prompt = buildScopePrompt(briefText, ctx);
+  const prompt = buildScopePrompt(briefText, ctx, prior);
   const hash = promptHash(prompt);
   try {
     const result = await generateObject({

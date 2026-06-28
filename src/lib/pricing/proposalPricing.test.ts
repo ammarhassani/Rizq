@@ -332,3 +332,25 @@ describe("computeProposalPrice — deliverable_count complexity (scope-size leve
     expect(r.anchor).toBeLessThanOrEqual(r.max);
   });
 });
+
+describe("computeProposalPrice — stated-rate personal anchor (feature 006)", () => {
+  const b = band(2000, 5000, 9000);
+  it("a stated rate counts as a personal anchor (no past history)", () => {
+    const without = computeProposalPrice(b, NO_MODS, []);
+    const high = computeProposalPrice(b, NO_MODS, [], 9000);
+    const low = computeProposalPrice(b, NO_MODS, [], 2000);
+    // With one stated point, personalWeight kicks in and pulls the anchor toward it.
+    expect(high.anchor).toBeGreaterThan(without.anchor);
+    expect(low.anchor).toBeLessThan(without.anchor);
+  });
+  it("null/zero stated rate leaves pricing unchanged", () => {
+    const base = computeProposalPrice(b, NO_MODS, [3000]);
+    expect(computeProposalPrice(b, NO_MODS, [3000], null).anchor).toBe(base.anchor);
+    expect(computeProposalPrice(b, NO_MODS, [3000], 0).anchor).toBe(base.anchor);
+  });
+  it("stays within the (complexity-scaled) band", () => {
+    const r = computeProposalPrice(b, NO_MODS, [], 100000);
+    expect(r.anchor).toBeLessThanOrEqual(r.max);
+    expect(r.anchor).toBeGreaterThanOrEqual(r.min);
+  });
+});

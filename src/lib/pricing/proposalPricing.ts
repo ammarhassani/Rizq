@@ -72,7 +72,11 @@ export function personalWeight(n: number): number {
 export function computeProposalPrice(
   market: MarketBand,
   mods: PricingModifierInput,
-  pastAnchors: number[]
+  pastAnchors: number[],
+  /** The freelancer's own stated project rate (e.g. project-rate-range midpoint).
+   *  Counts as a personal anchor point so pricing reflects them from proposal #1.
+   *  (feature 006). Bounded by the existing personalWeight cap. */
+  statedAnchor?: number | null
 ): ProposalPrice {
   const m = {
     urgency: urgencyMod(mods.urgency),
@@ -88,8 +92,12 @@ export function computeProposalPrice(
   const combined = m.urgency * m.client_type * m.ip;
   const modifiedAnchor = clamp(market.anchor * m.complexity * combined, min, max);
 
-  const w = personalWeight(pastAnchors.length);
-  const personalAnchor = median(pastAnchors);
+  // The freelancer's stated rate joins their personal history as one anchor point,
+  // so a profiled freelancer is reflected even with no past proposals.
+  const personalPoints =
+    typeof statedAnchor === "number" && statedAnchor > 0 ? [...pastAnchors, statedAnchor] : pastAnchors;
+  const w = personalWeight(personalPoints.length);
+  const personalAnchor = median(personalPoints);
   const blended = w > 0 ? modifiedAnchor * (1 - w) + personalAnchor * w : modifiedAnchor;
 
   const anchor = clamp(round50(blended), min, max);

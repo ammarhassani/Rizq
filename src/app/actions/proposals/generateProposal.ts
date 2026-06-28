@@ -7,6 +7,7 @@ import { generateFollowUps } from "@/lib/ai/followups";
 import { isAIConfigured } from "@/lib/ai/client";
 import { resolvePrice } from "@/lib/pricing/resolve";
 import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
+import { resolveSpecialty } from "@/lib/pricing/specialtyResolve";
 import {
   computeProposalPrice,
 } from "@/lib/pricing/proposalPricing";
@@ -150,12 +151,23 @@ export async function generateProposal(
   // the freelancer's saved city + experience tier (from onboarding / settings).
   const { data: ownerProfile } = await supabase
     .from("users")
-    .select("city, experience_tier_id, years_experience")
+    .select(
+      "city, experience_tier_id, years_experience, specialties, current_project_rate_range, primary_specialty:specialties!primary_specialty_id(slug)"
+    )
     .eq("id", userId)
     .maybeSingle();
   const ownerCity = (ownerProfile?.city as string | null) ?? null;
   const ownerTierId = (ownerProfile?.experience_tier_id as string | null) ?? null;
   const ownerYears = (ownerProfile?.years_experience as number | null) ?? null;
+  // feature 006 — the freelancer's own discipline is the specialty PRIOR.
+  const primarySpecialtySlug =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((ownerProfile as any)?.primary_specialty?.slug as string | null) ?? null;
+  const ownerStatedRange = (ownerProfile?.current_project_rate_range as { min?: number; max?: number } | null) ?? null;
+  const statedAnchor =
+    ownerStatedRange && typeof ownerStatedRange.min === "number" && typeof ownerStatedRange.max === "number"
+      ? (ownerStatedRange.min + ownerStatedRange.max) / 2
+      : null;
 
   // 2d. Load template defaults when template_id is provided
   let templateDefaults: PricingJson | null = null;
@@ -178,8 +190,20 @@ export async function generateProposal(
     return { ok: false, code: "error" };
   }
 
-  // 4. Extract scope via AI
-  const extraction = await extractScope(input.brief_text, refCtx.ctx);
+  // 4. Extract scope via AI — anchored to the freelancer's discipline (feature 006).
+  //    listedSlugs = the freelancer's free-text specialties mapped to known slugs.
+  const listedSlugs: string[] = [];
+  if (primarySpecialtySlug) listedSlugs.push(primarySpecialtySlug);
+  for (const entry of ((ownerProfile?.specialties as string[] | null) ?? [])) {
+    const key = String(entry).trim().toLowerCase();
+    const m = refCtx.specialties.find(
+      (s) => s.slug === key || s.name_ar?.toLowerCase() === key || s.name_en?.toLowerCase() === key
+    );
+    if (m?.slug && !listedSlugs.includes(m.slug)) listedSlugs.push(m.slug);
+  }
+  const specialtyPrior = primarySpecialtySlug ? { primarySlug: primarySpecialtySlug, listedSlugs } : null;
+
+  const extraction = await extractScope(input.brief_text, refCtx.ctx, specialtyPrior);
   if (!extraction) {
     // UI shows manual fallback form
     return { ok: false, code: "extraction_failed" };
@@ -197,7 +221,18 @@ export async function generateProposal(
   //    City and tier are resolved in the BACKGROUND so the freelancer never
   //    re-picks them: city = client's city → freelancer's city → first active;
   //    tier = freelancer's profile tier → "mid" → first. An explicit slug wins.
-  const specialtySlug = scope.specialty;
+  // The profile's primary discipline is the prior; the AI's guess only wins when
+  // it's clearly one of the freelancer's listed services (feature 006 — kills the
+  // disambiguation dependency for the common case). Empty profile → AI as before.
+  const resolvedSpecialty = resolveSpecialty({
+    primarySlug: primarySpecialtySlug,
+    listedSlugs,
+    aiSlug: scope.specialty,
+  });
+  const specialtySlug = refCtx.specialtyIdBySlug.has(resolvedSpecialty)
+    ? resolvedSpecialty
+    : scope.specialty;
+  if (specialtySlug !== scope.specialty) scope.specialty = specialtySlug; // keep scope consistent
   const specialtyId = refCtx.specialtyIdBySlug.get(specialtySlug);
   if (!specialtyId) {
     // Specialty extracted by AI but not in our active list
@@ -276,7 +311,8 @@ export async function generateProposal(
       ip_transfer: scope.ip_transfer,
       deliverable_count: scope.deliverable_count,
     },
-    pastAnchors
+    pastAnchors,
+    statedAnchor // feature 006 — the freelancer's stated rate as a personal anchor
   );
 
   // 9. Pick provenance citation by language
