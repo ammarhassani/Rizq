@@ -35,31 +35,41 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
   const [yearsExperience, setYearsExperience] = useState(
     profile.years_experience?.toString() ?? ""
   );
-  const [tierValue, setTierValue] = useState("");
-  const [languageAr, setLanguageAr] = useState(
-    profile.languages?.includes("ar") ?? true
-  );
-  const [languageEn, setLanguageEn] = useState(
-    profile.languages?.includes("en") ?? false
-  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Experience level is DERIVED from years — a single source of truth, never a
+  // second input that can disagree with it. (The pricing engine derives the real
+  // tier the same way.)
   const tiers = isAr ? EXPERIENCE_TIERS_AR : EXPERIENCE_TIERS_EN;
+  const yrs = yearsExperience === "" ? null : parseInt(yearsExperience, 10);
+  const derivedTier =
+    yrs == null || Number.isNaN(yrs)
+      ? null
+      : yrs < 2
+        ? tiers[0]
+        : yrs < 5
+          ? tiers[1]
+          : yrs < 10
+            ? tiers[2]
+            : tiers[3];
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      const langs: string[] = [];
-      if (languageAr) langs.push("ar");
-      if (languageEn) langs.push("en");
+      // Language was chosen on the welcome step — don't ask again. Keep what's
+      // there, else default to Arabic (+ English when the app is in English).
+      const langs =
+        profile.languages && profile.languages.length > 0
+          ? profile.languages
+          : Array.from(new Set(["ar", locale]));
 
       const result = await saveOnboardingStep("professional", {
         specialties: primarySpecialtySlug ? [primarySpecialtySlug] : [],
         years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
-        languages: langs.length > 0 ? langs : ["ar"],
+        languages: langs,
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -93,21 +103,6 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
         />
       </div>
 
-      {/* Experience tier */}
-      <div>
-        <label className={labelCls}>{t("experienceTier")}</label>
-        <Combobox
-          locale={locale}
-          value={tierValue || null}
-          onChange={(v) => setTierValue(v ?? "")}
-          options={tiers.map((tier) => ({ value: tier.value, label: tier.label }))}
-          placeholder={t("experienceTierPlaceholder")}
-          searchPlaceholder={tCommon("combobox.searchPlaceholder")}
-          emptyText={tCommon("combobox.noResults")}
-          allowClear
-        />
-      </div>
-
       {/* Years experience */}
       <div>
         <label className={labelCls}>{t("yearsExperience")}</label>
@@ -116,37 +111,25 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
           min={0}
           max={60}
           value={yearsExperience}
-          onChange={(e) => setYearsExperience(e.target.value)}
+          onChange={(e) => setYearsExperience(e.target.value.replace(/\D/g, "").slice(0, 2))}
           placeholder={t("yearsExperiencePlaceholder")}
           className={inputCls}
           dir="ltr"
+          inputMode="numeric"
         />
       </div>
 
-      {/* Languages */}
-      <div>
-        <p className={labelCls}>{t("languages")}</p>
-        <div className="flex gap-3 flex-wrap">
-          {(
-            [
-              { key: "ar", label: t("langAr"), state: languageAr, set: setLanguageAr },
-              { key: "en", label: t("langEn"), state: languageEn, set: setLanguageEn },
-            ] as const
-          ).map(({ key, label, state, set }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => set(!state)}
-              className={`rounded-2xl border px-4 py-2 text-sm transition-all ${
-                state
-                  ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
-              } ${font}`}
-              aria-pressed={state}
-            >
-              {label}
-            </button>
-          ))}
+      {/* Experience level — DERIVED from years (read-only, can't contradict it) */}
+      <div className="sm:col-span-2">
+        <label className={labelCls}>{t("experienceTier")}</label>
+        <div className="flex items-center min-h-[48px] rounded-xl border border-dashed border-[#8f7e48] bg-rizq-cream/40 px-4 py-3">
+          {derivedTier ? (
+            <span className={`text-sm font-medium text-rizq-green ${font}`}>{derivedTier.label}</span>
+          ) : (
+            <span className={`text-sm text-rizq-ink-soft ${font}`}>
+              {isAr ? "أدخل سنوات خبرتك لتحديد مستواك تلقائيًا" : "Enter your years to set your level automatically"}
+            </span>
+          )}
         </div>
       </div>
 
