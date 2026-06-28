@@ -29,6 +29,20 @@ import { StepReview } from "./StepReview";
 
 const TOTAL_STEPS = 11;
 
+// Per-step PAYOFF (feature 006) — what completing this step unlocks in the app,
+// so the freelancer feels their data feeding every module. Bilingual, RTL-safe.
+const STEP_PAYOFF: Record<string, { ar: string; en: string }> = {
+  identity: { ar: "يجعل عروضك وفواتيرك رسمية باسمك", en: "Makes your proposals & invoices official, in your name" },
+  location: { ar: "تسعير دقيق حسب سوق مدينتك", en: "Unlocks accurate pricing for your city's market" },
+  professional: { ar: "تخصصك وخبرتك يحددان كل سعر", en: "Your specialty & experience drive every price" },
+  rates: { ar: "التسعير يعكس سعرك من أول عرض", en: "Pricing reflects your own rate from proposal #1" },
+  platforms: { ar: "يعزّز مصداقيتك في العروض", en: "Adds credibility signals to your proposals" },
+  portfolio: { ar: "يبرز أعمالك التي تكسب العملاء", en: "Showcases the work that wins clients" },
+  brand: { ar: "اسمك وشعارك وألوانك على كل عرض وفاتورة", en: "Your name, logo & colors on every proposal & invoice" },
+  defaults: { ar: "فواتير أسرع بشروطك المعتادة", en: "Faster invoices with your standard terms" },
+  goals: { ar: "تتبّع تقدّمك نحو هدف دخلك", en: "Tracks your progress toward your income goal" },
+};
+
 // Config order (1-based index matches step.id)
 const STEP_KEYS = [
   "welcome",
@@ -116,17 +130,35 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
           />
         </div>
 
-        {/* Step title */}
+        {/* Step title + payoff */}
         {stepConfig && (
           <div>
             <h2 className={`text-lg font-bold text-rizq-ink ${font}`}>
               {isAr ? stepConfig.title_ar : stepConfig.title_en}
             </h2>
-            {stepConfig.step_key !== "welcome" && (
-              <p className="text-xs text-rizq-ink-soft mt-0.5">
-                {tv2("completeness", { pct: profile.profile_completeness_pct })}
+            {STEP_PAYOFF[stepKey] && (
+              <p className={`text-xs text-rizq-green/90 mt-1 flex items-center gap-1 ${font}`}>
+                <span aria-hidden>✦</span>
+                {isAr ? STEP_PAYOFF[stepKey].ar : STEP_PAYOFF[stepKey].en}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Profile-strength meter (feature 006) — fills as the profile gets richer,
+            distinct from the step-position bar above. */}
+        {stepKey !== "welcome" && (
+          <div className="pt-1">
+            <div className={`flex items-center justify-between text-[11px] text-rizq-ink-soft/70 mb-1 ${font}`}>
+              <span>{isAr ? "قوة ملفك" : "Profile strength"}</span>
+              <span className="tabular font-semibold text-rizq-green">{profile.profile_completeness_pct}%</span>
+            </div>
+            <div className="h-1 rounded-full bg-rizq-gold/15 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-rizq-green to-rizq-gold transition-all duration-700"
+                style={{ width: `${Math.max(0, Math.min(100, profile.profile_completeness_pct))}%` }}
+              />
+            </div>
           </div>
         )}
       </div>
