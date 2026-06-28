@@ -13,8 +13,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
-  const [fullNameAr, setFullNameAr] = useState(profile.full_name_ar ?? "");
-  const [fullNameEn, setFullNameEn] = useState(profile.full_name_en ?? "");
+  const [fullName, setFullName] = useState(profile.full_name_ar ?? profile.full_name_en ?? "");
   const [flNumber, setFlNumber] = useState(profile.fl_number ?? "");
   const [vatRegistered, setVatRegistered] = useState(profile.vat_registered ?? false);
   const [vatNumber, setVatNumber] = useState(profile.vat_number ?? "");
@@ -28,8 +27,9 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
     setError(null);
     startTransition(async () => {
       const result = await saveOnboardingStep("identity", {
-        full_name_ar: fullNameAr || null,
-        full_name_en: fullNameEn || null,
+        // One name field — mirror to both columns so AR + EN artifacts both resolve it.
+        full_name_ar: fullName || null,
+        full_name_en: fullName || null,
         fl_number: flNumber || null,
         vat_registered: vatRegistered,
         vat_number: vatNumber || null,
@@ -51,31 +51,17 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       dir={isAr ? "rtl" : "ltr"}
       className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 ${font}`}
     >
-      {/* Full name AR */}
-      <div>
-        <label className={labelCls}>{t("fullNameAr")}</label>
+      {/* Full name — single field, direction follows what they type */}
+      <div className="sm:col-span-2">
+        <label className={labelCls}>{isAr ? "الاسم الكامل" : "Full name"}</label>
         <input
           type="text"
-          value={fullNameAr}
-          onChange={(e) => setFullNameAr(e.target.value)}
-          placeholder={t("fullNameArPlaceholder")}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder={isAr ? "كما في هويتك" : "As on your ID"}
           className={inputCls}
           maxLength={120}
-          dir="rtl"
-        />
-      </div>
-
-      {/* Full name EN */}
-      <div>
-        <label className={labelCls}>{t("fullNameEn")}</label>
-        <input
-          type="text"
-          value={fullNameEn}
-          onChange={(e) => setFullNameEn(e.target.value)}
-          placeholder={t("fullNameEnPlaceholder")}
-          className={inputCls}
-          maxLength={120}
-          dir="ltr"
+          dir="auto"
         />
       </div>
 
