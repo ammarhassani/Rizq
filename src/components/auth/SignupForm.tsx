@@ -61,9 +61,11 @@ export function SignupForm({ locale }: Props) {
         // When email confirmation is off, signUp returns a live session → go
         // straight into the app (dashboard forwards new users to onboarding).
         // Only send to verify-email when confirmation is actually required.
+        // NOTE: `router` is the next-intl localized router — it prepends the
+        // locale itself, so paths here must be locale-less (no `/${locale}`).
         const path = result.needsVerification
           ? `/verify-email?email=${encodeURIComponent(values.email)}`
-          : `/${locale}/dashboard`;
+          : `/dashboard`;
         router.push(path);
         return;
       }
