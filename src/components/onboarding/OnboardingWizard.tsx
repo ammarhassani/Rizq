@@ -130,8 +130,8 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
           />
         </div>
 
-        {/* Step title + payoff */}
-        {stepConfig && (
+        {/* Step title + payoff (welcome renders its own hero, so skip it here) */}
+        {stepConfig && stepKey !== "welcome" && (
           <div>
             <h2 className={`text-lg font-bold text-rizq-ink ${font}`}>
               {isAr ? stepConfig.title_ar : stepConfig.title_en}

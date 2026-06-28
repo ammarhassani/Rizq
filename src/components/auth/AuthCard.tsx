@@ -38,16 +38,18 @@ export function AuthCard({ locale, eyebrow, title, subtitle, children, footer }:
           />
 
           {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
-          <h1 className={`text-3xl sm:text-4xl font-bold text-rizq-ink leading-tight ${font}`}>
-            {title}
-          </h1>
+          {title && (
+            <h1 className={`text-3xl sm:text-4xl font-bold text-rizq-ink leading-tight ${font}`}>
+              {title}
+            </h1>
+          )}
           {subtitle && (
             <p className={`mt-3 text-base text-rizq-ink-soft leading-relaxed ${font}`}>
               {subtitle}
             </p>
           )}
 
-          <div className="mt-8">{children}</div>
+          <div className={title || subtitle ? "mt-8" : ""}>{children}</div>
         </div>
 
         {footer && (

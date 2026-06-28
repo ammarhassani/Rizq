@@ -194,7 +194,7 @@ export default async function OnboardingPage({
         }}
       />
       <div className="relative z-10 w-full max-w-[520px]">
-        <AuthCard locale={localeTyped} title={t("v2.steps.welcome.title")} subtitle="">
+        <AuthCard locale={localeTyped} title="" subtitle="">
           <OnboardingWizard
             locale={localeTyped}
             profile={snapshot}

@@ -3,9 +3,20 @@
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { BadgeCheck, MapPin, Briefcase, Coins, Palette, Target } from "lucide-react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { setPreferredLanguage } from "@/app/actions/onboarding/setPreferredLanguage";
 import type { StepProps } from "./types";
+
+// A quick preview of the journey — so the welcome isn't a dead end.
+const JOURNEY = [
+  { code: "identity", Icon: BadgeCheck, ar: "هويتك", en: "Your identity" },
+  { code: "location", Icon: MapPin, ar: "مدينتك", en: "Your city" },
+  { code: "professional", Icon: Briefcase, ar: "تخصصك وخبرتك", en: "Specialty & experience" },
+  { code: "rates", Icon: Coins, ar: "أسعارك", en: "Your rates" },
+  { code: "brand", Icon: Palette, ar: "علامتك", en: "Your brand" },
+  { code: "goals", Icon: Target, ar: "أهدافك", en: "Your goals" },
+];
 
 export function StepWelcome({ locale, onNext }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.welcome");
@@ -74,21 +85,27 @@ export function StepWelcome({ locale, onNext }: StepProps) {
 
       <div className="h-px bg-rizq-gold/20" />
 
-      {/* Row 2 — welcome */}
-      <div className="flex flex-col items-center text-center gap-5">
-        <div className="w-16 h-16 rounded-full bg-rizq-green/10 flex items-center justify-center">
-          <span className="text-3xl font-bold text-rizq-green font-arabic">ر</span>
+      {/* Row 2 — welcome hero + what we'll set up */}
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <h2 className={`text-2xl font-bold text-rizq-ink ${font}`}>{t("title")}</h2>
+          <p className={`text-sm text-rizq-ink-soft leading-relaxed ${font}`}>{t("description")}</p>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-rizq-ink">{t("title")}</h2>
-          <p className="text-base text-rizq-ink-soft leading-relaxed max-w-sm mx-auto">
-            {t("description")}
-          </p>
-        </div>
+
+        {/* Preview the journey — answers "what comes next" */}
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+          {JOURNEY.map((s) => (
+            <li key={s.code} className={`flex items-center gap-2 text-sm text-rizq-ink ${font}`}>
+              <s.Icon size={16} className="text-rizq-green shrink-0" strokeWidth={1.75} />
+              <span>{isAr ? s.ar : s.en}</span>
+            </li>
+          ))}
+        </ul>
+
         <button
           type="button"
           onClick={() => onNext()}
-          className="inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-8 py-3.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-8 py-3.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all"
         >
           <span>{t("cta")}</span>
           <span className={isAr ? "rotate-180" : ""}>→</span>
