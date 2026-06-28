@@ -79,6 +79,6 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   P3 onboarding strength-meter + resumable → P4 smart prefill + live preview.
   ✅ **SHIPPED** (P1–P4): specialty prior + stated-rate anchor; invoice VAT/terms;
   dashboard income-goal bar; onboarding meter + payoff + URL prefill + live brand
-  preview. Live **price** preview deferred (needs a pricing action + provenance).
+  preview + live **price** preview (StepRates → real resolver + provenance).
 Active (`.specify/feature.json`): **006**.
 <!-- SPECKIT END -->

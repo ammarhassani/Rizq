@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import type { StepProps } from "./types";
 
 export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -73,6 +74,11 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       dir={isAr ? "rtl" : "ltr"}
       className={`space-y-5 ${font}`}
     >
+      {/* Live market-rate preview (feature 006) — the freelancer sees what the
+          engine derives from their specialty/city/experience while setting their
+          own rate. Ephemeral; cites provenance. */}
+      <OnboardingPricePreview locale={locale} />
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>{t("hourlyRate")}</label>

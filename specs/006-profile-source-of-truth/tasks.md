@@ -36,7 +36,7 @@ regress. Merge gate per phase: `pnpm typecheck` clean + `pnpm test` green; verif
 
 - [x] T016 [P] [US4] Create `src/lib/profile/prefill.ts`: `prefillFromUrl(url)` heuristic (platform + handle → field + specialty hint; no scraping) + `prefill.test.ts`.
 - [x] T017 [US4] Wire a "paste your profile URL" prefill into the relevant onboarding step: labeled suggestions, written only on confirm.
-- [x] T018 [US4] Live, ephemeral **brand** preview in StepBrand (persists nothing). NOTE: the live **price** preview is intentionally deferred — a shown price must call the engine + cite provenance (honesty); faking it would breach Principle I. The brand preview delivers the "feel your data" payoff now; the price preview is a follow-up that adds a debounced pricing action.
+- [x] T018 [US4] Live ephemeral previews (persists nothing): **brand** preview in StepBrand + **price** preview in StepRates via `previewPrice` action (real resolver + provenance citation — `src/app/actions/pricing/previewPrice.ts` + `OnboardingPricePreview.tsx`). Honest: the shown band comes from the engine and cites its provenance.
 - [~] T019 [US4] Verify live: prefill + brand preview. Logic unit-tested; routes render (307 auth-guard, no crash). Interactive UI walkthrough pending a browser session (no Playwright MCP in this tool session).
 
 ## Phase 6: Polish

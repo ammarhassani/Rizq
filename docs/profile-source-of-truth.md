@@ -6,8 +6,8 @@
 > freelancer's stated rate, invoices inherit VAT (KSA 15% when registered) +
 > payment terms, the dashboard shows progress to the personal income goal, and
 > onboarding gained a profile-strength meter + per-step payoff + URL prefill +
-> a live brand preview. The live **price** preview is the one deferred slice
-> (needs a pricing action + provenance — not faked). See `specs/006-*`.
+> a live brand preview **and a live price preview** (StepRates → real resolver +
+> provenance, ephemeral). All four phases are wired. See `specs/006-*`.
 
 ## The principle (stop the loop)
 A freelancer **is** "a senior graphic designer in Riyadh who charges ~X, transfers IP, takes
