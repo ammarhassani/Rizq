@@ -14,8 +14,12 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
   const font = isAr ? "font-arabic" : "font-sans";
 
   const [fullName, setFullName] = useState(profile.full_name_ar ?? profile.full_name_en ?? "");
-  const [flNumber, setFlNumber] = useState(profile.fl_number ?? "");
+  // FL number: the "FL" prefix is a fixed chip; we store only the digits the user types.
+  const [flDigits, setFlDigits] = useState((profile.fl_number ?? "").replace(/\D/g, ""));
   const [error, setError] = useState<string | null>(null);
+
+  // Optional, but if provided it must be 5–12 digits.
+  const flValid = flDigits === "" || /^\d{5,12}$/.test(flDigits);
   const [isPending, startTransition] = useTransition();
 
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
@@ -23,12 +27,17 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
 
   const handleSave = () => {
     setError(null);
+    if (!flValid) {
+      setError(isAr ? "رقم الوثيقة يجب أن يكون ٥–١٢ رقمًا." : "Document number must be 5–12 digits.");
+      return;
+    }
     startTransition(async () => {
       const result = await saveOnboardingStep("identity", {
         // One name field — mirror to both columns so AR + EN artifacts both resolve it.
         full_name_ar: fullName || null,
         full_name_en: fullName || null,
-        fl_number: flNumber || null,
+        // Persist canonically with the FL prefix; the input only holds digits.
+        fl_number: flDigits ? `FL-${flDigits}` : null,
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -61,19 +70,36 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
         />
       </div>
 
-      {/* FL Number */}
+      {/* FL Number — fixed "FL" chip + digits-only input */}
       <div className="sm:col-span-2">
         <label className={labelCls}>{t("flNumber")}</label>
-        <input
-          type="text"
-          value={flNumber}
-          onChange={(e) => setFlNumber(e.target.value)}
-          placeholder={t("flNumberPlaceholder")}
-          className={inputCls}
-          maxLength={40}
+        <div
           dir="ltr"
-        />
-        <p className="mt-1 text-xs text-rizq-ink-soft">{t("flNumberHint")}</p>
+          className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
+            flValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"
+          }`}
+        >
+          <span className="flex items-center px-3.5 bg-rizq-green/10 text-rizq-green font-semibold text-sm border-e border-[#8f7e48] select-none">
+            FL
+          </span>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={flDigits}
+            onChange={(e) => setFlDigits(e.target.value.replace(/\D/g, "").slice(0, 12))}
+            placeholder="XXXXXXXX"
+            className="flex-1 bg-transparent px-3 py-3 text-base text-rizq-ink tabular focus:outline-none"
+            aria-invalid={!flValid}
+            aria-label={t("flNumber")}
+          />
+        </div>
+        <p className={`mt-1 text-xs ${flValid ? "text-rizq-ink-soft" : "text-red-600"}`}>
+          {flValid
+            ? t("flNumberHint")
+            : isAr
+              ? "أرقام فقط (٥–١٢ خانة)."
+              : "Digits only (5–12)."}
+        </p>
       </div>
 
       {/* FL Document upload — DEFERRED */}
