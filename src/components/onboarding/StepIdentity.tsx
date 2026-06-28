@@ -15,8 +15,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
 
   const [fullName, setFullName] = useState(profile.full_name_ar ?? profile.full_name_en ?? "");
   const [flNumber, setFlNumber] = useState(profile.fl_number ?? "");
-  const [vatRegistered, setVatRegistered] = useState(profile.vat_registered ?? false);
-  const [vatNumber, setVatNumber] = useState(profile.vat_number ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -31,8 +29,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
         full_name_ar: fullName || null,
         full_name_en: fullName || null,
         fl_number: flNumber || null,
-        vat_registered: vatRegistered,
-        vat_number: vatNumber || null,
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -84,34 +80,6 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       <div className="sm:col-span-2 rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40 px-4 py-3">
         <p className="text-sm text-rizq-ink-soft">{t("flUploadDeferred")}</p>
       </div>
-
-      {/* VAT */}
-      <div className="sm:col-span-2 flex items-center gap-3">
-        <input
-          id="vat-check"
-          type="checkbox"
-          checked={vatRegistered}
-          onChange={(e) => setVatRegistered(e.target.checked)}
-          className="w-4 h-4 accent-rizq-green"
-        />
-        <label htmlFor="vat-check" className={`text-sm text-rizq-ink ${font}`}>
-          {t("vatRegistered")}
-        </label>
-      </div>
-      {vatRegistered && (
-        <div className="sm:col-span-2">
-          <label className={labelCls}>{t("vatNumber")}</label>
-          <input
-            type="text"
-            value={vatNumber}
-            onChange={(e) => setVatNumber(e.target.value)}
-            placeholder={t("vatNumberPlaceholder")}
-            className={inputCls}
-            maxLength={20}
-            dir="ltr"
-          />
-        </div>
-      )}
 
       {error && (
         <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
