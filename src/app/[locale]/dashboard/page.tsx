@@ -56,9 +56,15 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   // ref tables below using these FK ids.
   const { data: profile } = await supabase
     .from("users")
-    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id, income_goal_monthly_sar")
+    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id, income_goal_monthly_sar, onboarded_at, onboarding_completed")
     .eq("id", userId)
     .maybeSingle();
+
+  // New users land here after signup → send them through onboarding first.
+  // (Completing or skipping the wizard sets onboarded_at / onboarding_completed.)
+  if (profile && !profile.onboarded_at && !profile.onboarding_completed) {
+    redirect(getPathname({ href: "/onboarding", locale: locale as "ar" | "en" }));
+  }
 
   const userName =
     (profile?.full_name_ar as string | null) ??
