@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { NumberStepper } from "./NumberStepper";
 import type { StepProps } from "./types";
 
 export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -78,26 +79,28 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
             {t("depositPct")}
             <span className="text-xs text-rizq-ink-soft ms-1">{t("depositPctHint")}</span>
           </label>
-          <input
-            type="number"
+          <NumberStepper
+            locale={locale}
+            value={depositPct}
+            onChange={setDepositPct}
             min={0}
             max={100}
-            value={depositPct}
-            onChange={(e) => setDepositPct(e.target.value)}
-            className={inputCls}
-            dir="ltr"
+            step={5}
+            maxDigits={3}
+            ariaLabel={t("depositPct")}
           />
         </div>
         <div>
           <label className={labelCls}>{t("revisions")}</label>
-          <input
-            type="number"
+          <NumberStepper
+            locale={locale}
+            value={revisions}
+            onChange={setRevisions}
             min={0}
             max={50}
-            value={revisions}
-            onChange={(e) => setRevisions(e.target.value)}
-            className={inputCls}
-            dir="ltr"
+            step={1}
+            maxDigits={2}
+            ariaLabel={t("revisions")}
           />
         </div>
       </div>
@@ -167,14 +170,15 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
           {t("warrantyDays")}
           <span className="text-xs text-rizq-ink-soft ms-1">{t("warrantyDaysHint")}</span>
         </label>
-        <input
-          type="number"
+        <NumberStepper
+          locale={locale}
+          value={warrantyDays}
+          onChange={setWarrantyDays}
           min={0}
           max={365}
-          value={warrantyDays}
-          onChange={(e) => setWarrantyDays(e.target.value)}
-          className={inputCls}
-          dir="ltr"
+          step={1}
+          maxDigits={3}
+          ariaLabel={t("warrantyDays")}
         />
       </div>
       </div>

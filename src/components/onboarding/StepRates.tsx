@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
+import { NumberStepper } from "./NumberStepper";
 import type { StepProps } from "./types";
 
 export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -82,26 +83,24 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>{t("hourlyRate")}</label>
-          <input
-            type="number"
-            min={0}
+          <NumberStepper
+            locale={locale}
             value={hourlyRate}
-            onChange={(e) => setHourlyRate(e.target.value)}
+            onChange={setHourlyRate}
             placeholder={t("hourlyRatePlaceholder")}
-            className={inputCls}
-            dir="ltr"
+            step={10}
+            ariaLabel={t("hourlyRate")}
           />
         </div>
         <div>
           <label className={labelCls}>{t("dailyRate")}</label>
-          <input
-            type="number"
-            min={0}
+          <NumberStepper
+            locale={locale}
             value={dailyRate}
-            onChange={(e) => setDailyRate(e.target.value)}
+            onChange={setDailyRate}
             placeholder={t("dailyRatePlaceholder")}
-            className={inputCls}
-            dir="ltr"
+            step={50}
+            ariaLabel={t("dailyRate")}
           />
         </div>
       </div>
@@ -109,24 +108,22 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>{t("projectRateMin")}</label>
-          <input
-            type="number"
-            min={0}
+          <NumberStepper
+            locale={locale}
             value={projectMin}
-            onChange={(e) => setProjectMin(e.target.value)}
-            className={inputCls}
-            dir="ltr"
+            onChange={setProjectMin}
+            step={250}
+            ariaLabel={t("projectRateMin")}
           />
         </div>
         <div>
           <label className={labelCls}>{t("projectRateMax")}</label>
-          <input
-            type="number"
-            min={0}
+          <NumberStepper
+            locale={locale}
             value={projectMax}
-            onChange={(e) => setProjectMax(e.target.value)}
-            className={inputCls}
-            dir="ltr"
+            onChange={setProjectMax}
+            step={250}
+            ariaLabel={t("projectRateMax")}
           />
         </div>
       </div>
@@ -134,27 +131,25 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       <div className="grid grid-cols-2 gap-4">
       <div>
         <label className={labelCls}>{t("prevYearIncome")}</label>
-        <input
-          type="number"
-          min={0}
+        <NumberStepper
+          locale={locale}
           value={prevYearIncome}
-          onChange={(e) => setPrevYearIncome(e.target.value)}
+          onChange={setPrevYearIncome}
           placeholder={t("prevYearIncomePlaceholder")}
-          className={inputCls}
-          dir="ltr"
+          step={1000}
+          ariaLabel={t("prevYearIncome")}
         />
       </div>
 
       <div>
         <label className={labelCls}>{t("monthlyGoal")}</label>
-        <input
-          type="number"
-          min={0}
+        <NumberStepper
+          locale={locale}
           value={monthlyGoal}
-          onChange={(e) => setMonthlyGoal(e.target.value)}
+          onChange={setMonthlyGoal}
           placeholder={t("monthlyGoalPlaceholder")}
-          className={inputCls}
-          dir="ltr"
+          step={500}
+          ariaLabel={t("monthlyGoal")}
         />
       </div>
       </div>

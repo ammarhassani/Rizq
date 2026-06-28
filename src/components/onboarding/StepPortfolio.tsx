@@ -7,6 +7,7 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { ChipInput } from "@/components/ui/ChipInput";
 import { normalizeNotableClients } from "@/lib/profile/notableClients";
+import { NumberStepper } from "./NumberStepper";
 import type { StepProps } from "./types";
 
 interface Sample {
@@ -148,14 +149,14 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
       {/* Total projects */}
       <div>
         <label className={labelCls}>{t("totalProjects")}</label>
-        <input
-          type="number"
-          min={0}
+        <NumberStepper
+          locale={locale}
           value={totalProjects}
-          onChange={(e) => setTotalProjects(e.target.value)}
+          onChange={setTotalProjects}
           placeholder={t("totalProjectsPlaceholder")}
-          className={inputCls}
-          dir="ltr"
+          step={1}
+          maxDigits={4}
+          ariaLabel={t("totalProjects")}
         />
       </div>
 
