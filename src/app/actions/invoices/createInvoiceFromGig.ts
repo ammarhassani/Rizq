@@ -72,8 +72,20 @@ export async function createInvoiceFromGig(
   const subtotalSar = Number(gig.amount_sar);
   const clientId = (gig.client_id as string | null) ?? null;
   const proposalId = (gig.proposal_id as string | null) ?? null;
+
+  // feature 006 — the invoice inherits the freelancer's profile: VAT defaults to
+  // KSA 15% when they're VAT-registered, and payment terms default from settings.
+  const { data: prof } = await supabase
+    .from("users")
+    .select("vat_registered, default_payment_method, default_payment_details")
+    .eq("id", userId)
+    .maybeSingle();
+  const vatPct = prof?.vat_registered ? 15 : 0;
   const paymentMethod =
-    (gig.payment_method as string | null) ?? "bank_transfer";
+    (gig.payment_method as string | null) ??
+    (prof?.default_payment_method as string | null) ??
+    "bank_transfer";
+  const paymentDetails = (prof?.default_payment_details as string | null) ?? null;
 
   // Compute due_date: delivery_date + 15 days, or today + 15 days
   const baseDate = gig.delivery_date
@@ -103,9 +115,9 @@ export async function createInvoiceFromGig(
       description: gigTitle,
       items,
       subtotal_sar: subtotalSar,
-      vat_pct: 0,
+      vat_pct: vatPct,
       payment_method: paymentMethod,
-      payment_details: null,
+      payment_details: paymentDetails,
       due_date: dueDate,
       status: "draft",
     })

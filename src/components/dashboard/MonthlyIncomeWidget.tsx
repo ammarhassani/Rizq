@@ -17,6 +17,8 @@ type Props = {
   previous: MonthlyRow | null;
   trend?: TrendPoint[];
   locale: "ar" | "en";
+  /** The freelancer's personal monthly income goal (from onboarding/profile). feature 006 */
+  goalSar?: number | null;
 };
 
 function fmt(n: number | null, locale: "ar" | "en"): string {
@@ -24,7 +26,7 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function MonthlyIncomeWidget({ current, previous, trend, locale }: Props) {
+export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -35,6 +37,11 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale }: Props)
     prevTotal && prevTotal > 0
       ? Math.round(((totalSar - prevTotal) / prevTotal) * 100)
       : null;
+
+  // Progress toward the freelancer's own monthly goal (feature 006 — the profile
+  // income goal becomes a parameter the dashboard renders against).
+  const goalPct =
+    goalSar && goalSar > 0 ? Math.min(100, Math.round((totalSar / goalSar) * 100)) : null;
 
   return (
     <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-white/70 p-5 sm:p-6 flex flex-col gap-4 transition-[box-shadow,border-color] duration-200 hover:border-rizq-green/25 hover:shadow-sm">
@@ -80,6 +87,23 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale }: Props)
               </span>
             )}
           </div>
+
+          {goalPct !== null && (
+            <div className="pt-1">
+              <div className={`flex items-center justify-between text-xs mb-1 ${font}`}>
+                <span className="text-rizq-ink-soft/70">{isAr ? "هدفك الشهري" : "Your monthly goal"}</span>
+                <span className="tabular font-semibold text-rizq-green">
+                  {goalPct}% · {fmt(goalSar ?? 0, locale)}
+                </span>
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-rizq-gold/15 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-rizq-green transition-[width] duration-700"
+                  style={{ width: `${goalPct}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {trend && trend.length >= 2 && (
             <div className="pt-3 border-t border-rizq-gold/15">

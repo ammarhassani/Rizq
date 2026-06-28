@@ -56,7 +56,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   // ref tables below using these FK ids.
   const { data: profile } = await supabase
     .from("users")
-    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id")
+    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id, income_goal_monthly_sar")
     .eq("id", userId)
     .maybeSingle();
 
@@ -266,6 +266,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
             previous={prevMonth}
             trend={incomeTrend}
             locale={locale as "ar" | "en"}
+            goalSar={(profile?.income_goal_monthly_sar as number | null) ?? null}
           />
 
           {/* Quick Pricing */}
