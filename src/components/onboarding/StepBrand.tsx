@@ -113,6 +113,37 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
         </div>
       </div>
 
+      {/* Live, ephemeral brand preview (feature 006) — the freelancer sees their
+          identity on a proposal header in real time. Nothing is persisted here. */}
+      {(brandName || brandNameAr || taglineAr || taglineEn) && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-rizq-gold/30 bg-white/70 overflow-hidden"
+        >
+          <div className="h-1.5 bg-gradient-to-r from-rizq-green to-rizq-gold" />
+          <div className="p-4">
+            <p className={`text-[10px] uppercase tracking-wide text-rizq-ink-soft/60 mb-2 ${font}`}>
+              {isAr ? "معاينة حية لعرضك" : "Live preview of your proposal"}
+            </p>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className={`text-base font-bold text-rizq-green ${font}`}>
+                {(isAr ? brandNameAr || brandName : brandName || brandNameAr) ||
+                  (isAr ? "اسمك التجاري" : "Your brand")}
+              </span>
+              <span className={`text-[11px] text-rizq-ink-soft ${font}`}>
+                {isAr ? "عرض سعر" : "Proposal"}
+              </span>
+            </div>
+            {(isAr ? taglineAr : taglineEn) && (
+              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`} dir={isAr ? "rtl" : "ltr"}>
+                {isAr ? taglineAr : taglineEn}
+              </p>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       {/* Taglines + AI section */}
       <div className="space-y-3">
         <div>
