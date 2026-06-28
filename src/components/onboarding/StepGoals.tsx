@@ -76,7 +76,7 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip }: StepProps
     `rounded-2xl border px-4 py-2 text-sm transition-all ${
       selected
         ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-        : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+        : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
     } ${font}`;
 
   return (
@@ -86,7 +86,7 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip }: StepProps
       exit={{ opacity: 0, x: isAr ? 24 : -24 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       dir={isAr ? "rtl" : "ltr"}
-      className={`space-y-6 ${font}`}
+      className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5 ${font}`}
     >
       {/* Primary goal */}
       <div>
@@ -129,7 +129,7 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip }: StepProps
       </div>
 
       {/* Tone */}
-      <div>
+      <div className="sm:col-span-2">
         <p className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}>
           {t("preferredTone")}
         </p>
@@ -149,12 +149,12 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip }: StepProps
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
           {error}
         </p>
       )}
 
-      <div className={`flex items-center justify-between gap-3 pt-2 ${font}`}>
+      <div className={`sm:col-span-2 flex items-center justify-between gap-3 pt-2 ${font}`}>
         <button
           type="button"
           onClick={onBack}

@@ -7,13 +7,15 @@ type Props = {
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** Override the card width (e.g. wider for multi-column onboarding). */
+  maxWidthClass?: string;
 };
 
-export function AuthCard({ locale, eyebrow, title, subtitle, children, footer }: Props) {
+export function AuthCard({ locale, eyebrow, title, subtitle, children, footer, maxWidthClass = "max-w-[440px]" }: Props) {
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   return (
-    <div className="w-full max-w-[440px] mx-auto animate-fade-in">
+    <div className={`w-full ${maxWidthClass} mx-auto animate-fade-in`}>
         <div className="relative bg-rizq-cream/85 backdrop-blur-sm border border-rizq-gold/20 rounded-3xl p-8 sm:p-10 shadow-[0_30px_60px_-30px_rgba(26,95,63,0.18)]">
           {/* Gold corner accents — quiet editorial flourish */}
           <span

@@ -33,7 +33,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const handleAiTagline = () => {
@@ -146,6 +146,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
 
       {/* Taglines + AI section */}
       <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>{t("taglineAr")}</label>
           <input
@@ -169,6 +170,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
             maxLength={200}
             dir="ltr"
           />
+        </div>
         </div>
 
         {/* AI tagline button */}
@@ -231,6 +233,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
       </div>
 
       {/* Bios */}
+      <div className="grid grid-cols-2 gap-4">
       <div>
         <label className={labelCls}>{t("bioAr")}</label>
         <textarea
@@ -252,6 +255,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
           maxLength={1000}
           dir="ltr"
         />
+      </div>
       </div>
 
       {/* Contact */}

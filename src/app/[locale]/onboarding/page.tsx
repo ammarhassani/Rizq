@@ -193,8 +193,8 @@ export default async function OnboardingPage({
             "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
         }}
       />
-      <div className="relative z-10 w-full max-w-[520px]">
-        <AuthCard locale={localeTyped} title="" subtitle="">
+      <div className="relative z-10 w-full max-w-[680px]">
+        <AuthCard locale={localeTyped} title="" subtitle="" maxWidthClass="max-w-[680px]">
           <OnboardingWizard
             locale={localeTyped}
             profile={snapshot}

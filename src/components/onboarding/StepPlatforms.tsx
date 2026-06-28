@@ -54,7 +54,7 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip }: StepP
     setSuggestion(null);
   };
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const fields = [
@@ -92,10 +92,10 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip }: StepP
       exit={{ opacity: 0, x: isAr ? 24 : -24 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       dir={isAr ? "rtl" : "ltr"}
-      className={`space-y-4 ${font}`}
+      className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 ${font}`}
     >
       {/* Smart prefill — paste once, we suggest where it goes (feature 006) */}
-      <div className="rounded-2xl border border-rizq-green/20 bg-rizq-green/[0.03] p-3 space-y-2">
+      <div className="sm:col-span-2 rounded-2xl border border-rizq-green/20 bg-rizq-green/[0.03] p-3 space-y-2">
         <label className={`flex items-center gap-1.5 text-sm font-medium text-rizq-green ${font}`}>
           <Sparkles size={14} aria-hidden />
           {isAr ? "الصق رابط ملفك ونقترح مكانه" : "Paste a profile link — we'll suggest where it goes"}
@@ -143,12 +143,12 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip }: StepP
       ))}
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
           {error}
         </p>
       )}
 
-      <div className={`flex items-center justify-between gap-3 pt-2 ${font}`}>
+      <div className={`sm:col-span-2 flex items-center justify-between gap-3 pt-2 ${font}`}>
         <button
           type="button"
           onClick={onBack}

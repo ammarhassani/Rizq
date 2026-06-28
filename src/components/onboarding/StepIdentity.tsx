@@ -21,7 +21,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const handleSave = () => {
@@ -49,7 +49,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       exit={{ opacity: 0, x: isAr ? 24 : -24 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       dir={isAr ? "rtl" : "ltr"}
-      className={`space-y-5 ${font}`}
+      className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 ${font}`}
     >
       {/* Full name AR */}
       <div>
@@ -80,7 +80,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       </div>
 
       {/* FL Number */}
-      <div>
+      <div className="sm:col-span-2">
         <label className={labelCls}>{t("flNumber")}</label>
         <input
           type="text"
@@ -95,12 +95,12 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       </div>
 
       {/* FL Document upload — DEFERRED */}
-      <div className="rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40 px-4 py-3">
+      <div className="sm:col-span-2 rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40 px-4 py-3">
         <p className="text-sm text-rizq-ink-soft">{t("flUploadDeferred")}</p>
       </div>
 
       {/* VAT */}
-      <div className="flex items-center gap-3">
+      <div className="sm:col-span-2 flex items-center gap-3">
         <input
           id="vat-check"
           type="checkbox"
@@ -113,7 +113,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
         </label>
       </div>
       {vatRegistered && (
-        <div>
+        <div className="sm:col-span-2">
           <label className={labelCls}>{t("vatNumber")}</label>
           <input
             type="text"
@@ -128,11 +128,12 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       )}
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
           {error}
         </p>
       )}
 
+      <div className="sm:col-span-2">
       <StepNav
         locale={locale}
         onBack={onBack}
@@ -141,6 +142,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
         isPending={isPending}
         skippable
       />
+      </div>
     </motion.div>
   );
 }

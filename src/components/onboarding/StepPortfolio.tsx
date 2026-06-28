@@ -37,7 +37,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const addSample = () => {
@@ -144,6 +144,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
         )}
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Total projects */}
       <div>
         <label className={labelCls}>{t("totalProjects")}</label>
@@ -169,6 +170,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip }: StepP
           dir={isAr ? "rtl" : "ltr"}
           removeLabel={isAr ? "إزالة" : "Remove"}
         />
+      </div>
       </div>
 
       {error && (

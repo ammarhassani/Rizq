@@ -28,7 +28,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const ipOptions: Array<{ value: "full_transfer" | "license" | "per_project"; label: string }> = [
@@ -115,7 +115,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
               className={`rounded-2xl border px-4 py-2 text-sm transition-all ${
                 ipTerms === opt.value
                   ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-                  : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
               } ${font}`}
             >
               {opt.label}
@@ -137,7 +137,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
               className={`rounded-2xl border px-4 py-2 text-sm transition-all ${
                 paymentMethod === opt.value
                   ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-                  : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
               } ${font}`}
             >
               {opt.label}
@@ -146,6 +146,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
       {/* Payment details */}
       <div>
         <label className={labelCls}>{t("paymentDetails")}</label>
@@ -175,6 +176,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip }: StepPr
           className={inputCls}
           dir="ltr"
         />
+      </div>
       </div>
 
       {error && (

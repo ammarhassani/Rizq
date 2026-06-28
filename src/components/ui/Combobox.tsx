@@ -195,7 +195,7 @@ export function Combobox({
   const triggerClass = cn(
     "w-full inline-flex items-center justify-between gap-2 rounded-xl border bg-rizq-cream/60 px-4 py-3 text-base text-start transition-colors",
     "focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream",
-    open ? "border-rizq-green bg-rizq-cream" : "border-rizq-gold/30 hover:border-rizq-green/40",
+    open ? "border-rizq-green bg-rizq-cream" : "border-[#8f7e48] hover:border-rizq-green/40",
     disabled && "cursor-not-allowed opacity-60",
     font
   );
@@ -287,7 +287,7 @@ export function Combobox({
                 }
                 autoComplete="off"
                 className={cn(
-                  "w-full rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 py-2 text-sm text-rizq-ink transition-colors",
+                  "w-full rounded-lg border border-[#8f7e48] bg-rizq-cream/60 py-2 text-sm text-rizq-ink transition-colors",
                   "focus:border-rizq-green focus:bg-rizq-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/30",
                   "placeholder:text-rizq-ink-soft/50",
                   isAr ? "pr-9 pl-3" : "pl-9 pr-3"

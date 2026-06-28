@@ -46,7 +46,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
   const [isPending, startTransition] = useTransition();
 
   const tiers = isAr ? EXPERIENCE_TIERS_AR : EXPERIENCE_TIERS_EN;
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors appearance-none ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const handleSave = () => {
@@ -76,7 +76,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
       exit={{ opacity: 0, x: isAr ? 24 : -24 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
       dir={isAr ? "rtl" : "ltr"}
-      className={`space-y-5 ${font}`}
+      className={`grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 ${font}`}
     >
       {/* Primary specialty */}
       <div>
@@ -140,7 +140,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
               className={`rounded-2xl border px-4 py-2 text-sm transition-all ${
                 state
                   ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-                  : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
               } ${font}`}
               aria-pressed={state}
             >
@@ -151,12 +151,12 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
           {error}
         </p>
       )}
 
-      <div className={`flex items-center justify-between gap-3 pt-2 ${font}`}>
+      <div className={`sm:col-span-2 flex items-center justify-between gap-3 pt-2 ${font}`}>
         <button
           type="button"
           onClick={onBack}

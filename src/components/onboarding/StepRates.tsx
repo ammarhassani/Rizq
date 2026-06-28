@@ -34,7 +34,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const inputCls = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
+  const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
   const handleSave = () => {
@@ -131,6 +131,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
       <div>
         <label className={labelCls}>{t("prevYearIncome")}</label>
         <input
@@ -156,6 +157,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
           dir="ltr"
         />
       </div>
+      </div>
 
       {/* Rate confidence pills */}
       <div>
@@ -170,7 +172,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
               className={`rounded-2xl border px-4 py-2 text-sm transition-all ${
                 rateConfidence === opt.value
                   ? "border-rizq-green bg-rizq-green/10 text-rizq-green"
-                  : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
               } ${font}`}
             >
               {opt.label}
