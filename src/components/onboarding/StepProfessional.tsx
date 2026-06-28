@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { SPECIALTIES } from "@/lib/refData";
@@ -103,33 +103,36 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
         />
       </div>
 
-      {/* Years experience */}
+      {/* Years experience — text input (no native spinner) + level as an
+          animated underscript derived from the value. */}
       <div>
         <label className={labelCls}>{t("yearsExperience")}</label>
         <input
-          type="number"
-          min={0}
-          max={60}
+          type="text"
+          inputMode="numeric"
           value={yearsExperience}
           onChange={(e) => setYearsExperience(e.target.value.replace(/\D/g, "").slice(0, 2))}
           placeholder={t("yearsExperiencePlaceholder")}
           className={inputCls}
           dir="ltr"
-          inputMode="numeric"
         />
-      </div>
-
-      {/* Experience level — DERIVED from years (read-only, can't contradict it) */}
-      <div className="sm:col-span-2">
-        <label className={labelCls}>{t("experienceTier")}</label>
-        <div className="flex items-center min-h-[48px] rounded-xl border border-dashed border-[#8f7e48] bg-rizq-cream/40 px-4 py-3">
-          {derivedTier ? (
-            <span className={`text-sm font-medium text-rizq-green ${font}`}>{derivedTier.label}</span>
-          ) : (
-            <span className={`text-sm text-rizq-ink-soft ${font}`}>
-              {isAr ? "أدخل سنوات خبرتك لتحديد مستواك تلقائيًا" : "Enter your years to set your level automatically"}
-            </span>
-          )}
+        <div className="mt-1.5 min-h-[18px] overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.p
+              key={derivedTier?.value ?? "none"}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`text-xs ${derivedTier ? "text-rizq-green font-medium" : "text-rizq-ink-soft"} ${font}`}
+            >
+              {derivedTier
+                ? `${isAr ? "مستواك: " : "Level: "}${derivedTier.label}`
+                : isAr
+                  ? "يُحدَّد مستواك تلقائيًا من سنوات خبرتك"
+                  : "Your level is set automatically from your years"}
+            </motion.p>
+          </AnimatePresence>
         </div>
       </div>
 
