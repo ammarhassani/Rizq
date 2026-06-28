@@ -58,7 +58,12 @@ export function SignupForm({ locale }: Props) {
           method: "email",
           needs_verification: result.needsVerification,
         });
-        const path = `/verify-email?email=${encodeURIComponent(values.email)}`;
+        // When email confirmation is off, signUp returns a live session → go
+        // straight into the app (dashboard forwards new users to onboarding).
+        // Only send to verify-email when confirmation is actually required.
+        const path = result.needsVerification
+          ? `/verify-email?email=${encodeURIComponent(values.email)}`
+          : `/${locale}/dashboard`;
         router.push(path);
         return;
       }

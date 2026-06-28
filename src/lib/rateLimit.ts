@@ -21,6 +21,12 @@ export function checkRateLimit(
   limit: number,
   windowMs: number
 ): RateLimitResult {
+  // Dev: don't throttle anything — these limits are prod abuse-guards, not dev
+  // ergonomics. Set RATE_LIMIT_FORCE=1 to exercise them locally.
+  if (process.env.NODE_ENV !== "production" && process.env.RATE_LIMIT_FORCE !== "1") {
+    return { allowed: true, remaining: limit, resetInMs: windowMs };
+  }
+
   const now = Date.now();
   const existing = buckets.get(key);
 
