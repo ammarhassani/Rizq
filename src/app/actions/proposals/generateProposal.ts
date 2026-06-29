@@ -8,6 +8,9 @@ import { isAIConfigured } from "@/lib/ai/client";
 import { resolvePrice } from "@/lib/pricing/resolve";
 import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
 import { resolveSpecialty } from "@/lib/pricing/specialtyResolve";
+import { isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
+import { toSAR } from "@/lib/currency/convert";
+import { getSarRate } from "@/lib/currency/fxRates";
 import {
   computeProposalPrice,
 } from "@/lib/pricing/proposalPricing";
@@ -152,7 +155,7 @@ export async function generateProposal(
   const { data: ownerProfile } = await supabase
     .from("users")
     .select(
-      "city, experience_tier_id, years_experience, specialties, current_project_rate_range, primary_specialty:specialties!primary_specialty_id(slug)"
+      "city, experience_tier_id, years_experience, specialties, current_project_rate_range, rate_currency, primary_specialty:specialties!primary_specialty_id(slug)"
     )
     .eq("id", userId)
     .maybeSingle();
@@ -164,10 +167,20 @@ export async function generateProposal(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((ownerProfile as any)?.primary_specialty?.slug as string | null) ?? null;
   const ownerStatedRange = (ownerProfile?.current_project_rate_range as { min?: number; max?: number } | null) ?? null;
-  const statedAnchor =
+  const statedMidpoint =
     ownerStatedRange && typeof ownerStatedRange.min === "number" && typeof ownerStatedRange.max === "number"
       ? (ownerStatedRange.min + ownerStatedRange.max) / 2
       : null;
+  // feature 007 — the stated rate is in the freelancer's currency; convert it to
+  // SAR (the engine's base) before it becomes a pricing anchor. No rate → skip
+  // (don't fabricate). SAR is identity.
+  const rateCurrencyRaw = (ownerProfile as { rate_currency?: string | null } | null)?.rate_currency ?? null;
+  const rateCurrency: CurrencyCode = isCurrency(rateCurrencyRaw) ? rateCurrencyRaw : "SAR";
+  let statedAnchor: number | null = null;
+  if (statedMidpoint != null) {
+    const fx = await getSarRate(rateCurrency);
+    statedAnchor = toSAR(statedMidpoint, rateCurrency, fx);
+  }
 
   // 2d. Load template defaults when template_id is provided
   let templateDefaults: PricingJson | null = null;

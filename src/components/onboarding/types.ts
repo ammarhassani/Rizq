@@ -58,6 +58,7 @@ export interface ProfileSnapshot {
   previous_year_income_sar: number | null;
   income_goal_monthly_sar: number | null;
   rate_confidence: "exact" | "approximate" | "estimate";
+  rate_currency: string | null;
   bahr_profile_url: string | null;
   mostaql_profile_url: string | null;
   khamsat_profile_url: string | null;

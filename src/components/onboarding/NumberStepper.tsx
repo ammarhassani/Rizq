@@ -19,6 +19,8 @@ type Props = {
   step?: number;
   maxDigits?: number;
   ariaLabel?: string;
+  /** Optional trailing unit shown inside the field (e.g. a currency code). */
+  suffix?: string;
 };
 
 export function NumberStepper({
@@ -31,6 +33,7 @@ export function NumberStepper({
   step = 1,
   maxDigits = 9,
   ariaLabel,
+  suffix,
 }: Props) {
   const isAr = locale === "ar";
 
@@ -60,6 +63,11 @@ export function NumberStepper({
         aria-label={ariaLabel}
         className="flex-1 min-w-0 bg-transparent px-4 py-3 text-base text-rizq-ink tabular focus:outline-none"
       />
+      {suffix && (
+        <span className="flex items-center px-2.5 text-xs font-semibold text-rizq-ink-soft border-s border-[#8f7e48] select-none">
+          {suffix}
+        </span>
+      )}
       <div className="flex flex-col border-s border-[#8f7e48]">
         <button
           type="button"

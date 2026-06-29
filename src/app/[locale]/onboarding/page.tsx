@@ -54,7 +54,7 @@ export default async function OnboardingPage({
        primary_specialty_id, specialties, experience_tier_id,
        years_experience, languages,
        current_hourly_rate_sar, current_daily_rate_sar, current_project_rate_range,
-       previous_year_income_sar, income_goal_monthly_sar, rate_confidence,
+       previous_year_income_sar, income_goal_monthly_sar, rate_confidence, rate_currency,
        bahr_profile_url, mostaql_profile_url, khamsat_profile_url,
        linkedin_url, behance_url, personal_website_url,
        portfolio_samples, total_projects_completed, notable_clients,
@@ -113,6 +113,7 @@ export default async function OnboardingPage({
     income_goal_monthly_sar: (profile?.income_goal_monthly_sar as number | null) ?? null,
     rate_confidence:
       (profile?.rate_confidence as "exact" | "approximate" | "estimate" | null) ?? "approximate",
+    rate_currency: (profile?.rate_currency as string | null) ?? "SAR",
     bahr_profile_url: (profile?.bahr_profile_url as string | null) ?? null,
     mostaql_profile_url: (profile?.mostaql_profile_url as string | null) ?? null,
     khamsat_profile_url: (profile?.khamsat_profile_url as string | null) ?? null,

@@ -15,8 +15,8 @@ clean + `pnpm test` green per phase.
 
 ## Phase 2: Onboarding currency + correct anchor (US2 + US1 boundary) 🔒
 
-- [ ] T005 🔒 [US2] StepRates: add a compact currency selector (default `rate_currency`/SAR) that updates all rate labels/symbols live; save `rate_currency` with the rates (extend `saveOnboardingStep` rates schema).
-- [ ] T006 🔒 [US1] `loadFreelancerProfile` + `generateProposal`: read `rate_currency`; convert the stated project-rate midpoint → SAR via `getSarRate` before `statedAnchor`; null rate → skip the anchor (no fabrication). SAR currency → unchanged path.
+- [x] T005 🔒 [US2] StepRates: add a compact currency selector (default `rate_currency`/SAR) that updates all rate labels/symbols live; save `rate_currency` with the rates (extend `saveOnboardingStep` rates schema).
+- [x] T006 🔒 [US1] `loadFreelancerProfile` + `generateProposal`: read `rate_currency`; convert the stated project-rate midpoint → SAR via `getSarRate` before `statedAnchor`; null rate → skip the anchor (no fabrication). SAR currency → unchanged path.
 - [ ] T007 🔒 [US1/US2] Verify: USD freelancer's stated 2,000 → ~7,500 SAR anchor; SAR-only unchanged; feed-down skips anchor. Gate green.
 
 ## Phase 3: Invoice currency (US3) 🔒
