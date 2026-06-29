@@ -21,9 +21,10 @@ export function checkRateLimit(
   limit: number,
   windowMs: number
 ): RateLimitResult {
-  // Dev: don't throttle anything — these limits are prod abuse-guards, not dev
-  // ergonomics. Set RATE_LIMIT_FORCE=1 to exercise them locally.
-  if (process.env.NODE_ENV !== "production" && process.env.RATE_LIMIT_FORCE !== "1") {
+  // Dev only: don't throttle — these limits are prod abuse-guards, not dev
+  // ergonomics. NOT in test (so the limiter's own tests run) or prod. Set
+  // RATE_LIMIT_FORCE=1 to exercise it locally.
+  if (process.env.NODE_ENV === "development" && process.env.RATE_LIMIT_FORCE !== "1") {
     return { allowed: true, remaining: limit, resetInMs: windowMs };
   }
 
