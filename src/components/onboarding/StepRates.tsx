@@ -89,9 +89,14 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
           own rate. Ephemeral; cites provenance. */}
       <OnboardingPricePreview locale={locale} />
 
-      {/* Pricing currency — drives all rate fields below (feature 007) */}
+      {/* Preferred currency — used app-wide (feature 007) */}
       <div>
-        <label className={labelCls}>{isAr ? "عملة التسعير" : "Pricing currency"}</label>
+        <label className={labelCls}>{isAr ? "عملتك المفضّلة" : "Your preferred currency"}</label>
+        <p className={`-mt-1 mb-2 text-xs text-rizq-ink-soft ${font}`}>
+          {isAr
+            ? "تُستخدم في كل مكان — التسعير والعروض والفواتير ولوحة المعلومات."
+            : "Used across the app — pricing, proposals, invoices, and your dashboard."}
+        </p>
         <div className="flex flex-wrap gap-2">
           {SUPPORTED_CURRENCIES.map((c) => (
             <button
