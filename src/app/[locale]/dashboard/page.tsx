@@ -16,6 +16,9 @@ import { RecentProposalsWidget } from "@/components/dashboard/RecentProposalsWid
 import { UpcomingDeadlinesWidget } from "@/components/dashboard/UpcomingDeadlinesWidget";
 import { ActiveClientsWidget } from "@/components/dashboard/ActiveClientsWidget";
 import { MonthlyIncomeWidget } from "@/components/dashboard/MonthlyIncomeWidget";
+import { isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
+import { getSarRate } from "@/lib/currency/fxRates";
+import type { FxRate } from "@/lib/currency/convert";
 import { QuickPricingWidget } from "@/components/dashboard/QuickPricingWidget";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
 import { StartProjectButton } from "@/components/wizard/StartProjectButton";
@@ -56,7 +59,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   // ref tables below using these FK ids.
   const { data: profile } = await supabase
     .from("users")
-    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id, income_goal_monthly_sar, onboarded_at, onboarding_completed")
+    .select("name, full_name_ar, primary_specialty_id, city_id, experience_tier_id, income_goal_monthly_sar, rate_currency, onboarded_at, onboarding_completed")
     .eq("id", userId)
     .maybeSingle();
 
@@ -65,6 +68,15 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   if (profile && !profile.onboarded_at && !profile.onboarding_completed) {
     redirect(getPathname({ href: "/onboarding", locale: locale as "ar" | "en" }));
   }
+
+  // feature 007 — the user's preferred currency is the display lens; the ledger
+  // stays SAR. Resolve the FX rate once (peg for USD/AED, cache for EUR/GBP).
+  const prefCurrency: CurrencyCode = isCurrency(
+    (profile as { rate_currency?: string | null } | null)?.rate_currency
+  )
+    ? ((profile as { rate_currency?: string | null }).rate_currency as CurrencyCode)
+    : "SAR";
+  const incomeFx: FxRate | null = prefCurrency === "SAR" ? null : await getSarRate(prefCurrency);
 
   const userName =
     (profile?.full_name_ar as string | null) ??
@@ -273,6 +285,8 @@ export default async function DashboardPage({ params }: { params: Promise<Params
             trend={incomeTrend}
             locale={locale as "ar" | "en"}
             goalSar={(profile?.income_goal_monthly_sar as number | null) ?? null}
+            currency={prefCurrency}
+            fxRate={incomeFx}
           />
 
           {/* Quick Pricing */}

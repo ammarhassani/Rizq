@@ -2,6 +2,8 @@ import { Link } from "@/i18n/navigation";
 import { Wallet, Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { fromSAR, fxCitation, type FxRate } from "@/lib/currency/convert";
+import { currencyMeta, type CurrencyCode } from "@/lib/currency/currencies";
 
 type MonthlyRow = {
   month: string | null;
@@ -19,6 +21,9 @@ type Props = {
   locale: "ar" | "en";
   /** The freelancer's personal monthly income goal (from onboarding/profile). feature 006 */
   goalSar?: number | null;
+  /** Preferred display currency + its FX rate (feature 007). Ledger stays SAR. */
+  currency?: CurrencyCode;
+  fxRate?: FxRate | null;
 };
 
 function fmt(n: number | null, locale: "ar" | "en"): string {
@@ -26,10 +31,20 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar }: Props) {
+export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar, currency, fxRate }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
+
+  // feature 007 — display in the preferred currency (convert from the SAR ledger);
+  // fall back to SAR if no rate. Amounts shown are converted; the ledger is SAR.
+  const displayCur: CurrencyCode = currency && currency !== "SAR" && fxRate ? currency : "SAR";
+  const unitLabel = displayCur === "SAR" ? (isAr ? "ريال" : "SAR") : currencyMeta(displayCur).symbol;
+  const conv = (sar: number | null): number | null => {
+    if (sar == null) return null;
+    if (displayCur === "SAR") return sar;
+    return fromSAR(sar, displayCur, fxRate) ?? sar;
+  };
 
   const totalSar = current?.total_sar ?? 0;
   const prevTotal = previous?.total_sar ?? null;
@@ -75,9 +90,11 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar 
           <div className="flex items-end justify-between gap-2">
             <div>
               <p className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
-                <AnimatedNumber value={totalSar} locale={locale} duration={0.9} />
+                <AnimatedNumber value={conv(totalSar) ?? 0} locale={locale} duration={0.9} />
               </p>
-              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{isAr ? "ريال هذا الشهر" : "SAR this month"}</p>
+              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>
+                {isAr ? `${unitLabel} هذا الشهر` : `${unitLabel} this month`}
+              </p>
             </div>
             {changePercent !== null && (
               <span className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular ${
@@ -93,7 +110,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar 
               <div className={`flex items-center justify-between text-xs mb-1 ${font}`}>
                 <span className="text-rizq-ink-soft/70">{isAr ? "هدفك الشهري" : "Your monthly goal"}</span>
                 <span className="tabular font-semibold text-rizq-green">
-                  {goalPct}% · {fmt(goalSar ?? 0, locale)}
+                  {goalPct}% · {fmt(conv(goalSar ?? 0), locale)} {unitLabel}
                 </span>
               </div>
               <div className="h-1.5 w-full rounded-full bg-rizq-gold/15 overflow-hidden">
@@ -115,13 +132,20 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar 
             <div className="flex gap-4 pt-2 border-t border-rizq-gold/15">
               <div>
                 <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "مدفوع" : "Paid"}</p>
-                <p className="tabular text-sm font-semibold text-emerald-700">{fmt(current.paid_sar, locale)}</p>
+                <p className="tabular text-sm font-semibold text-emerald-700">{fmt(conv(current.paid_sar), locale)}</p>
               </div>
               <div>
                 <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "قيد الدفع" : "Pending"}</p>
-                <p className="tabular text-sm font-semibold text-amber-700">{fmt(current.pending_sar, locale)}</p>
+                <p className="tabular text-sm font-semibold text-amber-700">{fmt(conv(current.pending_sar), locale)}</p>
               </div>
             </div>
+          )}
+
+          {displayCur !== "SAR" && fxRate && (
+            <p className={`text-[10px] text-rizq-ink-soft/60 ${font}`}>
+              ≈ {isAr ? "محوّل · " : "converted · "}
+              {fxCitation(fxRate, locale)}
+            </p>
           )}
         </div>
       )}
