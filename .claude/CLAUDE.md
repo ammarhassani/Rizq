@@ -86,6 +86,10 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   numbers; graceful SAR-only fallback. 4 phases: P1 currency model + FX service + conversion lib →
   P2 onboarding selector + convert stated anchor (feature-006 boundary) → P3 invoice currency + VAT
   rule → P4 converted-figure display. Additive migration (`users.rate_currency`, `invoices.currency`
-  + FX basis) — **application deferred until DB reachable**. spec done → plan next.
+  + FX basis). ✅ **migration applied + P1–P2 + dashboard + gig-invoice SHIPPED**:
+  conversion lib + FX service; onboarding preferred-currency selector; proposal
+  stated-rate→SAR anchor; dashboard income in preferred currency (live-verified
+  USD = SAR/3.75, cited); gig→invoice records currency + artifact renders it.
+  Remaining: manual InvoiceForm currency entry + proposal price converted-secondary.
 Active (`.specify/feature.json`): **007**.
 <!-- SPECKIT END -->

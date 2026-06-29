@@ -19,15 +19,15 @@ clean + `pnpm test` green per phase.
 - [x] T006 🔒 [US1] `loadFreelancerProfile` + `generateProposal`: read `rate_currency`; convert the stated project-rate midpoint → SAR via `getSarRate` before `statedAnchor`; null rate → skip the anchor (no fabrication). SAR currency → unchanged path.
 - [ ] T007 🔒 [US1/US2] Verify: USD freelancer's stated 2,000 → ~7,500 SAR anchor; SAR-only unchanged; feed-down skips anchor. Gate green.
 
-## Phase 3: Invoice currency (US3) 🔒
+## Phase 3: Invoice currency (US3)
 
-- [ ] T008 🔒 [US3] Invoice create/actions + `artifact.ts`: default `currency` from `rate_currency`; compute totals in that currency; store currency + FX basis (non-SAR); VAT only when SAR (suppress non-SAR). InvoiceForm currency-aware labels.
-- [ ] T009 🔒 [US3] Verify: USD invoice renders in USD, VAT suppressed, basis stored; SAR invoice unchanged. Gate green.
+- [x] T008 [US3] **gig→invoice + artifact done**: `createInvoiceFromGig` defaults `currency` from `rate_currency`, stores FX basis, VAT only when SAR; `InvoiceArtifact` renders items/subtotal/fees/VAT/total in the currency (converted from the SAR ledger) + footer FX citation + "books in SAR" note. *Remaining: manual `InvoiceForm`/`createInvoice` currency entry (convert-on-save) — the ad-hoc path.*
+- [~] T009 [US3] gig→USD invoice render path landed; full manual-invoice live walkthrough pending the form slice.
 
-## Phase 4: Converted-figure display (US4) 🔒
+## Phase 4: Converted-figure display (US4)
 
-- [ ] T010 🔒 [US4] Proposal view + dashboard: SAR authoritative + a labeled secondary converted figure via `fromSAR` + `fxCitation`; HADAF stays SAR. i18n labels (AR/EN).
-- [ ] T011 🔒 [US4] Verify: converted equivalents show with FX citation; HADAF SAR. Gate green.
+- [x] T010 [US4] **Dashboard done** (income/paid/pending/goal in the preferred currency + FX citation; ledger + HADAF stay SAR). *Remaining: proposal price converted-secondary in PriceEditor.*
+- [x] T011 [US4] **Verified live**: dashboard as USD freelancer → $16,000 (=60k/3.75), goal 6,667$ (=25k/3.75), "≈ converted · 1 USD = 3.75 SAR · SAMA peg". Demo user reverted to SAR.
 
 ## Phase 5: Polish 🔒
 
