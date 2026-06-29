@@ -176,6 +176,10 @@ export async function createInvoiceFromGig(
     due_date: invoiceData.due_date as string | null,
     created_at: invoiceData.created_at as string,
     client_id: invoiceData.client_id as string | null,
+    currency: invoiceData.currency as string | null,
+    fx_rate_to_sar: invoiceData.fx_rate_to_sar as number | null,
+    fx_as_of: invoiceData.fx_as_of as string | null,
+    fx_source: invoiceData.fx_source as string | null,
   };
 
   const artifactJson = await assembleArtifactJson({

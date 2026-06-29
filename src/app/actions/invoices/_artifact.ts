@@ -14,6 +14,8 @@ import { buildInvoiceArtifact } from "@/lib/invoices/artifact";
 import type { InvoiceArtifactData, InvoiceArtifactInput } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { loadUserBrandDefaults } from "@/lib/proposals/brand";
+import { fxCitation } from "@/lib/currency/convert";
+import { isCurrency } from "@/lib/currency/currencies";
 
 // ---------------------------------------------------------------------------
 // Narrow invoice row shape (only the columns we actually SELECT in actions).
@@ -36,6 +38,11 @@ export type InvoiceRowForArtifact = {
   due_date: string | null;
   created_at: string;
   client_id: string | null;
+  // feature 007 — currency display lens (optional; default SAR)
+  currency?: string | null;
+  fx_rate_to_sar?: number | null;
+  fx_as_of?: string | null;
+  fx_source?: string | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -147,6 +154,22 @@ export async function buildInvoiceArtifactInputFromRow({
   const vatSar = Number(invoice.vat_sar) || 0;
   const totalSar = Number(invoice.total_sar) || 0;
 
+  // feature 007 — currency display lens (ledger above stays SAR).
+  const currency = (invoice.currency as string | null) ?? "SAR";
+  const fxRateToSar = invoice.fx_rate_to_sar ?? null;
+  const fxCit =
+    currency !== "SAR" && fxRateToSar && isCurrency(currency)
+      ? fxCitation(
+          {
+            quote: currency,
+            sarPerUnit: fxRateToSar,
+            asOf: invoice.fx_as_of ?? "",
+            source: invoice.fx_source ?? "FX",
+          },
+          locale
+        )
+      : null;
+
   return {
     locale,
     invoiceId: invoice.id,
@@ -179,6 +202,10 @@ export async function buildInvoiceArtifactInputFromRow({
     paymentDetails: invoice.payment_details ?? null,
 
     isFreeTier,
+
+    currency,
+    fxRateToSar,
+    fxCitation: fxCit,
   };
 }
 
