@@ -17,12 +17,8 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
   const font = isAr ? "font-arabic" : "font-sans";
 
   const [hourlyRate, setHourlyRate] = useState(profile.current_hourly_rate_sar?.toString() ?? "");
-  const [dailyRate, setDailyRate] = useState(profile.current_daily_rate_sar?.toString() ?? "");
   const [projectMin, setProjectMin] = useState(
     profile.current_project_rate_range?.min?.toString() ?? ""
-  );
-  const [projectMax, setProjectMax] = useState(
-    profile.current_project_rate_range?.max?.toString() ?? ""
   );
   const [prevYearIncome, setPrevYearIncome] = useState(
     profile.previous_year_income_sar?.toString() ?? ""
@@ -49,13 +45,14 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
+      const hourly = hourlyRate ? parseFloat(hourlyRate) : null;
+      const min = projectMin ? parseFloat(projectMin) : null;
       const result = await saveOnboardingStep("rates", {
-        current_hourly_rate_sar: hourlyRate ? parseFloat(hourlyRate) : null,
-        current_daily_rate_sar: dailyRate ? parseFloat(dailyRate) : null,
-        current_project_rate_range:
-          projectMin && projectMax
-            ? { min: parseFloat(projectMin), max: parseFloat(projectMax) }
-            : null,
+        current_hourly_rate_sar: hourly,
+        // Daily rate is derived from hourly (× 8h day) — we don't ask for it.
+        current_daily_rate_sar: hourly != null ? hourly * 8 : null,
+        // Only the min/floor project rate is asked; store it as the range (max = min).
+        current_project_rate_range: min != null ? { min, max: min } : null,
         previous_year_income_sar: prevYearIncome ? parseFloat(prevYearIncome) : null,
         income_goal_monthly_sar: monthlyGoal ? parseFloat(monthlyGoal) : null,
         rate_confidence: rateConfidence,
@@ -68,6 +65,11 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       }
     });
   };
+
+  // Monthly income-goal presets (in the chosen currency) for the scroll selector.
+  const GOAL_PRESETS = [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000];
+  const fmtMoney = (n: number) =>
+    new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 
   const confidenceOptions: Array<{ value: "exact" | "approximate" | "estimate"; label: string }> = [
     { value: "exact", label: t("rateConfidenceExact") },
@@ -124,6 +126,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         )}
       </div>
 
+      {/* Hourly rate + min/floor project rate (daily is derived = hourly × 8). */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>{lbl(t("hourlyRate"))}</label>
@@ -138,21 +141,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
           />
         </div>
         <div>
-          <label className={labelCls}>{lbl(t("dailyRate"))}</label>
-          <NumberStepper
-            locale={locale}
-            value={dailyRate}
-            onChange={setDailyRate}
-            placeholder={t("dailyRatePlaceholder")}
-            step={50}
-            ariaLabel={t("dailyRate")}
-            suffix={currency}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
           <label className={labelCls}>{lbl(t("projectRateMin"))}</label>
           <NumberStepper
             locale={locale}
@@ -163,20 +151,8 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
             suffix={currency}
           />
         </div>
-        <div>
-          <label className={labelCls}>{lbl(t("projectRateMax"))}</label>
-          <NumberStepper
-            locale={locale}
-            value={projectMax}
-            onChange={setProjectMax}
-            step={250}
-            ariaLabel={t("projectRateMax")}
-            suffix={currency}
-          />
-        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
       <div>
         <label className={labelCls}>{lbl(t("prevYearIncome"))}</label>
         <NumberStepper
@@ -190,18 +166,35 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         />
       </div>
 
+      {/* Monthly income goal — vertical scroll selector of presets (feature 007). */}
       <div>
         <label className={labelCls}>{lbl(t("monthlyGoal"))}</label>
-        <NumberStepper
-          locale={locale}
-          value={monthlyGoal}
-          onChange={setMonthlyGoal}
-          placeholder={t("monthlyGoalPlaceholder")}
-          step={500}
-          ariaLabel={t("monthlyGoal")}
-          suffix={currency}
-        />
-      </div>
+        <div
+          role="listbox"
+          aria-label={t("monthlyGoal")}
+          className="max-h-44 overflow-y-auto rounded-xl border border-[#8f7e48] bg-rizq-cream/60 divide-y divide-rizq-gold/15"
+        >
+          {GOAL_PRESETS.map((amt) => {
+            const selected = monthlyGoal === String(amt);
+            return (
+              <button
+                key={amt}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                onClick={() => setMonthlyGoal(selected ? "" : String(amt))}
+                className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                  selected
+                    ? "bg-rizq-green/10 text-rizq-green font-semibold"
+                    : "text-rizq-ink hover:bg-rizq-green/5"
+                } ${font}`}
+              >
+                <span className="tabular">{fmtMoney(amt)}</span>
+                <span className="text-xs text-rizq-ink-soft/70">{currency}{selected ? " ✓" : ""}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Rate confidence pills */}
