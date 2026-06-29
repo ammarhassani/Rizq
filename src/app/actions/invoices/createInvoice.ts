@@ -16,6 +16,8 @@ import { computeTotals, resolveFeeAmount } from "@/lib/invoices/items";
 import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
+import { getSarRate } from "@/lib/currency/fxRates";
+import type { CurrencyCode } from "@/lib/currency/currencies";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -51,6 +53,8 @@ const InputSchema = z.object({
   fees: z.array(FeeSchema).default([]),
   description: z.string().optional(),
   vat_pct: z.number().nonnegative().max(100).default(0),
+  // feature 007 — amounts are entered in this currency; converted to SAR for the ledger.
+  currency: z.enum(["SAR", "USD", "AED", "EUR", "GBP"]).default("SAR"),
   // payment
   payment_method: PaymentMethodEnum.default("bank_transfer"),
   payment_details: z.string().optional(),
@@ -127,19 +131,34 @@ export async function createInvoice(
     if (!proposalCheck) resolvedProposalId = null;
   }
 
+  // feature 007 — amounts are entered in `currency`; convert to SAR for the ledger
+  // (the artifact later renders SAR back into the currency). USD/AED use the peg;
+  // EUR/GBP need a cached rate — if absent we can't convert, so degrade to SAR
+  // (treat the entered amounts as SAR; never fabricate a rate).
+  const fx = data.currency === "SAR" ? null : await getSarRate(data.currency as CurrencyCode);
+  const effCurrency: string = data.currency !== "SAR" && fx ? data.currency : "SAR";
+  const rate = effCurrency !== "SAR" && fx ? fx.sarPerUnit : null;
+  const toSar = (n: number) => (rate ? n * rate : n);
+  // VAT is the SAR/KSA context only.
+  const effVatPct = effCurrency === "SAR" ? data.vat_pct : 0;
+
   // Compute the items subtotal (authoritative — the DB trigger then adds fees
-  // into the VAT base and the grand total).
-  const items: InvoiceLineItem[] = data.items as InvoiceLineItem[];
-  const subtotalSar = computeTotals(items, data.vat_pct).subtotal_sar;
-  // Resolve each fee to a concrete amount (percentage fees against the items
-  // subtotal) so the stored amount_sar is authoritative and the DB trigger,
-  // which sums amount_sar, stays correct. fee_type/rate are kept for display.
+  // into the VAT base and the grand total). Items converted to SAR.
+  const items: InvoiceLineItem[] = (data.items as InvoiceLineItem[]).map((it) => ({
+    ...it,
+    unit_price_sar: toSar(Number(it.unit_price_sar) || 0),
+    total_sar: toSar(Number(it.total_sar) || 0),
+  }));
+  const subtotalSar = computeTotals(items, effVatPct).subtotal_sar;
+  // Resolve each fee to a concrete SAR amount (fixed fees converted; percentage
+  // fees computed against the SAR subtotal). DB trigger sums amount_sar.
   const fees: InvoiceFee[] = data.fees.map((f) => {
+    const feeType = f.fee_type ?? "fixed";
     const fee: InvoiceFee = {
       name: f.name,
       category: f.category ?? null,
-      amount_sar: f.amount_sar,
-      fee_type: f.fee_type ?? "fixed",
+      amount_sar: feeType === "percentage" ? f.amount_sar : toSar(f.amount_sar),
+      fee_type: feeType,
       rate: f.rate ?? null,
     };
     return { ...fee, amount_sar: resolveFeeAmount(fee, subtotalSar) };
@@ -167,14 +186,18 @@ export async function createInvoice(
       items,
       fees,
       subtotal_sar: subtotalSar,
-      vat_pct: data.vat_pct,
+      vat_pct: effVatPct,
+      currency: effCurrency,
+      fx_rate_to_sar: rate,
+      fx_as_of: rate ? fx?.asOf ?? null : null,
+      fx_source: rate ? fx?.source ?? null : null,
       payment_method: data.payment_method,
       payment_details: data.payment_details ?? null,
       due_date: dueDate,
       status: "draft",
     })
     .select(
-      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, currency, fx_rate_to_sar, fx_as_of, fx_source, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -208,6 +231,10 @@ export async function createInvoice(
     due_date: invoiceData.due_date as string | null,
     created_at: invoiceData.created_at as string,
     client_id: invoiceData.client_id as string | null,
+    currency: invoiceData.currency as string | null,
+    fx_rate_to_sar: invoiceData.fx_rate_to_sar as number | null,
+    fx_as_of: invoiceData.fx_as_of as string | null,
+    fx_source: invoiceData.fx_source as string | null,
   };
 
   const artifactJson = await assembleArtifactJson({

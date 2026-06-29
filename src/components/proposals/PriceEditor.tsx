@@ -23,9 +23,13 @@ type Props = {
   /** Suggested market range — shown as a guide only, never enforced. */
   min?: number;
   max?: number;
+  /** feature 007 — preferred-currency secondary (SAR stays authoritative). */
+  currency?: string;
+  fxRateToSar?: number | null;
+  fxCitation?: string | null;
 };
 
-export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Props) {
+export function PriceEditor({ proposalId, locale, initialAnchor, min, max, currency, fxRateToSar, fxCitation }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -58,8 +62,14 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
     });
   }
 
-  const currency = isAr ? "ر.س" : "SAR";
+  const currencyLabel = isAr ? "ر.س" : "SAR";
   const hasRange = typeof min === "number" && typeof max === "number" && max > 0;
+
+  // feature 007 — converted secondary in the freelancer's preferred currency.
+  // SAR stays authoritative above; this is a labeled, cited estimate.
+  const showConverted =
+    typeof currency === "string" && currency !== "SAR" && typeof fxRateToSar === "number" && fxRateToSar > 0;
+  const convertedAnchor = showConverted ? saved / (fxRateToSar as number) : null;
 
   return (
     <div
@@ -88,7 +98,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
             dir="ltr"
           />
           <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
-            {currency}
+            {currencyLabel}
           </span>
         </div>
         <button
@@ -110,6 +120,15 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
             ? "اضبط أي سعر تراه مناسبًا."
             : "Set any price you see fit."}
       </p>
+
+      {showConverted && convertedAnchor != null && (
+        <p className={`mt-1 text-xs text-rizq-green/90 ${font}`}>
+          ≈ {fmt(Math.round(convertedAnchor))} {currency}
+          {fxCitation && (
+            <span className="text-rizq-ink-soft/60"> · {fxCitation}</span>
+          )}
+        </p>
+      )}
     </div>
   );
 }

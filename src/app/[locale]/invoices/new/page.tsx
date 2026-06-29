@@ -50,6 +50,14 @@ export default async function InvoicesNewPage({
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const userId = userData.user.id;
 
+  // feature 007 — default the invoice currency to the freelancer's preferred currency.
+  const { data: curRow } = await supabase
+    .from("users")
+    .select("rate_currency")
+    .eq("id", userId)
+    .maybeSingle();
+  const defaultCurrency = (curRow?.rate_currency as string | null) ?? "SAR";
+
   // Fetch user's clients for the picker (RLS scopes to the owner)
   const { data: clients } = await supabase
     .from("clients")
@@ -133,6 +141,7 @@ export default async function InvoicesNewPage({
           catalogItems={catalogItems}
           feePresets={feePresets}
           initial={gigPrefill}
+          defaultCurrency={defaultCurrency}
         />
       </div>
     </AppShell>

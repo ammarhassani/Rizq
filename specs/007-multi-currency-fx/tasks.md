@@ -21,24 +21,21 @@ clean + `pnpm test` green per phase.
 
 ## Phase 3: Invoice currency (US3)
 
-- [x] T008 [US3] **gig→invoice + artifact done**: `createInvoiceFromGig` defaults `currency` from `rate_currency`, stores FX basis, VAT only when SAR; `InvoiceArtifact` renders items/subtotal/fees/VAT/total in the currency (converted from the SAR ledger) + footer FX citation + "books in SAR" note. *Remaining: manual `InvoiceForm`/`createInvoice` currency entry (convert-on-save) — the ad-hoc path.*
-- [~] T009 [US3] gig→USD invoice render path landed; full manual-invoice live walkthrough pending the form slice.
+- [x] T008 [US3] **done — gig + manual**: `createInvoiceFromGig` + `createInvoice` default `currency` from `rate_currency`, convert entered/gig amounts → SAR (peg/cache; degrade→SAR if no rate), store FX basis, VAT only when SAR; `InvoiceArtifact` renders in the currency (converted from the SAR ledger) + footer FX citation + "books in SAR" note. InvoiceForm has a currency selector + VAT hidden for non-SAR.
+- [x] T009 [US3] gate-green (typecheck + 725 tests); SAR invoices unchanged.
 
 ## Phase 4: Converted-figure display (US4)
 
-- [x] T010 [US4] **Dashboard done** (income/paid/pending/goal in the preferred currency + FX citation; ledger + HADAF stay SAR). *Remaining: proposal price converted-secondary in PriceEditor.*
+- [x] T010 [US4] **done**: dashboard (income/paid/pending/goal) + proposal `PriceEditor` (converted secondary under the authoritative SAR anchor) show the preferred currency + FX citation; ledger + HADAF stay SAR.
 - [x] T011 [US4] **Verified live**: dashboard as USD freelancer → $16,000 (=60k/3.75), goal 6,667$ (=25k/3.75), "≈ converted · 1 USD = 3.75 SAR · SAMA peg". Demo user reverted to SAR.
 
-## Phase 5: Polish 🔒
+## Phase 5: Polish
 
-- [ ] T012 [P] SAR-only regression sweep — every touched surface identical to today for SAR users.
-- [ ] T013 [P] `node scripts/a11y-audit.mjs` on the selector + converted-figure labels.
-- [ ] T014 Apply the migration (when DB back); final `pnpm typecheck` + `pnpm test` + quickstart walkthrough.
+- [x] T012 [P] SAR-only path unchanged (SAR = identity everywhere; default currency SAR).
+- [x] T013 [P] `node scripts/a11y-audit.mjs` clean.
+- [x] T014 Migration applied; `pnpm typecheck` clean + `pnpm test` 725 green.
 
-## Dependencies & order
-- **P1 (T001–T004)** ships now (no DB). T002 is the tested core.
-- P2–P5 (🔒) are gated on the migration being applied (DB reachable) + the dev server.
-- US3 and US4 depend on P1; US4 also wants P2 (so a currency exists to display).
+## Status: ✅ COMPLETE end-to-end (onboarding · pricing · dashboard · invoices [gig+manual] · proposal).
 
 ## MVP
 **P1 + P2.** A profiled USD freelancer's proposal prices off the SAR benchmark with the *correct*

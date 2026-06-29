@@ -32,6 +32,10 @@ type Props = {
    */
   editable?: boolean;
   proposalId?: string;
+  /** feature 007 — preferred-currency secondary on the price editor (SAR stays authoritative). */
+  priceCurrency?: string;
+  priceFxRateToSar?: number | null;
+  priceFxCitation?: string | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -1212,7 +1216,7 @@ function renderSection(section: ArtifactSection, locale: "ar" | "en") {
 // Main export
 // ---------------------------------------------------------------------------
 
-export function ProposalArtifact({ data, locale, editable = false, proposalId }: Props) {
+export function ProposalArtifact({ data, locale, editable = false, proposalId, priceCurrency, priceFxRateToSar, priceFxCitation }: Props) {
   const dir = locale === "ar" ? "rtl" : "ltr";
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
@@ -1243,6 +1247,9 @@ export function ProposalArtifact({ data, locale, editable = false, proposalId }:
             initialAnchor={num(s.content["anchor"])}
             min={num(s.content["min"]) || undefined}
             max={num(s.content["max"]) || undefined}
+            currency={priceCurrency}
+            fxRateToSar={priceFxRateToSar}
+            fxCitation={priceFxCitation}
           />
         </div>
       );

@@ -21,6 +21,7 @@ import { computeInvoiceTotals, lineItemTotal, resolveFeeAmount } from "@/lib/inv
 import type { InvoiceFee } from "@/lib/invoices/items";
 import { Loader2, Trash2, Check } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { SUPPORTED_CURRENCIES, currencyMeta, isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
 import { ClientPicker } from "@/components/clients/ClientPicker";
 import { ItemPicker } from "@/components/items/ItemPicker";
 import { FeePicker } from "@/components/fees/FeePicker";
@@ -51,6 +52,8 @@ type Props = {
   catalogItems?: CreatedItem[];
   feePresets?: CreatedFeePreset[];
   initial?: InvoiceFormInitial;
+  /** feature 007 — the freelancer's preferred currency (default for new invoices). */
+  defaultCurrency?: string;
 };
 
 const PAYMENT_METHODS = ["bank_transfer", "stc_pay", "cash", "other"] as const;
@@ -86,6 +89,7 @@ export function InvoiceForm({
   catalogItems = [],
   feePresets = [],
   initial,
+  defaultCurrency,
 }: Props) {
   const t = useTranslations("Invoices.form");
   const router = useRouter();
@@ -114,12 +118,17 @@ export function InvoiceForm({
 
   const [fees, setFees] = useState<InvoiceFee[]>([]);
   const [vatOn, setVatOn] = useState(false);
+  const [currencyCode, setCurrencyCode] = useState<string>(
+    isCurrency(defaultCurrency) ? defaultCurrency : "SAR"
+  );
+  // VAT is the SAR/KSA context only — suppressed for non-SAR invoices.
+  const vatAllowed = currencyCode === "SAR";
   const [clientId, setClientId] = useState<string>(initial?.client_id ?? "");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [paymentDetails, setPaymentDetails] = useState("");
   const [dueDate, setDueDate] = useState(defaultDueDate());
 
-  const vatPct = vatOn ? VAT_RATE : 0;
+  const vatPct = vatOn && vatAllowed ? VAT_RATE : 0;
 
   const inputClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`;
   const labelClass = `block text-sm font-medium text-rizq-ink mb-2 ${font}`;
@@ -142,7 +151,7 @@ export function InvoiceForm({
     }).format(n);
   }
 
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = currencyCode === "SAR" ? (isAr ? "ر.س" : "SAR") : currencyMeta(currencyCode as CurrencyCode).symbol;
 
   // ── Item line handlers ─────────────────────────────────────────────────────
   function addItemFromCatalog(item: CreatedItem) {
@@ -202,6 +211,7 @@ export function InvoiceForm({
         items: validItems,
         fees,
         vat_pct: vatPct,
+        currency: currencyCode as "SAR" | "USD" | "AED" | "EUR" | "GBP",
         gig_id: initial?.gig_id,
         payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
         payment_details: paymentDetails.trim() || undefined,
@@ -353,37 +363,67 @@ export function InvoiceForm({
         <div className="rounded-2xl border border-rizq-gold/20 bg-rizq-cream/40 p-5 space-y-5">
           <p className={`text-sm font-semibold text-rizq-ink ${font}`}>{t("taxAndFeesLabel")}</p>
 
-          {/* VAT toggle — fixed 15% */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("vatToggleLabel")}</p>
-              <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>{t("vatToggleHint")}</p>
+          {/* Currency (feature 007) — amounts are entered in this currency; we store SAR. */}
+          <div>
+            <p className={`text-sm font-medium text-rizq-ink mb-2 ${font}`}>
+              {isAr ? "العملة" : "Currency"}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => setCurrencyCode(c.code)}
+                  aria-pressed={currencyCode === c.code}
+                  className={`rounded-2xl border px-3 py-1.5 text-sm transition-all ${
+                    currencyCode === c.code
+                      ? "border-rizq-green bg-rizq-green/10 text-rizq-green font-semibold"
+                      : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                  } ${font}`}
+                >
+                  {c.code} <span className="text-rizq-ink-soft/70">{c.symbol}</span>
+                </button>
+              ))}
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={vatOn}
-              aria-label={t("vatToggleLabel")}
-              onClick={() => setVatOn((v) => !v)}
-              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
-                vatOn ? "bg-rizq-green" : "bg-rizq-ink/15"
-              }`}
-            >
-              <span
-                className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow transition-transform ${
-                  vatOn
-                    ? isAr
-                      ? "-translate-x-6"
-                      : "translate-x-6"
-                    : isAr
-                    ? "-translate-x-1"
-                    : "translate-x-1"
+          </div>
+
+          {/* VAT toggle — fixed 15%; SAR-context only */}
+          {vatAllowed ? (
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("vatToggleLabel")}</p>
+                <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>{t("vatToggleHint")}</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={vatOn}
+                aria-label={t("vatToggleLabel")}
+                onClick={() => setVatOn((v) => !v)}
+                className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
+                  vatOn ? "bg-rizq-green" : "bg-rizq-ink/15"
                 }`}
               >
-                {vatOn && <Check size={12} className="text-rizq-green" strokeWidth={3} />}
-              </span>
-            </button>
-          </div>
+                <span
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow transition-transform ${
+                    vatOn
+                      ? isAr
+                        ? "-translate-x-6"
+                        : "translate-x-6"
+                      : isAr
+                      ? "-translate-x-1"
+                      : "translate-x-1"
+                  }`}
+                >
+                  {vatOn && <Check size={12} className="text-rizq-green" strokeWidth={3} />}
+                </span>
+              </button>
+            </div>
+          ) : (
+            <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>
+              {isAr ? "ضريبة القيمة المضافة تنطبق على الفواتير بالريال فقط." : "VAT applies to SAR invoices only."}
+            </p>
+          )}
 
           {/* Fees */}
           <div>

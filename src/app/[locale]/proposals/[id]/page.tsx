@@ -20,6 +20,9 @@ import { resolveLifecycle, type Lifecycle } from "@/lib/projects/lifecycle";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalArtifact } from "@/components/proposals/ProposalArtifact";
+import { isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
+import { getSarRate } from "@/lib/currency/fxRates";
+import { fxCitation } from "@/lib/currency/convert";
 import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles";
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { DownloadWordButton } from "@/components/proposals/DownloadWordButton";
@@ -143,6 +146,17 @@ export default async function ProposalDetailPage({
 
   if (proposalErr || !proposal) notFound();
 
+  // feature 007 — preferred currency for a converted secondary on the price (the
+  // SAR band stays authoritative). Ledger/engine stay SAR.
+  const { data: curRow } = await supabase
+    .from("users")
+    .select("rate_currency")
+    .eq("id", userData.user.id)
+    .maybeSingle();
+  const priceCurrency = isCurrency(curRow?.rate_currency) ? (curRow!.rate_currency as string) : "SAR";
+  const priceFx = priceCurrency === "SAR" ? null : await getSarRate(priceCurrency as CurrencyCode);
+  const priceFxCitation = priceFx ? fxCitation(priceFx, locale as "ar" | "en") : null;
+
   // Fetch version history
   const { data: versions } = await supabase
     .from("proposal_versions")
@@ -229,6 +243,9 @@ export default async function ProposalDetailPage({
             locale={locale as "ar" | "en"}
             editable={canEdit}
             proposalId={id}
+            priceCurrency={priceCurrency}
+            priceFxRateToSar={priceFx?.sarPerUnit ?? null}
+            priceFxCitation={priceFxCitation}
           />
         ) : (
           <div

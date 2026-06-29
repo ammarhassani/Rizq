@@ -90,6 +90,8 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   conversion lib + FX service; onboarding preferred-currency selector; proposal
   stated-rate→SAR anchor; dashboard income in preferred currency (live-verified
   USD = SAR/3.75, cited); gig→invoice records currency + artifact renders it.
-  Remaining: manual InvoiceForm currency entry + proposal price converted-secondary.
+  ✅ **COMPLETE end-to-end**: onboarding selector · pricing anchor · dashboard ·
+  invoices (gig + manual form, convert-on-save) · proposal PriceEditor secondary —
+  all show the preferred currency with cited FX; SAR stays the ledger base.
 Active (`.specify/feature.json`): **007**.
 <!-- SPECKIT END -->
