@@ -80,5 +80,12 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   ✅ **SHIPPED** (P1–P4): specialty prior + stated-rate anchor; invoice VAT/terms;
   dashboard income-goal bar; onboarding meter + payoff + URL prefill + live brand
   preview + live **price** preview (StepRates → real resolver + provenance).
-Active (`.specify/feature.json`): **006**.
+- `specs/007-multi-currency-fx/` — **Multi-Currency Pricing + FX Conversion**: freelancer picks a
+  pricing/display currency (USD/AED/EUR/GBP); SAR stays the engine/benchmark/HADAF base; convert at
+  the **boundary** using **cited** FX (source + as-of; SAR↔USD = SAMA peg 3.75), never invented
+  numbers; graceful SAR-only fallback. 4 phases: P1 currency model + FX service + conversion lib →
+  P2 onboarding selector + convert stated anchor (feature-006 boundary) → P3 invoice currency + VAT
+  rule → P4 converted-figure display. Additive migration (`users.rate_currency`, `invoices.currency`
+  + FX basis) — **application deferred until DB reachable**. spec done → plan next.
+Active (`.specify/feature.json`): **007**.
 <!-- SPECKIT END -->
