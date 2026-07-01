@@ -31,19 +31,14 @@ export function MonthlyGoalWheel({
   value,
   onChange,
   locale,
-  currency,
-  sarPerUnit = 1,
 }: {
   value: string;
   onChange: (v: string) => void;
   locale: "ar" | "en";
-  currency: string;
-  /** SAR per 1 unit of the display currency (rungs are SAR → divide to display). */
-  sarPerUnit?: number;
 }) {
   const isAr = locale === "ar";
-  // Rungs are SAR; show them in the chosen currency (a dollar ≈ 3.75 SAR).
-  const disp = (sar: number) => short(sarPerUnit > 0 ? sar / sarPerUnit : sar);
+  const currency = isAr ? "ر.س" : "SAR";
+  const disp = (sar: number) => short(sar);
   const font = isAr ? "font-arabic" : "font-sans";
   const ref = useRef<HTMLDivElement>(null);
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null);

@@ -90,8 +90,11 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   conversion lib + FX service; onboarding preferred-currency selector; proposal
   stated-rate→SAR anchor; dashboard income in preferred currency (live-verified
   USD = SAR/3.75, cited); gig→invoice records currency + artifact renders it.
-  ✅ **COMPLETE end-to-end**: onboarding selector · pricing anchor · dashboard ·
-  invoices (gig + manual form, convert-on-save) · proposal PriceEditor secondary —
-  all show the preferred currency with cited FX; SAR stays the ledger base.
-Active (`.specify/feature.json`): **007**.
+  ❌ **DROPPED (reverted 2026-07-01)** — founder decision: Rizq is Saudi/SAR-only
+  (foreign freelancers use their own tools; won't adopt an Arabic-branded app). All
+  currency code removed; app is SAR-only again. The onboarding restructure it rode
+  in with (single name, FL chip, 2-col, steppers, derived daily, no-max, goal wheel)
+  was KEPT. Additive DB columns (users.rate_currency, invoices.currency + fx_*,
+  fx_rates) left in place but inert/unused (drop later when convenient).
+Active (`.specify/feature.json`): **007** (closed).
 <!-- SPECKIT END -->

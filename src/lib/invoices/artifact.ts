@@ -110,15 +110,6 @@ export type InvoiceArtifactInput = {
   // tier
   /** True when the freelancer is on the free tier — renders watermark in footer. */
   isFreeTier: boolean;
-
-  // currency (feature 007) — DISPLAY lens. Amounts above stay SAR (the ledger);
-  // the React layer converts for display via fxRateToSar and labels with currency.
-  /** Display currency code (default "SAR"). */
-  currency?: string;
-  /** SAR per 1 unit of `currency`; null/absent when SAR (no conversion). */
-  fxRateToSar?: number | null;
-  /** Cited FX string for the footer, e.g. "1 USD = 3.75 SAR · SAMA peg · date". */
-  fxCitation?: string | null;
 };
 
 export type InvoiceArtifactSection = InvoiceArtifactSectionMeta & {
@@ -164,8 +155,6 @@ function buildLineItems(input: InvoiceArtifactInput): Record<string, unknown> {
   return {
     items: input.items,
     description: input.description,
-    currency: input.currency ?? "SAR",
-    fx_rate_to_sar: input.fxRateToSar ?? null,
   };
 }
 
@@ -182,8 +171,6 @@ function buildTotals(input: InvoiceArtifactInput): Record<string, unknown> {
     vat_pct: input.vatPct,
     vat_sar: input.vatSar,
     total_sar: input.totalSar,
-    currency: input.currency ?? "SAR",
-    fx_rate_to_sar: input.fxRateToSar ?? null,
   };
 }
 
@@ -206,8 +193,6 @@ function buildFooter(input: InvoiceArtifactInput): Record<string, unknown> {
     jurisdiction: "KSA",
     methodologyHref: "/methodology",
     invoiceId: input.invoiceId,
-    /** Cited FX line shown when the invoice is in a non-SAR currency. */
-    fx_citation: input.fxCitation ?? null,
   };
 }
 

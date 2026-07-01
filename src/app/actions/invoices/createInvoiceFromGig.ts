@@ -13,8 +13,6 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
-import { isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
-import { getSarRate } from "@/lib/currency/fxRates";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -79,17 +77,10 @@ export async function createInvoiceFromGig(
   // KSA 15% when they're VAT-registered, and payment terms default from settings.
   const { data: prof } = await supabase
     .from("users")
-    .select("vat_registered, default_payment_method, default_payment_details, rate_currency")
+    .select("vat_registered, default_payment_method, default_payment_details")
     .eq("id", userId)
     .maybeSingle();
-  // feature 007 — invoice inherits the preferred currency; the ledger (*_sar) stays
-  // SAR (the gig amount is SAR), the artifact displays the currency. VAT is the KSA
-  // (SAR) context only → suppressed for non-SAR.
-  const currency: CurrencyCode = isCurrency(prof?.rate_currency)
-    ? (prof!.rate_currency as CurrencyCode)
-    : "SAR";
-  const fx = currency === "SAR" ? null : await getSarRate(currency);
-  const vatPct = prof?.vat_registered && currency === "SAR" ? 15 : 0;
+  const vatPct = prof?.vat_registered ? 15 : 0;
   const paymentMethod =
     (gig.payment_method as string | null) ??
     (prof?.default_payment_method as string | null) ??
@@ -125,17 +116,13 @@ export async function createInvoiceFromGig(
       items,
       subtotal_sar: subtotalSar,
       vat_pct: vatPct,
-      currency,
-      fx_rate_to_sar: fx?.sarPerUnit ?? null,
-      fx_as_of: fx?.asOf ?? null,
-      fx_source: fx?.source ?? null,
       payment_method: paymentMethod,
       payment_details: paymentDetails,
       due_date: dueDate,
       status: "draft",
     })
     .select(
-      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, currency, fx_rate_to_sar, fx_as_of, fx_source, payment_method, payment_details, due_date, created_at, client_id"
+      "id, invoice_number, status, description, items, fees, subtotal_sar, vat_pct, vat_sar, total_sar, payment_method, payment_details, due_date, created_at, client_id"
     )
     .single();
 
@@ -176,10 +163,6 @@ export async function createInvoiceFromGig(
     due_date: invoiceData.due_date as string | null,
     created_at: invoiceData.created_at as string,
     client_id: invoiceData.client_id as string | null,
-    currency: invoiceData.currency as string | null,
-    fx_rate_to_sar: invoiceData.fx_rate_to_sar as number | null,
-    fx_as_of: invoiceData.fx_as_of as string | null,
-    fx_source: invoiceData.fx_source as string | null,
   };
 
   const artifactJson = await assembleArtifactJson({

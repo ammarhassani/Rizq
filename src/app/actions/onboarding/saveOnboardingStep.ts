@@ -48,7 +48,6 @@ const StepRatesSchema = z.object({
   previous_year_income_sar: z.number().nonnegative().optional().nullable(),
   income_goal_monthly_sar: z.number().nonnegative().optional().nullable(),
   rate_confidence: z.enum(["exact", "approximate", "estimate"]).optional(),
-  rate_currency: z.enum(["SAR", "USD", "AED", "EUR", "GBP"]).optional(),
 });
 
 const StepPlatformsSchema = z.object({

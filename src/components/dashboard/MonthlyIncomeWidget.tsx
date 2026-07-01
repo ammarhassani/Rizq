@@ -2,8 +2,6 @@ import { Link } from "@/i18n/navigation";
 import { Wallet, Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
-import { fromSAR, fxCitation, type FxRate } from "@/lib/currency/convert";
-import { currencyMeta, type CurrencyCode } from "@/lib/currency/currencies";
 
 type MonthlyRow = {
   month: string | null;
@@ -21,9 +19,6 @@ type Props = {
   locale: "ar" | "en";
   /** The freelancer's personal monthly income goal (from onboarding/profile). feature 006 */
   goalSar?: number | null;
-  /** Preferred display currency + its FX rate (feature 007). Ledger stays SAR. */
-  currency?: CurrencyCode;
-  fxRate?: FxRate | null;
 };
 
 function fmt(n: number | null, locale: "ar" | "en"): string {
@@ -31,20 +26,13 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar, currency, fxRate }: Props) {
+export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
 
-  // feature 007 — display in the preferred currency (convert from the SAR ledger);
-  // fall back to SAR if no rate. Amounts shown are converted; the ledger is SAR.
-  const displayCur: CurrencyCode = currency && currency !== "SAR" && fxRate ? currency : "SAR";
-  const unitLabel = displayCur === "SAR" ? (isAr ? "ريال" : "SAR") : currencyMeta(displayCur).symbol;
-  const conv = (sar: number | null): number | null => {
-    if (sar == null) return null;
-    if (displayCur === "SAR") return sar;
-    return fromSAR(sar, displayCur, fxRate) ?? sar;
-  };
+  const unitLabel = isAr ? "ريال" : "SAR";
+  const conv = (sar: number | null): number | null => sar;
 
   const totalSar = current?.total_sar ?? 0;
   const prevTotal = previous?.total_sar ?? null;
@@ -139,13 +127,6 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar,
                 <p className="tabular text-sm font-semibold text-amber-700">{fmt(conv(current.pending_sar), locale)}</p>
               </div>
             </div>
-          )}
-
-          {displayCur !== "SAR" && fxRate && (
-            <p className={`text-[10px] text-rizq-ink-soft/60 ${font}`}>
-              ≈ {isAr ? "محوّل · " : "converted · "}
-              {fxCitation(fxRate, locale)}
-            </p>
           )}
         </div>
       )}

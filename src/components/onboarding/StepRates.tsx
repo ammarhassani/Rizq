@@ -8,7 +8,6 @@ import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep"
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import { NumberStepper } from "./NumberStepper";
 import { MonthlyGoalWheel } from "./MonthlyGoalWheel";
-import { SUPPORTED_CURRENCIES, isCurrency, sarPerUnitPeg, type CurrencyCode } from "@/lib/currency/currencies";
 import type { StepProps } from "./types";
 
 export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -30,14 +29,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [rateConfidence, setRateConfidence] = useState<"exact" | "approximate" | "estimate">(
     profile.rate_confidence ?? "approximate"
   );
-  const [currency, setCurrency] = useState<CurrencyCode>(
-    isCurrency(profile.rate_currency) ? profile.rate_currency : "SAR"
-  );
   const [error, setError] = useState<string | null>(null);
-
-  // Labels bake "(SAR)"; the field now carries the chosen currency, so strip the
-  // trailing parenthetical and let the NumberStepper suffix show it.
-  const lbl = (s: string) => s.replace(/\s*[(（][^)）]*[)）]\s*$/u, "");
   const [isPending, startTransition] = useTransition();
 
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
@@ -57,7 +49,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         previous_year_income_sar: prevYearIncome ? parseFloat(prevYearIncome) : null,
         income_goal_monthly_sar: monthlyGoal ? parseFloat(monthlyGoal) : null,
         rate_confidence: rateConfidence,
-        rate_currency: currency,
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -87,45 +78,10 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
           own rate. Ephemeral; cites provenance. */}
       <OnboardingPricePreview locale={locale} />
 
-      {/* Preferred currency — used app-wide (feature 007) */}
-      <div>
-        <label className={labelCls}>{isAr ? "عملتك المفضّلة" : "Your preferred currency"}</label>
-        <p className={`-mt-1 mb-2 text-xs text-rizq-ink-soft ${font}`}>
-          {isAr
-            ? "تُستخدم في كل مكان — التسعير والعروض والفواتير ولوحة المعلومات."
-            : "Used across the app — pricing, proposals, invoices, and your dashboard."}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {SUPPORTED_CURRENCIES.map((c) => (
-            <button
-              key={c.code}
-              type="button"
-              onClick={() => setCurrency(c.code)}
-              aria-pressed={currency === c.code}
-              className={`rounded-2xl border px-3.5 py-2 text-sm transition-all ${
-                currency === c.code
-                  ? "border-rizq-green bg-rizq-green/10 text-rizq-green font-semibold"
-                  : "border-[#8f7e48] bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
-              } ${font}`}
-            >
-              {c.code}
-              <span className="text-rizq-ink-soft/70 ms-1">{c.symbol}</span>
-            </button>
-          ))}
-        </div>
-        {currency !== "SAR" && (
-          <p className={`mt-1.5 text-xs text-rizq-ink-soft ${font}`}>
-            {isAr
-              ? "السوق المرجعي بالريال؛ نحوّل سعرك للريال داخليًا مع توضيح المصدر."
-              : "The market benchmark stays in SAR; we convert your rate to SAR internally and show the source."}
-          </p>
-        )}
-      </div>
-
       {/* Hourly rate + min/floor project rate (daily is derived = hourly × 8). */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelCls}>{lbl(t("hourlyRate"))}</label>
+          <label className={labelCls}>{t("hourlyRate")}</label>
           <NumberStepper
             locale={locale}
             value={hourlyRate}
@@ -133,24 +89,22 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
             placeholder={t("hourlyRatePlaceholder")}
             step={10}
             ariaLabel={t("hourlyRate")}
-            suffix={currency}
           />
         </div>
         <div>
-          <label className={labelCls}>{lbl(t("projectRateMin"))}</label>
+          <label className={labelCls}>{t("projectRateMin")}</label>
           <NumberStepper
             locale={locale}
             value={projectMin}
             onChange={setProjectMin}
             step={250}
             ariaLabel={t("projectRateMin")}
-            suffix={currency}
           />
         </div>
       </div>
 
       <div>
-        <label className={labelCls}>{lbl(t("prevYearIncome"))}</label>
+        <label className={labelCls}>{t("prevYearIncome")}</label>
         <NumberStepper
           locale={locale}
           value={prevYearIncome}
@@ -158,20 +112,11 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
           placeholder={t("prevYearIncomePlaceholder")}
           step={1000}
           ariaLabel={t("prevYearIncome")}
-          suffix={currency}
         />
       </div>
 
-      {/* Monthly income goal — compact open wheel scroller (feature 007). Ladder is
-          in SAR; the wheel displays each rung converted to the chosen currency.
-          EUR/GBP have no client peg → fall back to showing SAR. */}
-      <MonthlyGoalWheel
-        value={monthlyGoal}
-        onChange={setMonthlyGoal}
-        locale={locale}
-        currency={sarPerUnitPeg(currency) ? currency : "SAR"}
-        sarPerUnit={sarPerUnitPeg(currency) ?? 1}
-      />
+      {/* Monthly income goal — compact open wheel scroller (SAR). */}
+      <MonthlyGoalWheel value={monthlyGoal} onChange={setMonthlyGoal} locale={locale} />
 
       {/* Rate confidence pills */}
       <div>

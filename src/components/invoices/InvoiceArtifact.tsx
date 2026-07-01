@@ -9,7 +9,6 @@
 
 import type { InvoiceArtifactData, InvoiceArtifactSection } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem } from "@/lib/invoices/items";
-import { currencyMeta, isCurrency } from "@/lib/currency/currencies";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -132,21 +131,6 @@ function str(v: unknown, fallback = ""): string {
 
 function num(v: unknown, fallback = 0): number {
   return typeof v === "number" && isFinite(v) ? v : fallback;
-}
-
-// feature 007 — currency display lens. Section content carries `currency` +
-// `fx_rate_to_sar`; when non-SAR with a rate, convert the SAR amounts for display
-// and label with the currency symbol. SAR (or no rate) → unchanged.
-function currencyView(c: Record<string, unknown>, fallbackLabel: string): {
-  label: string;
-  conv: (sar: number) => number;
-} {
-  const code = c["currency"];
-  const rate = typeof c["fx_rate_to_sar"] === "number" ? (c["fx_rate_to_sar"] as number) : null;
-  if (typeof code === "string" && isCurrency(code) && code !== "SAR" && rate && rate > 0) {
-    return { label: currencyMeta(code).symbol, conv: (sar: number) => sar / rate };
-  }
-  return { label: fallbackLabel, conv: (sar: number) => sar };
 }
 
 function fmtMoney(n: number, locale: "ar" | "en"): string {
@@ -410,7 +394,6 @@ function LineItemsSection({
 }) {
   const t = T[locale];
   const c = section.content;
-  const cv = currencyView(c, t.currency);
   const description = str(c["description"] as string | null | undefined);
   const rawItems = Array.isArray(c["items"])
     ? (c["items"] as unknown[]).filter(
@@ -464,15 +447,15 @@ function LineItemsSection({
                     {num(item.quantity)}
                   </td>
                   <td className="py-3 px-2 text-end tabular font-sans text-rizq-ink">
-                    {fmtMoney(cv.conv(num(item.unit_price_sar)), locale)}
+                    {fmtMoney(num(item.unit_price_sar), locale)}
                     <span className={`ms-1 text-xs text-rizq-ink-soft/60 ${font}`}>
-                      {cv.label}
+                      {t.currency}
                     </span>
                   </td>
                   <td className="py-3 px-2 text-end tabular font-sans font-medium text-rizq-ink">
-                    {fmtMoney(cv.conv(num(item.total_sar)), locale)}
+                    {fmtMoney(num(item.total_sar), locale)}
                     <span className={`ms-1 text-xs text-rizq-ink-soft/60 ${font}`}>
-                      {cv.label}
+                      {t.currency}
                     </span>
                   </td>
                 </tr>
@@ -498,7 +481,6 @@ function TotalsSection({
 }) {
   const t = T[locale];
   const c = section.content;
-  const cv = currencyView(c, t.currency);
   const subtotal = num(c["subtotal_sar"] as number | undefined);
   const vatPct = num(c["vat_pct"] as number | undefined);
   const vatSar = num(c["vat_sar"] as number | undefined);
@@ -525,8 +507,8 @@ function TotalsSection({
         <div className="flex items-center justify-between gap-4">
           <span className={`text-sm text-rizq-ink-soft ${font}`}>{t.subtotal}</span>
           <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-            {fmtMoney(cv.conv(subtotal), locale)}{" "}
-            <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{cv.label}</span>
+            {fmtMoney(subtotal, locale)}{" "}
+            <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
           </span>
         </div>
 
@@ -540,8 +522,8 @@ function TotalsSection({
               )}
             </span>
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-              {fmtMoney(cv.conv(f.amount_sar), locale)}{" "}
-              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{cv.label}</span>
+              {fmtMoney(f.amount_sar, locale)}{" "}
+              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
             </span>
           </div>
         ))}
@@ -553,8 +535,8 @@ function TotalsSection({
               {t.vat} ({vatPct}%)
             </span>
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
-              {fmtMoney(cv.conv(vatSar), locale)}{" "}
-              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{cv.label}</span>
+              {fmtMoney(vatSar, locale)}{" "}
+              <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
             </span>
           </div>
         )}
@@ -564,19 +546,12 @@ function TotalsSection({
           <div className="flex items-center justify-between gap-4">
             <span className={`text-base font-semibold text-rizq-ink ${font}`}>{t.total}</span>
             <span className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
-              {fmtMoney(cv.conv(total), locale)}
+              {fmtMoney(total, locale)}
               <span className={`ms-2 text-sm font-normal text-rizq-ink-soft ${font}`}>
-                {cv.label}
+                {t.currency}
               </span>
             </span>
           </div>
-          {cv.label !== t.currency && (
-            <p className={`mt-1 text-[10px] text-rizq-ink-soft/60 ${font}`}>
-              {locale === "ar"
-                ? `الدفاتر بالريال؛ المعروض محوّل. الإجمالي ${fmtMoney(total, locale)} ${t.currency}`
-                : `Books in SAR; shown converted. Total ${fmtMoney(total, locale)} ${t.currency}`}
-            </p>
-          )}
         </div>
       </div>
     </SectionShell>
@@ -648,7 +623,6 @@ function FooterSection({
   const watermark = c["watermark"] === true;
   const jurisdiction = str(c["jurisdiction"] as string | undefined, "KSA");
   const methodologyHref = str(c["methodologyHref"] as string | undefined, "/methodology");
-  const fxCitationStr = str(c["fx_citation"] as string | null | undefined);
 
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const dir = locale === "ar" ? "rtl" : "ltr";
@@ -669,12 +643,6 @@ function FooterSection({
           >
             {t.methodology} →
           </a>
-          {fxCitationStr && (
-            <span className="text-rizq-ink-soft/70">
-              {locale === "ar" ? "صرف: " : "FX: "}
-              {fxCitationStr}
-            </span>
-          )}
         </div>
 
         {/* Watermark badge — free tier only */}
