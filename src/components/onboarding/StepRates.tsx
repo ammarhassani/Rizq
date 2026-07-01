@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import { NumberStepper } from "./NumberStepper";
+import { MonthlyGoalSegments } from "./MonthlyGoalSegments";
 import { SUPPORTED_CURRENCIES, isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
 import type { StepProps } from "./types";
 
@@ -65,11 +66,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
       }
     });
   };
-
-  // Monthly income-goal presets (in the chosen currency) for the scroll selector.
-  const GOAL_PRESETS = [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000];
-  const fmtMoney = (n: number) =>
-    new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 
   const confidenceOptions: Array<{ value: "exact" | "approximate" | "estimate"; label: string }> = [
     { value: "exact", label: t("rateConfidenceExact") },
@@ -166,36 +162,13 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         />
       </div>
 
-      {/* Monthly income goal — vertical scroll selector of presets (feature 007). */}
-      <div>
-        <label className={labelCls}>{lbl(t("monthlyGoal"))}</label>
-        <div
-          role="listbox"
-          aria-label={t("monthlyGoal")}
-          className="max-h-44 overflow-y-auto rounded-xl border border-[#8f7e48] bg-rizq-cream/60 divide-y divide-rizq-gold/15"
-        >
-          {GOAL_PRESETS.map((amt) => {
-            const selected = monthlyGoal === String(amt);
-            return (
-              <button
-                key={amt}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                onClick={() => setMonthlyGoal(selected ? "" : String(amt))}
-                className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${
-                  selected
-                    ? "bg-rizq-green/10 text-rizq-green font-semibold"
-                    : "text-rizq-ink hover:bg-rizq-green/5"
-                } ${font}`}
-              >
-                <span className="tabular">{fmtMoney(amt)}</span>
-                <span className="text-xs text-rizq-ink-soft/70">{currency}{selected ? " ✓" : ""}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Monthly income goal — animated income-ladder segments (feature 007). */}
+      <MonthlyGoalSegments
+        value={monthlyGoal}
+        onChange={setMonthlyGoal}
+        locale={locale}
+        currency={currency}
+      />
 
       {/* Rate confidence pills */}
       <div>
