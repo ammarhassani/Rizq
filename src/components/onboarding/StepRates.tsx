@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import { NumberStepper } from "./NumberStepper";
-import { MonthlyGoalSegments } from "./MonthlyGoalSegments";
+import { MonthlyGoalWheel } from "./MonthlyGoalWheel";
 import { SUPPORTED_CURRENCIES, isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
 import type { StepProps } from "./types";
 
@@ -162,8 +162,8 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         />
       </div>
 
-      {/* Monthly income goal — animated income-ladder segments (feature 007). */}
-      <MonthlyGoalSegments
+      {/* Monthly income goal — compact open wheel scroller (feature 007). */}
+      <MonthlyGoalWheel
         value={monthlyGoal}
         onChange={setMonthlyGoal}
         locale={locale}
