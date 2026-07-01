@@ -36,3 +36,14 @@ export function isCurrency(x: string | null | undefined): x is CurrencyCode {
 export function currencyMeta(code: CurrencyCode): CurrencyMeta {
   return SUPPORTED_CURRENCIES.find((c) => c.code === code) ?? SUPPORTED_CURRENCIES[0];
 }
+
+/**
+ * SAR per 1 unit of `code` from the fixed pegs (client-computable, no feed).
+ * SAR→1, USD/AED via the SAMA peg chain. EUR/GBP float → null (need a live rate).
+ */
+export function sarPerUnitPeg(code: CurrencyCode): number | null {
+  if (code === "SAR") return 1;
+  if (code === "USD") return SAR_PER_USD;
+  if (code === "AED") return SAR_PER_AED;
+  return null;
+}

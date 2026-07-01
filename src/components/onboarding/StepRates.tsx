@@ -8,7 +8,7 @@ import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep"
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import { NumberStepper } from "./NumberStepper";
 import { MonthlyGoalWheel } from "./MonthlyGoalWheel";
-import { SUPPORTED_CURRENCIES, isCurrency, type CurrencyCode } from "@/lib/currency/currencies";
+import { SUPPORTED_CURRENCIES, isCurrency, sarPerUnitPeg, type CurrencyCode } from "@/lib/currency/currencies";
 import type { StepProps } from "./types";
 
 export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -162,12 +162,15 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         />
       </div>
 
-      {/* Monthly income goal — compact open wheel scroller (feature 007). */}
+      {/* Monthly income goal — compact open wheel scroller (feature 007). Ladder is
+          in SAR; the wheel displays each rung converted to the chosen currency.
+          EUR/GBP have no client peg → fall back to showing SAR. */}
       <MonthlyGoalWheel
         value={monthlyGoal}
         onChange={setMonthlyGoal}
         locale={locale}
-        currency={currency}
+        currency={sarPerUnitPeg(currency) ? currency : "SAR"}
+        sarPerUnit={sarPerUnitPeg(currency) ?? 1}
       />
 
       {/* Rate confidence pills */}

@@ -32,13 +32,18 @@ export function MonthlyGoalWheel({
   onChange,
   locale,
   currency,
+  sarPerUnit = 1,
 }: {
   value: string;
   onChange: (v: string) => void;
   locale: "ar" | "en";
   currency: string;
+  /** SAR per 1 unit of the display currency (rungs are SAR → divide to display). */
+  sarPerUnit?: number;
 }) {
   const isAr = locale === "ar";
+  // Rungs are SAR; show them in the chosen currency (a dollar ≈ 3.75 SAR).
+  const disp = (sar: number) => short(sarPerUnit > 0 ? sar / sarPerUnit : sar);
   const font = isAr ? "font-arabic" : "font-sans";
   const ref = useRef<HTMLDivElement>(null);
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,7 +89,7 @@ export function MonthlyGoalWheel({
         </span>
         {value && sel && (
           <span className={`tabular text-sm font-bold text-rizq-green ${font}`}>
-            {short(sel.lo)}–{short(sel.hi)} {currency}
+            {disp(sel.lo)}–{disp(sel.hi)} {currency}
           </span>
         )}
       </div>
@@ -133,7 +138,7 @@ export function MonthlyGoalWheel({
                   transform: `scale(${Math.max(0.82, 1 - d * 0.11)})`,
                 }}
               >
-                {short(s.lo)}–{short(s.hi)}
+                {disp(s.lo)}–{disp(s.hi)}
                 <span className={`ms-1.5 text-xs ${isSel ? "text-rizq-green/70" : "text-rizq-ink-soft/50"}`}>
                   {currency}
                 </span>
