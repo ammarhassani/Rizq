@@ -50,16 +50,6 @@ const StepRatesSchema = z.object({
   rate_confidence: z.enum(["exact", "approximate", "estimate"]).optional(),
 });
 
-const StepPlatformsSchema = z.object({
-  bahr_profile_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  mostaql_profile_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  khamsat_profile_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  linkedin_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  behance_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  personal_website_url: z.string().url().max(500).optional().nullable().or(z.literal("")),
-  platform_ratings: z.record(z.string(), z.number().min(0).max(5)).optional().nullable(),
-});
-
 const StepPortfolioSchema = z.object({
   portfolio_samples: z
     .array(
@@ -128,13 +118,12 @@ const StepGoalsSchema = z.object({
 });
 
 // ── Step number → key mapping ─────────────────────────────────────────────────
-// Step 1 = welcome (no save), Step 11 = review (use completeOnboarding)
+// Step 1 = welcome (no save), Step 10 = review (use completeOnboarding)
 const STEP_SCHEMAS = {
   identity: StepIdentitySchema,
   location: StepLocationSchema,
   professional: StepProfessionalSchema,
   rates: StepRatesSchema,
-  platforms: StepPlatformsSchema,
   portfolio: StepPortfolioSchema,
   brand: StepBrandSchema,
   defaults: StepDefaultsSchema,
@@ -148,12 +137,11 @@ const STEP_KEY_TO_NUM: Record<string, number> = {
   location: 3,
   professional: 4,
   rates: 5,
-  platforms: 6,
-  portfolio: 7,
-  brand: 8,
-  defaults: 9,
-  goals: 10,
-  review: 11,
+  portfolio: 6,
+  brand: 7,
+  defaults: 8,
+  goals: 9,
+  review: 10,
 };
 
 export type SaveOnboardingStepKey = keyof typeof STEP_SCHEMAS;
