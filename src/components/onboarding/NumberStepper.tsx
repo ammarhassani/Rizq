@@ -52,7 +52,7 @@ export function NumberStepper({
   return (
     <div
       dir="ltr"
-      className="flex items-stretch overflow-hidden rounded-xl border border-[#8f7e48] bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 focus-within:border-rizq-green"
+      className="flex items-stretch overflow-hidden rounded-xl border border-[#8f7e48] bg-rizq-cream/60 cursor-text transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 focus-within:border-rizq-green"
     >
       <input
         type="text"
@@ -61,7 +61,7 @@ export function NumberStepper({
         onChange={(e) => handleType(e.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className="flex-1 min-w-0 bg-transparent px-4 py-3 text-base text-rizq-ink tabular focus:outline-none"
+        className="flex-1 min-w-0 bg-transparent px-4 py-3 text-base text-rizq-ink tabular cursor-text focus:outline-none"
       />
       {suffix && (
         <span className="flex items-center px-2.5 text-xs font-semibold text-rizq-ink-soft border-s border-[#8f7e48] select-none">
@@ -73,7 +73,7 @@ export function NumberStepper({
           type="button"
           onClick={() => stepBy(step)}
           aria-label={isAr ? "زيادة" : "Increase"}
-          className="flex flex-1 items-center justify-center px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
+          className="flex flex-1 cursor-pointer items-center justify-center px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
         >
           <ChevronUp size={14} />
         </button>

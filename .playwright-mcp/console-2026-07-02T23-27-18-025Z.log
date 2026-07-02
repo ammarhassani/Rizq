@@ -1,0 +1,16 @@
+[    3012ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[    3120ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   12281ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   12361ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   86982ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   87278ms] [LOG] [Fast Refresh] done in 401ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   87677ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   87883ms] [LOG] [Fast Refresh] done in 319ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   88080ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   88335ms] [LOG] [Fast Refresh] done in 370ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   93481ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   93749ms] [LOG] [Fast Refresh] done in 380ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   94117ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   94307ms] [LOG] [Fast Refresh] done in 299ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   94535ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
+[   94715ms] [LOG] [Fast Refresh] done in 289ms @ http://localhost:3000/_next/static/chunks/0._z_next_dist_010cjg2._.js:1073
