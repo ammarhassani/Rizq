@@ -20,9 +20,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [projectMin, setProjectMin] = useState(
     profile.current_project_rate_range?.min?.toString() ?? ""
   );
-  const [prevYearIncome, setPrevYearIncome] = useState(
-    profile.previous_year_income_sar?.toString() ?? ""
-  );
   const [monthlyGoal, setMonthlyGoal] = useState(
     profile.income_goal_monthly_sar?.toString() ?? ""
   );
@@ -46,7 +43,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
         current_daily_rate_sar: hourly != null ? hourly * 8 : null,
         // Only the min/floor project rate is asked; store it as the range (max = min).
         current_project_rate_range: min != null ? { min, max: min } : null,
-        previous_year_income_sar: prevYearIncome ? parseFloat(prevYearIncome) : null,
         income_goal_monthly_sar: monthlyGoal ? parseFloat(monthlyGoal) : null,
         rate_confidence: rateConfidence,
       });
@@ -101,18 +97,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip }: StepProps
             ariaLabel={t("projectRateMin")}
           />
         </div>
-      </div>
-
-      <div>
-        <label className={labelCls}>{t("prevYearIncome")}</label>
-        <NumberStepper
-          locale={locale}
-          value={prevYearIncome}
-          onChange={setPrevYearIncome}
-          placeholder={t("prevYearIncomePlaceholder")}
-          step={1000}
-          ariaLabel={t("prevYearIncome")}
-        />
       </div>
 
       {/* Monthly income goal — compact open wheel scroller (SAR). */}
