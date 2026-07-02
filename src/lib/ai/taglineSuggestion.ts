@@ -12,19 +12,14 @@ import { deepseek, REASONING_MODEL } from "@/lib/ai/client";
 export type TaglineCtx = {
   specialty: string | null;
   bio_ar: string | null;
-  primary_goal: string | null;
   city: string | null;
+  /** The freelancer's app language — suggestions are written in it. */
+  locale: "ar" | "en";
 };
 
+// One field per tagline now (no per-language duplication) → single strings.
 const TaglineSuggestionsSchema = z.object({
-  taglines: z
-    .array(
-      z.object({
-        ar: z.string().min(1).max(200),
-        en: z.string().min(1).max(200),
-      })
-    )
-    .length(3),
+  taglines: z.array(z.string().min(1).max(200)).length(3),
 });
 
 export type TaglineSuggestions = z.infer<typeof TaglineSuggestionsSchema>;
@@ -35,30 +30,34 @@ export type TaglineSuggestions = z.infer<typeof TaglineSuggestionsSchema>;
 export function buildTaglinePrompt(ctx: TaglineCtx): string {
   const specialty = ctx.specialty ?? "مستقل";
   const city = ctx.city ?? "السعودية";
-  const goal = ctx.primary_goal ?? "increase_income";
   const bio = ctx.bio_ar
     ? `نبذة المستقل: ${ctx.bio_ar.slice(0, 400)}`
     : "لا توجد نبذة متاحة.";
+  const lang = ctx.locale === "en" ? "English" : "العربية";
 
-  return `أنت مساعد تسويقي متخصص بالسوق السعودي للمستقلين. مهمتك اقتراح 3 شعارات تجارية قصيرة وجذابة لمستقل سعودي.
+  return `أنت كاتب علامات تجارية راقٍ للسوق السعودي. اكتب 3 شعارات (taglines) قصيرة وأنيقة لعلامة مستقل سعودي — كلها مكتوبة بـ${lang}.
 
-السياق:
+السياق (للإلهام فقط، لا لإدراجه حرفيًا):
 - التخصص: ${specialty}
-- المدينة: ${city}
-- الهدف الرئيسي: ${goal}
+- المقر: ${city}
 - ${bio}
 
-القواعد:
-- كل شعار يجب أن يكون قصيرًا (بين 4 و12 كلمة عربية، و4 و12 كلمة إنجليزية).
-- الشعار يجب أن يعكس هوية المستقل وليس مجرد وصف عام.
-- أسلوب سعودي أصيل — لا ترجمة حرفية.
-- لا تخترع ادعاءات غير موجودة في السياق.
-- النبرة: احترافية مع لمسة شخصية.
-- هذه اقتراحات فقط — المستخدم يختار ما يناسبه.
-- أرجع بالضبط 3 شعارات بصيغة: { ar: "...", en: "..." }
+الشعار الجيد:
+- قصير ولافت: من كلمتين إلى ست كلمات — عبارة تُحفظ، لا جملة.
+- يعبّر عن حرفة المستقل وقيمته وإحساس التعامل معه.
+- لغة سليمة وسلسة وطبيعية، وليست ترجمة حرفية.
+- نبرة واثقة وراقية بلمسة إنسانية، لا تسويقية صاخبة.
 
-مثال على الجودة المطلوبة:
-{ ar: "تصميم يحكي قصتك بالسوق السعودي", en: "Design that tells your story in the Saudi market" }`;
+ممنوع منعًا باتًا (يُرفض الشعار إذا خالف):
+- أي وعد بالدخل أو الأرباح أو المضاعفة أو النمو أو أي أرقام/نسب ("ارفع دخلك"، "ضاعف أرباحك"، "boost your income"، "double your gains").
+- المبالغة والادعاءات ("الأفضل"، "الأول"، "رائد"، "مضمون").
+- حشر اسم المدينة أو كلمة "سعودي"/"الرياض" في نص الشعار.
+- لا تخترع أي شيء غير موجود في السياق.
+
+أمثلة جيدة: "هوية تُروى" · "تصميم يبقى في الذاكرة" · "Design that lingers".
+أمثلة سيئة — تجنّبها تمامًا: "ارفع دخلك مع موقعك" · "Saudi web dev doubling your gains".
+
+هذه اقتراحات فقط؛ يراجعها المستخدم ويعدّلها. أرجع بالضبط 3 شعارات نصية مفردة في مصفوفة taglines.`;
 }
 
 /**

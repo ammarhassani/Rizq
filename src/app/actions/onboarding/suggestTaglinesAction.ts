@@ -10,14 +10,16 @@ import { createClient } from "@/lib/supabase/server";
 import { suggestTaglines } from "@/lib/ai/taglineSuggestion";
 import type { TaglineSuggestions } from "@/lib/ai/taglineSuggestion";
 
-export async function suggestTaglinesAction(): Promise<TaglineSuggestions | null> {
+export async function suggestTaglinesAction(
+  locale: "ar" | "en" = "ar"
+): Promise<TaglineSuggestions | null> {
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return null;
 
   const { data: profile } = await supabase
     .from("users")
-    .select("specialties, primary_specialty_id, bio_ar, primary_goal, city")
+    .select("specialties, primary_specialty_id, bio_ar, city")
     .eq("id", userData.user.id)
     .maybeSingle();
 
@@ -28,8 +30,8 @@ export async function suggestTaglinesAction(): Promise<TaglineSuggestions | null
   const ctx = {
     specialty,
     bio_ar: (profile?.bio_ar as string | null) ?? null,
-    primary_goal: (profile?.primary_goal as string | null) ?? null,
     city: (profile?.city as string | null) ?? null,
+    locale,
   };
 
   return suggestTaglines(ctx);

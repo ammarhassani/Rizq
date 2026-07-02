@@ -10,8 +10,8 @@ import type { TaglineCtx } from "./taglineSuggestion";
 const BASE_CTX: TaglineCtx = {
   specialty: "تصميم جرافيك",
   bio_ar: "أنا مصمم جرافيك سعودي بخبرة ٧ سنوات في هوية الشركات.",
-  primary_goal: "build_brand",
   city: "الرياض",
+  locale: "ar",
 };
 
 describe("buildTaglinePrompt", () => {
@@ -23,11 +23,6 @@ describe("buildTaglinePrompt", () => {
   it("includes the city in the prompt", () => {
     const prompt = buildTaglinePrompt(BASE_CTX);
     expect(prompt).toContain("الرياض");
-  });
-
-  it("includes the primary_goal in the prompt", () => {
-    const prompt = buildTaglinePrompt(BASE_CTX);
-    expect(prompt).toContain("build_brand");
   });
 
   it("includes bio_ar content in the prompt", () => {
@@ -45,9 +40,14 @@ describe("buildTaglinePrompt", () => {
     expect(prompt).toContain("لا تخترع");
   });
 
-  it("includes bilingual instruction (ar/en format)", () => {
+  it("asks for the taglines array (single strings)", () => {
     const prompt = buildTaglinePrompt(BASE_CTX);
-    expect(prompt).toMatch(/ar.*en|en.*ar|\{ ar:|taglines/i);
+    expect(prompt).toContain("taglines");
+  });
+
+  it("forbids income/hype claims", () => {
+    const prompt = buildTaglinePrompt(BASE_CTX);
+    expect(prompt).toMatch(/ممنوع|الدخل|boost your income/);
   });
 
   it("includes the Saudi-market context directive", () => {
@@ -78,12 +78,6 @@ describe("buildTaglinePrompt", () => {
     expect(() => buildTaglinePrompt(ctx)).not.toThrow();
     const prompt = buildTaglinePrompt(ctx);
     expect(prompt).toContain("لا توجد نبذة");
-  });
-
-  it("handles null primary_goal with fallback", () => {
-    const ctx: TaglineCtx = { ...BASE_CTX, primary_goal: null };
-    const prompt = buildTaglinePrompt(ctx);
-    expect(prompt).toContain("increase_income");
   });
 
   it("truncates long bio_ar to 400 chars", () => {

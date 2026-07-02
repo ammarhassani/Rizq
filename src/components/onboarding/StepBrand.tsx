@@ -14,20 +14,17 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
-  const [brandName, setBrandName] = useState(profile.brand_name ?? "");
-  const [brandNameAr, setBrandNameAr] = useState(profile.brand_name_ar ?? "");
-  const [taglineAr, setTaglineAr] = useState(profile.tagline_ar ?? "");
-  const [taglineEn, setTaglineEn] = useState(profile.tagline_en ?? "");
-  const [bioAr, setBioAr] = useState(profile.bio_ar ?? "");
-  const [bioEn, setBioEn] = useState(profile.bio_en ?? "");
+  // One field each — no per-language duplication. Type in any language; we mirror
+  // to both language columns on save so every artifact resolves it.
+  const [brandName, setBrandName] = useState(profile.brand_name ?? profile.brand_name_ar ?? "");
+  const [tagline, setTagline] = useState(profile.tagline_ar ?? profile.tagline_en ?? "");
+  const [bio, setBio] = useState(profile.bio_ar ?? profile.bio_en ?? "");
   const [contactEmail, setContactEmail] = useState(profile.contact_email ?? "");
   const [contactPhone, setContactPhone] = useState(profile.contact_phone ?? "");
   const [contactWhatsapp, setContactWhatsapp] = useState(profile.contact_whatsapp ?? "");
   const [contactCity, setContactCity] = useState(profile.contact_city ?? "");
 
-  const [taglineSuggestions, setTaglineSuggestions] = useState<
-    Array<{ ar: string; en: string }> | null
-  >(null);
+  const [taglineSuggestions, setTaglineSuggestions] = useState<string[] | null>(null);
   const [taglineError, setTaglineError] = useState(false);
   const [isAiPending, startAiTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +37,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
     setTaglineError(false);
     setTaglineSuggestions(null);
     startAiTransition(async () => {
-      const result = await suggestTaglinesAction();
+      const result = await suggestTaglinesAction(locale);
       if (result) {
         setTaglineSuggestions(result.taglines);
       } else {
@@ -49,21 +46,21 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
     });
   };
 
-  const applyTagline = (suggestion: { ar: string; en: string }) => {
-    setTaglineAr(suggestion.ar);
-    setTaglineEn(suggestion.en);
+  const applyTagline = (suggestion: string) => {
+    setTagline(suggestion);
   };
 
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
       const result = await saveOnboardingStep("brand", {
+        // Single fields mirrored to both language columns.
         brand_name: brandName || null,
-        brand_name_ar: brandNameAr || null,
-        tagline_ar: taglineAr || null,
-        tagline_en: taglineEn || null,
-        bio_ar: bioAr || null,
-        bio_en: bioEn || null,
+        brand_name_ar: brandName || null,
+        tagline_ar: tagline || null,
+        tagline_en: tagline || null,
+        bio_ar: bio || null,
+        bio_en: bio || null,
         contact_email: contactEmail || "",
         contact_phone: contactPhone || null,
         contact_whatsapp: contactWhatsapp || null,
@@ -86,36 +83,22 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
       dir={isAr ? "rtl" : "ltr"}
       className={`space-y-5 ${font}`}
     >
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className={labelCls}>{t("brandNameAr")}</label>
-          <input
-            type="text"
-            value={brandNameAr}
-            onChange={(e) => setBrandNameAr(e.target.value)}
-            placeholder={t("brandNameArPlaceholder")}
-            className={inputCls}
-            maxLength={120}
-            dir="rtl"
-          />
-        </div>
-        <div>
-          <label className={labelCls}>{t("brandName")}</label>
-          <input
-            type="text"
-            value={brandName}
-            onChange={(e) => setBrandName(e.target.value)}
-            placeholder={t("brandNamePlaceholder")}
-            className={inputCls}
-            maxLength={120}
-            dir="ltr"
-          />
-        </div>
+      <div>
+        <label className={labelCls}>{isAr ? "اسم علامتك التجارية" : "Brand name"}</label>
+        <input
+          type="text"
+          value={brandName}
+          onChange={(e) => setBrandName(e.target.value)}
+          placeholder={isAr ? "مثال: استوديو التصميم" : "e.g. DesignStudio"}
+          className={inputCls}
+          maxLength={120}
+          dir="auto"
+        />
       </div>
 
       {/* Live, ephemeral brand preview (feature 006) — the freelancer sees their
           identity on a proposal header in real time. Nothing is persisted here. */}
-      {(brandName || brandNameAr || taglineAr || taglineEn) && (
+      {(brandName || tagline) && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -127,50 +110,35 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
               {isAr ? "معاينة حية لعرضك" : "Live preview of your proposal"}
             </p>
             <div className="flex items-baseline justify-between gap-3">
-              <span className={`text-base font-bold text-rizq-green ${font}`}>
-                {(isAr ? brandNameAr || brandName : brandName || brandNameAr) ||
-                  (isAr ? "اسمك التجاري" : "Your brand")}
+              <span className={`text-base font-bold text-rizq-green ${font}`} dir="auto">
+                {brandName || (isAr ? "اسمك التجاري" : "Your brand")}
               </span>
               <span className={`text-[11px] text-rizq-ink-soft ${font}`}>
                 {isAr ? "عرض سعر" : "Proposal"}
               </span>
             </div>
-            {(isAr ? taglineAr : taglineEn) && (
-              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`} dir={isAr ? "rtl" : "ltr"}>
-                {isAr ? taglineAr : taglineEn}
+            {tagline && (
+              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`} dir="auto">
+                {tagline}
               </p>
             )}
           </div>
         </motion.div>
       )}
 
-      {/* Taglines + AI section */}
+      {/* Tagline + AI section */}
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelCls}>{t("taglineAr")}</label>
+          <label className={labelCls}>{isAr ? "الشعار (Tagline)" : "Tagline"}</label>
           <input
             type="text"
-            value={taglineAr}
-            onChange={(e) => setTaglineAr(e.target.value)}
-            placeholder={t("taglineArPlaceholder")}
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            placeholder={isAr ? "مثال: تصميم يعكس هويتك" : "e.g. Design that reflects you"}
             className={inputCls}
             maxLength={200}
-            dir="rtl"
+            dir="auto"
           />
-        </div>
-        <div>
-          <label className={labelCls}>{t("taglineEn")}</label>
-          <input
-            type="text"
-            value={taglineEn}
-            onChange={(e) => setTaglineEn(e.target.value)}
-            placeholder={t("taglineEnPlaceholder")}
-            className={inputCls}
-            maxLength={200}
-            dir="ltr"
-          />
-        </div>
         </div>
 
         {/* AI tagline button */}
@@ -210,18 +178,15 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
               {taglineSuggestions.map((s, idx) => (
                 <div
                   key={idx}
-                  className="rounded-lg border border-rizq-gold/20 bg-white/60 p-3 space-y-1"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-rizq-gold/20 bg-white/60 p-3"
                 >
-                  <p className="text-sm text-rizq-ink font-arabic" dir="rtl">
-                    {s.ar}
-                  </p>
-                  <p className="text-xs text-rizq-ink-soft font-sans" dir="ltr">
-                    {s.en}
+                  <p className={`text-sm text-rizq-ink ${font}`} dir="auto">
+                    {s}
                   </p>
                   <button
                     type="button"
                     onClick={() => applyTagline(s)}
-                    className={`text-xs text-rizq-green hover:underline ${font}`}
+                    className={`shrink-0 text-xs text-rizq-green hover:underline ${font}`}
                   >
                     {t("aiTaglineUse")}
                   </button>
@@ -232,30 +197,17 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
         </div>
       </div>
 
-      {/* Bios */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Bio — single field */}
       <div>
-        <label className={labelCls}>{t("bioAr")}</label>
+        <label className={labelCls}>{isAr ? "نبذة عنك" : "Short bio"}</label>
         <textarea
-          value={bioAr}
-          onChange={(e) => setBioAr(e.target.value)}
-          placeholder={t("bioArPlaceholder")}
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          placeholder={isAr ? "سطران عن خبرتك وما يميّزك" : "A line or two about your experience and what sets you apart"}
           className={`${inputCls} resize-none h-24`}
           maxLength={1000}
-          dir="rtl"
+          dir="auto"
         />
-      </div>
-      <div>
-        <label className={labelCls}>{t("bioEn")}</label>
-        <textarea
-          value={bioEn}
-          onChange={(e) => setBioEn(e.target.value)}
-          placeholder={t("bioEnPlaceholder")}
-          className={`${inputCls} resize-none h-24`}
-          maxLength={1000}
-          dir="ltr"
-        />
-      </div>
       </div>
 
       {/* Contact */}
