@@ -111,7 +111,15 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
             ) : (
               <>
                 <Sparkles size={14} />
-                <span>{isAr ? "اكتب هويتي" : "Write my identity"}</span>
+                <span>
+                  {aiFilled
+                    ? isAr
+                      ? "أعد التوليد"
+                      : "Regenerate"
+                    : isAr
+                      ? "اكتب هويتي"
+                      : "Write my identity"}
+                </span>
               </>
             )}
           </button>
