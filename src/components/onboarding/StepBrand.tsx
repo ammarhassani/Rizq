@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2, Sparkles } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
-import { suggestTaglinesAction } from "@/app/actions/onboarding/suggestTaglinesAction";
+import { suggestBrandKitAction } from "@/app/actions/onboarding/suggestBrandKitAction";
 import type { StepProps } from "./types";
 
 export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps) {
@@ -24,8 +24,8 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [contactWhatsapp, setContactWhatsapp] = useState(profile.contact_whatsapp ?? "");
   const [contactCity, setContactCity] = useState(profile.contact_city ?? "");
 
-  const [taglineSuggestions, setTaglineSuggestions] = useState<string[] | null>(null);
-  const [taglineError, setTaglineError] = useState(false);
+  const [aiError, setAiError] = useState(false);
+  const [aiFilled, setAiFilled] = useState(false);
   const [isAiPending, startAiTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -33,21 +33,22 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
   const labelCls = `block text-sm font-medium text-rizq-ink mb-1.5 ${font}`;
 
-  const handleAiTagline = () => {
-    setTaglineError(false);
-    setTaglineSuggestions(null);
+  // Generate the whole identity (name + tagline + bio) from earlier steps and
+  // fill the fields — the freelancer reviews/edits before saving.
+  const handleGenerate = () => {
+    setAiError(false);
+    setAiFilled(false);
     startAiTransition(async () => {
-      const result = await suggestTaglinesAction(locale);
-      if (result) {
-        setTaglineSuggestions(result.taglines);
+      const kit = await suggestBrandKitAction(locale);
+      if (kit) {
+        setBrandName(kit.brand_name);
+        setTagline(kit.tagline);
+        setBio(kit.bio);
+        setAiFilled(true);
       } else {
-        setTaglineError(true);
+        setAiError(true);
       }
     });
-  };
-
-  const applyTagline = (suggestion: string) => {
-    setTagline(suggestion);
   };
 
   const handleSave = () => {
@@ -83,6 +84,50 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
       dir={isAr ? "rtl" : "ltr"}
       className={`space-y-5 ${font}`}
     >
+      {/* AI: write my whole identity from the earlier steps */}
+      <div className="rounded-2xl border border-rizq-green/20 bg-rizq-green/[0.03] p-4 space-y-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <p className={`text-sm font-medium text-rizq-ink ${font}`}>
+              {isAr ? "دع رِزق يكتب هويتك" : "Let Rizq write your identity"}
+            </p>
+            <p className={`text-xs text-rizq-ink-soft ${font}`}>
+              {isAr
+                ? "اسم وشعار ونبذة — من تخصصك ومدينتك وخبرتك. راجعها وعدّلها."
+                : "Name, tagline & bio — from your specialty, city & experience. Review and edit."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={isAiPending}
+            className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-4 py-2 text-sm font-medium hover:bg-rizq-green-dark transition-colors disabled:opacity-60 ${font}`}
+          >
+            {isAiPending ? (
+              <>
+                <Loader2 size={14} className="animate-spin" />
+                <span>{isAr ? "يكتب…" : "Writing…"}</span>
+              </>
+            ) : (
+              <>
+                <Sparkles size={14} />
+                <span>{isAr ? "اكتب هويتي" : "Write my identity"}</span>
+              </>
+            )}
+          </button>
+        </div>
+        {aiFilled && (
+          <p className={`text-xs text-rizq-green ${font}`}>
+            {isAr ? "✦ اقتراح ذكاء اصطناعي — عدّله كما تشاء." : "✦ AI suggestion — edit it freely."}
+          </p>
+        )}
+        {aiError && (
+          <p className={`text-xs text-red-600 ${font}`}>
+            {isAr ? "تعذّر التوليد. حاول مرة أخرى." : "Couldn't generate. Try again."}
+          </p>
+        )}
+      </div>
+
       <div>
         <label className={labelCls}>{isAr ? "اسم علامتك التجارية" : "Brand name"}</label>
         <input
@@ -126,75 +171,18 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
         </motion.div>
       )}
 
-      {/* Tagline + AI section */}
-      <div className="space-y-3">
-        <div>
-          <label className={labelCls}>{isAr ? "الشعار (Tagline)" : "Tagline"}</label>
-          <input
-            type="text"
-            value={tagline}
-            onChange={(e) => setTagline(e.target.value)}
-            placeholder={isAr ? "مثال: تصميم يعكس هويتك" : "e.g. Design that reflects you"}
-            className={inputCls}
-            maxLength={200}
-            dir="auto"
-          />
-        </div>
-
-        {/* AI tagline button */}
-        <div className="rounded-xl border border-rizq-gold/30 bg-rizq-cream/40 p-4 space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("aiTaglineTitle")}</p>
-              <p className={`text-xs text-rizq-ink-soft ${font}`}>{t("aiTaglineSubtitle")}</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleAiTagline}
-              disabled={isAiPending}
-              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/50 bg-rizq-cream px-4 py-2 text-sm text-rizq-green hover:bg-rizq-green/5 transition-colors disabled:opacity-60 ${font}`}
-            >
-              {isAiPending ? (
-                <>
-                  <Loader2 size={13} className="animate-spin" />
-                  <span>{t("aiTaglineGenerating")}</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={13} />
-                  <span>{t("aiTaglineGenerate")}</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {taglineError && (
-            <p className={`text-xs text-red-600 ${font}`}>{t("aiTaglineError")}</p>
-          )}
-
-          {taglineSuggestions && (
-            <div className="space-y-2">
-              <p className={`text-xs text-rizq-ink-soft ${font}`}>{t("aiTaglineDisclaimer")}</p>
-              {taglineSuggestions.map((s, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-rizq-gold/20 bg-white/60 p-3"
-                >
-                  <p className={`text-sm text-rizq-ink ${font}`} dir="auto">
-                    {s}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => applyTagline(s)}
-                    className={`shrink-0 text-xs text-rizq-green hover:underline ${font}`}
-                  >
-                    {t("aiTaglineUse")}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Tagline */}
+      <div>
+        <label className={labelCls}>{isAr ? "الشعار (Tagline)" : "Tagline"}</label>
+        <input
+          type="text"
+          value={tagline}
+          onChange={(e) => setTagline(e.target.value)}
+          placeholder={isAr ? "مثال: تصميم يعكس هويتك" : "e.g. Design that reflects you"}
+          className={inputCls}
+          maxLength={200}
+          dir="auto"
+        />
       </div>
 
       {/* Bio — single field */}
