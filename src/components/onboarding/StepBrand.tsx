@@ -17,6 +17,18 @@ function WhatsappIcon({ className }: { className?: string }) {
   );
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Saudi mobile national number: 9 digits starting with 5 (e.g. 5XXXXXXXX).
+const KSA_MOBILE_RE = /^5\d{8}$/;
+
+/** Reduce any stored/typed phone to the 9-digit national number (drop +966 / 0). */
+function toNationalPhone(raw: string | null | undefined): string {
+  let d = (raw ?? "").replace(/\D/g, "");
+  if (d.startsWith("966")) d = d.slice(3);
+  if (d.startsWith("0")) d = d.slice(1);
+  return d.slice(-9);
+}
+
 export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.brand");
   const tv2 = useTranslations("Onboarding.v2");
@@ -29,9 +41,19 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
   const [tagline, setTagline] = useState(profile.tagline_ar ?? profile.tagline_en ?? "");
   const [bio, setBio] = useState(profile.bio_ar ?? profile.bio_en ?? "");
   const [contactEmail, setContactEmail] = useState(profile.contact_email ?? "");
-  const [contactPhone, setContactPhone] = useState(profile.contact_phone ?? "");
-  const [contactWhatsapp, setContactWhatsapp] = useState(profile.contact_whatsapp ?? "");
+  // Phone / WhatsApp held as the 9-digit national number; +966 is a fixed prefix.
+  const [contactPhone, setContactPhone] = useState(toNationalPhone(profile.contact_phone));
+  const [contactWhatsapp, setContactWhatsapp] = useState(toNationalPhone(profile.contact_whatsapp));
+  const [waSameAsPhone, setWaSameAsPhone] = useState(() => {
+    const p = toNationalPhone(profile.contact_phone);
+    return p !== "" && p === toNationalPhone(profile.contact_whatsapp);
+  });
   const [contactCity, setContactCity] = useState(profile.contact_city ?? "");
+
+  // Validation — all optional, but must be well-formed if filled.
+  const emailValid = contactEmail === "" || EMAIL_RE.test(contactEmail);
+  const phoneValid = contactPhone === "" || KSA_MOBILE_RE.test(contactPhone);
+  const waValid = waSameAsPhone || contactWhatsapp === "" || KSA_MOBILE_RE.test(contactWhatsapp);
 
   const [aiError, setAiError] = useState(false);
   const [aiFilled, setAiFilled] = useState(false);
@@ -62,6 +84,12 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
 
   const handleSave = () => {
     setError(null);
+    if (!emailValid || !phoneValid || !waValid) {
+      setError(isAr ? "تحقّق من البريد أو رقم الجوال." : "Check your email or phone number.");
+      return;
+    }
+    const fullPhone = contactPhone ? `+966${contactPhone}` : null;
+    const fullWa = waSameAsPhone ? fullPhone : contactWhatsapp ? `+966${contactWhatsapp}` : null;
     startTransition(async () => {
       const result = await saveOnboardingStep("brand", {
         // Single fields mirrored to both language columns.
@@ -72,8 +100,8 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
         bio_ar: bio || null,
         bio_en: bio || null,
         contact_email: contactEmail || "",
-        contact_phone: contactPhone || null,
-        contact_whatsapp: contactWhatsapp || null,
+        contact_phone: fullPhone,
+        contact_whatsapp: fullWa,
         contact_city: contactCity || null,
       });
       if (result.ok) {
@@ -225,39 +253,88 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip }: StepProps
               type="email"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
-              className={`${inputCls} ps-11`}
+              placeholder="you@example.com"
+              className={`${inputCls} ps-11 ${emailValid ? "" : "!border-red-500"}`}
               maxLength={200}
               dir="ltr"
+              aria-invalid={!emailValid}
             />
           </div>
+          {!emailValid && (
+            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+              {isAr ? "بريد إلكتروني غير صحيح." : "Enter a valid email."}
+            </p>
+          )}
         </div>
         <div>
           <label className={labelCls}>{t("contactPhone")}</label>
-          <div className="relative" dir="ltr">
-            <Phone size={16} className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-rizq-ink-soft/70" />
+          <div
+            dir="ltr"
+            className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
+              phoneValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"
+            }`}
+          >
+            <span className="flex items-center gap-1.5 border-e border-[#8f7e48] px-3 text-sm text-rizq-ink-soft select-none">
+              <Phone size={15} />
+              +966
+            </span>
             <input
               type="tel"
+              inputMode="numeric"
               value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              className={`${inputCls} ps-11`}
-              maxLength={30}
+              onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, "").slice(0, 9))}
+              placeholder="5XXXXXXXX"
+              className="flex-1 min-w-0 bg-transparent px-3 py-3 text-base text-rizq-ink tabular focus:outline-none"
               dir="ltr"
+              aria-invalid={!phoneValid}
             />
           </div>
+          {!phoneValid && (
+            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+              {isAr ? "جوال سعودي غير صحيح (٩ أرقام تبدأ بـ ٥)." : "Enter a valid Saudi mobile (9 digits, starts with 5)."}
+            </p>
+          )}
         </div>
         <div>
-          <label className={labelCls}>{t("contactWhatsapp")}</label>
-          <div className="relative" dir="ltr">
-            <WhatsappIcon className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#25D366]" />
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <span className={`text-sm font-medium text-rizq-ink ${font}`}>{t("contactWhatsapp")}</span>
+            <label className={`flex cursor-pointer items-center gap-1.5 text-xs text-rizq-ink-soft ${font}`}>
+              <input
+                type="checkbox"
+                checked={waSameAsPhone}
+                onChange={(e) => setWaSameAsPhone(e.target.checked)}
+                className="h-3.5 w-3.5 accent-rizq-green"
+              />
+              {isAr ? "نفس رقم الجوال" : "Same as phone"}
+            </label>
+          </div>
+          <div
+            dir="ltr"
+            className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
+              waSameAsPhone ? "opacity-60" : ""
+            } ${waValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"}`}
+          >
+            <span className="flex items-center gap-1.5 border-e border-[#8f7e48] px-3 text-sm text-rizq-ink-soft select-none">
+              <WhatsappIcon className="h-4 w-4 text-[#25D366]" />
+              +966
+            </span>
             <input
               type="tel"
-              value={contactWhatsapp}
-              onChange={(e) => setContactWhatsapp(e.target.value)}
-              className={`${inputCls} ps-11`}
-              maxLength={30}
+              inputMode="numeric"
+              value={waSameAsPhone ? contactPhone : contactWhatsapp}
+              onChange={(e) => setContactWhatsapp(e.target.value.replace(/\D/g, "").slice(0, 9))}
+              disabled={waSameAsPhone}
+              placeholder="5XXXXXXXX"
+              className="flex-1 min-w-0 bg-transparent px-3 py-3 text-base text-rizq-ink tabular focus:outline-none disabled:cursor-not-allowed"
               dir="ltr"
+              aria-invalid={!waValid}
             />
           </div>
+          {!waValid && (
+            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+              {isAr ? "جوال سعودي غير صحيح." : "Enter a valid Saudi mobile."}
+            </p>
+          )}
         </div>
         <div>
           <label className={labelCls}>{t("contactCity")}</label>
