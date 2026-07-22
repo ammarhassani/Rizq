@@ -374,6 +374,17 @@
   color: var(--on-accent);
 }
 
+/* Primary button — aurora fill + accent glow (audit §O2: the primitive IS the
+   brand, so screens stop hand-rolling rounded-full bg-rizq-green pills). */
+.aurora-btn {
+  background: var(--fill);
+  color: var(--on-accent);
+  box-shadow: 0 6px 20px -9px color-mix(in srgb, var(--acc) 60%, transparent);
+  transition: filter 0.18s ease, box-shadow 0.18s ease;
+}
+.aurora-btn:hover { filter: brightness(1.06); }
+.aurora-btn:active { filter: brightness(0.96); }
+
 /* Honesty chip (constitution Principle I) — a deliberate emerald glass chip,
    never grey fine print (audit §D4). */
 .honesty-chip {
