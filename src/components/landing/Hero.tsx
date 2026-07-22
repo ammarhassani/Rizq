@@ -1,10 +1,16 @@
 import { getTranslations } from "next-intl/server";
-import { Zap, Check } from "lucide-react";
+import { Check, FileText, TrendingUp } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
 
 type Props = { locale: "ar" | "en" };
 
+/**
+ * Landing hero. Two columns on desktop: the pitch (left) + a product glimpse
+ * card (right) so a visitor SEES the product above the fold, not just type
+ * (audit §L2). The glimpse is a static, representative mock — landing
+ * decoration, not live data.
+ */
 export async function Hero({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: "Hero" });
   const tLanding = await getTranslations({ locale, namespace: "Landing" });
@@ -18,81 +24,60 @@ export async function Hero({ locale }: Props) {
     tLanding("hero.chip4"),
   ];
 
+  const nf = new Intl.NumberFormat(isAr ? "ar-SA" : "en-US");
+  const income = nf.format(24800);
+  const goal = nf.format(35000);
+  const pct = isAr ? "٧٤٪" : "74%";
+  const delta = isAr ? "+٪١٨" : "+18%";
+
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="relative overflow-hidden"
-    >
-      {/* One signature texture, not three (audit §L3): a single soft aurora glow.
-          The page .bg-paper carries the drifting orbs; the dot-grid is retired. */}
+    <section aria-labelledby="hero-heading" className="relative overflow-hidden">
+      {/* One signature texture (audit §L3): a single soft aurora glow. */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(ellipse 60% 50% at 78% 8%, color-mix(in srgb, var(--acc) 12%, transparent), transparent 60%)",
+            "radial-gradient(ellipse 55% 45% at 80% 6%, color-mix(in srgb, var(--acc) 13%, transparent), transparent 60%)",
         }}
       />
 
       <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 pt-12 pb-16 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24">
-        <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10">
-          {/* Vertical gold hairline rule on the start side */}
-          <div
-            aria-hidden
-            className="col-span-1 hidden lg:flex justify-center"
-          >
-            <Reveal asMount delay={0.0} duration={1.1}>
-              <div className="rule-gold w-px h-full min-h-[24rem]" />
-            </Reveal>
-          </div>
-
-          <div className="col-span-12 lg:col-span-10 lg:col-start-2 flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          {/* ── Left: the pitch ─────────────────────────────────────────── */}
+          <div className="flex flex-col">
             <Reveal asMount delay={0.05} direction="side">
-              <p className="eyebrow mb-5 sm:mb-6">{t("eyebrow")}</p>
+              <p className="eyebrow mb-5">{t("eyebrow")}</p>
             </Reveal>
 
-            {/*
-              رِزق glyph: rendered without a mount-fade so it paints at full
-              opacity on first frame. This keeps it as a clean LCP candidate
-              instead of being delayed by the opacity 0→1 transition.
-            */}
-            <div className="flex flex-col items-start gap-2 mb-6 sm:mb-8">
+            {/* رِزق glyph — the aurora signature. Painted at full opacity (LCP). */}
+            <div className="flex flex-col items-start gap-1 mb-5">
               <p
                 aria-label="Rizq"
                 className="font-display font-bold aurora-text leading-[0.82] tracking-tight"
                 style={{
-                  fontSize: "clamp(5rem, 14vw, 12rem)",
+                  fontSize: "clamp(4rem, 9vw, 7.5rem)",
                   fontFeatureSettings: '"liga", "calt", "kern"',
                 }}
               >
                 رِزق
               </p>
-              {!isAr && (
-                <p className="font-display text-2xl sm:text-3xl text-[var(--gold)] font-medium tracking-tight ps-1 -mt-1">
-                  Rizq
-                </p>
-              )}
             </div>
 
             <Reveal asMount delay={0.32} direction="side">
-              <h1
-                id="hero-heading"
-                className={`display-2 max-w-3xl text-rizq-ink ${font}`}
-              >
+              <h1 id="hero-heading" className={`display-2 max-w-xl text-rizq-ink ${font}`}>
                 {t("tagline")}
               </h1>
             </Reveal>
 
             <Reveal asMount delay={0.42}>
-              <p
-                className={`mt-5 sm:mt-6 max-w-2xl text-lg sm:text-xl leading-relaxed text-rizq-ink-soft ${font}`}
-              >
+              <p className={`mt-4 sm:mt-5 max-w-lg text-lg leading-relaxed text-rizq-ink-soft ${font}`}>
                 {t("subtitle")}
               </p>
             </Reveal>
 
             <Reveal asMount delay={0.58}>
-              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
+              <div className="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <Link
                   href="/signup"
                   className={`group inline-flex items-center justify-center gap-2 rounded-full aurora-btn px-7 py-4 text-sm sm:text-base font-medium tracking-wide hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] focus-visible:ring-offset-2 ${font}`}
@@ -105,7 +90,7 @@ export async function Hero({ locale }: Props) {
 
                 <a
                   href="#apps"
-                  className={`group inline-flex items-center justify-center gap-2 px-2 py-4 text-sm sm:text-base text-rizq-ink-soft hover:text-rizq-green transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 rounded-sm ${font}`}
+                  className={`group inline-flex items-center justify-center gap-2 px-2 py-4 text-sm sm:text-base text-rizq-ink-soft hover:text-rizq-green transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] focus-visible:ring-offset-2 rounded-sm ${font}`}
                 >
                   <span>{t("ctaSecondary")}</span>
                   <span className="transition-transform group-hover:translate-y-0.5">↓</span>
@@ -113,13 +98,13 @@ export async function Hero({ locale }: Props) {
               </div>
             </Reveal>
 
-            {/* Trust chips — concrete proof row under the CTAs */}
+            {/* Trust chips — one row, concrete proof */}
             <Reveal asMount delay={0.74}>
-              <ul className="mt-8 sm:mt-10 flex flex-wrap items-center gap-x-3 gap-y-2.5">
+              <ul className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-2.5">
                 {chips.map((chip) => (
                   <li
                     key={chip}
-                    className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-green/20 bg-rizq-green/6 px-3 py-1.5 text-xs font-medium text-rizq-green ${font}`}
+                    className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--acc-line)] bg-[var(--acc-soft)] px-3 py-1.5 text-xs font-medium text-[var(--acc-tint)] ${font}`}
                   >
                     <Check size={13} strokeWidth={2.2} aria-hidden />
                     <span>{chip}</span>
@@ -127,30 +112,93 @@ export async function Hero({ locale }: Props) {
                 ))}
               </ul>
             </Reveal>
+          </div>
 
-            {/* Live status row */}
-            <Reveal asMount delay={0.84} direction="side">
-              <div className="mt-7 sm:mt-9 inline-flex items-center gap-3 self-start text-xs">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-rizq-green/30 bg-rizq-green/8">
-                  <Zap
-                    size={13}
-                    className="text-rizq-green"
-                    strokeWidth={1.8}
-                    aria-hidden
-                  />
+          {/* ── Right: product glimpse (show, don't tell — audit §L2) ────── */}
+          <Reveal asMount delay={0.5} className="relative">
+            <div className="relative mx-auto w-full max-w-md">
+              {/* Floating "proposal ready" chip */}
+              <div
+                className={`absolute -top-4 z-10 nm-raised-sm rounded-2xl bg-[var(--raised)] px-4 py-2.5 flex items-center gap-2.5 ${
+                  isAr ? "start-2" : "end-2"
+                } ${font}`}
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg aurora-fill shrink-0">
+                  <FileText size={14} strokeWidth={1.9} aria-hidden />
                 </span>
-                <span
-                  className={`tracking-[0.18em] uppercase text-rizq-ink-soft/80 ${font}`}
-                >
-                  {t("trustBadge")}
-                </span>
-                <span className="block h-px w-10 bg-rizq-gold/40" aria-hidden />
-                <span className={`text-rizq-green font-medium ${font}`}>
-                  {t("comingSoon")}
+                <span className="text-xs font-semibold text-rizq-ink">
+                  {isAr ? "عرض «شركة نون» جاهز" : "Noon Co. proposal ready"}
                 </span>
               </div>
-            </Reveal>
-          </div>
+
+              {/* Money hero card */}
+              <div className="nm-raised rounded-[26px] bg-[var(--raised)] p-6 sm:p-7 pt-9">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className={`text-sm text-[var(--content-muted)] ${font}`}>
+                      {isAr ? "دخل هذا الشهر" : "This month"}
+                    </p>
+                    <p className="mt-1 flex items-baseline gap-2">
+                      <span className="tabular font-sans text-4xl sm:text-5xl font-bold aurora-text-m leading-none">
+                        {income}
+                      </span>
+                      <span className={`text-sm text-[var(--content-muted)] ${font}`}>
+                        {isAr ? "ريال" : "SAR"}
+                      </span>
+                    </p>
+                    <span className="mt-2 inline-flex items-center gap-1 rounded-full status-positive px-2.5 py-1 text-xs font-semibold tabular">
+                      <TrendingUp size={12} strokeWidth={2.2} aria-hidden />
+                      {delta}
+                    </span>
+                  </div>
+
+                  {/* Goal ring dial */}
+                  <div
+                    className="relative h-16 w-16 shrink-0 rounded-full"
+                    style={{ background: "conic-gradient(var(--acc) 0turn 0.74turn, var(--track) 0.74turn 1turn)" }}
+                    aria-hidden
+                  >
+                    <div className="absolute inset-[6px] rounded-full bg-[var(--raised)] flex items-center justify-center">
+                      <span className="tabular text-sm font-bold text-[var(--acc)]">{pct}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sparkline */}
+                <svg
+                  viewBox="0 0 220 52"
+                  preserveAspectRatio="none"
+                  className="mt-5 w-full h-12"
+                  aria-hidden
+                >
+                  <defs>
+                    <linearGradient id="hero-spark" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="var(--acc)" stopOpacity="0.5" />
+                      <stop offset="100%" stopColor="var(--acc)" />
+                    </linearGradient>
+                  </defs>
+                  <polyline
+                    points="0,44 31,38 62,40 92,28 123,31 154,18 185,13 220,6"
+                    fill="none"
+                    stroke="url(#hero-spark)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+
+                {/* Goal line */}
+                <div className={`mt-4 pt-4 border-t border-[var(--line)] flex items-center justify-between ${font}`}>
+                  <span className="text-xs text-[var(--content-muted)]">
+                    {isAr ? "الهدف الشهري" : "Monthly goal"}
+                  </span>
+                  <span className="tabular text-xs font-semibold text-rizq-ink">
+                    {goal} {isAr ? "ريال" : "SAR"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
