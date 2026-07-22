@@ -40,6 +40,8 @@ export interface StepProps {
    * (debounced) and hides the wizard's Back/Skip/Save buttons. Defaults to false (wizard flow).
    */
   autosave?: boolean;
+  /** Called when a save fails — lets the Settings profile page surface a "couldn't save" toast. */
+  onSaveError?: () => void;
 }
 
 /** Columns we load from users to pre-fill wizard fields. */

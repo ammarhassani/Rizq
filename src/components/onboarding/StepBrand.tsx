@@ -30,7 +30,7 @@ function toNationalPhone(raw: string | null | undefined): string {
   return d.slice(-9);
 }
 
-export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.brand");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -109,6 +109,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave }:
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

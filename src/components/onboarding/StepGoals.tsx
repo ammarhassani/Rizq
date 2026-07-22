@@ -18,7 +18,7 @@ type PrimaryGoal =
 
 type Tone = "formal" | "balanced" | "friendly";
 
-export function StepGoals({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepGoals({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.goals");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -69,6 +69,7 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip, autosave }:
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

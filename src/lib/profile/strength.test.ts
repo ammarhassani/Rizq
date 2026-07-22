@@ -1,79 +1,93 @@
 import { describe, it, expect } from "vitest";
-import { computeStrength, strengthItems, STRENGTH_STEP_PCT, OPTIMAL_THRESHOLD, type StrengthProfile } from "./strength";
+import { computeStrength, strengthItems, OPTIMAL_THRESHOLD, type StrengthProfile } from "./strength";
 
-const EMPTY: StrengthProfile = {};
+// A profile with EVERY dimension filled (using the fields the editors actually persist).
 const FULL: StrengthProfile = {
   full_name_ar: "أحمد",
   fl_number: "12345678",
-  primary_specialty_id: "s1",
-  city_id: "c1",
-  experience_tier_id: "t1",
-  current_hourly_rate_sar: 150,
+  specialties: ["web-dev"],
+  city: "riyadh",
+  years_experience: 10,
+  current_hourly_rate_sar: 350,
   income_goal_monthly_sar: 12000,
+  brand_name: "Studio",
+  bio_ar: "نبذة",
+  contact_email: "a@b.com",
+  logo_url: "https://x/logo.png",
+  notable_clients: ["ClientA"],
 };
 
-describe("computeStrength", () => {
+describe("computeStrength (comprehensive, weighted)", () => {
   it("is 0 for an empty profile", () => {
-    expect(computeStrength(EMPTY)).toBe(0);
-  });
-  it("is 100 when all 7 core fields are set", () => {
-    expect(computeStrength(FULL)).toBe(100);
-  });
-  it("counts a daily rate as the rate field (either hourly or daily)", () => {
-    const { current_hourly_rate_sar, ...rest } = FULL;
-    void current_hourly_rate_sar;
-    expect(computeStrength({ ...rest, current_daily_rate_sar: 1000 })).toBe(100);
-  });
-  it("each filled core field adds ~1/7 of 100", () => {
-    expect(computeStrength({ full_name_ar: "أحمد" })).toBe(Math.round((1 / 7) * 100)); // 14
-    expect(computeStrength({ full_name_ar: "أحمد", city_id: "c1" })).toBe(Math.round((2 / 7) * 100)); // 29
-  });
-  it("ignores non-core fields", () => {
-    expect(computeStrength({ ...EMPTY, income_goal_monthly_sar: null } as StrengthProfile)).toBe(0);
+    expect(computeStrength({})).toBe(0);
   });
 
-  it("counts specialty via `specialties` slug array (what the editor actually saves)", () => {
-    expect(computeStrength({ specialties: ["web-development"] })).toBe(14);
-    expect(computeStrength({ specialties: [] })).toBe(0);
+  it("is 100 only when the whole profile is filled", () => {
+    expect(computeStrength(FULL)).toBe(100);
   });
-  it("counts city via `city` text (not only city_id)", () => {
-    expect(computeStrength({ city: "riyadh" })).toBe(14);
+
+  it("does NOT hit 100 with only the KYC essentials (brand/bio/portfolio still empty)", () => {
+    const kycOnly: StrengthProfile = {
+      full_name_ar: "أحمد",
+      fl_number: "12345678",
+      specialties: ["web-dev"],
+      city: "riyadh",
+      years_experience: 10,
+      current_hourly_rate_sar: 350,
+      income_goal_monthly_sar: 12000,
+    };
+    // full_name8 + fl6 + specialty12 + city10 + experience8 + rate12 + goal8 = 64
+    expect(computeStrength(kycOnly)).toBe(64);
   });
-  it("counts experience via `years_experience` (not only experience_tier_id)", () => {
-    expect(computeStrength({ years_experience: 10 })).toBe(14);
+
+  it("adds each dimension's own weight", () => {
+    expect(computeStrength({ full_name_ar: "أحمد" })).toBe(8);
+    expect(computeStrength({ specialties: ["web-dev"] })).toBe(12);
+    expect(computeStrength({ city: "riyadh" })).toBe(10);
+    expect(computeStrength({ full_name_ar: "أحمد", city: "riyadh" })).toBe(18);
   });
-  it("reaches 100 with what the profile editors actually persist (slug/text/years)", () => {
-    expect(
-      computeStrength({
-        full_name_ar: "أحمد",
-        fl_number: "12345678",
-        specialties: ["web-development"],
-        city: "riyadh",
-        years_experience: 10,
-        current_hourly_rate_sar: 350,
-        income_goal_monthly_sar: 12000,
-      }),
-    ).toBe(100);
+
+  it("accepts the fields the editors persist (slug/text/years), not only *_id", () => {
+    expect(computeStrength({ specialties: ["web-dev"] })).toBe(12); // not primary_specialty_id
+    expect(computeStrength({ city: "riyadh" })).toBe(10); // not city_id
+    expect(computeStrength({ years_experience: 5 })).toBe(8); // not experience_tier_id
+  });
+
+  it("counts a project-range rate (not only hourly/daily)", () => {
+    expect(computeStrength({ current_project_rate_range: { min: 5000, max: 9000 } })).toBe(12);
+  });
+
+  it("portfolio is met by ANY portfolio signal (samples, clients, projects, or a platform URL)", () => {
+    expect(computeStrength({ linkedin_url: "https://linkedin.com/x" })).toBe(8);
+    expect(computeStrength({ total_projects_completed: 12 })).toBe(8);
+    expect(computeStrength({ notable_clients: ["A"] })).toBe(8);
+    expect(computeStrength({ notable_clients: [] })).toBe(0);
+  });
+
+  it("clearing the only specialty drops its weight (the reported bug)", () => {
+    const withSpecialty = { ...FULL };
+    expect(computeStrength(withSpecialty)).toBe(100);
+    const cleared = { ...FULL, specialties: [] as string[] };
+    expect(computeStrength(cleared)).toBe(88); // 100 - specialty(12)
   });
 });
 
 describe("strengthItems", () => {
-  it("returns 7 items with correct met flags", () => {
-    const items = strengthItems({ full_name_ar: "أحمد", city_id: "c1" });
-    expect(items).toHaveLength(7);
-    expect(items.find((i) => i.key === "full_name")?.met).toBe(true);
-    expect(items.find((i) => i.key === "city")?.met).toBe(true);
-    expect(items.find((i) => i.key === "specialty")?.met).toBe(false);
+  it("returns all 12 dimensions with weights summing to 100", () => {
+    const items = strengthItems({});
+    expect(items).toHaveLength(12);
+    expect(items.reduce((s, i) => s + i.weight, 0)).toBe(100);
+    expect(items.every((i) => !i.met)).toBe(true);
   });
-  it("every item is met for a full profile", () => {
-    expect(strengthItems(FULL).every((i) => i.met)).toBe(true);
+  it("marks met dimensions", () => {
+    const items = strengthItems({ specialties: ["web-dev"], city: "riyadh" });
+    expect(items.find((i) => i.key === "specialty")?.met).toBe(true);
+    expect(items.find((i) => i.key === "city")?.met).toBe(true);
+    expect(items.find((i) => i.key === "brand")?.met).toBe(false);
   });
 });
 
 describe("constants", () => {
-  it("STRENGTH_STEP_PCT is ~14", () => {
-    expect(STRENGTH_STEP_PCT).toBe(14);
-  });
   it("OPTIMAL_THRESHOLD is 80", () => {
     expect(OPTIMAL_THRESHOLD).toBe(80);
   });

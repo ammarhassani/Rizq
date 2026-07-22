@@ -11,7 +11,7 @@ import { MonthlyGoalWheel } from "./MonthlyGoalWheel";
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
 
-export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.rates");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -51,6 +51,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave }:
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

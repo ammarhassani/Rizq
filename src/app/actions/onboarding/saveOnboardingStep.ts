@@ -186,11 +186,13 @@ export async function saveOnboardingStep(
     profile_last_updated: new Date().toISOString(),
   };
 
-  // First: fetch current onboarding_step so we can use max()
+  // First: fetch the current row so completeness is computed over the WHOLE profile (must
+  // include every column the strength model reads, else the stored pct undercounts vs the
+  // Settings profile page). onboarding_step is fetched for the max() below.
   const { data: currentRow, error: fetchErr } = await supabase
     .from("users")
     .select(
-      "onboarding_step, full_name_ar, fl_number, primary_specialty_id, city_id, experience_tier_id, current_hourly_rate_sar, current_daily_rate_sar, income_goal_monthly_sar"
+      "onboarding_step, full_name_ar, fl_number, primary_specialty_id, specialties, city_id, city, experience_tier_id, years_experience, current_hourly_rate_sar, current_daily_rate_sar, current_project_rate_range, income_goal_monthly_sar, brand_name, brand_name_ar, bio_ar, bio_en, contact_email, contact_phone, contact_whatsapp, logo_url, portfolio_samples, notable_clients, total_projects_completed, bahr_profile_url, mostaql_profile_url, khamsat_profile_url, linkedin_url, behance_url, personal_website_url"
     )
     .eq("id", uid)
     .maybeSingle();

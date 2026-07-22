@@ -17,7 +17,7 @@ interface Sample {
   description: string;
 }
 
-export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.portfolio");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -75,6 +75,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosav
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

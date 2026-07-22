@@ -8,7 +8,7 @@ import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep"
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
 
-export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.identity");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -44,6 +44,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

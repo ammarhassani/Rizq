@@ -10,7 +10,7 @@ import { Combobox } from "@/components/ui/Combobox";
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
 
-export function StepLocation({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepLocation({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.location");
   const tv2 = useTranslations("Onboarding.v2");
   const tCommon = useTranslations("Common");
@@ -36,6 +36,7 @@ export function StepLocation({ locale, profile, onNext, onBack, onSkip, autosave
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

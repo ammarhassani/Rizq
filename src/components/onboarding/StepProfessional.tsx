@@ -24,7 +24,7 @@ const EXPERIENCE_TIERS_EN = [
   { label: "Expert (10+ years)", value: "expert" },
 ];
 
-export function StepProfessional({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
+export function StepProfessional({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.professional");
   const tv2 = useTranslations("Onboarding.v2");
   const tCommon = useTranslations("Common");
@@ -77,6 +77,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip, auto
         onNext(result.completeness);
       } else {
         setError(tv2("errorSave"));
+        onSaveError?.();
       }
     });
   };

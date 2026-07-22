@@ -1,4 +1,4 @@
-import { STRENGTH_STEP_PCT, type StrengthItem } from "@/lib/profile/strength";
+import { type StrengthItem } from "@/lib/profile/strength";
 import { CheckCircle2, Circle } from "lucide-react";
 
 /**
@@ -48,7 +48,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
                   <Circle className="h-3.5 w-3.5 text-rizq-ink-soft/40" aria-hidden="true" />
                   {isAr ? m.label_ar : m.label_en}
                 </span>
-                <span className="tabular text-xs font-medium text-rizq-green">+{STRENGTH_STEP_PCT}%</span>
+                <span className="tabular text-xs font-medium text-rizq-green">+{m.weight}%</span>
               </li>
             ))}
           </ul>

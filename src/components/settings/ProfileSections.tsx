@@ -9,6 +9,7 @@
  */
 
 import { useRouter } from "@/i18n/navigation";
+import { toast } from "sonner";
 import type { ProfileSnapshot } from "@/components/onboarding/types";
 import type { TestimonialRow } from "@/app/actions/proposals/testimonials";
 import { StepIdentity } from "@/components/onboarding/StepIdentity";
@@ -38,8 +39,12 @@ export function ProfileSections({ locale, snapshot, testimonials }: Props) {
   // Persist happened inside the editor; refresh so the server recomputes strength + the checklist.
   const onSaved = () => router.refresh();
 
+  // Surface a failed autosave (was silent — a failed save left the meter and the field out of sync).
+  const onSaveError = () =>
+    toast.error(isAr ? "لم يتم الحفظ — تحقق من اتصالك وحاول مجددًا" : "Couldn't save — check your connection and try again");
+
   // autosave: each editor saves on change (debounced) and hides its Save/Back/Skip buttons.
-  const stepProps = { locale, profile: snapshot, onNext: onSaved, onBack: noop, onSkip: noop, autosave: true };
+  const stepProps = { locale, profile: snapshot, onNext: onSaved, onBack: noop, onSkip: noop, autosave: true, onSaveError };
 
   const sections: Array<{ key: string; ar: string; en: string; el: React.ReactNode }> = [
     { key: "identity", ar: "الهوية", en: "Identity", el: <StepIdentity {...stepProps} /> },
