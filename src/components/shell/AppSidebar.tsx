@@ -94,7 +94,7 @@ function SidebarNav({
             {/* Group label — hidden when collapsed */}
             {!collapsed && (
               <p
-                className={`mb-0.5 px-2 text-[10px] uppercase tracking-[0.18em] text-rizq-gold-dark/70 select-none ${font}`}
+                className={`mb-0.5 px-2 text-[10px] uppercase tracking-[0.18em] text-[var(--content-faint)] select-none ${font}`}
               >
                 {t(`groups.${group}`)}
               </p>
@@ -113,7 +113,7 @@ function SidebarNav({
                     "transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.98]",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
                     active
-                      ? "bg-rizq-green text-rizq-cream shadow-sm"
+                      ? "aurora-fill shadow-md"
                       : "text-rizq-ink hover:bg-rizq-green/8 hover:text-rizq-green hover:-translate-y-px",
                     collapsed ? "justify-center" : "",
                   ]
@@ -137,8 +137,8 @@ function SidebarNav({
                 </Link>
               );
             })}
-            {/* Gold hairline separator between groups */}
-            <div className="mt-1 mb-1 h-px bg-rizq-gold/20 mx-2" aria-hidden />
+            {/* Hairline separator between groups — calmer than the old gold rule (audit §O4) */}
+            <div className="mt-1 mb-1 h-px bg-[var(--line-2)] mx-2" aria-hidden />
           </div>
         );
       })}
@@ -181,19 +181,16 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
         className={[
           "hidden lg:flex flex-col shrink-0 transition-[width] duration-200 ease-in-out print:!hidden",
           "sticky top-0 h-screen overflow-y-auto overflow-x-hidden",
-          "bg-rizq-cream/98 border-s border-rizq-gold/20",
+          "bg-[var(--surface)] border-s border-[var(--line)]",
           sidebarWidth,
         ].join(" ")}
         aria-label={t("topbar.openSidebar")}
       >
         {/* Brand mark at top */}
-        <div className="flex items-center justify-between gap-2 px-3 py-4 border-b border-rizq-gold/15 shrink-0">
+        <div className="flex items-center justify-between gap-2 px-3 py-4 border-b border-[var(--line)] shrink-0">
           {!collapsed && (
-            <Link
-              href="/"
-              className={`font-arabic text-xl font-bold text-rizq-green hover:text-rizq-green-dark transition-colors truncate ${font}`}
-            >
-              رِزق
+            <Link href="/" className="truncate" aria-label="رِزق">
+              <span className="font-display text-2xl font-bold leading-none aurora-text">رِزق</span>
             </Link>
           )}
           <button
@@ -220,11 +217,11 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
       <Sheet open={mobileOpen} onOpenChange={(open) => { if (!open) onMobileClose(); }}>
         <SheetContent
           side={locale === "ar" ? "right" : "left"}
-          className="w-[260px] bg-rizq-cream/98 p-0 flex flex-col"
+          className="w-[260px] bg-[var(--surface)] p-0 flex flex-col"
           showCloseButton
         >
-          <SheetHeader className="px-4 pt-4 pb-3 border-b border-rizq-gold/15">
-            <SheetTitle className={`font-arabic text-xl font-bold text-rizq-green ${font}`}>
+          <SheetHeader className="px-4 pt-4 pb-3 border-b border-[var(--line)]">
+            <SheetTitle className="font-display text-2xl font-bold aurora-text">
               رِزق
             </SheetTitle>
           </SheetHeader>
