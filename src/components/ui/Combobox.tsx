@@ -35,6 +35,12 @@ type Props = {
   disabled?: boolean;
   /** Rendered under the option list — e.g. a "+ Add client" action. */
   footer?: React.ReactNode;
+  /**
+   * Accessible name for the trigger. `role=combobox` does NOT take its name from the visible
+   * text, so without this (or a placeholder) screen readers announce an unnamed control.
+   * Defaults to `placeholder`.
+   */
+  "aria-label"?: string;
 };
 
 /**
@@ -64,6 +70,7 @@ export function Combobox({
   id,
   disabled = false,
   footer,
+  "aria-label": ariaLabel,
 }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -207,6 +214,7 @@ export function Combobox({
         type="button"
         id={id}
         role="combobox"
+        aria-label={ariaLabel ?? placeholder ?? undefined}
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}

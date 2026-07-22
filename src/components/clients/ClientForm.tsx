@@ -237,7 +237,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       {/* Client type */}
       <div>
         <label className={labelClass}>{t("clientTypeLabel")}</label>
-        <select value={clientType} onChange={(e) => setClientType(e.target.value)} className={`${inputClass} appearance-none`}>
+        <select aria-label={t("clientTypeLabel")} value={clientType} onChange={(e) => setClientType(e.target.value)} className={`${inputClass} appearance-none`}>
           {CLIENT_TYPES.map((ct) => (
             <option key={ct} value={ct}>{t(`clientType_${ct}`)}</option>
           ))}
@@ -247,7 +247,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       {/* Source */}
       <div>
         <label className={labelClass}>{t("sourceLabel")}</label>
-        <select value={source} onChange={(e) => setSource(e.target.value)} className={`${inputClass} appearance-none`}>
+        <select aria-label={t("sourceLabel")} value={source} onChange={(e) => setSource(e.target.value)} className={`${inputClass} appearance-none`}>
           {CLIENT_SOURCES.map((s) => (
             <option key={s} value={s}>{t(`source_${s}`)}</option>
           ))}

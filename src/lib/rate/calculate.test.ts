@@ -155,10 +155,11 @@ describe("calculateRate — market_percentile", () => {
     expect(out.market_percentile).toBe(90);
   });
 
-  it("per_project > max → percentile = 90 (clamp before rounding up to 99)", () => {
+  it("per_project above max → percentile extrapolates above 90 (toward 99)", () => {
     const out = calculateRate({ ...BASE_INPUT, monthly_target_sar: 30_000, projects_per_month_target: 1 }, BAND);
-    // per_project = 30000 > max 10000 → 90 (capped)
-    expect(out.market_percentile).toBe(90);
+    // per_project = 30000 > max 10000 → above the band → > 90 (never pinned at 90)
+    expect(out.market_percentile).toBeGreaterThan(90);
+    expect(out.market_percentile).toBeLessThanOrEqual(99);
   });
 
   it("per_project halfway between min and anchor → ~30", () => {
@@ -185,31 +186,26 @@ describe("calculateRate — is_realistic", () => {
     expect(calculateRate(BASE_INPUT, null).is_realistic).toBeNull();
   });
 
-  it("is true when percentile = 90 (boundary — inclusive)", () => {
+  it("is true when percentile = 90 (boundary — at the top of the band, inclusive)", () => {
     // per_project = max (10000) → percentile 90 → realistic = true
     const out = calculateRate({ ...BASE_INPUT, monthly_target_sar: 10_000, projects_per_month_target: 1 }, BAND);
     expect(out.market_percentile).toBe(90);
     expect(out.is_realistic).toBe(true);
   });
 
-  it("is false when percentile = 91+ (above max → capped 90? No — above max still 90)", () => {
-    // Above max → 90, so is_realistic = true even above max (capped)
-    // This is correct per spec: market_percentile ≤ 90 → true
+  it("is FALSE when the target sits above the market band (percentile > 90)", () => {
+    // per_project = 50000, far above max 10000 → percentile > 90 → NOT realistic.
+    // (Regression: previously the percentile was pinned at 90, so is_realistic was
+    // always true — a 5×-above-market target read as "realistic".)
     const out = calculateRate({ ...BASE_INPUT, monthly_target_sar: 50_000, projects_per_month_target: 1 }, BAND);
-    expect(out.market_percentile).toBe(90);
-    expect(out.is_realistic).toBe(true); // 90 ≤ 90
+    expect(out.market_percentile).toBeGreaterThan(90);
+    expect(out.is_realistic).toBe(false);
   });
 
-  it("is_realistic false only when percentile > 90 (99 clamp from below-min side won't produce >90)", () => {
-    // The current linear mapping clamps at 90 for > max.
-    // True false case: value = 99 is never returned for > max by our estimatePercentile.
-    // is_realistic can only be false if somehow percentile > 90.
-    // Since our estimatePercentile caps at 90 for values ≥ max, is_realistic = true there.
-    // Testing the is_realistic = false path requires a band where pct > 90.
-    // That isn't reachable with the current clamp — the spec says "≤ 90 → true".
-    // Let's verify is_realistic = true at and above max.
+  it("flags a modestly-above-market target as not realistic", () => {
+    // per_project = 20000 (2× the max) → above the band → not realistic
     const out = calculateRate({ ...BASE_INPUT, monthly_target_sar: 20_000, projects_per_month_target: 1 }, BAND);
-    expect(out.is_realistic).toBe(true);
+    expect(out.is_realistic).toBe(false);
   });
 
   it("is true for per_project at anchor (percentile 50)", () => {
@@ -280,10 +276,12 @@ describe("calculateRate — context and suggestion strings", () => {
     expect(low.suggestion_ar).not.toBe(high.suggestion_ar);
   });
 
-  it("context for above-90th (>max) returns the premium tier string", () => {
+  it("context for above-90th (>max) returns the exceeds-90% string (now reachable)", () => {
     const out = calculateRate({ ...BASE_INPUT, monthly_target_sar: 50_000, projects_per_month_target: 1 }, BAND);
-    // percentile = 90 → the ≤90 block (top 25% block) runs
-    expect(out.market_context_ar).toContain("أعلى ٢٥٪");
+    // percentile now extrapolates above 90 → the "exceeds 90%" block runs (previously
+    // unreachable because the percentile was pinned at 90).
+    expect(out.market_percentile).toBeGreaterThan(90);
+    expect(out.market_context_ar).toContain("أعلى من ٩٠٪");
   });
 
   it("all output strings are non-empty", () => {

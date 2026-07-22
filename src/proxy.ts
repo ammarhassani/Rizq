@@ -5,7 +5,12 @@ import { updateSession } from "@/lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PROTECTED_PATTERN = /^\/(?:ar|en)\/dashboard(?:\/|$)/;
+// All authenticated app routes. Gating them here (not only in each page) means the
+// unauthenticated redirect to /login carries a ?returnTo, so a deep link resumes after
+// login instead of dumping the user on the dashboard. (Public routes — tool, marketing,
+// share tokens, auth pages — are deliberately excluded.)
+const PROTECTED_PATTERN =
+  /^\/(?:ar|en)\/(?:dashboard|calendar|catalog|clients|documents|hadaf|income|invoices|projects|proposals|rate-calculator|settings|upgrade)(?:\/|$)/;
 const ONBOARDING_PATTERN = /^\/(?:ar|en)\/onboarding(?:\/|$)/;
 const AUTH_PAGES_PATTERN = /^\/(?:ar|en)\/(?:login|signup|forgot-password|reset-password|verify-email)(?:\/|$)/;
 // Bare marketing root, e.g. /ar or /en (with optional trailing slash).

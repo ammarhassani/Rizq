@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { Users, AlertCircle, Plus } from "lucide-react";
+import { WidgetError } from "./WidgetError";
 
 type Client = {
   id: string;
@@ -11,6 +12,7 @@ type Client = {
 
 type Props = {
   clients: Client[];
+  error?: boolean;
   locale: "ar" | "en";
 };
 
@@ -19,7 +21,7 @@ function daysSince(iso: string | null): number | null {
   return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function ActiveClientsWidget({ clients, locale }: Props) {
+export function ActiveClientsWidget({ clients, error, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -43,7 +45,9 @@ export function ActiveClientsWidget({ clients, locale }: Props) {
         </Link>
       </div>
 
-      {clients.length === 0 ? (
+      {error ? (
+        <WidgetError locale={locale} />
+      ) : clients.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
             {isAr ? "ما عندك عملاء بعد." : "No clients yet."}

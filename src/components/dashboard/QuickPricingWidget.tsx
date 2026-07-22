@@ -5,10 +5,12 @@ import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 type Props = {
   anchor: number | null;
   specialty: string | null;
+  /** Provenance citation (source + sample size + date range) — required by Principle I. */
+  citation: string | null;
   locale: "ar" | "en";
 };
 
-export function QuickPricingWidget({ anchor, specialty, locale }: Props) {
+export function QuickPricingWidget({ anchor, specialty, citation, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -35,6 +37,10 @@ export function QuickPricingWidget({ anchor, specialty, locale }: Props) {
           <p className={`text-xs text-rizq-ink-soft mt-1 ${font}`}>
             {isAr ? `وسيط السوق: ${specialty ?? "تخصصك"}` : `Market median: ${specialty ?? "your specialty"}`}
           </p>
+          {/* Honesty (Principle I): the median must cite its provenance + sample + date. */}
+          {citation && (
+            <p className={`text-[11px] leading-snug text-rizq-ink-soft/75 mt-1.5 ${font}`}>{citation}</p>
+          )}
           <Link
             href="/tool"
             className={`mt-3 inline-flex items-center gap-1 text-xs text-rizq-green hover:underline ${font}`}

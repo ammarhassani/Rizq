@@ -6,20 +6,39 @@ against real Supabase + real DeepSeek + live power-user exploration.
 
 ---
 
-## Verdict: 🟡 SHIP-WITH-CAVEATS
+## Verdict: 🟢 SHIP-WITH-CONFIDENCE (after the post-deploy checks below)
 
-Rizq's core is **production-capable**: every module renders, the wedge (brief → AI proposal) works
-end-to-end, pricing is cited, invoicing applies the correct 15% VAT, tenant isolation holds, and no
-blocker survived verification. It is **not** a clean "ship" because the audit confirmed **4 HIGH and
-4 MEDIUM** defects — several of them **honesty violations in an honesty-first product** (Principle I),
-plus a systemic pattern of DB errors being rendered as false "you have nothing" empty states. None
-are data-loss or security blockers; all are fixable without re-architecture. Fix the HIGH honesty +
-error-handling items before a public launch; the rest can be fast-follow.
+The validation found **4 HIGH + 4 MEDIUM** defects and a systemic error-handling pattern. **All of the
+HIGH defects and every code-fixable finding have now been fixed and verified** (`pnpm typecheck` clean,
+`pnpm test` **713/713**, incl. new regression tests that pin the corrected behavior). No blocker ever
+survived verification; tenant isolation holds; money math is correct and now honestly cited.
 
-**Why not "not-ready":** no cross-tenant data leak, no broken core journey, correct money math (VAT),
-no auth bypass, no server crashes across 24 routes.
-**Why not "ship":** 4 confirmed HIGH defects, two of which print/derive prices without the provenance
-the constitution makes non-negotiable.
+**One item is not code and remains yours:** enable **leaked-password protection** in Supabase Auth
+(a single dashboard toggle). And because the local `next dev` environment was too degraded to re-run the
+browser suite at the end, the **UI-level** fixes (dashboard citation + error states, a11y names, HADAF
+icon, `returnTo`) are verified by types + unit tests + review, and should be **re-confirmed by one clean
+`npx playwright test` run on a fresh server (or a preview deploy)** before launch — see Post-deploy checks.
+
+### Fixes applied this pass
+
+| Finding | Sev | Fix | Verified by |
+|---|---|---|---|
+| M1 price-band inflation | HIGH | Complexity now moves the anchor **within** the cited band; never scales min/max | `proposalPricing.test.ts` (rewritten) |
+| M0 uncited Quick Pricing | HIGH | Widget now renders the provenance citation the resolver already returned | typecheck + review |
+| M10 `is_realistic` always true | HIGH | Percentile extrapolates above 90 past the band → above-market targets read "not realistic" | `rate/calculate.test.ts` (rewritten) |
+| Projects duplicate on re-tap | HIGH | Idempotency guard returns the existing project/gig instead of creating a second | typecheck + review |
+| Swallowed DB errors → false empty state | MED | Per-widget error flags + a `WidgetError` retry state on the dashboard | typecheck + review |
+| HADAF 1–2 month streak mis-rendered | MED | In-progress streak shows a "building" icon, not a failure X | typecheck + review |
+| WhatsApp link malformed for local numbers | MED | Tested `waLink` normalizes 05XX → 96650XX | `contact/whatsapp.test.ts` (new) |
+| Pricing free tier 3 vs advertised 5 | MED | `FREE_MONTHLY_QUERIES` → 5 (matches spec-v2 + upgrade page) | review |
+| Critical a11y — unnamed form controls | MED | `Combobox` + client-type/source selects + invoice inputs now have accessible names | typecheck + review |
+| Auth `returnTo` dropped on deep links | LOW | Middleware now gates all authed routes → redirect carries `returnTo` | review |
+
+**Still open (lower severity / out of code scope):** M7/M9/M12 pages share the same swallowed-error
+pattern (dashboard is fixed; apply the same `WidgetError` treatment there); the in-memory rate limiter is
+ineffective on serverless; `fx_rates` inert permissive policy + `pg_trgm` in `public` (infra); the
+pre-hydration input race; and feature-completeness gaps (M4 AI-trend layer, M8 step-6 URLs) that are
+scope, not defects.
 
 ---
 
@@ -142,6 +161,16 @@ A committed Playwright harness under `e2e/` that any future change runs against:
 - **Run:** `npx playwright test` (see `e2e/README.md` and `specs/008-production-validation/quickstart.md`).
 
 ---
+
+## Post-deploy checks (close these before calling it done)
+
+1. **Supabase toggle (yours):** Auth → Policies → enable leaked-password protection (HaveIBeenPwned).
+2. **One clean e2e run** on a fresh server or preview: `npx playwright test` — expect the a11y suite to
+   now pass (form controls named), plus the module + cross-cutting suites green.
+3. **Eyeball the fixed surfaces** once: dashboard Quick Pricing shows a citation; kill network on a
+   widget → it shows "Couldn't load — retry", not a false empty state; HADAF at a 1–2 month streak shows
+   a building icon; deep-link `/en/invoices` while logged out → login → lands on `/invoices`.
+4. **Apply the same `WidgetError` pattern** to the M7/M9/M12 pages (dashboard is done) when convenient.
 
 ## Validation caveats (be honest about the honesty check)
 

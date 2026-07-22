@@ -47,12 +47,37 @@ export async function createProjectFromProposal(
   // Load the proposal (owner-scoped) for title + client derivation.
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, client_id, scope_json, specialties(name_ar, name_en, slug)")
+    .select("id, client_id, project_id, scope_json, specialties(name_ar, name_en, slug)")
     .eq("id", proposal_id)
     .eq("user_id", userId)
     .single();
 
   if (fetchErr || !proposal) return { ok: false, code: "not_found" };
+
+  // Idempotency: a proposal already converted into a project must NOT spawn a second
+  // project + money gig on re-tap (double-click, back-navigate + retap). Return the
+  // existing one instead of duplicating (which would double-count income + client rollups).
+  // ponytail: app-level guard covers the sequential re-tap case; add a UNIQUE index on
+  // projects(origin_proposal_id) if truly concurrent taps ever need to be deduped.
+  const existingProjectId = (proposal.project_id as string | null) ?? null;
+  if (existingProjectId) {
+    const { data: existingProject } = await supabase
+      .from("projects")
+      .select("id")
+      .eq("id", existingProjectId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (existingProject) {
+      const { data: existingGig } = await supabase
+        .from("gigs")
+        .select("id")
+        .eq("project_id", existingProjectId)
+        .eq("user_id", userId)
+        .limit(1)
+        .maybeSingle();
+      return { ok: true, project_id: existingProjectId, gig_id: (existingGig?.id as string) ?? "" };
+    }
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const specialtyRaw = proposal.specialties as any;

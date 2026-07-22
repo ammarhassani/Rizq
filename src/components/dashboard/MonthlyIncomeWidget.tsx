@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { Wallet, Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { WidgetError } from "./WidgetError";
 
 type MonthlyRow = {
   month: string | null;
@@ -16,6 +17,7 @@ type Props = {
   current: MonthlyRow | null;
   previous: MonthlyRow | null;
   trend?: TrendPoint[];
+  error?: boolean;
   locale: "ar" | "en";
   /** The freelancer's personal monthly income goal (from onboarding/profile). feature 006 */
   goalSar?: number | null;
@@ -26,7 +28,7 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar }: Props) {
+export function MonthlyIncomeWidget({ current, previous, trend, error, locale, goalSar }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -60,7 +62,9 @@ export function MonthlyIncomeWidget({ current, previous, trend, locale, goalSar 
         </Link>
       </div>
 
-      {totalSar === 0 && !current ? (
+      {error ? (
+        <WidgetError locale={locale} />
+      ) : totalSar === 0 && !current ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
             {isAr ? "ما سجّلت أي مشاريع هذا الشهر." : "No income logged this month."}

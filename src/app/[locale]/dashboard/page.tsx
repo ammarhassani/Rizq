@@ -88,6 +88,13 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     created_at: string | null;
     clients: { name: string } | null;
   };
+  // Per-widget error flags: a failed query must show an error+retry state, NOT a false
+  // "you have nothing yet" empty state (constitution Principle V + Principle I honesty).
+  let proposalsError = false;
+  let invoiceDeadlinesError = false;
+  let clientsError = false;
+  let incomeError = false;
+
   let proposals: ProposalRow[] = [];
   {
     const { data, error } = await supabase
@@ -97,7 +104,10 @@ export default async function DashboardPage({ params }: { params: Promise<Params
       .gte("created_at", thirtyDaysAgo)
       .order("created_at", { ascending: false })
       .limit(5);
-    if (error) console.error("[dashboard] proposals query failed", error.message);
+    if (error) {
+      console.error("[dashboard] proposals query failed", error.message);
+      proposalsError = true;
+    }
     proposals = (data ?? []) as unknown as ProposalRow[];
   }
 
@@ -105,7 +115,10 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   let invoiceDeadlines: UpcomingInvoice[] = [];
   try {
     invoiceDeadlines = await getUpcomingInvoiceDueDates(supabase, userId, { limit: 7 });
-  } catch { /* widget shows error state */ }
+  } catch (e) {
+    console.error("[dashboard] invoice deadlines query failed", e);
+    invoiceDeadlinesError = true;
+  }
 
   // Clients
   type ClientRow = {
@@ -117,14 +130,21 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   };
   let clients: ClientRow[] = [];
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("clients")
       .select("id, name, total_gigs, total_value_sar, last_contacted_at")
       .eq("user_id", userId)
       .order("last_contacted_at", { ascending: false })
       .limit(10);
+    if (error) {
+      console.error("[dashboard] clients query failed", error.message);
+      clientsError = true;
+    }
     clients = (data ?? []) as ClientRow[];
-  } catch { /* widget shows error state */ }
+  } catch (e) {
+    console.error("[dashboard] clients query failed", e);
+    clientsError = true;
+  }
 
   // Monthly income (current + previous month, plus a trailing series for the
   // sparkline). We fetch the last ~12 months and derive both from one query.
@@ -174,12 +194,16 @@ export default async function DashboardPage({ params }: { params: Promise<Params
       .sort((a, b) => a.d.getTime() - b.d.getTime())
       .slice(-6)
       .map((r) => ({ label: monthFmt.format(r.d), value: r.value }));
-  } catch { /* widget shows 0 state */ }
+  } catch (e) {
+    console.error("[dashboard] monthly income query failed", e);
+    incomeError = true;
+  }
 
   // Quick pricing — resolve slugs from the user's onboarding FK ids (if set),
   // then call resolvePrice. Most users haven't set these yet → widget shows CTA.
   let quickPricingAnchor: number | null = null;
   let quickPricingSpecialty: string | null = null;
+  let quickPricingCitation: string | null = null;
   const specialtyId = (profile?.primary_specialty_id as string | null) ?? null;
   const cityId = (profile?.city_id as string | null) ?? null;
   const tierId = (profile?.experience_tier_id as string | null) ?? null;
@@ -203,6 +227,8 @@ export default async function DashboardPage({ params }: { params: Promise<Params
           quickPricingAnchor = res.anchor;
           quickPricingSpecialty =
             (isAr ? (specRes.data?.name_ar as string | null) : (specRes.data?.name_en as string | null)) ?? sSlug;
+          // Carry the provenance citation so the widget can be honest about the number.
+          quickPricingCitation = isAr ? res.provenance_citation_ar : res.provenance_citation_en;
         }
       }
     } catch { /* skip gracefully */ }
@@ -251,18 +277,21 @@ export default async function DashboardPage({ params }: { params: Promise<Params
                 created_at: p.created_at,
               };
             })}
+            error={proposalsError}
             locale={locale as "ar" | "en"}
           />
 
           {/* Upcoming Deadlines */}
           <UpcomingDeadlinesWidget
             invoices={invoiceDeadlines}
+            error={invoiceDeadlinesError}
             locale={locale as "ar" | "en"}
           />
 
           {/* Active Clients */}
           <ActiveClientsWidget
             clients={clients}
+            error={clientsError}
             locale={locale as "ar" | "en"}
           />
 
@@ -271,6 +300,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
             current={currentMonth}
             previous={prevMonth}
             trend={incomeTrend}
+            error={incomeError}
             locale={locale as "ar" | "en"}
             goalSar={(profile?.income_goal_monthly_sar as number | null) ?? null}
           />
@@ -279,6 +309,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
           <QuickPricingWidget
             anchor={quickPricingAnchor}
             specialty={quickPricingSpecialty}
+            citation={quickPricingCitation}
             locale={locale as "ar" | "en"}
           />
 

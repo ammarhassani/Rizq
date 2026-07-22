@@ -296,6 +296,7 @@ export function InvoiceForm({
                         </label>
                         <input
                           type="number"
+                          aria-label={t("qtyLabel")}
                           inputMode="decimal"
                           min="0.01"
                           step="any"
@@ -313,6 +314,7 @@ export function InvoiceForm({
                         <div className="relative">
                           <input
                             type="number"
+                            aria-label={t("unitPriceLabel")}
                             inputMode="decimal"
                             min="0"
                             step="any"
@@ -517,6 +519,7 @@ export function InvoiceForm({
           <label className={labelClass}>{t("dueDateLabel")}</label>
           <input
             type="date"
+            aria-label={t("dueDateLabel")}
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             className={`${inputClass} font-sans`}

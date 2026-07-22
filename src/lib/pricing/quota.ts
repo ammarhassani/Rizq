@@ -23,7 +23,9 @@ export type QuotaState =
     };
 
 const ANON_FREE_QUERIES = 1; // PRD §4.4 — 1 free anon query per cookie
-const FREE_MONTHLY_QUERIES = 3; // PRD §4.4 — 3 / calendar month
+// spec-v2 Part IV.1 and the /upgrade page both advertise 5 free lookups / calendar month.
+// (Was 3, which silently paywalled free users 2 lookups early — a spec/UI mismatch.)
+const FREE_MONTHLY_QUERIES = 5;
 const ANON_COOKIE = "rizq_anon_session";
 
 /**

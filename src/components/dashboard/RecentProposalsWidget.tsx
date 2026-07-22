@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { FileText, Plus } from "lucide-react";
+import { WidgetError } from "./WidgetError";
 
 type Proposal = {
   id: string;
@@ -12,6 +13,7 @@ type Proposal = {
 
 type Props = {
   proposals: Proposal[];
+  error?: boolean;
   locale: "ar" | "en";
 };
 
@@ -35,7 +37,7 @@ const statusLabelsAr: Record<string, string> = {
   expired: "منتهٍ",
 };
 
-export function RecentProposalsWidget({ proposals, locale }: Props) {
+export function RecentProposalsWidget({ proposals, error, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -54,7 +56,9 @@ export function RecentProposalsWidget({ proposals, locale }: Props) {
         </Link>
       </div>
 
-      {proposals.length === 0 ? (
+      {error ? (
+        <WidgetError locale={locale} />
+      ) : proposals.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
             {isAr ? "ما عندك عروض حتى الآن." : "No proposals yet."}

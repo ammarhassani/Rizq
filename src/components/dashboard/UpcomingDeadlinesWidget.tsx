@@ -1,9 +1,11 @@
 import { Link } from "@/i18n/navigation";
 import { CalendarClock, Plus } from "lucide-react";
 import type { UpcomingInvoice } from "@/lib/invoices/queries";
+import { WidgetError } from "./WidgetError";
 
 type Props = {
   invoices: UpcomingInvoice[];
+  error?: boolean;
   locale: "ar" | "en";
 };
 
@@ -24,7 +26,7 @@ const statusColors: Record<string, string> = {
   overdue: "text-red-600",
 };
 
-export function UpcomingDeadlinesWidget({ invoices, locale }: Props) {
+export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -43,7 +45,9 @@ export function UpcomingDeadlinesWidget({ invoices, locale }: Props) {
         </Link>
       </div>
 
-      {invoices.length === 0 ? (
+      {error ? (
+        <WidgetError locale={locale} />
+      ) : invoices.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
             {isAr ? "لا توجد مواعيد قادمة." : "No upcoming deadlines."}

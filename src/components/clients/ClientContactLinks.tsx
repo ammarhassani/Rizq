@@ -2,6 +2,7 @@
  * ClientContactLinks — tap-to-contact links. Phase-3 task 3.2.
  */
 import { Phone, Mail, MapPin } from "lucide-react";
+import { waLink } from "@/lib/contact/whatsapp";
 
 type Props = {
   locale: "ar" | "en";
@@ -20,11 +21,8 @@ export function ClientContactLinks({ locale, phone, email, phoneWhatsapp, linked
   if (!phone && !email && !phoneWhatsapp && !linkedinUrl && !city) return null;
 
   const label = isAr ? "التواصل" : "Contact";
-  const waUrl = phoneWhatsapp
-    ? `https://wa.me/${phoneWhatsapp.replace(/\D/g, "")}`
-    : phone
-    ? `https://wa.me/${phone.replace(/\D/g, "")}`
-    : null;
+  // Normalize to international form so local (05XX) numbers produce a valid wa.me link.
+  const waUrl = waLink(phoneWhatsapp) ?? waLink(phone);
 
   return (
     <section className="mt-0 mb-6">

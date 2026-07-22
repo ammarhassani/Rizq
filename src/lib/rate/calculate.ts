@@ -106,7 +106,12 @@ function estimatePercentile(value: number, band: MarketBand): number {
     const denom = max - anchor;
     pct = denom === 0 ? 90 : 50 + ((value - anchor) / denom) * 40;
   } else {
-    pct = 90;
+    // value > max: extrapolate ABOVE 90 toward 99 (same slope as the 50→90 segment),
+    // so a genuinely-above-market target reads > 90 and is_realistic can be false.
+    // Previously this was hard-pinned at 90, which made is_realistic always true.
+    const denom = max - anchor;
+    const overshoot = denom > 0 ? (value - max) / denom : 1;
+    pct = 90 + Math.min(9, overshoot * 40);
   }
 
   return Math.min(99, Math.max(1, Math.round(pct)));

@@ -304,29 +304,34 @@ describe("computeProposalPrice — output shape", () => {
   });
 });
 
-describe("computeProposalPrice — deliverable_count complexity (scope-size lever)", () => {
+describe("computeProposalPrice — deliverable_count complexity (anchor lever, honest band)", () => {
   const b = band(670, 1000, 1340);
-  it("1 or null deliverables leaves the band unchanged (no single-item regression)", () => {
+  it("1 or null deliverables leaves the anchor lever inactive (no single-item regression)", () => {
     const one = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 1 }, []);
     const none = computeProposalPrice(b, { ...NO_MODS, deliverable_count: null }, []);
-    expect(one.max).toBe(1340);
-    expect(none.max).toBe(1340);
     expect(one.modifiers.complexity).toBe(1.0);
+    expect(none.modifiers.complexity).toBe(1.0);
+    expect(one.max).toBe(1340);
   });
-  it("more deliverables scale the band up and lift the anchor", () => {
+  it("more deliverables lift the anchor but NEVER scale the cited band (Principle I)", () => {
     const small = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 1 }, []);
     const big = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 5 }, []);
     expect(big.modifiers.complexity).toBeCloseTo(1.4, 5);
-    expect(big.max).toBeGreaterThan(small.max);
-    expect(big.anchor).toBeGreaterThan(small.anchor);
-    expect(big.min).toBeGreaterThan(small.min);
+    // Band boundaries stay equal to the cited market band — no fabricated figures.
+    expect(big.min).toBe(small.min);
+    expect(big.max).toBe(small.max);
+    expect(big.max).toBe(1340);
+    // The anchor moves up toward max, staying inside the band.
+    expect(big.anchor).toBeGreaterThanOrEqual(small.anchor);
+    expect(big.anchor).toBeLessThanOrEqual(big.max);
   });
-  it("caps complexity at +60% (sublinear, never runs away)", () => {
+  it("even at max complexity the band is never fabricated beyond the citation", () => {
     const huge = computeProposalPrice(b, { ...NO_MODS, deliverable_count: 50 }, []);
     expect(huge.modifiers.complexity).toBe(1.6);
-    expect(huge.max).toBe(2140); // round10(1340 * 1.6)
+    expect(huge.max).toBe(1340); // NOT 2140 — the citation vouches for 1340, not more
+    expect(huge.anchor).toBeLessThanOrEqual(1340);
   });
-  it("keeps min <= anchor <= max after scaling", () => {
+  it("keeps min <= anchor <= max after applying complexity", () => {
     const r = computeProposalPrice(b, { urgency: "rush_under_1_week", client_type: "corporate", ip_transfer: "full_transfer", deliverable_count: 6 }, []);
     expect(r.min).toBeLessThanOrEqual(r.anchor);
     expect(r.anchor).toBeLessThanOrEqual(r.max);
@@ -348,7 +353,7 @@ describe("computeProposalPrice — stated-rate personal anchor (feature 006)", (
     expect(computeProposalPrice(b, NO_MODS, [3000], null).anchor).toBe(base.anchor);
     expect(computeProposalPrice(b, NO_MODS, [3000], 0).anchor).toBe(base.anchor);
   });
-  it("stays within the (complexity-scaled) band", () => {
+  it("stays within the cited band", () => {
     const r = computeProposalPrice(b, NO_MODS, [], 100000);
     expect(r.anchor).toBeLessThanOrEqual(r.max);
     expect(r.anchor).toBeGreaterThanOrEqual(r.min);

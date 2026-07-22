@@ -44,11 +44,12 @@ function ipMod(ip: PricingModifierInput["ip_transfer"]): number {
   return 1.0;
 }
 /**
- * Scope-size lever: the market band is for a typical (≈single-deliverable)
- * engagement, so a multi-deliverable scope is more work and should price higher.
- * Sublinear (+10% per extra deliverable) and capped at +60% so it never runs
- * away. 1 (or unknown) deliverable → 1.0 (no change; single-item proposals are
- * unaffected). This is the previously-reserved `complexity` modifier.
+ * Scope-size lever: a multi-deliverable scope is more work, so it pushes the anchor
+ * UP within the market band — like the other modifiers. It does NOT scale the band's
+ * min/max: doing so would print figures no benchmark record supports, which the
+ * citation ("based on N records") vouches for (constitution Principle I; M1.7 step 1
+ * "move the anchor, never fabricate a band"). Sublinear (+10% per extra deliverable),
+ * capped at +60%. 1 (or unknown) deliverable → 1.0 (single-item proposals unaffected).
  */
 function complexityMod(deliverableCount: PricingModifierInput["deliverable_count"]): number {
   const n = typeof deliverableCount === "number" && deliverableCount > 0 ? deliverableCount : 1;
@@ -85,12 +86,13 @@ export function computeProposalPrice(
     complexity: complexityMod(mods.deliverable_count),
   };
 
-  // Complexity scales the whole band (scope size); urgency/client/ip then move
-  // the anchor *within* that band. Keeps min ≤ anchor ≤ max and a consistent meter.
-  const min = round10(market.min * m.complexity);
-  const max = round10(market.max * m.complexity);
-  const combined = m.urgency * m.client_type * m.ip;
-  const modifiedAnchor = clamp(market.anchor * m.complexity * combined, min, max);
+  // The band is the CITED market band (rounded, never scaled) so every displayed
+  // figure is backed by the provenance citation. All modifiers — including scope
+  // complexity — move the anchor *within* that band (clamped). Keeps min ≤ anchor ≤ max.
+  const min = round10(market.min);
+  const max = round10(market.max);
+  const combined = m.urgency * m.client_type * m.ip * m.complexity;
+  const modifiedAnchor = clamp(market.anchor * combined, min, max);
 
   // The freelancer's stated rate joins their personal history as one anchor point,
   // so a profiled freelancer is reflected even with no past proposals.

@@ -13,7 +13,7 @@ import { getHadafStatusAction } from "@/app/actions/hadaf/status";
 import { HadafStreakBar } from "@/components/hadaf/HadafStreakBar";
 import { HadafActionPlanClient } from "@/components/hadaf/HadafActionPlanClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
-import { CheckCircle2, XCircle, ExternalLink, AlertTriangle } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, AlertTriangle, TrendingUp } from "lucide-react";
 
 type Params = { locale: string };
 
@@ -176,7 +176,13 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
           /* Not-qualifying / in-progress streak state */
           <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-9 mb-8 ${font}`}>
             <div className="flex items-start gap-4 mb-5">
-              <XCircle size={26} className="text-rizq-gold shrink-0 mt-0.5" />
+              {/* A 1–2 month streak is PROGRESS, not failure — show a building icon, not an X.
+                  X is only for a broken/zero streak this month. */}
+              {status.current_streak > 0 ? (
+                <TrendingUp size={26} className="text-rizq-green shrink-0 mt-0.5" />
+              ) : (
+                <XCircle size={26} className="text-rizq-gold shrink-0 mt-0.5" />
+              )}
               <div>
                 <h2 className={`text-xl font-bold text-rizq-ink ${font}`}>
                   {status.current_streak > 0
