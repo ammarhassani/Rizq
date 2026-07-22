@@ -31,16 +31,16 @@ const TRANSITIONS: Record<InvoiceStatus, InvoiceStatus[]> = {
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-rizq-ink/8 text-rizq-ink-soft border-rizq-ink/15",
-  sent: "bg-blue-50 text-blue-700 border-blue-200",
-  viewed: "bg-blue-50 text-blue-700 border-blue-200",
-  paid: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  overdue: "bg-red-50 text-red-700 border-red-200",
+  sent: "status-info",
+  viewed: "status-info",
+  paid: "status-positive",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/8 text-rizq-ink-soft border-rizq-ink/15",
 };
 
 const STATUS_DOT: Record<string, string> = {
-  draft: "bg-rizq-ink/30", sent: "bg-blue-500", viewed: "bg-blue-500",
-  paid: "bg-emerald-500", overdue: "bg-red-500", cancelled: "bg-rizq-ink/30",
+  draft: "bg-rizq-ink/30", sent: "bg-[var(--acc-tint)]", viewed: "bg-[var(--acc-tint)]",
+  paid: "bg-[var(--acc)]", overdue: "bg-[var(--over)]", cancelled: "bg-rizq-ink/30",
 };
 
 const LABEL_AR: Record<string, string> = {

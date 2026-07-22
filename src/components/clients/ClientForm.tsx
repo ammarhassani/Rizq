@@ -188,7 +188,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
 
       {/* Name (required) */}
       <div>
-        <label className={labelClass}>{t("nameLabel")} <span className="text-red-500">*</span></label>
+        <label className={labelClass}>{t("nameLabel")} <span className="text-[var(--over)]">*</span></label>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} className={inputClass} />
       </div>
 
@@ -298,7 +298,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       </div>
 
       {/* Error */}
-      {error && <p role="alert" className={`text-sm text-red-700 ${font}`}>{error}</p>}
+      {error && <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>{error}</p>}
 
       {/* Submit */}
       <button

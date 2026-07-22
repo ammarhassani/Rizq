@@ -220,7 +220,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
 
       {/* Amount (primary — big) */}
       <div>
-        <label className={labelClass}>{t("amountLabel")} <span className="text-red-500">*</span></label>
+        <label className={labelClass}>{t("amountLabel")} <span className="text-[var(--over)]">*</span></label>
         <div className="relative">
           <input
             type="number"
@@ -241,7 +241,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
 
       {/* Title (required) */}
       <div>
-        <label className={labelClass}>{t("titleLabel")} <span className="text-red-500">*</span></label>
+        <label className={labelClass}>{t("titleLabel")} <span className="text-[var(--over)]">*</span></label>
         <input
           type="text"
           value={title}
@@ -387,7 +387,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
       )}
 
       {/* Error */}
-      {error && <p role="alert" className={`text-sm text-red-700 ${font}`}>{error}</p>}
+      {error && <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>{error}</p>}
 
       {/* Submit */}
       <button

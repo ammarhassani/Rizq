@@ -268,7 +268,7 @@ export function ClientDetailActions({
           <button
             type="button"
             onClick={() => setShowArchiveConfirm(true)}
-            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
           >
             <Archive size={14} />
             {t("archive")}
@@ -380,14 +380,14 @@ export function ClientDetailActions({
 
         {/* Insight error / upgrade hint */}
         {insightError && (
-          <p className={`mt-3 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
+          <p className={`mt-3 text-xs text-[var(--warn)] bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
             {insightError}
           </p>
         )}
 
         {/* Persona error / upgrade hint */}
         {personaError && (
-          <p className={`mt-3 text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
+          <p className={`mt-3 text-xs text-[var(--warn)] bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
             {personaError}
           </p>
         )}
@@ -411,7 +411,7 @@ export function ClientDetailActions({
           )}
 
           {followupError && (
-            <p className={`text-xs text-red-600 ${font}`}>{followupError}</p>
+            <p className={`text-xs text-[var(--over)] ${font}`}>{followupError}</p>
           )}
 
           {followupDraft && (
@@ -422,7 +422,7 @@ export function ClientDetailActions({
                 value={followupDraft}
                 rows={4}
                 dir="rtl"
-                className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-3 text-sm text-rizq-ink resize-none font-arabic focus:outline-none`}
+                className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-3 text-sm text-rizq-ink resize-none font-arabic focus:outline-none`}
               />
 
               <div className="flex flex-wrap gap-3">
@@ -445,7 +445,7 @@ export function ClientDetailActions({
                     href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-full border border-green-400/50 text-green-700 px-5 py-2.5 text-sm font-medium hover:bg-green-50 transition-colors ${font}`}
+                    className={`inline-flex items-center gap-2 rounded-full border border-green-400/50 text-[var(--acc)] px-5 py-2.5 text-sm font-medium hover:bg-green-50 transition-colors ${font}`}
                   >
                     <Send size={14} />
                     {tAi("whatsapp")}

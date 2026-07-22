@@ -23,10 +23,10 @@ type Props = {
 
 const INVOICE_STATUS_STYLES: Record<string, string> = {
   draft: "bg-rizq-ink/8 text-rizq-ink-soft",
-  sent: "bg-blue-50 text-blue-700",
+  sent: "status-info",
   viewed: "bg-purple-50 text-purple-700",
-  paid: "bg-emerald-50 text-emerald-700",
-  overdue: "bg-red-50 text-red-600",
+  paid: "status-positive",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/6 text-rizq-ink-soft/60",
 };
 
@@ -94,7 +94,7 @@ export function ClientInvoiceHistory({ locale, invoices }: Props) {
               key={inv.id}
               href={`/invoices/${inv.id}` as `/invoices/${string}`}
               dir={dir}
-              className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
               <div className="min-w-0">
                 <p className="tabular font-sans text-sm font-medium text-rizq-ink truncate">
@@ -114,7 +114,7 @@ export function ClientInvoiceHistory({ locale, invoices }: Props) {
                     </span>
                   )}
                   {overdueFlag && (
-                    <span className={`text-xs font-medium text-red-600 ${font}`}>
+                    <span className={`text-xs font-medium text-[var(--over)] ${font}`}>
                       {isAr ? "⚠ متأخرة" : "⚠ Overdue"}
                     </span>
                   )}

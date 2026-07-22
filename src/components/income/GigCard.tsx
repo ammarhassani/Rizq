@@ -26,12 +26,12 @@ type Props = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  paid: "bg-emerald-50 text-emerald-700",
-  pending: "bg-amber-50 text-amber-700",
-  deposit_paid: "bg-amber-50 text-amber-700",
-  in_progress: "bg-blue-50 text-blue-700",
-  delivered: "bg-blue-50 text-blue-700",
-  overdue: "bg-red-50 text-red-700",
+  paid: "status-positive",
+  pending: "status-pending",
+  deposit_paid: "status-pending",
+  in_progress: "status-info",
+  delivered: "status-info",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/8 text-rizq-ink-soft",
 };
 
@@ -88,7 +88,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
           ? `/projects/${gig.project_id}`
           : `/income/${gig.id}`) as `/projects/${string}` | `/income/${string}`
       }
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
@@ -97,7 +97,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
               {gig.title}
             </p>
             {gig.ai_anomaly_flag && (
-              <span title={isAr ? "تنبيه تحليل" : "Anomaly detected"} className="text-amber-500 text-sm" aria-label="anomaly">
+              <span title={isAr ? "تنبيه تحليل" : "Anomaly detected"} className="text-[var(--warn)] text-sm" aria-label="anomaly">
                 ❗
               </span>
             )}

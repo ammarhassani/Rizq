@@ -18,9 +18,9 @@ import { updateClient } from "@/app/actions/clients/clients";
 type Priority = "low" | "medium" | "high";
 
 const STOPS: { key: Priority; dot: string; ring: string }[] = [
-  { key: "low", dot: "bg-emerald-500", ring: "ring-emerald-500/40" },
-  { key: "medium", dot: "bg-amber-400", ring: "ring-amber-400/40" },
-  { key: "high", dot: "bg-red-500", ring: "ring-red-500/40" },
+  { key: "low", dot: "bg-[var(--acc)]", ring: "ring-emerald-500/40" },
+  { key: "medium", dot: "bg-[var(--warn)]", ring: "ring-amber-400/40" },
+  { key: "high", dot: "bg-[var(--over)]", ring: "ring-red-500/40" },
 ];
 
 const LABEL_AR: Record<Priority, string> = { low: "منخفضة", medium: "متوسطة", high: "عالية" };

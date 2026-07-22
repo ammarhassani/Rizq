@@ -93,9 +93,9 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
             <p className={`text-xs text-rizq-ink-soft/60 mb-0.5 ${font}`}>
               {t("summaryPaid")}
             </p>
-            <p className="tabular font-sans text-xl font-bold text-emerald-700 leading-none">
+            <p className="tabular font-sans text-xl font-bold text-[var(--acc)] leading-none">
               <AnimatedNumber value={summary.paidTotal} locale={locale} duration={0.9} />
-              <span className={`ms-1.5 text-xs font-normal text-emerald-700/60 ${font}`}>
+              <span className={`ms-1.5 text-xs font-normal text-[var(--acc)]/60 ${font}`}>
                 {isAr ? "ر.س" : "SAR"}
               </span>
             </p>
@@ -105,14 +105,14 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
               <p className={`text-xs text-rizq-ink-soft/60 mb-0.5 ${font}`}>
                 {t("summaryOverdue")}
                 {summary.overdueCount > 0 && (
-                  <span className={`ms-1 text-red-600 font-semibold ${font}`}>
+                  <span className={`ms-1 text-[var(--over)] font-semibold ${font}`}>
                     ({summary.overdueCount})
                   </span>
                 )}
               </p>
-              <p className="tabular font-sans text-xl font-bold text-red-700 leading-none">
+              <p className="tabular font-sans text-xl font-bold text-[var(--over)] leading-none">
                 {fmtMoney(summary.overdueTotal, locale)}
-                <span className={`ms-1.5 text-xs font-normal text-red-700/60 ${font}`}>
+                <span className={`ms-1.5 text-xs font-normal text-[var(--over)]/60 ${font}`}>
                   {isAr ? "ر.س" : "SAR"}
                 </span>
               </p>

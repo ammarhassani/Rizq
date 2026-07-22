@@ -249,19 +249,19 @@ export function IncomeListClient({ gigs, locale }: Props) {
           )}
         </button>
         {csvState === "upgrade" && (
-          <p className={`text-sm text-amber-700 ${font}`}>
+          <p className={`text-sm text-[var(--warn)] ${font}`}>
             {tAi("upgradeHint")}
           </p>
         )}
         {csvState === "error" && (
-          <p className={`text-sm text-red-700 ${font}`}>
+          <p className={`text-sm text-[var(--over)] ${font}`}>
             {isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again."}
           </p>
         )}
       </div>
 
       {/* ── AI Forecast section ─────────────────────────────────────────── */}
-      <div dir={dir} className={`rounded-2xl border border-rizq-gold/20 bg-white/40 px-5 py-4 space-y-3 ${font}`}>
+      <div dir={dir} className={`rounded-2xl border border-rizq-gold/20 bg-[var(--panel)] px-5 py-4 space-y-3 ${font}`}>
         {/* Generate button */}
         {(forecast.status === "idle" || forecast.status === "error") && (
           <button
@@ -285,7 +285,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
 
         {/* Upgrade hint */}
         {forecast.status === "upgrade" && (
-          <p className={`text-sm text-amber-700 ${font}`}>
+          <p className={`text-sm text-[var(--warn)] ${font}`}>
             {tAi("upgradeHint")}
           </p>
         )}

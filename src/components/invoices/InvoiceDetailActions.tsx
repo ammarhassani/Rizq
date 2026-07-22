@@ -214,7 +214,7 @@ export function InvoiceDetailActions({
               type="button"
               onClick={handleMarkViewed}
               disabled={isMarkingViewed}
-              className={`inline-flex items-center gap-2 rounded-full border border-blue-300/50 text-blue-700 px-5 py-2.5 text-sm font-medium hover:bg-blue-50 transition-all disabled:opacity-70 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-blue-300/50 text-[var(--acc-tint)] px-5 py-2.5 text-sm font-medium hover:bg-blue-50 transition-all disabled:opacity-70 ${font}`}
             >
               {isMarkingViewed ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -248,7 +248,7 @@ export function InvoiceDetailActions({
               type="button"
               onClick={handleMarkOverdue}
               disabled={isMarkingOverdue}
-              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
             >
               {isMarkingOverdue ? (
                 <Loader2 size={14} className="animate-spin" />
@@ -279,7 +279,7 @@ export function InvoiceDetailActions({
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(true)}
-              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
             >
               <Trash2 size={14} />
               {t("delete")}
@@ -330,7 +330,7 @@ export function InvoiceDetailActions({
                 type="button"
                 onClick={handleGenerateReminder}
                 disabled={isGeneratingReminder}
-                className={`inline-flex items-center gap-2 rounded-full border border-amber-300/60 text-amber-700 px-5 py-2.5 text-sm font-medium hover:bg-amber-50 transition-all disabled:opacity-70 ${font}`}
+                className={`inline-flex items-center gap-2 rounded-full border border-amber-300/60 text-[var(--warn)] px-5 py-2.5 text-sm font-medium hover:bg-amber-50 transition-all disabled:opacity-70 ${font}`}
               >
                 {isGeneratingReminder ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -344,10 +344,10 @@ export function InvoiceDetailActions({
 
           {/* Description draft output */}
           {descriptionError && (
-            <p className={`mt-3 text-sm text-red-700 ${font}`}>{descriptionError}</p>
+            <p className={`mt-3 text-sm text-[var(--over)] ${font}`}>{descriptionError}</p>
           )}
           {descriptionDraft && (
-            <div className={`mt-3 rounded-2xl border border-rizq-gold/25 bg-white/60 p-4 space-y-2 ${font}`} dir={dir}>
+            <div className={`mt-3 rounded-2xl border border-rizq-gold/25 bg-[var(--raised)] p-4 space-y-2 ${font}`} dir={dir}>
               <p className="text-xs font-medium text-rizq-green/80 tracking-wide">
                 {tAi("descriptionLabel")}
               </p>
@@ -368,24 +368,24 @@ export function InvoiceDetailActions({
 
           {/* Reminder draft output */}
           {reminderError && (
-            <p className={`mt-3 text-sm text-amber-700 ${font}`}>{reminderError}</p>
+            <p className={`mt-3 text-sm text-[var(--warn)] ${font}`}>{reminderError}</p>
           )}
           {reminderDraft && (
             <div className={`mt-3 rounded-2xl border border-amber-200/60 bg-amber-50/40 p-4 space-y-2 ${font}`} dir={dir}>
-              <p className="text-xs font-medium text-amber-700/80 tracking-wide">
+              <p className="text-xs font-medium text-[var(--warn)]/80 tracking-wide">
                 {tAi("draftLabel")}
               </p>
               <textarea
                 readOnly
                 value={reminderDraft}
                 rows={4}
-                className={`w-full rounded-xl border border-amber-200/50 bg-white/70 px-3 py-2.5 text-sm text-rizq-ink resize-none focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 ${font}`}
+                className={`w-full rounded-xl border border-amber-200/50 bg-[var(--raised)] px-3 py-2.5 text-sm text-rizq-ink resize-none focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 ${font}`}
                 dir={dir}
               />
               <button
                 type="button"
                 onClick={() => copyToClipboard(reminderDraft, setReminderCopied)}
-                className={`inline-flex items-center gap-1.5 rounded-full border border-amber-300/50 bg-white/70 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50 transition-all ${font}`}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-amber-300/50 bg-[var(--raised)] px-3 py-1.5 text-xs font-medium text-[var(--warn)] hover:bg-amber-50 transition-all ${font}`}
               >
                 <Copy size={12} />
                 {reminderCopied ? tAi("copied") : tAi("copy")}

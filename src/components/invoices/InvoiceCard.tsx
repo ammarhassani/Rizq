@@ -26,10 +26,10 @@ type Props = {
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-rizq-ink/8 text-rizq-ink-soft",
-  sent: "bg-blue-50 text-blue-700",
-  viewed: "bg-blue-50 text-blue-700",
-  paid: "bg-emerald-50 text-emerald-700",
-  overdue: "bg-red-50 text-red-700",
+  sent: "status-info",
+  viewed: "status-info",
+  paid: "status-positive",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/8 text-rizq-ink-soft",
 };
 
@@ -87,7 +87,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
   return (
     <Link
       href={`/invoices/${invoice.id}` as `/invoices/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
             </p>
             {/* Overdue badge */}
             {overdueFlag && (
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-red-50 text-red-700 ${font}`}>
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium status-overdue ${font}`}>
                 {isAr ? "متأخرة" : "Overdue"}
               </span>
             )}

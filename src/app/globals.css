@@ -398,6 +398,7 @@
 .status-pending  { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent); }
 .status-overdue  { color: var(--over); background: color-mix(in srgb, var(--over) 12%, transparent); border: 1px solid color-mix(in srgb, var(--over) 30%, transparent); }
 .status-neutral  { color: var(--content-muted); background: var(--line-2); border: 1px solid var(--line); }
+.status-info     { color: var(--acc-tint); background: color-mix(in srgb, #31d0de 12%, transparent); border: 1px solid color-mix(in srgb, #31d0de 30%, transparent); }
 
 /* ── @property-backed animated gradients (Tailwind JIT can't emit @property) ── */
 @property --aurora-angle {

@@ -39,12 +39,12 @@ function relativeDate(iso: string | null, locale: "ar" | "en"): string {
 }
 
 function followUpDot(lastContactedAt: string | null, priority: string | null): string {
-  if (priority === "high") return "bg-red-500";
-  if (!lastContactedAt) return "bg-red-400";
+  if (priority === "high") return "bg-[var(--over)]";
+  if (!lastContactedAt) return "bg-[var(--over)]";
   const days = Math.floor((Date.now() - new Date(lastContactedAt).getTime()) / 86400000);
-  if (days > 30) return "bg-red-500";
-  if (days > 14) return "bg-amber-400";
-  return "bg-emerald-500";
+  if (days > 30) return "bg-[var(--over)]";
+  if (days > 14) return "bg-[var(--warn)]";
+  return "bg-[var(--acc)]";
 }
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
@@ -63,7 +63,7 @@ export function ClientCard({ client, locale, prioritySlot }: Props) {
   return (
     <Link
       href={`/clients/${client.id}` as `/clients/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 flex items-start gap-3">

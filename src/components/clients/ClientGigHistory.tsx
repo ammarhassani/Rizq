@@ -18,11 +18,11 @@ type Props = {
 
 const GIG_STATUS_STYLES: Record<string, string> = {
   pending: "bg-rizq-ink/8 text-rizq-ink-soft",
-  deposit_paid: "bg-blue-50 text-blue-700",
-  in_progress: "bg-amber-50 text-amber-700",
+  deposit_paid: "status-info",
+  in_progress: "status-pending",
   delivered: "bg-purple-50 text-purple-700",
-  paid: "bg-emerald-50 text-emerald-700",
-  overdue: "bg-red-50 text-red-600",
+  paid: "status-positive",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/6 text-rizq-ink-soft/60",
 };
 
@@ -63,7 +63,7 @@ export function ClientGigHistory({ locale, gigs }: Props) {
           <div
             key={g.id}
             dir={dir}
-            className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 ${font}`}
+            className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 ${font}`}
           >
             <div className="min-w-0">
               <p className="text-sm font-medium text-rizq-ink truncate">{g.title}</p>

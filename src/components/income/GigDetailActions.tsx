@@ -176,7 +176,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
           </p>
           <Link
             href={`/invoices/${linkedInvoice.id}` as `/invoices/${string}`}
-            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/30 bg-white/70 text-rizq-green px-4 py-2 text-sm font-medium hover:bg-rizq-green/10 transition-all ${font}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/30 bg-[var(--raised)] text-rizq-green px-4 py-2 text-sm font-medium hover:bg-rizq-green/10 transition-all ${font}`}
           >
             <FileText size={14} />
             <span className="tabular">{linkedInvoice.invoice_number}</span>
@@ -240,7 +240,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
               type="button"
               onClick={handleMarkOverdue}
               disabled={isMarkingOverdue}
-              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
             >
               {isMarkingOverdue ? <Loader2 size={14} className="animate-spin" /> : <AlertCircle size={14} />}
               {t("markOverdue")}
@@ -251,7 +251,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-red-600 px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
           >
             <Trash2 size={14} />
             {t("delete")}
@@ -285,7 +285,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
 
       {/* Invoice generation error */}
       {invoiceError && (
-        <p role="alert" className={`text-sm text-red-700 px-1 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] px-1 ${font}`}>
           {invoiceError}
         </p>
       )}

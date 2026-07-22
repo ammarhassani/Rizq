@@ -245,7 +245,7 @@ export function InvoiceForm({
         {/* Client (required) */}
         <div>
           <label className={labelClass}>
-            {t("clientLabel")} <span className="text-red-500">*</span>
+            {t("clientLabel")} <span className="text-[var(--over)]">*</span>
           </label>
           <ClientPicker
             value={clientId}
@@ -259,7 +259,7 @@ export function InvoiceForm({
         {/* Items (required, from catalog) */}
         <div>
           <label className={labelClass}>
-            {t("itemsLabel")} <span className="text-red-500">*</span>
+            {t("itemsLabel")} <span className="text-[var(--over)]">*</span>
           </label>
 
           {items.length > 0 && (
@@ -272,7 +272,7 @@ export function InvoiceForm({
                 return (
                   <div
                     key={idx}
-                    className="rounded-2xl border border-rizq-gold/25 bg-white/50 p-3 sm:p-4"
+                    className="rounded-2xl border border-rizq-gold/25 bg-[var(--panel)] p-3 sm:p-4"
                     dir={dir}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -282,7 +282,7 @@ export function InvoiceForm({
                       <button
                         type="button"
                         onClick={() => removeItem(idx)}
-                        className="shrink-0 p-1.5 text-rizq-ink-soft/50 hover:text-red-600 transition-colors"
+                        className="shrink-0 p-1.5 text-rizq-ink-soft/50 hover:text-[var(--over)] transition-colors"
                         aria-label={isAr ? "حذف البند" : "Remove item"}
                       >
                         <Trash2 size={15} />
@@ -396,7 +396,7 @@ export function InvoiceForm({
                 {fees.map((fee, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/25 bg-white/50 px-3.5 py-2.5"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/25 bg-[var(--panel)] px-3.5 py-2.5"
                     dir={dir}
                   >
                     <div className="min-w-0">
@@ -420,7 +420,7 @@ export function InvoiceForm({
                       <button
                         type="button"
                         onClick={() => removeFee(idx)}
-                        className="p-1.5 text-rizq-ink-soft/50 hover:text-red-600 transition-colors"
+                        className="p-1.5 text-rizq-ink-soft/50 hover:text-[var(--over)] transition-colors"
                         aria-label={isAr ? "حذف الرسوم" : "Remove fee"}
                       >
                         <Trash2 size={15} />
@@ -439,7 +439,7 @@ export function InvoiceForm({
         {(totals.subtotal_sar > 0 || totals.fees_sar > 0) && (
           <div
             dir={dir}
-            className={`rounded-2xl border border-rizq-gold/20 bg-white/50 p-5 space-y-2 ${font}`}
+            className={`rounded-2xl border border-rizq-gold/20 bg-[var(--panel)] p-5 space-y-2 ${font}`}
           >
             <div className="flex items-center justify-between">
               <span className="text-sm text-rizq-ink-soft">{t("subtotalLabel")}</span>
@@ -528,7 +528,7 @@ export function InvoiceForm({
         </div>
 
         {error && (
-          <p role="alert" className={`text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
             {error}
           </p>
         )}
