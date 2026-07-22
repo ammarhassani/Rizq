@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Loader2, Sparkles, Mail, Phone, MapPin } from "lucide-react";
+import { Loader2, Sparkles, Mail, Phone, MapPin, Image as ImageIcon } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import { suggestBrandKitAction } from "@/app/actions/onboarding/suggestBrandKitAction";
 import type { StepProps } from "./types";
@@ -51,6 +51,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
   });
   const [contactCity, setContactCity] = useState(profile.contact_city ?? "");
   const [logoUrl, setLogoUrl] = useState(profile.logo_url ?? "");
+  const [logoBroken, setLogoBroken] = useState(false);
 
   // Validation — all optional, but must be well-formed if filled.
   const emailValid = contactEmail === "" || EMAIL_RE.test(contactEmail);
@@ -260,20 +261,46 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
         />
       </div>
 
-      {/* Logo URL — appears on proposals & invoices */}
+      {/* Logo — paste an image link; live preview. (Real file upload needs a public bucket.) */}
       <div>
-        <label className={labelCls}>{isAr ? "رابط شعارك" : "Logo URL"}</label>
-        <input
-          type="url"
-          value={logoUrl}
-          onChange={(e) => setLogoUrl(e.target.value)}
-          placeholder="https://…"
-          className={`${inputCls} font-sans`}
-          dir="ltr"
-        />
-        <p className={`mt-1 text-xs text-rizq-ink-soft/70 ${font}`}>
-          {isAr ? "يظهر على عروضك وفواتيرك." : "Shown on your proposals & invoices."}
-        </p>
+        <label className={labelCls}>{isAr ? "شعارك" : "Your logo"}</label>
+        <div className="flex items-center gap-3">
+          {logoUrl.trim() && !logoBroken ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt={isAr ? "معاينة الشعار" : "Logo preview"}
+              onError={() => setLogoBroken(true)}
+              className="h-14 w-14 shrink-0 rounded-xl border border-rizq-gold/25 bg-white object-contain p-1"
+            />
+          ) : (
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40">
+              <ImageIcon size={20} className="text-rizq-ink-soft/50" aria-hidden="true" />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <input
+              type="url"
+              value={logoUrl}
+              onChange={(e) => {
+                setLogoUrl(e.target.value);
+                setLogoBroken(false);
+              }}
+              placeholder={isAr ? "الصق رابط صورة الشعار (https://…)" : "Paste a logo image link (https://…)"}
+              className={`${inputCls} font-sans`}
+              dir="ltr"
+            />
+            <p className={`mt-1 text-xs text-rizq-ink-soft/70 ${font}`}>
+              {logoBroken
+                ? isAr
+                  ? "تعذّر تحميل الصورة — تحقّق من الرابط."
+                  : "Couldn't load that image — check the link."
+                : isAr
+                  ? "يظهر على عروضك وفواتيرك."
+                  : "Shown on your proposals & invoices."}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Contact — each field branded with its icon */}

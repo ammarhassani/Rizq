@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { computeStrength, strengthItems, OPTIMAL_THRESHOLD, type StrengthProfile } from "./strength";
 
-// A profile with EVERY dimension filled (using the fields the editors actually persist).
+/** Every one of the 15 dimensions filled (using the fields the editors persist). */
 const FULL: StrengthProfile = {
   full_name_ar: "أحمد",
   fl_number: "12345678",
@@ -11,23 +11,26 @@ const FULL: StrengthProfile = {
   current_hourly_rate_sar: 350,
   income_goal_monthly_sar: 12000,
   brand_name: "Studio",
+  tagline_ar: "شعار",
   bio_ar: "نبذة",
-  contact_email: "a@b.com",
   logo_url: "https://x/logo.png",
+  contact_email: "a@b.com",
+  portfolio_samples: [{ title: "x" }],
   notable_clients: ["ClientA"],
+  linkedin_url: "https://linkedin.com/x",
 };
 
-describe("computeStrength (comprehensive, weighted)", () => {
+describe("computeStrength (granular, honest)", () => {
   it("is 0 for an empty profile", () => {
     expect(computeStrength({})).toBe(0);
   });
 
-  it("is 100 only when the whole profile is filled", () => {
+  it("is 100 only when EVERY dimension is filled", () => {
     expect(computeStrength(FULL)).toBe(100);
   });
 
-  it("does NOT hit 100 with only the KYC essentials (brand/bio/portfolio still empty)", () => {
-    const kycOnly: StrengthProfile = {
+  it("KYC essentials alone are far from 100 (brand/tagline/bio/logo/samples/clients/platforms empty)", () => {
+    const kyc: StrengthProfile = {
       full_name_ar: "أحمد",
       fl_number: "12345678",
       specialties: ["web-dev"],
@@ -36,54 +39,51 @@ describe("computeStrength (comprehensive, weighted)", () => {
       current_hourly_rate_sar: 350,
       income_goal_monthly_sar: 12000,
     };
-    // full_name8 + fl6 + specialty12 + city10 + experience8 + rate12 + goal8 = 64
-    expect(computeStrength(kycOnly)).toBe(64);
+    // 6+11+8+8+11+7+5 = 56
+    expect(computeStrength(kyc)).toBe(56);
   });
 
-  it("adds each dimension's own weight", () => {
-    expect(computeStrength({ full_name_ar: "أحمد" })).toBe(8);
-    expect(computeStrength({ specialties: ["web-dev"] })).toBe(12);
-    expect(computeStrength({ city: "riyadh" })).toBe(10);
-    expect(computeStrength({ full_name_ar: "أحمد", city: "riyadh" })).toBe(18);
+  it("each unfilled section is honestly missing — e.g. no logo, no tagline, no platforms drops the score", () => {
+    const noExtras = { ...FULL, logo_url: null, tagline_ar: null, tagline_en: null };
+    // 100 - logo(5) - tagline(5) = 90
+    expect(computeStrength(noExtras)).toBe(90);
+    const noPlatforms = { ...FULL, linkedin_url: null };
+    // platforms had only linkedin → now unmet → 100 - 5 = 95
+    expect(computeStrength(noPlatforms)).toBe(95);
+    const noSamples = { ...FULL, portfolio_samples: [] as unknown[] };
+    expect(computeStrength(noSamples)).toBe(95);
   });
 
   it("accepts the fields the editors persist (slug/text/years), not only *_id", () => {
-    expect(computeStrength({ specialties: ["web-dev"] })).toBe(12); // not primary_specialty_id
-    expect(computeStrength({ city: "riyadh" })).toBe(10); // not city_id
-    expect(computeStrength({ years_experience: 5 })).toBe(8); // not experience_tier_id
+    expect(computeStrength({ specialties: ["web-dev"] })).toBe(11);
+    expect(computeStrength({ city: "riyadh" })).toBe(8);
+    expect(computeStrength({ years_experience: 5 })).toBe(8);
   });
 
-  it("counts a project-range rate (not only hourly/daily)", () => {
-    expect(computeStrength({ current_project_rate_range: { min: 5000, max: 9000 } })).toBe(12);
-  });
-
-  it("portfolio is met by ANY portfolio signal (samples, clients, projects, or a platform URL)", () => {
-    expect(computeStrength({ linkedin_url: "https://linkedin.com/x" })).toBe(8);
-    expect(computeStrength({ total_projects_completed: 12 })).toBe(8);
-    expect(computeStrength({ notable_clients: ["A"] })).toBe(8);
-    expect(computeStrength({ notable_clients: [] })).toBe(0);
+  it("platforms is met by any presence signal (a URL or a used-platform flag)", () => {
+    expect(computeStrength({ behance_url: "https://be/x" })).toBe(5);
+    expect(computeStrength({ uses_bahr: true })).toBe(5);
   });
 
   it("clearing the only specialty drops its weight (the reported bug)", () => {
-    const withSpecialty = { ...FULL };
-    expect(computeStrength(withSpecialty)).toBe(100);
-    const cleared = { ...FULL, specialties: [] as string[] };
-    expect(computeStrength(cleared)).toBe(88); // 100 - specialty(12)
+    expect(computeStrength(FULL)).toBe(100);
+    expect(computeStrength({ ...FULL, specialties: [] as string[] })).toBe(89); // 100 - specialty(11)
   });
 });
 
 describe("strengthItems", () => {
-  it("returns all 12 dimensions with weights summing to 100", () => {
+  it("returns 15 dimensions whose weights sum to 100", () => {
     const items = strengthItems({});
-    expect(items).toHaveLength(12);
+    expect(items).toHaveLength(15);
     expect(items.reduce((s, i) => s + i.weight, 0)).toBe(100);
     expect(items.every((i) => !i.met)).toBe(true);
   });
-  it("marks met dimensions", () => {
+  it("marks the unfilled sections as missing", () => {
     const items = strengthItems({ specialties: ["web-dev"], city: "riyadh" });
+    expect(items.find((i) => i.key === "logo")?.met).toBe(false);
+    expect(items.find((i) => i.key === "tagline")?.met).toBe(false);
+    expect(items.find((i) => i.key === "platforms")?.met).toBe(false);
     expect(items.find((i) => i.key === "specialty")?.met).toBe(true);
-    expect(items.find((i) => i.key === "city")?.met).toBe(true);
-    expect(items.find((i) => i.key === "brand")?.met).toBe(false);
   });
 });
 

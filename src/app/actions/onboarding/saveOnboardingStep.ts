@@ -192,7 +192,7 @@ export async function saveOnboardingStep(
   const { data: currentRow, error: fetchErr } = await supabase
     .from("users")
     .select(
-      "onboarding_step, full_name_ar, fl_number, primary_specialty_id, specialties, city_id, city, experience_tier_id, years_experience, current_hourly_rate_sar, current_daily_rate_sar, current_project_rate_range, income_goal_monthly_sar, brand_name, brand_name_ar, bio_ar, bio_en, contact_email, contact_phone, contact_whatsapp, logo_url, portfolio_samples, notable_clients, total_projects_completed, bahr_profile_url, mostaql_profile_url, khamsat_profile_url, linkedin_url, behance_url, personal_website_url"
+      "onboarding_step, full_name_ar, fl_number, primary_specialty_id, specialties, city_id, city, experience_tier_id, years_experience, current_hourly_rate_sar, current_daily_rate_sar, current_project_rate_range, income_goal_monthly_sar, brand_name, brand_name_ar, tagline_ar, tagline_en, bio_ar, bio_en, logo_url, contact_email, contact_phone, contact_whatsapp, portfolio_samples, notable_clients, total_projects_completed, bahr_profile_url, mostaql_profile_url, khamsat_profile_url, linkedin_url, behance_url, personal_website_url, uses_bahr, uses_mostaql, uses_khamsat"
     )
     .eq("id", uid)
     .maybeSingle();
