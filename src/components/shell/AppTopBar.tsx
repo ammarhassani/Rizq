@@ -83,7 +83,7 @@ export function AppTopBar({
             className={[
               "hidden sm:inline-flex items-center gap-2 h-9 rounded-xl ps-2.5 pe-2 shrink-0",
               "bg-[var(--raised)] border border-rizq-gold/25 hover:border-rizq-green/40 hover:bg-rizq-green/8",
-              "text-rizq-ink-soft/70 transition-colors",
+              "text-[var(--content-muted)] transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
               font,
             ].join(" ")}
@@ -92,7 +92,7 @@ export function AppTopBar({
             <span className="text-xs">{tCmd("triggerLabel")}</span>
             <kbd
               aria-hidden
-              className="ms-1 inline-flex items-center rounded-md border border-rizq-gold/30 bg-rizq-cream/80 px-1.5 py-0.5 text-[10px] font-medium text-rizq-ink-soft/70"
+              className="ms-1 inline-flex items-center rounded-md border border-rizq-gold/30 bg-rizq-cream/80 px-1.5 py-0.5 text-[10px] font-medium text-[var(--content-muted)]"
             >
               {"⌘K"}
             </kbd>

@@ -45,7 +45,7 @@ export async function ContinueLifecycleList({ locale }: { locale: "ar" | "en" })
             >
               <span className="min-w-0">
                 <span className={`block text-sm font-medium text-rizq-ink truncate ${font}`}>{item.title}</span>
-                <span className={`block text-xs text-rizq-ink-soft/70 ${font}`}>
+                <span className={`block text-xs text-[var(--content-muted)] ${font}`}>
                   {item.currentStageKey ? t(STAGE_KEY[item.currentStageKey]) : t("complete")}
                 </span>
               </span>

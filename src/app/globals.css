@@ -125,13 +125,15 @@
   --content-2: #463d30;
   --content-3: #5e5545;
   --content-muted: #6a5f4e;
-  --content-faint: #857a66;
+  /* faint: darkened to clear WCAG AA (4.5:1) for 10px labels on light surfaces */
+  --content-faint: #5f5642;
   /* lines */
   --line: rgba(60, 45, 20, 0.12);
   --line-2: rgba(60, 45, 20, 0.07);
-  /* accent + aurora */
-  --acc: #0b7b57;
-  --acc-tint: #0b7b57;
+  /* accent + aurora — acc darkened from #0b7b57 (4.48:1, just under AA) to clear
+     4.5:1 both as emerald text on light surfaces and as a fill under light text */
+  --acc: #0a6b4b;
+  --acc-tint: #0a6b4b;
   --gold: #b8862e;
   --grad: linear-gradient(100deg, #0a8f66, #0e8fa0 50%, #b8862e);
   --grad-m: linear-gradient(100deg, #0a8f66, #b8862e);
