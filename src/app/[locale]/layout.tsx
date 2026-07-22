@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Tajawal, Inter } from "next/font/google";
+import { Tajawal, Inter, El_Messiri } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { PostHogProvider } from "@/lib/analytics/PostHogProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import "../globals.css";
 
 const tajawal = Tajawal({
@@ -18,6 +19,14 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+// Wahaj display / wordmark face — expressive Arabic (audit §1.3).
+const elMessiri = El_Messiri({
+  subsets: ["arabic", "latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-el-messiri",
   display: "swap",
 });
 
@@ -59,15 +68,17 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${tajawal.variable} ${inter.variable} h-full`}
+      className={`${tajawal.variable} ${inter.variable} ${elMessiri.variable} h-full`}
       suppressHydrationWarning
     >
       <body
-        className={`min-h-full bg-paper text-rizq-ink antialiased selection:bg-rizq-gold/30 selection:text-rizq-ink ${bodyFontClass}`}
+        className={`min-h-full bg-paper text-rizq-ink antialiased selection:bg-rizq-green/25 selection:text-rizq-ink ${bodyFontClass}`}
       >
-        <NextIntlClientProvider>
-          <PostHogProvider>{children}</PostHogProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider>
+          <NextIntlClientProvider>
+            <PostHogProvider>{children}</PostHogProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

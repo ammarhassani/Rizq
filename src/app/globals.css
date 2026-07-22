@@ -2,26 +2,31 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Wahaj is theme-aware via a data-theme attribute (next-themes), light by default. */
+@custom-variant dark (&:is([data-theme="dark"] *));
 
 @theme {
-  --color-rizq-green: #1a5f3f;
-  --color-rizq-green-light: #2a8b5c;
-  --color-rizq-green-dark: #0f4128;
-  --color-rizq-gold: #c8a951;
-  --color-rizq-gold-light: #e6c77a;
-  --color-rizq-gold-dark: #9e8a3d;
-  /* WCAG AA text token: ~5.6:1 on white/cream — use for SMALL gold text
-     (eyebrows, labels). Reserve the brighter gold/gold-dark for large display
-     text + decorative rules where contrast minimums don't apply. */
-  --color-rizq-gold-deep: #6b5a23;
-  --color-rizq-cream: #faf5ec;
-  --color-rizq-cream-dark: #e8e0cc;
-  --color-rizq-ink: #1a1a1a;
-  --color-rizq-ink-soft: #3d3d3d;
+  /* rizq-* stay declared here so Tailwind still generates the bg-rizq and
+     text-rizq utilities the codebase already uses. Their VALUES are overridden to the
+     Wahaj semantic tokens inside the theme blocks below, so the ~1400 existing
+     rizq-* references become theme-aware without touching 158 files (audit §1.1).
+     New / reskinned surfaces consume the semantic tokens (--surface, --content,
+     --acc, --grad …) directly. */
+  --color-rizq-green: #0b7b57;
+  --color-rizq-green-light: #12c58c;
+  --color-rizq-green-dark: #0a6a4b;
+  --color-rizq-gold: #b8862e;
+  --color-rizq-gold-light: #d3a24a;
+  --color-rizq-gold-dark: #9e7327;
+  --color-rizq-gold-deep: #0b7b57;
+  --color-rizq-cream: #f3ece0;
+  --color-rizq-cream-dark: #d9d0bf;
+  --color-rizq-ink: #241f19;
+  --color-rizq-ink-soft: #463d30;
 
   --animate-fade-in: fade-in 0.5s ease-in-out;
   --animate-slide-up: slide-up 0.6s ease-out;
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-breathe-amber: breathe-amber 2.6s ease-in-out infinite;
 
@@ -29,14 +34,19 @@
     0% { opacity: 0; }
     100% { opacity: 1; }
   }
-  /* Incomplete lifecycle stages: a soft amber (brand gold #C8A951) glow that breathes. */
+  /* Incomplete lifecycle stages: a soft accent glow that breathes. */
   @keyframes breathe-amber {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(200, 169, 81, 0.0); opacity: 0.82; }
-    50% { box-shadow: 0 0 11px 2px rgba(200, 169, 81, 0.6); opacity: 1; }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 230, 168, 0.0); opacity: 0.82; }
+    50% { box-shadow: 0 0 11px 2px rgba(52, 230, 168, 0.55); opacity: 1; }
   }
   @keyframes slide-up {
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
+  }
+  /* Wahaj entrance — staggered rise. */
+  @keyframes rise {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: none; }
   }
   @keyframes shimmer {
     0% { background-position: -200% 0; }
@@ -46,6 +56,8 @@
 
 @theme inline {
   --font-arabic: var(--font-tajawal), "Tajawal", system-ui, sans-serif;
+  /* Wahaj display / wordmark — expressive Arabic face (audit §1.3). */
+  --font-display: var(--font-el-messiri), "El Messiri", var(--font-tajawal), "Tajawal", serif;
 }
 
 @theme inline {
@@ -53,7 +65,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-heading: var(--font-el-messiri), var(--font-inter), "Inter", system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -92,73 +104,177 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* ───────────────────────────────────────────────────────────────────────
+   Wahaj (وهج) — "dark neumorphism that glows." Semantic, theme-aware tokens.
+   LIGHT is the default; DARK is Wahaj night. Components consume these tokens;
+   the rizq-* names above are overridden here so legacy refs follow the theme.
+   ─────────────────────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  /* surfaces */
+  --bg: #e4dcce;
+  --surface: #ede6d8;
+  --panel: #e7dfd1;
+  --raised: #f3ece0;
+  --track: #d9d0bf;
+  /* neumorph shadow pair */
+  --nm-dark: #cbc2b1;
+  --nm-light: #fbf8f0;
+  /* text */
+  --content: #241f19;
+  --content-2: #463d30;
+  --content-3: #5e5545;
+  --content-muted: #6a5f4e;
+  --content-faint: #857a66;
+  /* lines */
+  --line: rgba(60, 45, 20, 0.12);
+  --line-2: rgba(60, 45, 20, 0.07);
+  /* accent + aurora */
+  --acc: #0b7b57;
+  --acc-tint: #0b7b57;
+  --gold: #b8862e;
+  --grad: linear-gradient(100deg, #0a8f66, #0e8fa0 50%, #b8862e);
+  --grad-m: linear-gradient(100deg, #0a8f66, #b8862e);
+  --fill: linear-gradient(120deg, #12c58c, #12a6b8);
+  --acc-soft: rgba(11, 123, 87, 0.12);
+  --acc-line: rgba(11, 123, 87, 0.32);
+  --on-accent: #06110c;
+  /* status */
+  --warn: #94671f;
+  --over: #be4326;
+  /* shimmer skeleton */
+  --shim-d: #dbd1bf;
+  --shim-l: #f1e9d8;
+
+  /* rizq-* legacy shims → semantic (theme-aware) */
+  --color-rizq-green: var(--acc);
+  --color-rizq-green-light: var(--acc);
+  --color-rizq-green-dark: var(--acc);
+  --color-rizq-gold: var(--gold);
+  --color-rizq-gold-light: var(--gold);
+  --color-rizq-gold-dark: var(--gold);
+  --color-rizq-gold-deep: var(--acc);
+  --color-rizq-cream: var(--raised);
+  --color-rizq-cream-dark: var(--track);
+  --color-rizq-ink: var(--content);
+  --color-rizq-ink-soft: var(--content-2);
+
+  /* shadcn neutrals mapped onto Wahaj so primitives inherit the theme */
+  --background: var(--bg);
+  --foreground: var(--content);
+  --card: var(--raised);
+  --card-foreground: var(--content);
+  --popover: var(--raised);
+  --popover-foreground: var(--content);
+  --primary: var(--acc);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--panel);
+  --secondary-foreground: var(--content);
+  --muted: var(--panel);
+  --muted-foreground: var(--content-muted);
+  --accent: var(--panel);
+  --accent-foreground: var(--content);
+  --destructive: var(--over);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--acc);
+  --chart-1: #0a8f66;
+  --chart-2: #0e8fa0;
+  --chart-3: #b8862e;
+  --chart-4: #12a6b8;
+  --chart-5: #5e5545;
+  --radius: 0.875rem;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--content);
+  --sidebar-primary: var(--acc);
+  --sidebar-primary-foreground: var(--on-accent);
+  --sidebar-accent: var(--panel);
+  --sidebar-accent-foreground: var(--content);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--acc);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+[data-theme="dark"] {
+  /* surfaces */
+  --bg: #05080a;
+  --surface: #0c1012;
+  --panel: #0e1416;
+  --raised: #12181a;
+  --track: #0a0e0f;
+  /* neumorph shadow pair */
+  --nm-dark: #080b0c;
+  --nm-light: #1b2427;
+  /* text */
+  --content: #eaf3ee;
+  --content-2: #c7d3cc;
+  --content-3: #a9b6ae;
+  --content-muted: #93a19a;
+  --content-faint: #6b7972;
+  /* lines */
+  --line: rgba(255, 255, 255, 0.09);
+  --line-2: rgba(255, 255, 255, 0.05);
+  /* accent + aurora */
+  --acc: #34e6a8;
+  --acc-tint: #7fd8c0;
+  --gold: #e9c15f;
+  --grad: linear-gradient(100deg, #34e6a8, #31d0de 50%, #e9c15f);
+  --grad-m: linear-gradient(100deg, #34e6a8, #e9c15f);
+  --fill: linear-gradient(120deg, #34e6a8, #31d0de);
+  --acc-soft: rgba(52, 230, 168, 0.1);
+  --acc-line: rgba(52, 230, 168, 0.25);
+  --on-accent: #06110c;
+  /* status */
+  --warn: #e9c15f;
+  --over: #f0715a;
+  /* shimmer skeleton */
+  --shim-d: #151d1f;
+  --shim-l: #26332f;
+
+  /* rizq-* legacy shims → semantic (theme-aware) */
+  --color-rizq-green: var(--acc);
+  --color-rizq-green-light: var(--acc);
+  --color-rizq-green-dark: var(--acc);
+  --color-rizq-gold: var(--gold);
+  --color-rizq-gold-light: var(--gold);
+  --color-rizq-gold-dark: var(--gold);
+  --color-rizq-gold-deep: var(--acc);
+  --color-rizq-cream: var(--raised);
+  --color-rizq-cream-dark: var(--track);
+  --color-rizq-ink: var(--content);
+  --color-rizq-ink-soft: var(--content-2);
+
+  /* shadcn neutrals */
+  --background: var(--bg);
+  --foreground: var(--content);
+  --card: var(--raised);
+  --card-foreground: var(--content);
+  --popover: var(--raised);
+  --popover-foreground: var(--content);
+  --primary: var(--acc);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--panel);
+  --secondary-foreground: var(--content);
+  --muted: var(--panel);
+  --muted-foreground: var(--content-muted);
+  --accent: var(--panel);
+  --accent-foreground: var(--content);
+  --destructive: var(--over);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--acc);
+  --chart-1: #34e6a8;
+  --chart-2: #31d0de;
+  --chart-3: #e9c15f;
+  --chart-4: #2ec6b0;
+  --chart-5: #a9b6ae;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--content);
+  --sidebar-primary: var(--acc);
+  --sidebar-primary-foreground: var(--on-accent);
+  --sidebar-accent: var(--panel);
+  --sidebar-accent-foreground: var(--content);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--acc);
 }
 
 @layer base {
@@ -172,83 +288,137 @@
   }
 }
 
-/* Subtle paper-grain on the cream surface. Kept light — no SVG filter,
-   no background-attachment:fixed (both are scroll-jank culprits on macOS). */
+/* Page background — Wahaj base + two faint drifting aurora orbs (calm, low-alpha). */
 .bg-paper {
-  background-color: var(--color-rizq-cream);
+  background-color: var(--bg);
   background-image:
-    radial-gradient(
-      ellipse at 18% 12%,
-      rgba(200, 169, 81, 0.06) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse at 88% 88%,
-      rgba(26, 95, 63, 0.05) 0%,
-      transparent 50%
-    );
+    radial-gradient(ellipse at 82% 8%, color-mix(in srgb, var(--acc) 14%, transparent) 0%, transparent 46%),
+    radial-gradient(ellipse at 12% 92%, color-mix(in srgb, var(--gold) 10%, transparent) 0%, transparent 44%);
+  background-attachment: fixed;
 }
 
-/* Editorial gold hairline — used as a vertical or horizontal accent rule */
+/* Editorial hairline rules (kept for legacy callers; now neutral, not gold). */
 .rule-gold {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    var(--color-rizq-gold) 18%,
-    var(--color-rizq-gold) 82%,
-    transparent 100%
-  );
+  background-image: linear-gradient(to bottom, transparent 0%, var(--line) 18%, var(--line) 82%, transparent 100%);
 }
-
 .rule-gold-h {
-  background-image: linear-gradient(
-    to right,
-    transparent 0%,
-    var(--color-rizq-gold) 18%,
-    var(--color-rizq-gold) 82%,
-    transparent 100%
-  );
+  background-image: linear-gradient(to right, transparent 0%, var(--line) 18%, var(--line) 82%, transparent 100%);
 }
 
 /* Display-scale type, fluid via clamp so it adapts without breakpoints */
 .display-1 {
+  font-family: var(--font-display);
   font-size: clamp(3.25rem, 7vw + 1rem, 6.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
   font-weight: 700;
 }
 .display-2 {
+  font-family: var(--font-display);
   font-size: clamp(2rem, 3.6vw + 0.6rem, 3.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
   font-weight: 700;
 }
 .eyebrow {
   font-size: 0.75rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  /* Deep gold for WCAG AA (small text needs >=4.5:1); gold-dark failed at ~2.8:1. */
-  color: var(--color-rizq-gold-deep);
+  color: var(--acc-tint);
   font-weight: 600;
 }
 
-/* Numeric marker for sectioned content (٠١, ٠٢, ٠٣). Light gold, large. */
 .section-numeral {
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-  color: var(--color-rizq-gold);
-  opacity: 0.55;
+  color: var(--gold);
+  opacity: 0.5;
   font-size: clamp(2.25rem, 4vw, 3.5rem);
   line-height: 1;
 }
 
-/* ── Bespoke chart draw-in animations ──────────────────────────────────────
-   Pure-CSS reveals for the SVG charts (TrendChart / BandMeter). These let the
-   charts stay server-rendered: no client JS just to animate. The line uses a
-   stroke-dash trick to "draw" itself; the area + markers fade/scale in after.
-   All are neutralized by the reduced-motion block below (animations are
-   globally zeroed there); the `motion-reduce:*` utility classes on the
-   elements additionally pin stroke-dash to its resting (fully-drawn) state. */
+/* ── Wahaj recipes — neumorphism + aurora ──────────────────────────────────
+   The whole system rests on the neumorph shadow pair + the aurora gradients.
+   Utilities so components stay declarative and theme-aware. */
+.nm-raised {
+  box-shadow: 7px 7px 16px var(--nm-dark), -7px -7px 16px var(--nm-light);
+}
+.nm-raised-sm {
+  box-shadow: 4px 4px 9px var(--nm-dark), -4px -4px 9px var(--nm-light);
+}
+.nm-inset {
+  box-shadow: inset 4px 4px 10px var(--nm-dark), inset -4px -4px 10px var(--nm-light);
+}
+/* raised + accent hero glow */
+.nm-glow {
+  box-shadow: 7px 7px 16px var(--nm-dark), -7px -7px 16px var(--nm-light),
+    0 0 30px -8px color-mix(in srgb, var(--acc) 55%, transparent);
+}
+
+/* Aurora gradient text — display + money only, never body / never < ~20px. */
+.aurora-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.aurora-text-m {
+  background: var(--grad-m);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Aurora fill — buttons / active / avatars. Ink text sits on top. */
+.aurora-fill {
+  background: var(--fill);
+  color: var(--on-accent);
+}
+
+/* Honesty chip (constitution Principle I) — a deliberate emerald glass chip,
+   never grey fine print (audit §D4). */
+.honesty-chip {
+  background: var(--acc-soft);
+  border: 1px solid var(--acc-line);
+  color: var(--acc-tint);
+}
+
+/* Branded status ramp (replaces raw Tailwind bg-blue-100 etc. — audit §D5). */
+.status-positive { color: var(--acc); background: var(--acc-soft); border: 1px solid var(--acc-line); }
+.status-pending  { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent); }
+.status-overdue  { color: var(--over); background: color-mix(in srgb, var(--over) 12%, transparent); border: 1px solid color-mix(in srgb, var(--over) 30%, transparent); }
+.status-neutral  { color: var(--content-muted); background: var(--line-2); border: 1px solid var(--line); }
+
+/* ── @property-backed animated gradients (Tailwind JIT can't emit @property) ── */
+@property --aurora-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@property --gp {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+@keyframes aurora-spin {
+  to { --aurora-angle: 360deg; }
+}
+@keyframes ringfill {
+  from { --gp: 0; }
+}
+
+/* Aurora rotating border — the "magic" frame (Proposal Studio, next-action). */
+.aurora-ring {
+  border-radius: 22px;
+  padding: 1.6px;
+  background: conic-gradient(
+    from var(--aurora-angle),
+    var(--acc), #31d0de, var(--gold), var(--acc)
+  );
+  animation: aurora-spin 6s linear infinite;
+  will-change: background;
+}
+
+/* ── Bespoke chart draw-in animations (server-rendered SVG charts) ────────── */
 @keyframes chart-line-draw {
   0% { stroke-dashoffset: 1000; opacity: 0.4; }
   100% { stroke-dashoffset: 0; opacity: 1; }
@@ -266,7 +436,6 @@
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
-
 .chart-line-draw {
   stroke-dasharray: 1000;
   stroke-dashoffset: 0;
@@ -282,71 +451,41 @@
   animation: chart-pin-rise 0.6s ease-out 0.3s both;
 }
 
-/* ── Aurora AI bar ───────────────────────────────────────────────────────
-   @property is required for animating a CSS custom property used inside
-   conic-gradient. Tailwind JIT cannot generate @property rules.       */
-@property --aurora-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes aurora-spin {
-  to { --aurora-angle: 360deg; }
-}
-
-/* Outer shell — animated border via padding + conic-gradient bg. The 2px
-   padding IS the visible border; the inner element masks the center. */
+/* ── Aurora AI bar (Proposal Studio inline generation strip) ──────────────── */
 .ai-aurora-border {
   border-radius: 19px;
   padding: 1.75px;
   background: conic-gradient(
     from var(--aurora-angle),
-    #1a5f3f   0%,
-    #2f8f5e  18%,
-    #1a5f3f  34%,
-    #a98f3f  50%,
-    #1a5f3f  66%,
-    #338057  82%,
-    #1a5f3f 100%
+    var(--acc) 0%, #31d0de 25%, var(--gold) 50%, #31d0de 75%, var(--acc) 100%
   );
   animation: aurora-spin 8s linear infinite;
-  box-shadow:
-    0 1px 2px rgba(26, 95, 63, 0.08),
-    0 8px 30px rgba(26, 95, 63, 0.12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 8px 30px -10px color-mix(in srgb, var(--acc) 45%, transparent);
   will-change: background;
 }
-
-/* Inner content — one cohesive frosted-cream pill (a real widget surface) */
 .ai-aurora-inner {
   display: flex;
   align-items: center;
   gap: 12px;
   border-radius: 17.25px;
   padding-block: 11px;
-  padding-inline-start: 16px; /* logical — flips for RTL automatically */
+  padding-inline-start: 16px;
   padding-inline-end: 11px;
-  background: rgba(250, 245, 236, 0.86);
+  background: color-mix(in srgb, var(--raised) 88%, transparent);
   backdrop-filter: blur(16px) saturate(1.1);
   -webkit-backdrop-filter: blur(16px) saturate(1.1);
 }
-
-/* Keyboard focus ring (WCAG 2.4.7 / 2.4.11) */
 .ai-aurora-inner:focus-within {
-  outline: 2px solid #1a5f3f;
+  outline: 2px solid var(--acc);
   outline-offset: 3px;
 }
-
-/* Reply chip — solid background so it reads over any proposal content */
 .ai-aurora-reply {
   border-radius: 17.25px;
   padding: 11px 14px;
-  background: rgba(250, 245, 236, 0.96);
+  background: color-mix(in srgb, var(--raised) 96%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
-
-/* Typewriter caret for the animated placeholder */
 @keyframes caret-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -357,26 +496,26 @@
   height: 1.05em;
   margin-inline-start: 1px;
   vertical-align: text-bottom;
-  background: rgba(26, 95, 63, 0.55);
+  background: color-mix(in srgb, var(--acc) 60%, transparent);
   animation: caret-blink 1.05s steps(1) infinite;
 }
 
 /* ── WCAG 2.1 — reduced motion ─────────────────────────────────────────────
-   Neutralize CSS-driven motion (the shimmer skeleton, fade/slide keyframes,
-   and any decorative transitions) for users who ask for reduced motion.
-   Framer Motion is JS-driven and unaffected here; those components already
-   honor useReducedMotion() and render their resting state. */
+   Neutralize CSS-driven motion; land animated states at their resting value.
+   Framer Motion is JS-driven and honors useReducedMotion() in its components. */
 @media (prefers-reduced-motion: reduce) {
   .animate-shimmer,
   [style*="shimmer"],
   [class*="shimmer"],
   .ai-aurora-border,
+  .aurora-ring,
   .ai-caret {
     animation: none !important;
     background-position: 0 0 !important;
   }
-  .ai-aurora-border {
-    background: #1a5f3f;
+  .ai-aurora-border,
+  .aurora-ring {
+    background: var(--acc);
   }
   *,
   *::before,
@@ -389,50 +528,44 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────
-   Print / PDF — app-wide. window.print() (the "Download / Print PDF" button)
-   should output ONLY the document (invoice or proposal artifact) on clean A4,
-   never the app chrome. The shell (sidebar, top bar, nav progress, dot-grid,
-   toasts, command palette) and each page's non-document parts (back links,
-   action panels, version history, edit forms) carry `print:hidden` /
-   `.print-hidden`; the document column carries `.print-region`.
+   Print / PDF — app-wide. window.print() outputs ONLY the document (invoice
+   or proposal artifact) on clean A4, never the app chrome. The client-facing
+   artifact is deliberately kept sober here (white, no glow, no shadow).
    ─────────────────────────────────────────────────────────────────────── */
 @media print {
   @page {
     size: A4;
     margin: 14mm 14mm 18mm;
   }
-
   html,
   body {
     background: #ffffff !important;
   }
-
-  /* Belt-and-suspenders chrome removal (Tailwind's print:hidden covers the rest). */
   .print-hidden,
   [data-print-hidden],
   [data-sonner-toaster],
   [data-rizq-command-palette] {
     display: none !important;
   }
-
-  /* The printable document fills the sheet — drop the shell's max-width + padding. */
   .print-region {
     max-width: 100% !important;
     margin: 0 !important;
     padding-block: 0 !important;
     padding-inline: 0 !important;
   }
-
-  /* Keep document sections + invoice tables intact across page breaks. */
   .print-region section,
   .print-region table,
   .print-region tr {
     break-inside: avoid;
     page-break-inside: avoid;
   }
-
-  /* No drop shadows in print — they render as muddy grey boxes. */
+  /* No neumorph/aurora in print — flatten to sober ink-on-white. */
   .print-region * {
     box-shadow: none !important;
+  }
+  .print-region .aurora-text,
+  .print-region .aurora-text-m {
+    -webkit-text-fill-color: #0a0a0a !important;
+    color: #0a0a0a !important;
   }
 }
