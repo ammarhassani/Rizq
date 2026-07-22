@@ -50,6 +50,7 @@ export function AppsLauncher({ open, onClose, locale }: Props) {
               <DialogClose
                 key={app.id}
                 render={<span />}
+                nativeButton={false}
                 className="contents"
               >
                 <Link
