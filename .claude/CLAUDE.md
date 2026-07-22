@@ -105,7 +105,10 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   against real Supabase+DeepSeek; (C) merged `docs/validation/production-maturity-report.md` verdict.
   **No product-source changes** (validation only; role/label selectors, no `data-testid`). Adds
   `@playwright/test` dev dep. Plan: [specs/008-production-validation/plan.md](specs/008-production-validation/plan.md).
-  spec+plan done → **tasks next**.
+  ✅ **SHIPPED**: static audit (`docs/validation/business-logic-audit.md`) + committed Playwright
+  harness (`e2e/`) + merged report (`docs/validation/production-maturity-report.md`); remediation
+  applied (invoice→project link; `monthly_income` view now counts paid gigs with no delivery date;
+  a11y + honesty fixes).
 - `specs/009-settings-profile-kyc/` — **Profile as single KYC source of truth (Settings)**: one
   **Settings → Profile** page to complete/backfill the whole profile (reuses the onboarding `Step*`
   editors + `saveOnboardingStep` + `profileCompleteness`), with a strength bar + "what's missing (+X%)"
@@ -115,6 +118,9 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   the Proposals button with a **strength nudge** hidden at/above 80%. Extract snapshot loader +
   strength mapping to `lib/profile/snapshot.ts` (shared with onboarding). **No new fields/columns, no
   migration.** Plan: [specs/009-settings-profile-kyc/plan.md](specs/009-settings-profile-kyc/plan.md).
-  spec+plan done → **tasks next**.
-Active (`.specify/feature.json`): **009** (planning done → tasks).
+  ✅ **SHIPPED**: Settings → Profile KYC page (reuses `Step*` editors + autosave-on-real-edit); honest
+  **core/optional** strength model (`lib/profile/strength.ts` — track-record is optional, never
+  penalizes newcomers; retired `completeness.ts`); studio profile deleted (testimonials re-homed as a
+  profile section); proposals strength nudge hidden ≥80%.
+Active (`.specify/feature.json`): **009** — shipped; no feature in flight, next TBD.
 <!-- SPECKIT END -->

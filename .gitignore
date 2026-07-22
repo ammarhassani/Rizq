@@ -58,3 +58,6 @@ next-env.d.ts
 /blob-report/
 # SECURITY: saved auth sessions of disposable test users — never commit
 /e2e/.auth/
+
+# superpowers plugin scratch (brainstorm sessions, ephemeral server state)
+/.superpowers/
