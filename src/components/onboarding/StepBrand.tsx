@@ -50,6 +50,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
     return p !== "" && p === toNationalPhone(profile.contact_whatsapp);
   });
   const [contactCity, setContactCity] = useState(profile.contact_city ?? "");
+  const [logoUrl, setLogoUrl] = useState(profile.logo_url ?? "");
 
   // Validation — all optional, but must be well-formed if filled.
   const emailValid = contactEmail === "" || EMAIL_RE.test(contactEmail);
@@ -100,6 +101,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
         tagline_en: tagline || null,
         bio_ar: bio || null,
         bio_en: bio || null,
+        logo_url: logoUrl.trim() || null,
         contact_email: contactEmail || "",
         contact_phone: fullPhone,
         contact_whatsapp: fullWa,
@@ -119,6 +121,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
     brandName,
     tagline,
     bio,
+    logoUrl,
     contactEmail,
     contactPhone,
     contactWhatsapp,
@@ -255,6 +258,22 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           maxLength={1000}
           dir="auto"
         />
+      </div>
+
+      {/* Logo URL — appears on proposals & invoices */}
+      <div>
+        <label className={labelCls}>{isAr ? "رابط شعارك" : "Logo URL"}</label>
+        <input
+          type="url"
+          value={logoUrl}
+          onChange={(e) => setLogoUrl(e.target.value)}
+          placeholder="https://…"
+          className={`${inputCls} font-sans`}
+          dir="ltr"
+        />
+        <p className={`mt-1 text-xs text-rizq-ink-soft/70 ${font}`}>
+          {isAr ? "يظهر على عروضك وفواتيرك." : "Shown on your proposals & invoices."}
+        </p>
       </div>
 
       {/* Contact — each field branded with its icon */}

@@ -80,6 +80,7 @@ export interface ProfileSnapshot {
   tagline_en: string | null;
   bio_ar: string | null;
   bio_en: string | null;
+  logo_url: string | null;
   contact_email: string | null;
   contact_phone: string | null;
   contact_whatsapp: string | null;
