@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Menu, LayoutGrid, Sparkles, Search } from "lucide-react";
 import { LocaleToggle } from "@/components/landing/LocaleToggle";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AppsLauncher } from "./AppsLauncher";
 import { UserMenu } from "./UserMenu";
 import { useCommandPalette } from "./CommandPaletteContext";
@@ -124,6 +125,9 @@ export function AppTopBar({
           >
             <LayoutGrid size={18} aria-hidden strokeWidth={1.6} />
           </button>
+
+          {/* Theme toggle */}
+          <ThemeToggle locale={locale} />
 
           {/* Locale toggle */}
           <LocaleToggle />
