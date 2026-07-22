@@ -40,7 +40,7 @@ export function QuickActionsWidget({ locale }: Props) {
   ];
 
   return (
-    <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-white/70 p-5 sm:p-6 flex flex-col gap-4 transition-[box-shadow,border-color] duration-200 hover:border-rizq-green/25 hover:shadow-sm">
+    <div dir={dir} className="rounded-3xl nm-raised border border-[var(--line)] bg-[var(--raised)] p-5 sm:p-6 flex flex-col gap-4 transition-[box-shadow,border-color] duration-200 hover:border-rizq-green/25 hover:shadow-sm">
       <div className="flex items-center gap-2">
         <Zap className="h-4 w-4 text-rizq-gold opacity-80" />
         <span className={`text-sm font-semibold text-rizq-ink ${font}`}>

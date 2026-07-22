@@ -49,7 +49,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
     goalSar && goalSar > 0 ? Math.min(100, Math.round((totalSar / goalSar) * 100)) : null;
 
   return (
-    <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-white/70 p-5 sm:p-6 flex flex-col gap-4 transition-[box-shadow,border-color] duration-200 hover:border-rizq-green/25 hover:shadow-sm">
+    <div dir={dir} className="nm-raised rounded-[22px] bg-[var(--raised)] p-5 sm:p-6 flex flex-col gap-4">
       <div className={`flex items-center justify-between ${font}`}>
         <div className="flex items-center gap-2">
           <Wallet className="h-4 w-4 text-rizq-green opacity-70" />
@@ -81,7 +81,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
         <div className="space-y-3">
           <div className="flex items-end justify-between gap-2">
             <div>
-              <p className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
+              <p className="tabular font-sans text-4xl sm:text-5xl font-bold aurora-text-m leading-none">
                 <AnimatedNumber value={conv(totalSar) ?? 0} locale={locale} duration={0.9} />
               </p>
               <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>
@@ -90,7 +90,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
             </div>
             {changePercent !== null && (
               <span className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular ${
-                changePercent >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+                changePercent >= 0 ? "status-positive" : "status-overdue"
               }`}>
                 {changePercent >= 0 ? "↑" : "↓"}{Math.abs(changePercent)}%
               </span>
@@ -105,9 +105,9 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
                   {goalPct}% · {fmt(conv(goalSar ?? 0), locale)} {unitLabel}
                 </span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-rizq-gold/15 overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-[var(--track)] overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-rizq-green transition-[width] duration-700"
+                  className="h-full rounded-full aurora-fill transition-[width] duration-700"
                   style={{ width: `${goalPct}%` }}
                 />
               </div>
@@ -115,20 +115,20 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
           )}
 
           {trend && trend.length >= 2 && (
-            <div className="pt-3 border-t border-rizq-gold/15">
+            <div className="pt-3 border-t border-[var(--line)]">
               <TrendChart points={trend} locale={locale} height={96} showLatest={false} />
             </div>
           )}
 
           {current && (
-            <div className="flex gap-4 pt-2 border-t border-rizq-gold/15">
+            <div className="flex gap-4 pt-2 border-t border-[var(--line)]">
               <div>
                 <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "مدفوع" : "Paid"}</p>
-                <p className="tabular text-sm font-semibold text-emerald-700">{fmt(conv(current.paid_sar), locale)}</p>
+                <p className="tabular text-sm font-semibold text-[var(--acc)]">{fmt(conv(current.paid_sar), locale)}</p>
               </div>
               <div>
                 <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "قيد الدفع" : "Pending"}</p>
-                <p className="tabular text-sm font-semibold text-amber-700">{fmt(conv(current.pending_sar), locale)}</p>
+                <p className="tabular text-sm font-semibold text-[var(--warn)]">{fmt(conv(current.pending_sar), locale)}</p>
               </div>
             </div>
           )}

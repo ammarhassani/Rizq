@@ -32,14 +32,16 @@ export async function ContinueLifecycleList({ locale }: { locale: "ar" | "en" })
   const font = isAr ? "font-arabic" : "font-sans";
 
   return (
-    <section dir={dir} className={`rounded-2xl border border-rizq-gold/20 bg-white/60 p-5 ${font}`}>
-      <h2 className={`text-sm font-semibold text-rizq-ink mb-3 ${font}`}>{t("continueTitle")}</h2>
-      <ul className="space-y-2">
+    <div dir={dir} className="aurora-ring">
+      <section className={`rounded-[20px] bg-[var(--raised)] p-5 ${font}`}>
+        <p className={`eyebrow mb-2 ${font}`}>{isAr ? "أكمل ما بدأته" : "Pick up where you left off"}</p>
+        <h2 className={`text-base font-semibold text-rizq-ink mb-3 ${font}`}>{t("continueTitle")}</h2>
+        <ul className="space-y-2">
         {result.items.map((item) => (
           <li key={`${item.anchorKind}-${item.id}`}>
             <Link
               href={`${item.href}${item.href.includes("?") ? "&" : "?"}guided=1` as `/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-rizq-cream/50 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3 hover:border-[var(--acc-line)] hover:bg-[var(--acc-soft)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] ${font}`}
             >
               <span className="min-w-0">
                 <span className={`block text-sm font-medium text-rizq-ink truncate ${font}`}>{item.title}</span>
@@ -54,7 +56,8 @@ export async function ContinueLifecycleList({ locale }: { locale: "ar" | "en" })
             </Link>
           </li>
         ))}
-      </ul>
-    </section>
+        </ul>
+      </section>
+    </div>
   );
 }

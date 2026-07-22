@@ -250,10 +250,22 @@ export default async function DashboardPage({ params }: { params: Promise<Params
           </h1>
         </div>
 
-        {/* Lifecycle: start a project + resume in-progress */}
-        <div className="mb-6 space-y-4">
-          <StartProjectButton locale={locale as "ar" | "en"} />
-          <ContinueLifecycleList locale={locale as "ar" | "en"} />
+        {/* Hero row: the money hero (the figure that matters most to a
+            price-sensitive freelancer) beside the unmistakable next action
+            (audit §D1/§D2). */}
+        <div className="mb-5 grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-4 sm:gap-5 items-start">
+          <MonthlyIncomeWidget
+            current={currentMonth}
+            previous={prevMonth}
+            trend={incomeTrend}
+            error={incomeError}
+            locale={locale as "ar" | "en"}
+            goalSar={(profile?.income_goal_monthly_sar as number | null) ?? null}
+          />
+          <div className="space-y-4">
+            <StartProjectButton locale={locale as "ar" | "en"} />
+            <ContinueLifecycleList locale={locale as "ar" | "en"} />
+          </div>
         </div>
 
         {/* Widget grid */}
@@ -293,16 +305,6 @@ export default async function DashboardPage({ params }: { params: Promise<Params
             clients={clients}
             error={clientsError}
             locale={locale as "ar" | "en"}
-          />
-
-          {/* Monthly Income */}
-          <MonthlyIncomeWidget
-            current={currentMonth}
-            previous={prevMonth}
-            trend={incomeTrend}
-            error={incomeError}
-            locale={locale as "ar" | "en"}
-            goalSar={(profile?.income_goal_monthly_sar as number | null) ?? null}
           />
 
           {/* Quick Pricing */}
