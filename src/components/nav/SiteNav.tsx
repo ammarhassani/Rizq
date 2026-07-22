@@ -33,7 +33,7 @@ export async function SiteNav({ locale, sticky = true, hideLogout = false }: Pro
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12 h-14 sm:h-16 flex items-center justify-between gap-3">
         {/* Brand */}
         <Link href="/" className="group inline-flex items-baseline gap-2 shrink-0">
-          <span className="font-arabic text-2xl font-bold text-rizq-green tracking-tight transition-colors group-hover:text-rizq-green-dark">
+          <span className="font-display text-2xl font-bold aurora-text tracking-tight">
             رِزق
           </span>
           <span aria-hidden className="hidden md:inline-block h-3 w-px bg-rizq-gold/50" />

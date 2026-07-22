@@ -23,18 +23,14 @@ export async function Hero({ locale }: Props) {
       aria-labelledby="hero-heading"
       className="relative overflow-hidden"
     >
-      {/* faint gold dot grid texture */}
+      {/* One signature texture, not three (audit §L3): a single soft aurora glow.
+          The page .bg-paper carries the drifting orbs; the dot-grid is retired. */}
       <div
         aria-hidden
-        className="absolute inset-0 opacity-[0.55] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.22) 1px, transparent 1.6px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 18%, black 72%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 18%, black 72%, transparent 100%)",
+            "radial-gradient(ellipse 60% 50% at 78% 8%, color-mix(in srgb, var(--acc) 12%, transparent), transparent 60%)",
         }}
       />
 
@@ -63,7 +59,7 @@ export async function Hero({ locale }: Props) {
             <div className="flex flex-col items-start gap-2 mb-6 sm:mb-8">
               <p
                 aria-label="Rizq"
-                className="font-arabic font-bold text-rizq-green leading-[0.82] tracking-tight"
+                className="font-display font-bold aurora-text leading-[0.82] tracking-tight"
                 style={{
                   fontSize: "clamp(5rem, 14vw, 12rem)",
                   fontFeatureSettings: '"liga", "calt", "kern"',
@@ -72,7 +68,7 @@ export async function Hero({ locale }: Props) {
                 رِزق
               </p>
               {!isAr && (
-                <p className="font-sans text-2xl sm:text-3xl text-rizq-gold-dark font-medium tracking-tight ps-1 -mt-1">
+                <p className="font-display text-2xl sm:text-3xl text-[var(--gold)] font-medium tracking-tight ps-1 -mt-1">
                   Rizq
                 </p>
               )}
@@ -99,7 +95,7 @@ export async function Hero({ locale }: Props) {
               <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6">
                 <Link
                   href="/signup"
-                  className={`group inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-sm sm:text-base font-medium tracking-wide shadow-[0_2px_0_0_var(--color-rizq-green-dark)] hover:bg-rizq-green-dark transition-all hover:shadow-[0_4px_16px_-4px_rgba(26,95,63,0.45)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 ${font}`}
+                  className={`group inline-flex items-center justify-center gap-2 rounded-full aurora-btn px-7 py-4 text-sm sm:text-base font-medium tracking-wide hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] focus-visible:ring-offset-2 ${font}`}
                 >
                   <span>{t("ctaPrimary")}</span>
                   <span className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
