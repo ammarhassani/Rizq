@@ -12,7 +12,6 @@ const ROUTES: { path: string; label: string }[] = [
   { path: "/en/proposals", label: "M1 Proposals list" },
   { path: "/en/proposals/new", label: "M1 Proposal new" },
   { path: "/en/proposals/templates", label: "M1 Templates" },
-  { path: "/en/proposals/profile", label: "M1 Proposal profile" },
   { path: "/en/clients", label: "M2 Clients" },
   { path: "/en/clients/new", label: "M2 Client new" },
   { path: "/en/income", label: "M3 Income" },
