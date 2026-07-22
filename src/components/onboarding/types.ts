@@ -35,6 +35,11 @@ export interface StepProps {
   onSkip: () => void;
   /** Current profile snapshot for pre-filling (may be partial). */
   profile: ProfileSnapshot;
+  /**
+   * Autosave mode (feature 009, Settings → Profile). When true the editor saves on change
+   * (debounced) and hides the wizard's Back/Skip/Save buttons. Defaults to false (wizard flow).
+   */
+  autosave?: boolean;
 }
 
 /** Columns we load from users to pre-fill wizard fields. */

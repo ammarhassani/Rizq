@@ -9,6 +9,7 @@ import { SPECIALTIES } from "@/lib/refData";
 import { Combobox } from "@/components/ui/Combobox";
 import { NumberStepper } from "./NumberStepper";
 import type { StepProps } from "./types";
+import { useAutosave } from "./useAutosave";
 
 const EXPERIENCE_TIERS_AR = [
   { label: "مبتدئ (أقل من سنتين)", value: "beginner" },
@@ -23,7 +24,7 @@ const EXPERIENCE_TIERS_EN = [
   { label: "Expert (10+ years)", value: "expert" },
 ];
 
-export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: StepProps) {
+export function StepProfessional({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.professional");
   const tv2 = useTranslations("Onboarding.v2");
   const tCommon = useTranslations("Common");
@@ -79,6 +80,9 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
       }
     });
   };
+
+  // Settings → Profile: save on change (debounced), no Save button.
+  useAutosave(!!autosave, handleSave, [primarySpecialtySlug, yearsExperience]);
 
   return (
     <motion.div
@@ -145,41 +149,50 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip }: St
         </p>
       )}
 
-      <div className={`sm:col-span-2 flex items-center justify-between gap-3 pt-2 ${font}`}>
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isPending}
-          className="text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors disabled:opacity-50"
-        >
-          {tv2("back")}
-        </button>
-        <div className="flex items-center gap-3 ms-auto">
+      {autosave ? (
+        isPending && (
+          <p className={`sm:col-span-2 flex items-center gap-2 text-xs text-rizq-ink-soft ${font}`}>
+            <Loader2 size={13} className="animate-spin" />
+            {tv2("saving")}
+          </p>
+        )
+      ) : (
+        <div className={`sm:col-span-2 flex items-center justify-between gap-3 pt-2 ${font}`}>
           <button
             type="button"
-            onClick={onSkip}
+            onClick={onBack}
             disabled={isPending}
             className="text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors disabled:opacity-50"
           >
-            {tv2("skipStep")}
+            {tv2("back")}
           </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isPending}
-            className="inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0"
-          >
-            {isPending ? (
-              <>
-                <Loader2 size={15} className="animate-spin" />
-                <span>{tv2("saving")}</span>
-              </>
-            ) : (
-              <span>{tv2("save")}</span>
-            )}
-          </button>
+          <div className="flex items-center gap-3 ms-auto">
+            <button
+              type="button"
+              onClick={onSkip}
+              disabled={isPending}
+              className="text-sm text-rizq-ink-soft hover:text-rizq-green transition-colors disabled:opacity-50"
+            >
+              {tv2("skipStep")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isPending}
+              className="inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  <span>{tv2("saving")}</span>
+                </>
+              ) : (
+                <span>{tv2("save")}</span>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 }

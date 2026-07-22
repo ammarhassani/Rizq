@@ -31,6 +31,30 @@ describe("computeStrength", () => {
   it("ignores non-core fields", () => {
     expect(computeStrength({ ...EMPTY, income_goal_monthly_sar: null } as StrengthProfile)).toBe(0);
   });
+
+  it("counts specialty via `specialties` slug array (what the editor actually saves)", () => {
+    expect(computeStrength({ specialties: ["web-development"] })).toBe(14);
+    expect(computeStrength({ specialties: [] })).toBe(0);
+  });
+  it("counts city via `city` text (not only city_id)", () => {
+    expect(computeStrength({ city: "riyadh" })).toBe(14);
+  });
+  it("counts experience via `years_experience` (not only experience_tier_id)", () => {
+    expect(computeStrength({ years_experience: 10 })).toBe(14);
+  });
+  it("reaches 100 with what the profile editors actually persist (slug/text/years)", () => {
+    expect(
+      computeStrength({
+        full_name_ar: "أحمد",
+        fl_number: "12345678",
+        specialties: ["web-development"],
+        city: "riyadh",
+        years_experience: 10,
+        current_hourly_rate_sar: 350,
+        income_goal_monthly_sar: 12000,
+      }),
+    ).toBe(100);
+  });
 });
 
 describe("strengthItems", () => {

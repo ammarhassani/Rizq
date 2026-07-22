@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import type { StepProps } from "./types";
+import { useAutosave } from "./useAutosave";
 
-export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepProps) {
+export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.identity");
   const tv2 = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -46,6 +47,9 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       }
     });
   };
+
+  // Settings → Profile: save on change (debounced), no Save button.
+  useAutosave(!!autosave, handleSave, [fullName, flDigits]);
 
   return (
     <motion.div
@@ -114,14 +118,23 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip }: StepPr
       )}
 
       <div className="sm:col-span-2">
-      <StepNav
-        locale={locale}
-        onBack={onBack}
-        onSkip={onSkip}
-        onSave={handleSave}
-        isPending={isPending}
-        skippable
-      />
+      {autosave ? (
+        isPending && (
+          <p className={`flex items-center gap-2 text-xs text-rizq-ink-soft ${font}`}>
+            <Loader2 size={13} className="animate-spin" />
+            {tv2("saving")}
+          </p>
+        )
+      ) : (
+        <StepNav
+          locale={locale}
+          onBack={onBack}
+          onSkip={onSkip}
+          onSave={handleSave}
+          isPending={isPending}
+          skippable
+        />
+      )}
       </div>
     </motion.div>
   );
