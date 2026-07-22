@@ -331,7 +331,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
     <form
       onSubmit={handleSubmit}
       dir={dir}
-      className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-6 animate-fade-in"
+      className="nm-raised rounded-[22px] bg-[var(--raised)] p-7 sm:p-10 space-y-6 animate-fade-in"
       noValidate
     >
       {/* Template picker — only shown when the owner has saved templates */}
@@ -427,7 +427,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
       <button
         type="submit"
         disabled={isFlowPending}
-        className={`group w-full inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-4 text-base font-medium tracking-wide hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
+        className={`group w-full inline-flex items-center justify-center gap-2 rounded-full aurora-btn px-7 py-4 text-base font-medium tracking-wide hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 ${font}`}
       >
         {isFlowPending ? (
           <>
@@ -548,19 +548,24 @@ function DraftingView({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Live drafting status */}
+      {/* Live drafting status — the generation "moment" (audit §O1) */}
       <div
-        className={`flex items-center justify-center gap-2 text-sm text-rizq-gold-dark ${font}`}
+        className={`flex items-center justify-center gap-2 text-sm font-medium ${font}`}
         aria-live="polite"
       >
-        <Sparkles size={15} className="animate-pulse shrink-0" />
-        <span>{label}</span>
+        <Sparkles size={15} className="animate-pulse shrink-0 text-[var(--acc)]" />
+        <span className="aurora-text-m">{label}</span>
       </div>
 
-      {/* Artifact, prose sections filling in live */}
-      <StreamingProse active={isLoading}>
-        <ProposalArtifact data={liveArtifact} locale={locale} />
-      </StreamingProse>
+      {/* Aurora rotating border frames the GENERATION only — DraftingView unmounts
+          on done, so the persisted, client-facing artifact stays sober (no glow). */}
+      <div className="aurora-ring">
+        <div className="rounded-[20px] bg-[var(--raised)] p-4 sm:p-6">
+          <StreamingProse active={isLoading}>
+            <ProposalArtifact data={liveArtifact} locale={locale} />
+          </StreamingProse>
+        </div>
+      </div>
     </div>
   );
 }
