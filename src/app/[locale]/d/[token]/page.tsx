@@ -110,7 +110,7 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
               {isAr ? "تحميل الملف" : "Download file"}
             </a>
           ) : (
-            <p className={`text-sm text-red-600 ${font}`}>
+            <p className={`text-sm text-[var(--over)] ${font}`}>
               {isAr ? "تعذّر تحضير رابط التحميل." : "Could not prepare download link."}
             </p>
           )}

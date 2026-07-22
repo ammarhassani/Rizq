@@ -366,7 +366,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
           htmlFor="client-picker"
           className={`block text-sm font-medium text-rizq-ink mb-2 ${font}`}
         >
-          {t("pickClient")} <span className="text-red-500">*</span>
+          {t("pickClient")} <span className="text-[var(--over)]">*</span>
         </label>
         <ClientPicker
           id="client-picker"
@@ -418,7 +418,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
 
       {/* Error */}
       {formError && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {formError}
         </p>
       )}

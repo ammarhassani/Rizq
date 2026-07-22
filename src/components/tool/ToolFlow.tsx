@@ -247,7 +247,7 @@ export function ToolFlow({
       />
 
       {view.kind === "form" && view.error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {view.error}
         </p>
       )}

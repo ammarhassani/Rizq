@@ -114,7 +114,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
         <button
           onClick={handleDelete}
           disabled={isPending}
-          className={`inline-flex items-center gap-2 rounded-full border border-red-200 text-red-600 px-5 py-2.5 text-sm hover:bg-red-50 disabled:opacity-50 transition-all ${font}`}
+          className={`inline-flex items-center gap-2 rounded-full border border-red-200 text-[var(--over)] px-5 py-2.5 text-sm hover:bg-red-50 disabled:opacity-50 transition-all ${font}`}
         >
           <Trash2 size={15} />
           {confirmDelete
@@ -133,11 +133,11 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
       </div>
 
       {error && (
-        <p className={`rounded-xl bg-red-50 text-red-700 px-4 py-2.5 text-sm ${font}`}>{error}</p>
+        <p className={`rounded-xl status-overdue px-4 py-2.5 text-sm ${font}`}>{error}</p>
       )}
 
       {/* Share section */}
-      <div className="rounded-2xl border border-rizq-gold/20 bg-white/60 p-5">
+      <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
             <Share2 size={16} className="text-rizq-ink-soft" />
@@ -165,7 +165,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
             <select
               value={shareHours}
               onChange={(e) => setShareHours(Number(e.target.value))}
-              className={`rounded-lg border border-rizq-gold/30 bg-white/70 px-2 py-1 text-xs ${font}`}
+              className={`rounded-lg border border-rizq-gold/30 bg-[var(--raised)] px-2 py-1 text-xs ${font}`}
             >
               <option value={24}>{isAr ? "٢٤ ساعة" : "24 hours"}</option>
               <option value={72}>{isAr ? "٣ أيام" : "3 days"}</option>
@@ -180,7 +180,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
             <input
               readOnly
               value={`${typeof window !== "undefined" ? window.location.origin : ""}${shareUrl}`}
-              className={`flex-1 rounded-xl border border-rizq-gold/20 bg-white/70 px-3 py-1.5 text-xs text-rizq-ink-soft truncate ${font}`}
+              className={`flex-1 rounded-xl border border-rizq-gold/20 bg-[var(--raised)] px-3 py-1.5 text-xs text-rizq-ink-soft truncate ${font}`}
             />
             <button
               type="button"
@@ -195,7 +195,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
       </div>
 
       {/* Metadata */}
-      <div className="rounded-2xl border border-rizq-gold/20 bg-white/60 p-5 space-y-3">
+      <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-3">
         <h3 className={`text-sm font-semibold text-rizq-ink ${font}`}>
           {isAr ? "بيانات الوثيقة" : "Document info"}
         </h3>

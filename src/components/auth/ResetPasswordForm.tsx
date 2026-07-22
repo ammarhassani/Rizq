@@ -120,7 +120,7 @@ export function ResetPasswordForm({ locale }: Props) {
           </button>
         </div>
         {errors.password && (
-          <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
             {errors.password.message}
           </p>
         )}
@@ -144,7 +144,7 @@ export function ResetPasswordForm({ locale }: Props) {
           } ${font}`}
         />
         {errors.confirm && (
-          <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
             {errors.confirm.message}
           </p>
         )}

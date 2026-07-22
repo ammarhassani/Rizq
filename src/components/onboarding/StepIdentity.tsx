@@ -98,7 +98,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
             aria-label={t("flNumber")}
           />
         </div>
-        <p className={`mt-1 text-xs ${flValid ? "text-rizq-ink-soft" : "text-red-600"}`}>
+        <p className={`mt-1 text-xs ${flValid ? "text-rizq-ink-soft" : "text-[var(--over)]"}`}>
           {flValid
             ? t("flNumberHint")
             : isAr
@@ -113,7 +113,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
       </div>
 
       {error && (
-        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

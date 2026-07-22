@@ -141,7 +141,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
       {/* Name (required) */}
       <div>
         <label className={labelClass}>
-          {t("nameLabel")} <span className="text-red-500">*</span>
+          {t("nameLabel")} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           type="text"
@@ -186,7 +186,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
           {feeType === "percentage" ? (
             <>
               <label className={labelClass}>
-                {isAr ? "النسبة" : "Percentage"} <span className="text-red-500">*</span>
+                {isAr ? "النسبة" : "Percentage"} <span className="text-[var(--over)]">*</span>
               </label>
               <div className="relative">
                 <input
@@ -214,7 +214,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
           ) : (
             <>
               <label className={labelClass}>
-                {t("amountLabel")} <span className="text-red-500">*</span>
+                {t("amountLabel")} <span className="text-[var(--over)]">*</span>
               </label>
               <div className="relative">
                 <input
@@ -251,7 +251,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
         </div>
       </div>
 
-      {error && <p role="alert" className={cn("text-sm text-red-700", font)}>{error}</p>}
+      {error && <p role="alert" className={cn("text-sm text-[var(--over)]", font)}>{error}</p>}
 
       <button
         type="submit"

@@ -78,7 +78,7 @@ export function ProjectFilesClient({
 
   const inputs = docs.filter((d) => d.kind === "input");
   const deliverables = docs.filter((d) => d.kind === "deliverable");
-  const fieldCls = `w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
+  const fieldCls = `w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
   const renderGroup = (label: string, items: Doc[]) => (
     <div>
@@ -90,7 +90,7 @@ export function ProjectFilesClient({
           {items.map((d) => (
             <li
               key={d.id}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 ${font}`}
             >
               <span className="flex items-center gap-2 min-w-0">
                 <FileText size={15} className="text-rizq-ink-soft shrink-0" />
@@ -169,7 +169,7 @@ export function ProjectFilesClient({
             {isUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
             {isUploading ? t("uploading") : t("upload")}
           </button>
-          {error && <span role="alert" className={`text-sm text-red-700 ${font}`}>{error}</span>}
+          {error && <span role="alert" className={`text-sm text-[var(--over)] ${font}`}>{error}</span>}
         </div>
       </div>
 

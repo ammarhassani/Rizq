@@ -232,7 +232,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
         </div>
 
         {/* Pro plan card */}
-        <div className="rounded-2xl border-2 border-rizq-green/50 bg-white/70 p-6 relative overflow-hidden">
+        <div className="rounded-2xl border-2 border-rizq-green/50 bg-[var(--raised)] p-6 relative overflow-hidden">
           {/* Subtle green gradient accent */}
           <div
             aria-hidden
@@ -283,7 +283,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
           </button>
 
           {checkout.status === "error" && (
-            <p className={`text-xs text-red-700 text-center mt-2 ${font}`}>
+            <p className={`text-xs text-[var(--over)] text-center mt-2 ${font}`}>
               {isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again."}
             </p>
           )}

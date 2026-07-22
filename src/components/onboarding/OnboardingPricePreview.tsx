@@ -32,7 +32,7 @@ export function OnboardingPricePreview({ locale }: { locale: "ar" | "en" }) {
 
   if (state === "loading") {
     return (
-      <div className="rounded-2xl border border-rizq-gold/25 bg-white/60 p-4 animate-pulse">
+      <div className="rounded-2xl border border-rizq-gold/25 bg-[var(--raised)] p-4 animate-pulse">
         <div className="h-3 w-28 bg-rizq-gold/20 rounded mb-3" />
         <div className="h-6 w-44 bg-rizq-green/15 rounded" />
       </div>

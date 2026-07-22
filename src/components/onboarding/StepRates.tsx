@@ -130,7 +130,7 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

@@ -68,12 +68,12 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
       </div>
 
       {/* Payment timeline */}
-      <div className={`rounded-2xl border border-rizq-gold/20 bg-white/70 p-5 space-y-4 ${font}`}>
+      <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-4 ${font}`}>
         <div dir={dir} className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span
               className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm ${
-                depositDone ? "bg-emerald-100 text-emerald-700" : "bg-rizq-gold/15 text-rizq-ink-soft"
+                depositDone ? "bg-emerald-100 text-[var(--acc)]" : "bg-rizq-gold/15 text-rizq-ink-soft"
               }`}
             >
               {depositDone ? "✓" : "○"}
@@ -99,7 +99,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
           <div className="flex items-center gap-3">
             <span
               className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm ${
-                finalDone ? "bg-emerald-100 text-emerald-700" : "bg-rizq-gold/15 text-rizq-ink-soft"
+                finalDone ? "bg-emerald-100 text-[var(--acc)]" : "bg-rizq-gold/15 text-rizq-ink-soft"
               }`}
             >
               {finalDone ? "✓" : "○"}

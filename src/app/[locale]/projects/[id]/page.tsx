@@ -234,7 +234,7 @@ export default async function ProjectDetailPage({
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("originProposalTitle")}</h2>
             <Link
               href={`/proposals/${originProposal.id}` as `/proposals/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
               <span className="flex items-center gap-2">
                 <span className={`text-sm font-medium text-rizq-ink ${font}`}>{t("viewProposal")}</span>
@@ -253,7 +253,7 @@ export default async function ProjectDetailPage({
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{isAr ? "العميل المرتبط" : "Linked client"}</h2>
             <Link
               href={`/clients/${clientId}` as `/clients/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
               <span className={`text-sm font-medium text-rizq-ink ${font}`}>{clientName}</span>
               <span className="text-sm text-rizq-ink-soft/60">→</span>

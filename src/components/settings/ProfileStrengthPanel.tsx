@@ -74,7 +74,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
             {optionalMissing.map((m) => (
               <li
                 key={m.key}
-                className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/25 bg-white/40 px-3 py-1 text-xs text-rizq-ink-soft ${font}`}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/25 bg-[var(--raised)] px-3 py-1 text-xs text-rizq-ink-soft ${font}`}
               >
                 <Circle className="h-3 w-3 text-rizq-ink-soft/40" aria-hidden="true" />
                 {isAr ? m.label_ar : m.label_en}

@@ -23,9 +23,9 @@ const STAGE_TITLE_KEY: Record<LifecycleStageKey, string> = {
 // live pulsing halo (animate-ping) — so it reads as the active step, not just a
 // darker shade of "next". "next" softly breathes amber; done/skipped are calm.
 const STATE_BADGE: Record<LifecycleStageState, { key: string; cls: string; mark: string }> = {
-  done: { key: "stateDone", cls: "bg-emerald-100 text-emerald-700", mark: "✓" },
+  done: { key: "stateDone", cls: "bg-emerald-100 text-[var(--acc)]", mark: "✓" },
   current: { key: "stateCurrent", cls: "", mark: "" },
-  next: { key: "stateNext", cls: "bg-[#C8A951]/15 text-amber-700/80 animate-breathe-amber", mark: "○" },
+  next: { key: "stateNext", cls: "bg-[#C8A951]/15 text-[var(--warn)]/80 animate-breathe-amber", mark: "○" },
   skipped: { key: "stateSkipped", cls: "bg-rizq-ink/8 text-rizq-ink-soft", mark: "⤼" },
 };
 
@@ -83,9 +83,9 @@ export async function LifecycleStepper({
                 <span
                   className={`block text-xs ${font} ${
                     isCurrent
-                      ? "font-medium text-amber-700"
+                      ? "font-medium text-[var(--warn)]"
                       : s.state === "next"
-                        ? "text-amber-700/70"
+                        ? "text-[var(--warn)]/70"
                         : "text-rizq-ink-soft/70"
                   }`}
                 >
@@ -115,7 +115,7 @@ export async function LifecycleStepper({
       </ol>
 
       <div className="mt-4 flex items-center justify-between gap-3">
-        <p className={`text-xs ${lifecycle.complete ? "text-emerald-700" : "text-rizq-ink-soft/70"} ${font}`}>
+        <p className={`text-xs ${lifecycle.complete ? "text-[var(--acc)]" : "text-rizq-ink-soft/70"} ${font}`}>
           {lifecycle.complete ? t("complete") : ""}
         </p>
         {cta}

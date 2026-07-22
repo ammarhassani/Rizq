@@ -122,7 +122,7 @@ export function MethodologyFaq({ locale, sectionsText }: Props) {
             </>
           )}
           {error && (
-            <p className={`text-sm text-red-600/80 ${font}`}>{error}</p>
+            <p className={`text-sm text-[var(--over)]/80 ${font}`}>{error}</p>
           )}
         </div>
       )}

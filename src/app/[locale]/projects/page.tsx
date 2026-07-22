@@ -86,7 +86,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
                 <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}${lc.complete ? "" : "?guided=1"}` as `/projects/${string}`}
-                    className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 transition motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
+                    className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 transition motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
                   >
                     <div dir={dir} className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -114,7 +114,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
                           }`}
                           aria-hidden
                         />
-                        <span className={`${lc.complete ? "text-emerald-700" : "text-amber-700"} font-medium ${font}`}>
+                        <span className={`${lc.complete ? "text-[var(--acc)]" : "text-[var(--warn)]"} font-medium ${font}`}>
                           {stageLabel}
                         </span>
                       </span>

@@ -64,7 +64,7 @@ export function AccountIntegrations({
         </div>
       )}
       {(status === "error" || status === "not_configured") && (
-        <div role="alert" className={`mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 ${font}`}>
+        <div role="alert" className={`mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-[var(--over)] ${font}`}>
           {t("connectErrorBanner")}
         </div>
       )}
@@ -90,7 +90,7 @@ export function AccountIntegrations({
               type="button"
               onClick={() => disconnect(github.id)}
               disabled={pending}
-              className={`inline-flex items-center gap-1.5 rounded-full border border-red-300/50 text-red-600 px-4 py-2 text-sm font-medium hover:bg-red-50 transition disabled:opacity-60 ${font}`}
+              className={`inline-flex items-center gap-1.5 rounded-full border border-red-300/50 text-[var(--over)] px-4 py-2 text-sm font-medium hover:bg-red-50 transition disabled:opacity-60 ${font}`}
             >
               {pending ? <Loader2 size={13} className="animate-spin" /> : <Unplug size={13} />}
               {t("revokeConnection")}

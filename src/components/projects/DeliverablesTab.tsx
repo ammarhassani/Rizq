@@ -17,8 +17,8 @@ import { nextState, normalizeState } from "@/lib/projects/deliverableState";
 const STATE_LABEL_KEY: Record<string, string> = { draft: "stateDraft", ready: "stateReady", sent: "stateSent" };
 const STATE_STYLE: Record<string, string> = {
   draft: "bg-rizq-gold/15 text-rizq-ink-soft",
-  ready: "bg-blue-50 text-blue-700",
-  sent: "bg-emerald-100 text-emerald-700",
+  ready: "status-info",
+  sent: "bg-emerald-100 text-[var(--acc)]",
 };
 
 export function DeliverablesTab({
@@ -69,7 +69,7 @@ export function DeliverablesTab({
         return (
           <li
             key={`${item.source}-${item.id}`}
-            className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3"
+            className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3"
           >
             <span className="flex items-center gap-2 min-w-0">
               {item.source === "file" ? (

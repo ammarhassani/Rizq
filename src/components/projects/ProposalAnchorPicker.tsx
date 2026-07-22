@@ -80,7 +80,7 @@ export function ProposalAnchorPicker({ locale, onCreateNew }: { locale: "ar" | "
   }
 
   if (status === "error") {
-    return <p role="alert" className={`text-sm text-red-700 ${font}`}>{t("error")}</p>;
+    return <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>{t("error")}</p>;
   }
 
   if (items.length === 0) {
@@ -109,11 +109,11 @@ export function ProposalAnchorPicker({ locale, onCreateNew }: { locale: "ar" | "
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("pickerSearch")}
           aria-label={t("pickerSearch")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 py-2.5 ltr:pl-9 rtl:pr-9 px-4 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] py-2.5 ltr:pl-9 rtl:pr-9 px-4 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
         />
       </div>
 
-      {error && <p role="alert" className={`mb-3 text-sm text-red-700 ${font}`}>{error}</p>}
+      {error && <p role="alert" className={`mb-3 text-sm text-[var(--over)] ${font}`}>{error}</p>}
 
       <ul className="space-y-2">
         {filtered.map((p) => (
@@ -122,7 +122,7 @@ export function ProposalAnchorPicker({ locale, onCreateNew }: { locale: "ar" | "
               type="button"
               onClick={() => anchor(p.id)}
               disabled={pendingId !== null}
-              className={`w-full text-start flex items-center justify-between gap-3 rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 transition-colors disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 px-4 py-3 ${font}`}
+              className={`w-full text-start flex items-center justify-between gap-3 rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 transition-colors disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 px-4 py-3 ${font}`}
             >
               <span className="flex items-center gap-2 min-w-0">
                 {pendingId === p.id ? <Loader2 size={15} className="animate-spin text-rizq-green shrink-0" /> : <FileText size={15} className="text-rizq-ink-soft shrink-0" aria-hidden />}

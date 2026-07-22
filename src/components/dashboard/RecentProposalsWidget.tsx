@@ -19,11 +19,11 @@ type Props = {
 
 const statusColors: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600",
-  final: "bg-blue-100 text-blue-700",
-  sent: "bg-amber-100 text-amber-700",
+  final: "bg-blue-100 text-[var(--acc-tint)]",
+  sent: "bg-amber-100 text-[var(--warn)]",
   viewed: "bg-purple-100 text-purple-700",
-  accepted: "bg-emerald-100 text-emerald-700",
-  declined: "bg-red-100 text-red-700",
+  accepted: "bg-emerald-100 text-[var(--acc)]",
+  declined: "bg-red-100 text-[var(--over)]",
   expired: "bg-gray-100 text-gray-500",
 };
 

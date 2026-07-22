@@ -265,7 +265,7 @@ export function InsightsWidget({ locale }: Props) {
   if (status === "error") {
     return (
       <div dir={dir} className={`rounded-3xl border border-red-100 bg-red-50/50 p-6 sm:p-8 ${font}`}>
-        <p className={`text-sm text-red-700 ${font}`}>
+        <p className={`text-sm text-[var(--over)] ${font}`}>
           {isAr ? "تعذّر تحميل التحليلات. حاول مجددًا." : "Could not load insights. Try again."}
         </p>
         <button
@@ -346,14 +346,14 @@ export function InsightsWidget({ locale }: Props) {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => handleVote(i, "up")}
-                        className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-emerald-600" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-[var(--acc)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
                         aria-label="useful"
                       >
                         <ThumbsUp className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => handleVote(i, "down")}
-                        className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-red-600" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-[var(--over)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
                         aria-label="not useful"
                       >
                         <ThumbsDown className="h-3 w-3" />

@@ -77,7 +77,7 @@ export function ProjectStartChooser({
     );
   }
 
-  const cardCls = `group flex flex-col items-start gap-2 rounded-2xl border border-rizq-gold/25 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/40 hover:-translate-y-0.5 transition motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 text-start ${font}`;
+  const cardCls = `group flex flex-col items-start gap-2 rounded-2xl border border-rizq-gold/25 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/40 hover:-translate-y-0.5 transition motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 text-start ${font}`;
 
   return (
     <div dir={dir} className={font}>
@@ -101,7 +101,7 @@ export function ProjectStartChooser({
           <span className={`text-sm text-rizq-ink-soft ${font}`}>{t("chooserDirectDesc")}</span>
         </button>
       </div>
-      {error && <p role="alert" className={`mt-4 text-sm text-red-700 ${font}`}>{error}</p>}
+      {error && <p role="alert" className={`mt-4 text-sm text-[var(--over)] ${font}`}>{error}</p>}
     </div>
   );
 }

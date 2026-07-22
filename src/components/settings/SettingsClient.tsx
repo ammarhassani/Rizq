@@ -114,7 +114,7 @@ function ExportSection({ locale, font }: { locale: "ar" | "en"; font: string }) 
       </div>
 
       {exportError && (
-        <p className={`text-sm text-red-600 mb-3 ${font}`}>{exportError}</p>
+        <p className={`text-sm text-[var(--over)] mb-3 ${font}`}>{exportError}</p>
       )}
 
       <button
@@ -179,7 +179,7 @@ function DeleteSection({
 
   return (
     <section>
-      <h2 className={`text-base font-semibold text-red-700 mb-1 ${font}`}>
+      <h2 className={`text-base font-semibold text-[var(--over)] mb-1 ${font}`}>
         {t("dangerZoneTitle")}
       </h2>
       <p className={`text-sm text-rizq-ink-soft mb-4 ${font}`}>
@@ -193,7 +193,7 @@ function DeleteSection({
           setConfirmInput("");
           setDeleteError(null);
         }}
-        className={`inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 px-5 py-2.5 text-sm font-medium transition-all ${font}`}
+        className={`inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-[var(--over)] px-5 py-2.5 text-sm font-medium transition-all ${font}`}
       >
         <Trash2 size={15} strokeWidth={1.8} />
         <span>{t("deleteButton")}</span>
@@ -228,7 +228,7 @@ function DeleteSection({
             {/* Icon + title */}
             <div className="flex items-center gap-3 mb-4">
               <div className="h-10 w-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                <AlertTriangle size={20} strokeWidth={1.8} className="text-red-600" />
+                <AlertTriangle size={20} strokeWidth={1.8} className="text-[var(--over)]" />
               </div>
               <h3 className={`text-lg font-semibold text-rizq-ink ${font}`}>
                 {t("deleteDialogTitle")}
@@ -265,7 +265,7 @@ function DeleteSection({
             </div>
 
             {deleteError && (
-              <p className={`text-sm text-red-600 mb-3 ${font}`}>{deleteError}</p>
+              <p className={`text-sm text-[var(--over)] mb-3 ${font}`}>{deleteError}</p>
             )}
 
             {/* Actions */}

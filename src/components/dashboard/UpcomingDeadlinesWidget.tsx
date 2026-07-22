@@ -21,9 +21,9 @@ function fmtDate(iso: string, locale: "ar" | "en"): string {
 }
 
 const statusColors: Record<string, string> = {
-  sent: "text-amber-600",
-  viewed: "text-blue-600",
-  overdue: "text-red-600",
+  sent: "text-[var(--warn)]",
+  viewed: "text-[var(--acc-tint)]",
+  overdue: "text-[var(--over)]",
 };
 
 export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {

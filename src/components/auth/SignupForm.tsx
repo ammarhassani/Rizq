@@ -107,7 +107,7 @@ export function SignupForm({ locale }: Props) {
           } ${font}`}
         />
         {errors.email && (
-          <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
             {errors.email.message}
           </p>
         )}
@@ -142,7 +142,7 @@ export function SignupForm({ locale }: Props) {
           </button>
         </div>
         {errors.password && (
-          <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
             {errors.password.message}
           </p>
         )}

@@ -120,7 +120,7 @@ export function ArtifactSkeleton({ locale, activeStep = 0 }: Props) {
         </div>
 
         {/* Price hero */}
-        <div className="rounded-2xl border border-rizq-gold/15 bg-white/40 p-5 space-y-3">
+        <div className="rounded-2xl border border-rizq-gold/15 bg-[var(--raised)] p-5 space-y-3">
           <div className="h-2 w-24 rounded-full bg-rizq-gold/20" />
           <div className="h-10 w-40 rounded-xl bg-rizq-green/8 overflow-hidden">
             <span
@@ -133,7 +133,7 @@ export function ArtifactSkeleton({ locale, activeStep = 0 }: Props) {
         </div>
 
         {/* Scope block */}
-        <div className="rounded-2xl border border-rizq-gold/15 bg-white/40 p-5 space-y-2">
+        <div className="rounded-2xl border border-rizq-gold/15 bg-[var(--raised)] p-5 space-y-2">
           <div className="h-2 w-28 rounded-full bg-rizq-gold/20" />
           {[0, 1, 2].map((j) => (
             <div
@@ -155,7 +155,7 @@ export function ArtifactSkeleton({ locale, activeStep = 0 }: Props) {
           {[0, 1].map((k) => (
             <div
               key={k}
-              className="rounded-xl border border-rizq-gold/15 bg-white/40 p-4 space-y-1.5"
+              className="rounded-xl border border-rizq-gold/15 bg-[var(--raised)] p-4 space-y-1.5"
             >
               <div className="h-2 w-3/4 rounded-full bg-rizq-ink/6" />
               <div className="h-6 w-12 rounded-lg bg-rizq-green/8 overflow-hidden">

@@ -129,7 +129,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* File picker */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "الملف" : "File"} <span className="text-red-500">*</span>
+          {isAr ? "الملف" : "File"} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           ref={fileRef}
@@ -147,7 +147,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "العنوان" : "Title"} <span className="text-red-500">*</span>
+          {isAr ? "العنوان" : "Title"} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           type="text"
@@ -155,7 +155,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           onChange={(e) => setTitleAr(e.target.value)}
           required
           placeholder={isAr ? "مثال: شهادة ضريبة القيمة المضافة 2026" : "e.g. VAT Certificate 2026"}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
         />
       </div>
 
@@ -197,7 +197,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           </div>
         )}
         {categoryAI?.accepted && (
-          <p className={`mt-1 text-xs text-emerald-600 flex items-center gap-1 ${font}`}>
+          <p className={`mt-1 text-xs text-[var(--acc)] flex items-center gap-1 ${font}`}>
             <CheckCircle size={11} />
             {isAr ? "تم قبول التصنيف المقترح" : "AI suggestion accepted"}
           </p>
@@ -219,7 +219,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 resize-none ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 resize-none ${font}`}
         />
       </div>
 
@@ -243,7 +243,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           type="date"
           value={expiryDate}
           onChange={(e) => setExpiryDate(e.target.value)}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
         />
         {/* AI expiry suggestion */}
         {expiryAI && !expiryAI.accepted && expiryAI.value && (
@@ -281,12 +281,12 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           value={tags}
           onChange={(e) => setTags(e.target.value)}
           placeholder={isAr ? "مثال: 2026، رسمي" : "e.g. 2026, official"}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
+          className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
         />
       </div>
 
       {error && (
-        <p className={`rounded-xl bg-red-50 text-red-700 px-4 py-2.5 text-sm ${font}`}>{error}</p>
+        <p className={`rounded-xl status-overdue px-4 py-2.5 text-sm ${font}`}>{error}</p>
       )}
 
       <button

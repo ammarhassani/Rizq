@@ -43,7 +43,7 @@ export function IntegrationsTab({
   const [busy, setBusy] = useState<string | null>(null);
   const [repos, setRepos] = useState<GithubRepo[] | null>(null);
   const [, start] = useTransition();
-  const fieldCls = `rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
+  const fieldCls = `rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
   const attached = new Set((links ?? []).map((l) => l.external_url));
 
@@ -99,7 +99,7 @@ export function IntegrationsTab({
             </span>
             <span className={`text-sm font-semibold text-rizq-ink ${font}`}>GitHub</span>
             {githubConnected && (
-              <span className="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 text-xs">
+              <span className="inline-flex items-center rounded-full bg-emerald-100 text-[var(--acc)] px-2 py-0.5 text-xs">
                 {githubLogin ? t("connectedAs", { login: githubLogin }) : t("statusActive")}
               </span>
             )}
@@ -129,7 +129,7 @@ export function IntegrationsTab({
               {repos.map((repo) => {
                 const isAttached = attached.has(repo.html_url);
                 return (
-                  <li key={repo.full_name} className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/70 px-4 py-2.5">
+                  <li key={repo.full_name} className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-2.5">
                     <span className="min-w-0">
                       <span className={`block text-sm font-medium text-rizq-ink truncate ${font}`}>{repo.full_name}</span>
                       <span className="flex items-center gap-2 text-xs text-rizq-ink-soft/70">
@@ -177,12 +177,12 @@ export function IntegrationsTab({
         ) : (
           <ul className="space-y-2">
             {links.map((l) => (
-              <li key={l.id} className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3">
+              <li key={l.id} className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3">
                 <a href={l.external_url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 min-w-0 text-sm text-rizq-ink hover:text-rizq-green ${font}`}>
                   {l.provider === "github" ? <GithubIcon size={14} className="shrink-0" /> : <ExternalLink size={14} className="shrink-0" />}
                   <span className="truncate">{l.display_label}</span>
                 </a>
-                <button type="button" onClick={() => removeLink(l.id)} disabled={busy === `rm-${l.id}`} className="text-rizq-ink-soft/60 hover:text-red-600 shrink-0" title={t("removeLink")}>
+                <button type="button" onClick={() => removeLink(l.id)} disabled={busy === `rm-${l.id}`} className="text-rizq-ink-soft/60 hover:text-[var(--over)] shrink-0" title={t("removeLink")}>
                   {busy === `rm-${l.id}` ? <Loader2 size={12} className="animate-spin" /> : <X size={14} />}
                 </button>
               </li>

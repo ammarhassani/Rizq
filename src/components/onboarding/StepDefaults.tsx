@@ -196,7 +196,7 @@ export function StepDefaults({ locale, profile, onNext, onBack, onSkip, autosave
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

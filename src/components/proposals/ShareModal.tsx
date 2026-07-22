@@ -189,7 +189,7 @@ export function ShareModal({
         </div>
 
         {/* Toggle row */}
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-rizq-gold/20 bg-white/60 px-4 py-3 mb-5">
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-rizq-gold/20 bg-[var(--raised)] px-4 py-3 mb-5">
           <span className={`text-sm font-medium text-rizq-ink ${font}`}>
             {isShared ? t("disableShare") : t("enableShare")}
           </span>
@@ -238,7 +238,7 @@ export function ShareModal({
             <button
               type="button"
               onClick={handleCopy}
-              className={`w-full flex items-center gap-3 rounded-xl border border-rizq-gold/25 bg-white/70 hover:bg-rizq-cream/90 px-4 py-3 text-sm font-medium text-rizq-ink transition-colors ${font}`}
+              className={`w-full flex items-center gap-3 rounded-xl border border-rizq-gold/25 bg-[var(--raised)] hover:bg-rizq-cream/90 px-4 py-3 text-sm font-medium text-rizq-ink transition-colors ${font}`}
             >
               <span className="shrink-0 text-rizq-green">
                 {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -252,7 +252,7 @@ export function ShareModal({
             <button
               type="button"
               onClick={handlePdf}
-              className={`w-full flex items-center gap-3 rounded-xl border border-rizq-gold/25 bg-white/70 hover:bg-rizq-cream/90 px-4 py-3 text-sm font-medium text-rizq-ink transition-colors ${font}`}
+              className={`w-full flex items-center gap-3 rounded-xl border border-rizq-gold/25 bg-[var(--raised)] hover:bg-rizq-cream/90 px-4 py-3 text-sm font-medium text-rizq-ink transition-colors ${font}`}
             >
               <span className="shrink-0 text-rizq-ink-soft">
                 <ExternalLink size={16} />

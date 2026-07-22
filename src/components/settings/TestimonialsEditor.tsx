@@ -114,7 +114,7 @@ export function TestimonialsEditor({ locale, initial }: Props) {
               <button
                 type="button"
                 onClick={() => removeRow(idx)}
-                className="p-1.5 text-rizq-ink-soft hover:text-red-600 transition-colors"
+                className="p-1.5 text-rizq-ink-soft hover:text-[var(--over)] transition-colors"
                 aria-label={t("remove")}
               >
                 <Trash2 size={16} />
@@ -215,7 +215,7 @@ export function TestimonialsEditor({ locale, initial }: Props) {
       )}
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

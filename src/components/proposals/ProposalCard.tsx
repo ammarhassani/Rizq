@@ -36,11 +36,11 @@ type StatusKey = "draft" | "final" | "sent" | "viewed" | "accepted" | "declined"
 const STATUS_STYLES: Record<StatusKey, string> = {
   draft:    "bg-rizq-ink/8 text-rizq-ink-soft",
   final:    "bg-rizq-green/12 text-rizq-green",
-  sent:     "bg-blue-50 text-blue-700",
+  sent:     "status-info",
   viewed:   "bg-purple-50 text-purple-700",
-  accepted: "bg-emerald-50 text-emerald-700",
-  declined: "bg-red-50 text-red-600",
-  expired:  "bg-amber-50 text-amber-700",
+  accepted: "status-positive",
+  declined: "bg-red-50 text-[var(--over)]",
+  expired:  "status-pending",
 };
 
 function statusStyle(status: string | null): string {
@@ -163,7 +163,7 @@ export function ProposalCard({ proposal, locale }: Props) {
   return (
     <Link
       href={`/proposals/${proposal.id}` as `/proposals/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-white/70 hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition duration-200 motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
+      className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition duration-200 motion-reduce:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 p-5 ${font}`}
     >
       <div dir={dir} className="flex items-start justify-between gap-4">
         {/* Left: client (primary) + deliverable/brief (secondary) */}

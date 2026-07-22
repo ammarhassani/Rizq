@@ -141,7 +141,7 @@ export function WaitlistForm({ locale }: Props) {
         <p
           id="waitlist-error"
           role="alert"
-          className={`mt-3 text-sm text-red-700 ${font}`}
+          className={`mt-3 text-sm text-[var(--over)] ${font}`}
         >
           {errors.email.message}
         </p>

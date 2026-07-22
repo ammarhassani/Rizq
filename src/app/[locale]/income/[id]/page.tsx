@@ -40,12 +40,12 @@ function fmtDateTime(iso: string | null | undefined, locale: "ar" | "en"): strin
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  paid: "bg-emerald-50 text-emerald-700",
-  pending: "bg-amber-50 text-amber-700",
-  deposit_paid: "bg-amber-50 text-amber-700",
-  in_progress: "bg-blue-50 text-blue-700",
-  delivered: "bg-blue-50 text-blue-700",
-  overdue: "bg-red-50 text-red-700",
+  paid: "status-positive",
+  pending: "status-pending",
+  deposit_paid: "status-pending",
+  in_progress: "status-info",
+  delivered: "status-info",
+  overdue: "status-overdue",
   cancelled: "bg-rizq-ink/8 text-rizq-ink-soft",
 };
 
@@ -227,12 +227,12 @@ export default async function GigDetailPage({
         {/* Payment timeline */}
         <section className="mb-6">
           <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("paymentTimeline")}</h2>
-          <div className={`rounded-2xl border border-rizq-gold/20 bg-white/70 p-5 space-y-4 ${font}`}>
+          <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-4 ${font}`}>
             {/* Deposit */}
             <div dir={dir} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm ${
-                  gig.status !== "pending" ? "bg-emerald-100 text-emerald-700" : "bg-rizq-gold/15 text-rizq-ink-soft"
+                  gig.status !== "pending" ? "bg-emerald-100 text-[var(--acc)]" : "bg-rizq-gold/15 text-rizq-ink-soft"
                 }`}>
                   {gig.status !== "pending" ? "✓" : "○"}
                 </span>
@@ -256,7 +256,7 @@ export default async function GigDetailPage({
             <div dir={dir} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm ${
-                  gig.status === "paid" ? "bg-emerald-100 text-emerald-700" : "bg-rizq-gold/15 text-rizq-ink-soft"
+                  gig.status === "paid" ? "bg-emerald-100 text-[var(--acc)]" : "bg-rizq-gold/15 text-rizq-ink-soft"
                 }`}>
                   {gig.status === "paid" ? "✓" : "○"}
                 </span>
@@ -281,7 +281,7 @@ export default async function GigDetailPage({
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("linkedClient")}</h2>
             <Link
               href={`/clients/${clientId}` as `/clients/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
               <span className={`text-sm font-medium text-rizq-ink ${font}`}>{clientName}</span>
               <span className="text-sm text-rizq-ink-soft/60">→</span>
@@ -295,7 +295,7 @@ export default async function GigDetailPage({
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("linkedProposal")}</h2>
             <Link
               href={`/proposals/${gig.proposal_id}` as `/proposals/${string}`}
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
               <span className={`text-sm font-medium text-rizq-ink ${font}`}>{isAr ? "عرض تقديمي مرتبط" : "Linked proposal"}</span>
               <span className="text-sm text-rizq-ink-soft/60">→</span>
@@ -307,7 +307,7 @@ export default async function GigDetailPage({
         {gig.payment_notes && (
           <section className="mb-6">
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("paymentNotes")}</h2>
-            <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 px-5 py-4 text-sm text-rizq-ink whitespace-pre-wrap ${font}`}>
+            <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] px-5 py-4 text-sm text-rizq-ink whitespace-pre-wrap ${font}`}>
               {gig.payment_notes}
             </div>
           </section>

@@ -48,7 +48,7 @@ export async function ProjectIntegrationsSlot({
               href={it.external_url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 transition-all ${font}`}
+              className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 transition-all ${font}`}
             >
               <span className="flex items-center gap-2 min-w-0">
                 <span className={`text-sm font-medium text-rizq-ink truncate ${font}`}>
@@ -65,7 +65,7 @@ export async function ProjectIntegrationsSlot({
       )}
 
       {/* Coming-soon provider chips (honest stub — nothing connected) */}
-      <div className={`rounded-2xl border border-dashed border-rizq-gold/30 bg-white/40 p-5 ${font}`}>
+      <div className={`rounded-2xl border border-dashed border-rizq-gold/30 bg-[var(--raised)] p-5 ${font}`}>
         <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>{t("integrationsHint")}</p>
         <div className="flex flex-wrap gap-2">
           {PROJECT_INTEGRATION_PROVIDERS.filter((p) => p !== "other").map((p) => (

@@ -189,7 +189,7 @@ export function RateCalculatorClient({
       )}
 
       {/* ── Inputs ────────────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 p-6 space-y-5">
+      <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-6 space-y-5">
         <h2 className={`text-base font-semibold text-rizq-ink ${font}`}>
           {t("inputsTitle")}
         </h2>
@@ -328,7 +328,7 @@ export function RateCalculatorClient({
           )}
 
           {/* Rate cards */}
-          <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 p-6">
+          <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-6">
             <h2 className={`text-base font-semibold text-rizq-ink mb-5 ${font}`}>
               {t("resultsTitle")}
             </h2>
@@ -404,7 +404,7 @@ export function RateCalculatorClient({
 
           {/* Market band meter — where the user's rate sits min→max */}
           {market && (market.min > 0 || market.max > 0) && (
-            <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 p-6">
+            <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-6">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="h-4 w-4 text-rizq-green" />
                 <span className={`text-sm font-medium text-rizq-ink ${font}`}>
@@ -423,7 +423,7 @@ export function RateCalculatorClient({
 
           {/* Market percentile bar */}
           {output.market_percentile != null && (
-            <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 p-6">
+            <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-6">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-4 w-4 text-rizq-green" />
                 <span className={`text-sm font-medium text-rizq-ink ${font}`}>
@@ -464,9 +464,9 @@ export function RateCalculatorClient({
               }`}
             >
               {output.is_realistic ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-5 w-5 text-[var(--acc)] shrink-0 mt-0.5" />
               ) : (
-                <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 text-[var(--warn)] shrink-0 mt-0.5" />
               )}
               <div>
                 <p
@@ -480,7 +480,7 @@ export function RateCalculatorClient({
                 </p>
                 <p
                   className={`text-xs mt-0.5 ${
-                    output.is_realistic ? "text-emerald-700" : "text-amber-700"
+                    output.is_realistic ? "text-[var(--acc)]" : "text-[var(--warn)]"
                   } ${font}`}
                 >
                   {output.is_realistic
@@ -492,7 +492,7 @@ export function RateCalculatorClient({
           )}
 
           {/* Rule-based suggestion */}
-          <div className="rounded-2xl border border-rizq-gold/20 bg-white/70 px-5 py-4 text-sm text-rizq-ink leading-relaxed">
+          <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] px-5 py-4 text-sm text-rizq-ink leading-relaxed">
             {isAr ? output.suggestion_ar : output.suggestion_en}
           </div>
 
@@ -503,7 +503,7 @@ export function RateCalculatorClient({
                 type="button"
                 disabled={isAiLoading || !output.per_project_rate}
                 onClick={handleAiAnalysis}
-                className={`w-full flex items-center justify-center gap-2 rounded-xl border border-rizq-green/30 bg-white/60 text-rizq-green px-5 py-3 text-sm font-medium hover:bg-rizq-green/5 transition-colors disabled:opacity-60 ${font}`}
+                className={`w-full flex items-center justify-center gap-2 rounded-xl border border-rizq-green/30 bg-[var(--raised)] text-rizq-green px-5 py-3 text-sm font-medium hover:bg-rizq-green/5 transition-colors disabled:opacity-60 ${font}`}
               >
                 <Sparkles className="h-4 w-4" />
                 {t("aiAnalysisButton")}
@@ -518,7 +518,7 @@ export function RateCalculatorClient({
             )}
 
             {aiError && !isAiLoading && (
-              <p className={`text-sm text-red-600 ${font}`}>{t("aiAnalysisError")}</p>
+              <p className={`text-sm text-[var(--over)] ${font}`}>{t("aiAnalysisError")}</p>
             )}
 
             {aiNarrative && !isAiLoading && (
@@ -547,19 +547,19 @@ export function RateCalculatorClient({
               type="button"
               disabled={isSaving}
               onClick={handleSave}
-              className={`inline-flex items-center gap-2 rounded-xl border border-rizq-gold/30 bg-white/70 text-rizq-ink px-5 py-2.5 text-sm hover:bg-rizq-cream/80 transition-colors disabled:opacity-60 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-xl border border-rizq-gold/30 bg-[var(--raised)] text-rizq-ink px-5 py-2.5 text-sm hover:bg-rizq-cream/80 transition-colors disabled:opacity-60 ${font}`}
             >
               {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               {isSaving ? t("saveDefaultsLoading") : t("saveDefaultsButton")}
             </button>
 
             {savedMsg === "ok" && (
-              <span className={`text-sm text-emerald-600 ${font}`}>
+              <span className={`text-sm text-[var(--acc)] ${font}`}>
                 {t("saveDefaultsSuccess")}
               </span>
             )}
             {savedMsg === "error" && (
-              <span className={`text-sm text-red-600 ${font}`}>
+              <span className={`text-sm text-[var(--over)] ${font}`}>
                 {t("saveDefaultsError")}
               </span>
             )}

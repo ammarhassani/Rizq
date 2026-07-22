@@ -102,7 +102,7 @@ export function ReviewActions({ locale, submissionId }: Props) {
           type="button"
           disabled={isPending}
           onClick={() => run("reject")}
-          className={`inline-flex items-center gap-2 rounded-full border border-red-300/60 text-red-700 hover:bg-red-50 px-4 py-2 text-sm transition-colors disabled:opacity-60 ${font}`}
+          className={`inline-flex items-center gap-2 rounded-full border border-red-300/60 text-[var(--over)] hover:bg-red-50 px-4 py-2 text-sm transition-colors disabled:opacity-60 ${font}`}
         >
           {isPending && pendingAction === "reject" ? (
             <Loader2 size={14} className="animate-spin" strokeWidth={2.2} />

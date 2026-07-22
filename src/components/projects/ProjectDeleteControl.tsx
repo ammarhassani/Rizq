@@ -46,7 +46,7 @@ export function ProjectDeleteControl({ locale, projectId }: Props) {
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className={`inline-flex items-center gap-1.5 text-xs font-medium text-red-600/75 hover:text-red-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded ${font}`}
+          className={`inline-flex items-center gap-1.5 text-xs font-medium text-[var(--over)]/75 hover:text-[var(--over)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 rounded ${font}`}
         >
           <Trash2 size={13} aria-hidden />
           {t("delete")}
@@ -75,7 +75,7 @@ export function ProjectDeleteControl({ locale, projectId }: Props) {
         </div>
       )}
       {error && (
-        <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

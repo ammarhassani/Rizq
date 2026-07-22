@@ -69,8 +69,8 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
             </div>
             {needsFollowup.length > 0 && (
               <div className="flex items-center gap-1.5 rounded-xl bg-amber-50 border border-amber-100 px-3 py-1.5">
-                <AlertCircle className="h-3 w-3 text-amber-600 shrink-0" />
-                <p className={`text-xs text-amber-700 ${font}`}>
+                <AlertCircle className="h-3 w-3 text-[var(--warn)] shrink-0" />
+                <p className={`text-xs text-[var(--warn)] ${font}`}>
                   {needsFollowup.length} {isAr ? "يحتاج متابعة" : "need follow-up"}
                 </p>
               </div>
@@ -87,7 +87,7 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
               >
                 <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{c.name}</p>
                 {stale && (
-                  <span className={`text-xs text-amber-600 shrink-0 ${font}`}>
+                  <span className={`text-xs text-[var(--warn)] shrink-0 ${font}`}>
                     {isAr ? `${d} يوم` : `${d}d ago`}
                   </span>
                 )}

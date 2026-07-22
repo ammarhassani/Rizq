@@ -51,11 +51,11 @@ const CLIENT_TYPE_LABELS = {
 const PROPOSAL_STATUS_STYLES: Record<string, string> = {
   draft: "bg-rizq-ink/8 text-rizq-ink-soft",
   final: "bg-rizq-green/12 text-rizq-green",
-  sent: "bg-blue-50 text-blue-700",
+  sent: "status-info",
   viewed: "bg-purple-50 text-purple-700",
-  accepted: "bg-emerald-50 text-emerald-700",
-  declined: "bg-red-50 text-red-600",
-  expired: "bg-amber-50 text-amber-700",
+  accepted: "status-positive",
+  declined: "bg-red-50 text-[var(--over)]",
+  expired: "status-pending",
 };
 
 const PROPOSAL_STATUS_AR: Record<string, string> = {
@@ -258,7 +258,7 @@ export default async function ClientDetailPage({
                 <Link
                   key={p.id}
                   href={`/proposals/${p.id}` as `/proposals/${string}`}
-                  className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+                  className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
                 >
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PROPOSAL_STATUS_STYLES[p.status ?? "draft"] ?? PROPOSAL_STATUS_STYLES.draft}`}>
                     {isAr ? PROPOSAL_STATUS_AR[p.status ?? "draft"] : PROPOSAL_STATUS_EN[p.status ?? "draft"]}
@@ -277,7 +277,7 @@ export default async function ClientDetailPage({
         {client.notes && (
           <section className="mt-6">
             <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("notes")}</h2>
-            <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 px-5 py-4 text-sm text-rizq-ink whitespace-pre-wrap ${font}`}>
+            <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] px-5 py-4 text-sm text-rizq-ink whitespace-pre-wrap ${font}`}>
               {client.notes}
             </div>
           </section>

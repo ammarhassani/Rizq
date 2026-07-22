@@ -72,7 +72,7 @@ export function SalesHistoryDialog({ open, onOpenChange, item, locale }: Props) 
   }, [open, item]);
 
   const stat = (label: string, value: string) => (
-    <div className="rounded-xl border border-rizq-gold/20 bg-white/50 px-4 py-3 text-center">
+    <div className="rounded-xl border border-rizq-gold/20 bg-[var(--raised)] px-4 py-3 text-center">
       <p className="tabular font-sans text-xl font-bold text-rizq-green">{value}</p>
       <p className={cn("mt-0.5 text-xs text-rizq-ink-soft", font)}>{label}</p>
     </div>
@@ -107,7 +107,7 @@ export function SalesHistoryDialog({ open, onOpenChange, item, locale }: Props) 
                 <span className={cn("text-sm", font)}>{t("histLoading")}</span>
               </div>
             ) : error ? (
-              <p className={cn("py-10 text-center text-sm text-red-700", font)}>{t("histError")}</p>
+              <p className={cn("py-10 text-center text-sm text-[var(--over)]", font)}>{t("histError")}</p>
             ) : history && history.count === 0 ? (
               <div className="py-10 text-center">
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-rizq-green/10 text-rizq-green">
@@ -130,7 +130,7 @@ export function SalesHistoryDialog({ open, onOpenChange, item, locale }: Props) 
                   {history.recent.map((r) => (
                     <li
                       key={r.invoice_id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/20 bg-white/50 px-3.5 py-2.5"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/20 bg-[var(--raised)] px-3.5 py-2.5"
                     >
                       <div className="min-w-0">
                         <p className="tabular font-sans text-sm font-medium text-rizq-ink">{r.invoice_number}</p>

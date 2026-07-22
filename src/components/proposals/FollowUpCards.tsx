@@ -83,7 +83,7 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
           return (
             <div
               key={q.id}
-              className="rounded-2xl border border-rizq-gold/20 bg-white/50 p-5 space-y-3"
+              className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-3"
             >
               <p className="text-sm font-medium text-rizq-ink">{questionText}</p>
 

@@ -21,21 +21,21 @@ export function QuickActionsWidget({ locale }: Props) {
       icon: PlusCircle,
       labelAr: "سجّل مشروع",
       labelEn: "Log Project",
-      color: "text-emerald-600",
+      color: "text-[var(--acc)]",
     },
     {
       href: "/clients/new" as const,
       icon: UserPlus,
       labelAr: "عميل جديد",
       labelEn: "Add Client",
-      color: "text-blue-600",
+      color: "text-[var(--acc-tint)]",
     },
     {
       href: "/invoices/new" as const,
       icon: Receipt,
       labelAr: "فاتورة جديدة",
       labelEn: "New Invoice",
-      color: "text-amber-600",
+      color: "text-[var(--warn)]",
     },
   ];
 

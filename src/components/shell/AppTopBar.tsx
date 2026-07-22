@@ -82,7 +82,7 @@ export function AppTopBar({
             aria-label={tCmd("triggerAria")}
             className={[
               "hidden sm:inline-flex items-center gap-2 h-9 rounded-xl ps-2.5 pe-2 shrink-0",
-              "bg-white/60 border border-rizq-gold/25 hover:border-rizq-green/40 hover:bg-rizq-green/8",
+              "bg-[var(--raised)] border border-rizq-gold/25 hover:border-rizq-green/40 hover:bg-rizq-green/8",
               "text-rizq-ink-soft/70 transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
               font,

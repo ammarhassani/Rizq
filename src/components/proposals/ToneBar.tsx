@@ -84,7 +84,7 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
               className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all disabled:opacity-60 ${
                 isThis
                   ? "bg-rizq-green text-rizq-cream shadow-sm"
-                  : "border border-rizq-gold/30 bg-white/60 text-rizq-ink hover:border-rizq-green/50 hover:bg-rizq-green/8"
+                  : "border border-rizq-gold/30 bg-[var(--raised)] text-rizq-ink hover:border-rizq-green/50 hover:bg-rizq-green/8"
               }`}
             >
               {isLoading && <Loader2 size={13} className="animate-spin shrink-0" />}
@@ -96,7 +96,7 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
 
       {/* Error */}
       {error && (
-        <p role="alert" className="text-xs text-red-700">
+        <p role="alert" className="text-xs text-[var(--over)]">
           {error}
         </p>
       )}

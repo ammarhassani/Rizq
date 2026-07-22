@@ -153,7 +153,7 @@ export function EditProposalForm({
       {/* Inline form */}
       {open && (
         <div
-          className={`rounded-2xl border border-rizq-green/20 bg-white/70 backdrop-blur-sm p-5 space-y-5 animate-fade-in shadow-sm ${font}`}
+          className={`rounded-2xl border border-rizq-green/20 bg-[var(--raised)] backdrop-blur-sm p-5 space-y-5 animate-fade-in shadow-sm ${font}`}
         >
           {/* Header row */}
           <div className="flex items-center justify-between gap-3">
@@ -239,7 +239,7 @@ export function EditProposalForm({
           {errorMsg && (
             <p
               role="alert"
-              className={`text-sm text-red-600 ${font}`}
+              className={`text-sm text-[var(--over)] ${font}`}
             >
               {errorMsg}
             </p>

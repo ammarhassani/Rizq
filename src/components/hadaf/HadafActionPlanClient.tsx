@@ -110,7 +110,7 @@ export function HadafActionPlanClient({ locale, initialAr, initialEn }: Props) {
 
       {/* Error */}
       {error && (
-        <p className="text-sm text-red-600 mb-3">{error}</p>
+        <p className="text-sm text-[var(--over)] mb-3">{error}</p>
       )}
 
       {/* Generate button */}

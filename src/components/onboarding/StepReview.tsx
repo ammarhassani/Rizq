@@ -129,7 +129,7 @@ export function StepReview({ locale, profile, onBack, onNext, onSkip }: StepProp
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

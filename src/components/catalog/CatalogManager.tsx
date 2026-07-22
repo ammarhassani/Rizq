@@ -352,7 +352,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
               </button>
             )}
             <button type="button" disabled={isMutating} onClick={() => setConfirm({ op: "delete", kind: tab, ids: [...sel] })}
-              className={cn("inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-white px-3.5 py-2 text-sm text-red-600 transition-all hover:bg-red-50 disabled:opacity-60", font)}>
+              className={cn("inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-white px-3.5 py-2 text-sm text-[var(--over)] transition-all hover:bg-red-50 disabled:opacity-60", font)}>
               <Trash2 size={14} aria-hidden /> <span>{t("bulkDelete")}</span>
             </button>
           </div>
@@ -434,7 +434,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
           <DialogPrimitive.Popup dir={isAr ? "rtl" : "ltr"}
             className={cn("fixed start-1/2 top-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 sm:max-w-md rounded-3xl border border-rizq-gold/25 bg-rizq-cream/98 p-6 shadow-xl sm:p-8 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:animate-none", font)}>
             <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-[var(--over)]">
                 <TriangleAlert size={18} strokeWidth={2} aria-hidden />
               </span>
               <div className="min-w-0">
@@ -508,7 +508,7 @@ function RowActions({ actions, font }: { actions: RowAction[]; font: string }) {
           className={cn(
             "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2",
             a.danger
-              ? "text-red-600 hover:bg-red-50 focus-visible:ring-red-400/40"
+              ? "text-[var(--over)] hover:bg-red-50 focus-visible:ring-red-400/40"
               : "text-rizq-ink-soft hover:bg-rizq-green/10 hover:text-rizq-green focus-visible:ring-rizq-green/40"
           )}>
           {a.icon}<span>{a.label}</span>

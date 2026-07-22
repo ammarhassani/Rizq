@@ -184,8 +184,8 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
               <div className={`shrink-0 ${font}`}>
                 <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold tabular ${
                   changePercent >= 0
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-red-50 text-red-700"
+                    ? "status-positive"
+                    : "status-overdue"
                 }`}>
                   {changePercent >= 0 ? "↑" : "↓"}
                   {Math.abs(changePercent)}%
@@ -200,20 +200,20 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
             <div dir={dir} className="mt-4 pt-4 border-t border-rizq-gold/20 flex flex-wrap gap-4">
               <div>
                 <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("paid")}</p>
-                <p className="tabular font-sans text-base font-semibold text-emerald-700">
+                <p className="tabular font-sans text-base font-semibold text-[var(--acc)]">
                   {fmtPrice(currentMonthRow.paid_sar ?? 0, locale as "ar" | "en")}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("pending")}</p>
-                <p className="tabular font-sans text-base font-semibold text-amber-700">
+                <p className="tabular font-sans text-base font-semibold text-[var(--warn)]">
                   {fmtPrice(currentMonthRow.pending_sar ?? 0, locale as "ar" | "en")}
                 </p>
               </div>
               {(currentMonthRow.overdue_sar ?? 0) > 0 && (
                 <div>
                   <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("overdue")}</p>
-                  <p className="tabular font-sans text-base font-semibold text-red-700">
+                  <p className="tabular font-sans text-base font-semibold text-[var(--over)]">
                     {fmtPrice(currentMonthRow.overdue_sar ?? 0, locale as "ar" | "en")}
                   </p>
                 </div>
@@ -239,7 +239,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
 
         {/* Monthly income trend */}
         {incomeTrend.length >= 2 && (
-          <div className={`rounded-3xl border border-rizq-gold/25 bg-white/60 p-6 sm:p-7 mb-8 ${font}`} dir={dir}>
+          <div className={`rounded-3xl border border-rizq-gold/25 bg-[var(--raised)] p-6 sm:p-7 mb-8 ${font}`} dir={dir}>
             <p className="eyebrow mb-4">{isAr ? "اتجاه الدخل" : "Income trend"}</p>
             <TrendChart points={incomeTrend} locale={locale as "ar" | "en"} height={140} />
           </div>
@@ -247,7 +247,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
 
         {/* Previous month summary (compact) */}
         {prevMonthRow && (prevMonthRow.total_sar ?? 0) > 0 && (
-          <div className={`rounded-2xl border border-rizq-gold/15 bg-white/50 px-5 py-4 mb-6 flex flex-wrap items-center justify-between gap-3 ${font}`} dir={dir}>
+          <div className={`rounded-2xl border border-rizq-gold/15 bg-[var(--raised)] px-5 py-4 mb-6 flex flex-wrap items-center justify-between gap-3 ${font}`} dir={dir}>
             <p className={`text-sm text-rizq-ink-soft ${font}`}>
               {fmtMonth(prevMonthStart, locale as "ar" | "en")}
             </p>

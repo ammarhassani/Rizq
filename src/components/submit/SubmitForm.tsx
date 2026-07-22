@@ -421,7 +421,7 @@ export function SubmitForm({
             <button
               type="button"
               onClick={() => setProofFile(null)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-rizq-ink-soft/70 hover:text-red-700 hover:bg-rizq-cream"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-rizq-ink-soft/70 hover:text-[var(--over)] hover:bg-rizq-cream"
               aria-label="Remove file"
             >
               <X size={14} strokeWidth={1.8} />
@@ -445,7 +445,7 @@ export function SubmitForm({
           </label>
         )}
         {uploadError && (
-          <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
             {uploadError}
           </p>
         )}
@@ -547,7 +547,7 @@ function FieldShell({
       </label>
       {children}
       {error && (
-        <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

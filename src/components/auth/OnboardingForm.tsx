@@ -124,7 +124,7 @@ export function OnboardingForm({ locale }: Props) {
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

@@ -185,7 +185,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           </p>
         )}
         {aiError && (
-          <p className={`text-xs text-red-600 ${font}`}>
+          <p className={`text-xs text-[var(--over)] ${font}`}>
             {isAr ? "تعذّر التوليد. حاول مرة أخرى." : "Couldn't generate. Try again."}
           </p>
         )}
@@ -210,7 +210,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-rizq-gold/30 bg-white/70 overflow-hidden"
+          className="rounded-2xl border border-rizq-gold/30 bg-[var(--raised)] overflow-hidden"
         >
           <div className="h-1.5 bg-gradient-to-r from-rizq-green to-rizq-gold" />
           <div className="p-4">
@@ -321,7 +321,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
             />
           </div>
           {!emailValid && (
-            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+            <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
               {isAr ? "بريد إلكتروني غير صحيح." : "Enter a valid email."}
             </p>
           )}
@@ -350,7 +350,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
             />
           </div>
           {!phoneValid && (
-            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+            <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
               {isAr ? "جوال سعودي غير صحيح (٩ أرقام تبدأ بـ ٥)." : "Enter a valid Saudi mobile (9 digits, starts with 5)."}
             </p>
           )}
@@ -391,7 +391,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
             />
           </div>
           {!waValid && (
-            <p className={`mt-1 text-xs text-red-600 ${font}`}>
+            <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
               {isAr ? "جوال سعودي غير صحيح." : "Enter a valid Saudi mobile."}
             </p>
           )}
@@ -412,7 +412,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

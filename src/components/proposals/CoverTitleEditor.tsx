@@ -69,7 +69,7 @@ export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
           }}
           maxLength={140}
           placeholder={isAr ? "مثال: هوية بصرية لمحمصة قهوة" : "e.g. Brand identity for a coffee roastery"}
-          className={`flex-1 rounded-xl border border-rizq-gold/30 bg-white/70 px-3.5 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
+          className={`flex-1 rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-3.5 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
         />
         <button
           type="button"

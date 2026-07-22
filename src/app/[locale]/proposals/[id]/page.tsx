@@ -296,7 +296,7 @@ export default async function ProposalDetailPage({
               {versionRows.map((v) => (
                 <div
                   key={v.version}
-                  className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 ${font}`}
+                  className={`flex items-start justify-between gap-4 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 ${font}`}
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-rizq-green leading-none">

@@ -127,7 +127,7 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
       {/* Name (required) */}
       <div>
         <label className={labelClass}>
-          {t("nameLabel")} <span className="text-red-500">*</span>
+          {t("nameLabel")} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           type="text"
@@ -143,7 +143,7 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>
-            {t("unitPriceLabel")} <span className="text-red-500">*</span>
+            {t("unitPriceLabel")} <span className="text-[var(--over)]">*</span>
           </label>
           <div className="relative">
             <input
@@ -193,7 +193,7 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
         />
       </div>
 
-      {error && <p role="alert" className={cn("text-sm text-red-700", font)}>{error}</p>}
+      {error && <p role="alert" className={cn("text-sm text-[var(--over)]", font)}>{error}</p>}
 
       <button
         type="submit"

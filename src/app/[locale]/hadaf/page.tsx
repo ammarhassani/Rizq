@@ -123,7 +123,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
           /* Fully qualifying state */
           <div className={`rounded-3xl border border-emerald-200 bg-emerald-50/70 p-7 sm:p-9 mb-8 ${font}`}>
             <div className="flex items-start gap-4 mb-5">
-              <CheckCircle2 size={28} className="text-emerald-600 shrink-0 mt-0.5" />
+              <CheckCircle2 size={28} className="text-[var(--acc)] shrink-0 mt-0.5" />
               <div>
                 <h2 className={`text-xl font-bold text-rizq-ink ${font}`}>
                   {t("qualifyingTitle", { n: status.current_streak })}
@@ -145,7 +145,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
 
             {/* Current month income check */}
             <div className="flex items-center gap-2 mb-3">
-              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <CheckCircle2 size={16} className="text-[var(--acc)] shrink-0" />
               <p className={`text-sm ${font}`}>
                 {t("currentMonthIncome", {
                   income: fmtSAR(status.current_month_income, locale as "ar" | "en"),
@@ -160,7 +160,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                 <p className="text-xs text-rizq-ink-soft/60 mb-1">
                   {t("estimatedSubsidyLabel")}
                 </p>
-                <p className="tabular font-sans text-2xl font-bold text-emerald-700">
+                <p className="tabular font-sans text-2xl font-bold text-[var(--acc)]">
                   <AnimatedNumber value={status.estimated_subsidy} locale={locale as "ar" | "en"} duration={0.9} />{" "}
                   <span className={`text-sm font-normal ${font}`}>
                     {isAr ? "ريال/شهر" : "SAR/month"}
@@ -205,7 +205,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
             </div>
 
             {/* Current month income + gap */}
-            <div className={`rounded-2xl bg-white/60 border border-rizq-gold/15 p-4 mb-5 ${font}`}>
+            <div className={`rounded-2xl bg-[var(--raised)] border border-rizq-gold/15 p-4 mb-5 ${font}`}>
               <div className="flex flex-wrap gap-4">
                 <div>
                   <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("currentMonthLabel")}</p>
@@ -236,7 +236,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
               {/* Gap to target */}
               {status.current_month_income < rules.minimum_monthly_income_sar && (
                 <div className="mt-3 pt-3 border-t border-rizq-gold/15">
-                  <p className={`text-sm text-amber-700 ${font}`}>
+                  <p className={`text-sm text-[var(--warn)] ${font}`}>
                     {t("gapToTarget", {
                       gap: fmtSAR(
                         rules.minimum_monthly_income_sar - status.current_month_income,
@@ -251,7 +251,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
             {/* Broken streak note */}
             {status.current_streak === 0 &&
               status.streak_history.some((h) => h.qualifying) && (
-                <p className={`text-xs text-amber-700 mb-4 ${font}`}>
+                <p className={`text-xs text-[var(--warn)] mb-4 ${font}`}>
                   {t("streakBrokenNote")}
                 </p>
               )}
@@ -267,7 +267,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
 
         {/* ── Monthly history table ───────────────────────────────────────── */}
         {status.streak_history.length > 0 && (
-          <div className={`rounded-3xl border border-rizq-gold/15 bg-white/50 p-5 sm:p-7 mb-8 ${font}`}>
+          <div className={`rounded-3xl border border-rizq-gold/15 bg-[var(--raised)] p-5 sm:p-7 mb-8 ${font}`}>
             <h2 className={`text-base font-semibold text-rizq-ink mb-4 ${font}`}>
               {t("historyTitle")}
             </h2>
@@ -301,7 +301,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                       <td className="py-2 text-center">
                         {row.qualifying ? (
                           <span className="inline-flex items-center justify-center">
-                            <CheckCircle2 size={15} className="text-emerald-600" />
+                            <CheckCircle2 size={15} className="text-[var(--acc)]" />
                           </span>
                         ) : (
                           <span className="inline-flex items-center justify-center">
@@ -330,7 +330,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
             href="https://hrdf.org.sa"
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex items-center gap-1.5 text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors ${font}`}
+            className={`inline-flex items-center gap-1.5 text-sm font-medium text-[var(--warn)] hover:text-amber-900 transition-colors ${font}`}
           >
             {t("hrdfLinkLabel")}
             <ExternalLink size={13} />

@@ -47,12 +47,12 @@ type Props = {
 const SOURCE_COLORS: Record<string, { dot: string; badge: string; icon: React.FC<{ size?: number; className?: string }> }> = {
   proposal: {
     dot: "bg-blue-500",
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
+    badge: "status-info",
     icon: FileText,
   },
   gig: {
     dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    badge: "status-positive",
     icon: Briefcase,
   },
   invoice: {
@@ -100,16 +100,16 @@ function formatHijri(date: Date): string {
 
 function StatusBadge({ status, t }: { status: string; t: ReturnType<typeof useTranslations> }) {
   const statusMap: Record<string, string> = {
-    pending: "bg-amber-50 text-amber-700 border-amber-200",
-    paid: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    overdue: "bg-red-50 text-red-700 border-red-200",
-    active: "bg-blue-50 text-blue-700 border-blue-200",
-    sent: "bg-blue-50 text-blue-700 border-blue-200",
+    pending: "status-pending",
+    paid: "status-positive",
+    overdue: "status-overdue",
+    active: "status-info",
+    sent: "status-info",
     draft: "bg-gray-50 text-gray-600 border-gray-200",
     in_progress: "bg-indigo-50 text-indigo-700 border-indigo-200",
     delivered: "bg-teal-50 text-teal-700 border-teal-200",
     cancelled: "bg-gray-50 text-gray-500 border-gray-200",
-    final: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    final: "status-positive",
   };
   const cls = statusMap[status] ?? "bg-gray-50 text-gray-600 border-gray-200";
   const label = t(`statusBadge.${status}`, { defaultValue: status });
@@ -147,7 +147,7 @@ function EventRow({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-start flex items-start gap-3 rounded-2xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/60 transition-all group ${font}`}
+      className={`w-full text-start flex items-start gap-3 rounded-2xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/60 transition-all group ${font}`}
     >
       <span className={`mt-0.5 flex-shrink-0 rounded-lg p-1.5 ${color.badge}`}>
         <Icon size={14} />
@@ -358,7 +358,7 @@ function MonthView({
                 onClick={() => onDaySelect(key)}
                 className={`
                   min-h-[56px] sm:min-h-[72px] p-1.5 text-start flex flex-col transition-colors
-                  ${cell.isCurrentMonth ? "bg-white/80" : "bg-rizq-cream/30"}
+                  ${cell.isCurrentMonth ? "bg-[var(--raised)]" : "bg-rizq-cream/30"}
                   ${weekend && cell.isCurrentMonth ? "bg-amber-50/40" : ""}
                   ${isSelected ? "ring-2 ring-inset ring-rizq-green/60 bg-rizq-green/5" : ""}
                   hover:bg-rizq-cream/80
@@ -448,7 +448,7 @@ function AgendaView({
         <div key={section.key}>
           <h3
             className={`text-xs font-semibold uppercase tracking-wide mb-3 flex items-center gap-2 ${
-              section.urgent ? "text-red-600" : "text-rizq-ink-soft/50"
+              section.urgent ? "text-[var(--over)]" : "text-rizq-ink-soft/50"
             } ${font}`}
           >
             {section.urgent && <AlertCircle size={12} />}
@@ -532,7 +532,7 @@ function WeekView({
                 ? "border-rizq-green/40 bg-rizq-green/5"
                 : isWeekend
                 ? "border-amber-200/40 bg-amber-50/20"
-                : "border-rizq-gold/15 bg-white/50"
+                : "border-rizq-gold/15 bg-[var(--raised)]"
             }`}
           >
             {/* Day header */}
@@ -606,7 +606,7 @@ function DayPanel({
   const dayEvents = events.filter((ev) => ev.event_date === dateKey);
 
   return (
-    <div className={`mt-4 rounded-2xl border border-rizq-gold/20 bg-white/70 p-5 ${font}`}>
+    <div className={`mt-4 rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 ${font}`}>
       <div className="flex items-center justify-between mb-4">
         <h3 className={`text-sm font-semibold text-rizq-ink ${font}`}>{label}</h3>
         <button
@@ -743,7 +743,7 @@ export function CalendarClient({ events, prefs, locale }: Props) {
           className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
             showHijri
               ? "bg-rizq-gold/20 text-rizq-ink border border-rizq-gold/40"
-              : "border border-rizq-gold/20 bg-white/50 text-rizq-ink-soft/60 hover:border-rizq-gold/40"
+              : "border border-rizq-gold/20 bg-[var(--raised)] text-rizq-ink-soft/60 hover:border-rizq-gold/40"
           } ${font}`}
         >
           {t("toggleHijri")}
@@ -762,7 +762,7 @@ export function CalendarClient({ events, prefs, locale }: Props) {
               className={`rounded-full px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ${
                 sourceFilter === c.key
                   ? (color ? `${color.badge} border` : "bg-rizq-green text-rizq-cream")
-                  : "border border-rizq-gold/25 bg-white/50 text-rizq-ink-soft/60 hover:border-rizq-green/30"
+                  : "border border-rizq-gold/25 bg-[var(--raised)] text-rizq-ink-soft/60 hover:border-rizq-green/30"
               } ${font}`}
             >
               {color && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${color.dot}`} />}
@@ -781,7 +781,7 @@ export function CalendarClient({ events, prefs, locale }: Props) {
               type="button"
               onClick={isAr ? nextMonth : prevMonth}
               aria-label={t("prevMonth")}
-              className="rounded-full p-2 border border-rizq-gold/20 bg-white/50 hover:border-rizq-green/40 transition-colors text-rizq-ink"
+              className="rounded-full p-2 border border-rizq-gold/20 bg-[var(--raised)] hover:border-rizq-green/40 transition-colors text-rizq-ink"
             >
               {isAr ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </button>
@@ -801,7 +801,7 @@ export function CalendarClient({ events, prefs, locale }: Props) {
               type="button"
               onClick={isAr ? prevMonth : nextMonth}
               aria-label={t("nextMonth")}
-              className="rounded-full p-2 border border-rizq-gold/20 bg-white/50 hover:border-rizq-green/40 transition-colors text-rizq-ink"
+              className="rounded-full p-2 border border-rizq-gold/20 bg-[var(--raised)] hover:border-rizq-green/40 transition-colors text-rizq-ink"
             >
               {isAr ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
             </button>

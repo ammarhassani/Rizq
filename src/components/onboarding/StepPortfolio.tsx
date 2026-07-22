@@ -106,7 +106,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosav
               <button
                 type="button"
                 onClick={() => removeSample(idx)}
-                className="text-rizq-ink-soft hover:text-red-600 transition-colors"
+                className="text-rizq-ink-soft hover:text-[var(--over)] transition-colors"
               >
                 <Trash2 size={14} />
               </button>
@@ -180,7 +180,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosav
       </div>
 
       {error && (
-        <p role="alert" className={`text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

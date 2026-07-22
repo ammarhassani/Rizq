@@ -64,7 +64,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
   return (
     <div
       dir={dir}
-      className={`print:hidden mt-3 rounded-2xl border border-rizq-green/20 bg-white/70 p-4 ${font}`}
+      className={`print:hidden mt-3 rounded-2xl border border-rizq-green/20 bg-[var(--raised)] p-4 ${font}`}
     >
       <label className={`block text-xs font-medium text-rizq-ink-soft/70 uppercase tracking-wide mb-2 ${font}`}>
         {isAr ? "اضبط السعر يدويًا" : "Adjust price manually"}
@@ -84,7 +84,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
                 save();
               }
             }}
-            className={`w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-3.5 py-2.5 pe-12 text-sm text-rizq-ink tabular font-sans focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors`}
+            className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-3.5 py-2.5 pe-12 text-sm text-rizq-ink tabular font-sans focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors`}
             dir="ltr"
           />
           <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>

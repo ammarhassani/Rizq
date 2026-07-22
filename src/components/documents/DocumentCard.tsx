@@ -51,9 +51,9 @@ function getExpiryInfo(
 }
 
 const EXPIRY_STYLES = {
-  ok: "bg-emerald-50 text-emerald-700",
-  warn: "bg-amber-50 text-amber-700",
-  expired: "bg-red-50 text-red-700",
+  ok: "status-positive",
+  warn: "status-pending",
+  expired: "status-overdue",
 };
 
 export function DocumentCard({ doc, locale, categories, onClick }: Props) {
@@ -71,7 +71,7 @@ export function DocumentCard({ doc, locale, categories, onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-start rounded-2xl border border-rizq-gold/20 bg-white/60 hover:bg-rizq-cream/60 hover:border-rizq-gold/40 transition-all px-5 py-4 flex items-start gap-3 group ${font}`}
+      className={`w-full text-start rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/60 hover:border-rizq-gold/40 transition-all px-5 py-4 flex items-start gap-3 group ${font}`}
     >
       <span className="mt-0.5 flex-shrink-0 w-9 h-9 rounded-xl bg-rizq-green/8 flex items-center justify-center text-rizq-green">
         {icon}

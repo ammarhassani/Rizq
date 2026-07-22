@@ -51,7 +51,7 @@ export async function ProjectInvoicesList({
       <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{t("invoicesTitle")}</h2>
 
       {invoices.length === 0 ? (
-        <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 px-5 py-4 text-sm text-rizq-ink-soft ${font}`}>
+        <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] px-5 py-4 text-sm text-rizq-ink-soft ${font}`}>
           {t("invoicesEmpty")}
         </div>
       ) : (
@@ -65,7 +65,7 @@ export async function ProjectInvoicesList({
                 key={inv.id}
                 href={`/invoices/${inv.id}` as `/invoices/${string}`}
                 dir={dir}
-                className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
+                className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
               >
                 <span className="flex items-center gap-3 min-w-0">
                   <span className={`text-sm font-medium text-rizq-ink truncate ${font}`}>

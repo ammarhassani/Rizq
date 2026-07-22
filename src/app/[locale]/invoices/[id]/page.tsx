@@ -107,10 +107,10 @@ export default async function InvoiceDetailPage({
 
   const STATUS_STYLES: Record<string, string> = {
     draft:     "bg-rizq-ink/8 text-rizq-ink-soft",
-    sent:      "bg-blue-50 text-blue-700",
-    viewed:    "bg-blue-50 text-blue-700",
-    paid:      "bg-emerald-50 text-emerald-700",
-    overdue:   "bg-red-50 text-red-700",
+    sent:      "status-info",
+    viewed:    "status-info",
+    paid:      "status-positive",
+    overdue:   "status-overdue",
     cancelled: "bg-rizq-ink/8 text-rizq-ink-soft",
   };
   const statusStyle = STATUS_STYLES[status] ?? STATUS_STYLES.draft;
@@ -188,7 +188,7 @@ export default async function InvoiceDetailPage({
         ) : (
           <div
             dir={dir}
-            className={`rounded-2xl border border-rizq-gold/20 bg-white/60 p-8 text-center ${font}`}
+            className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-8 text-center ${font}`}
           >
             <p className={`text-sm text-rizq-ink-soft ${font}`}>
               {isAr

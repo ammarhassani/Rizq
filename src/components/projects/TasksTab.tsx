@@ -25,8 +25,8 @@ const NEXT: Record<TaskStatus, TaskStatus> = { todo: "doing", doing: "done", don
 const STATUS_KEY: Record<TaskStatus, string> = { todo: "statusTodo", doing: "statusDoing", done: "statusDone" };
 const STATUS_STYLE: Record<TaskStatus, string> = {
   todo: "bg-rizq-gold/15 text-rizq-ink-soft",
-  doing: "bg-blue-50 text-blue-700",
-  done: "bg-emerald-100 text-emerald-700",
+  doing: "status-info",
+  done: "bg-emerald-100 text-[var(--acc)]",
 };
 
 export function TasksTab({
@@ -60,7 +60,7 @@ export function TasksTab({
     });
   };
 
-  const fieldCls = `rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
+  const fieldCls = `rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
   const groups = [
     { id: null as string | null, name: t("ungrouped"), target: null as string | null },
@@ -70,7 +70,7 @@ export function TasksTab({
   function TaskItem({ task }: { task: TaskRow }) {
     const status = normalizeStatus(task.status);
     return (
-      <li className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-white/60 px-4 py-2.5">
+      <li className="flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-2.5">
         <span className="min-w-0 flex items-center gap-2">
           <button
             type="button"
@@ -87,7 +87,7 @@ export function TasksTab({
         <button
           type="button"
           onClick={() => run(`d-${task.id}`, () => deleteTask({ task_id: task.id }))}
-          className="text-rizq-ink-soft/60 hover:text-red-600 transition-colors shrink-0"
+          className="text-rizq-ink-soft/60 hover:text-[var(--over)] transition-colors shrink-0"
           title={t("deleteTask")}
         >
           <Trash2 size={14} />

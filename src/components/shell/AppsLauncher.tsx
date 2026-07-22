@@ -58,7 +58,7 @@ export function AppsLauncher({ open, onClose, locale }: Props) {
                   onClick={onClose}
                   className={[
                     "group flex flex-col items-center gap-2 rounded-xl border border-rizq-gold/20",
-                    "bg-white/60 hover:bg-rizq-green/8 hover:border-rizq-green/30",
+                    "bg-[var(--raised)] hover:bg-rizq-green/8 hover:border-rizq-green/30",
                     "px-2 py-3 text-center transition-all min-h-[80px] justify-center",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
                   ].join(" ")}

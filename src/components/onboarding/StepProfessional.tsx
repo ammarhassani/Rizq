@@ -145,7 +145,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip, auto
       </div>
 
       {error && (
-        <p role="alert" className={`sm:col-span-2 text-sm text-red-700 ${font}`}>
+        <p role="alert" className={`sm:col-span-2 text-sm text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

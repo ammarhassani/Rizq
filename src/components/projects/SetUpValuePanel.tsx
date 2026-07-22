@@ -52,7 +52,7 @@ export function SetUpValuePanel({ locale, projectId }: { locale: "ar" | "en"; pr
               min={1}
               value={amount || ""}
               onChange={(e) => setAmount(Math.max(0, Number(e.target.value) || 0))}
-              className={`tabular w-40 rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+              className={`tabular w-40 rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
             />
           </div>
           <button
@@ -65,7 +65,7 @@ export function SetUpValuePanel({ locale, projectId }: { locale: "ar" | "en"; pr
             {t("setUpValue")}
           </button>
         </div>
-        {error && <p role="alert" className={`mt-2 text-sm text-red-700 ${font}`}>{error}</p>}
+        {error && <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>{error}</p>}
       </div>
     </section>
   );

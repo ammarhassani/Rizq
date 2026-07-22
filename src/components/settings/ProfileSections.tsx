@@ -60,14 +60,14 @@ export function ProfileSections({ locale, snapshot, testimonials }: Props) {
   return (
     <div dir={dir} className="space-y-4">
       {sections.map((s) => (
-        <section key={s.key} className={`rounded-3xl border border-rizq-gold/25 bg-white/60 p-5 sm:p-6 ${font}`}>
+        <section key={s.key} className={`rounded-3xl border border-rizq-gold/25 bg-[var(--raised)] p-5 sm:p-6 ${font}`}>
           <h2 className={`text-sm font-semibold text-rizq-ink mb-4 ${font}`}>{isAr ? s.ar : s.en}</h2>
           {s.el}
         </section>
       ))}
 
       {/* Testimonials — re-homed from the retired studio profile. */}
-      <section className={`rounded-3xl border border-rizq-gold/25 bg-white/60 p-5 sm:p-6 ${font}`}>
+      <section className={`rounded-3xl border border-rizq-gold/25 bg-[var(--raised)] p-5 sm:p-6 ${font}`}>
         <h2 className={`text-sm font-semibold text-rizq-ink mb-4 ${font}`}>
           {isAr ? "شهادات العملاء" : "Testimonials"}
         </h2>

@@ -82,7 +82,7 @@ export function ProjectLifecycleCta({ locale, nextAction, projectId, gigId, invo
         {isPending ? t("working") : t(CTA_KEY[nextAction])}
       </button>
       {error && (
-        <p role="alert" className={`mt-1 text-xs text-red-700 ${font}`}>
+        <p role="alert" className={`mt-1 text-xs text-[var(--over)] ${font}`}>
           {error}
         </p>
       )}

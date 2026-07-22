@@ -73,7 +73,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
     });
   }
 
-  const fieldCls = `w-full rounded-xl border border-rizq-gold/30 bg-white/70 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
+  const fieldCls = `w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
   return (
     <section dir={dir} className="mb-6">
@@ -83,14 +83,14 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-white/60 px-3 py-1.5 text-xs font-medium text-rizq-ink-soft hover:text-rizq-ink hover:border-rizq-green/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-[var(--raised)] px-3 py-1.5 text-xs font-medium text-rizq-ink-soft hover:text-rizq-ink hover:border-rizq-green/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
         >
           <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
           {open ? (isAr ? "إغلاق" : "Close") : (isAr ? "تعديل" : "Edit")}
         </button>
       </div>
       {open && (
-      <div className={`rounded-2xl border border-rizq-gold/20 bg-white/60 p-5 space-y-4 ${font}`}>
+      <div className={`rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-4 ${font}`}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="amount-sar" className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
@@ -161,12 +161,12 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
             {isPending ? t("savingMoneyDetails") : t("saveMoneyDetails")}
           </button>
           {saved && !isPending && (
-            <span className={`inline-flex items-center gap-1 text-sm text-emerald-700 ${font}`}>
+            <span className={`inline-flex items-center gap-1 text-sm text-[var(--acc)] ${font}`}>
               <Check size={14} /> {t("savedMoneyDetails")}
             </span>
           )}
           {error && (
-            <span role="alert" className={`text-sm text-red-700 ${font}`}>
+            <span role="alert" className={`text-sm text-[var(--over)] ${font}`}>
               {error}
             </span>
           )}
