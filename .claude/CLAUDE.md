@@ -96,5 +96,15 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   in with (single name, FL chip, 2-col, steppers, derived daily, no-max, goal wheel)
   was KEPT. Additive DB columns (users.rate_currency, invoices.currency + fx_*,
   fx_rates) left in place but inert/unused (drop later when convenient).
-Active (`.specify/feature.json`): **007** (closed).
+- `specs/008-production-validation/` — **Production-Maturity Validation**: prove the whole app is
+  production-ready with evidence, not vibes. (A) static spec-vs-code audit of every module M0–M12 +
+  cross-cutting lenses (money-math, honesty/provenance, RLS, i18n) → severity-ranked gaps; (B) committed
+  Playwright e2e harness (`e2e/`) that self-signs-up a disposable user (email-confirm OFF), clears the
+  onboarding gate, and drives every module + golden path (proposal→project→invoice→income→dashboard) +
+  cross-cutting suites (RLS 2-user, axe a11y, RTL/i18n, mobile, share-token safety, realtime feedback)
+  against real Supabase+DeepSeek; (C) merged `docs/validation/production-maturity-report.md` verdict.
+  **No product-source changes** (validation only; role/label selectors, no `data-testid`). Adds
+  `@playwright/test` dev dep. Plan: [specs/008-production-validation/plan.md](specs/008-production-validation/plan.md).
+  spec+plan done → **tasks next**.
+Active (`.specify/feature.json`): **008** (planning done → tasks).
 <!-- SPECKIT END -->

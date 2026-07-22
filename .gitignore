@@ -50,3 +50,11 @@ next-env.d.ts
 # MCP server config (may contain access tokens) — keep local only
 .mcp.json
 .playwright-mcp/
+
+# Playwright e2e (feature 008 validation harness)
+/test-results/
+/playwright-report/
+/.playwright/
+/blob-report/
+# SECURITY: saved auth sessions of disposable test users — never commit
+/e2e/.auth/
