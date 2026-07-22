@@ -13,6 +13,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { computeStrength } from "@/lib/profile/strength";
 
 // ── Per-step Zod schemas ─────────────────────────────────────────────────────
 
@@ -150,26 +151,6 @@ export type SaveOnboardingStepResult =
   | { ok: true; completeness: number }
   | { ok: false; code: "no_session" | "invalid" | "unknown_step" | "error" };
 
-/**
- * Compute a simple profile completeness percentage based on key fields.
- * Non-skippable core fields: full_name_ar, fl_number, primary_specialty_id,
- * city_id, experience_tier_id, current_hourly_rate_sar or current_daily_rate_sar,
- * income_goal_monthly_sar. = 7 fields.
- */
-function computeCompleteness(profile: Record<string, unknown>): number {
-  const checks: boolean[] = [
-    Boolean(profile.full_name_ar),
-    Boolean(profile.fl_number),
-    Boolean(profile.primary_specialty_id),
-    Boolean(profile.city_id),
-    Boolean(profile.experience_tier_id),
-    Boolean(profile.current_hourly_rate_sar ?? profile.current_daily_rate_sar),
-    Boolean(profile.income_goal_monthly_sar),
-  ];
-  const filled = checks.filter(Boolean).length;
-  return Math.round((filled / checks.length) * 100);
-}
-
 export async function saveOnboardingStep(
   stepKey: string,
   data: unknown
@@ -227,7 +208,7 @@ export async function saveOnboardingStep(
     ...(currentRow ?? {}),
     ...cleanData,
   };
-  const pct = computeCompleteness(mergedForCompleteness);
+  const pct = computeStrength(mergedForCompleteness);
   updatePayload.profile_completeness_pct = pct;
 
   const { error } = await supabase

@@ -106,5 +106,15 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   **No product-source changes** (validation only; role/label selectors, no `data-testid`). Adds
   `@playwright/test` dev dep. Plan: [specs/008-production-validation/plan.md](specs/008-production-validation/plan.md).
   spec+plan done → **tasks next**.
-Active (`.specify/feature.json`): **008** (planning done → tasks).
+- `specs/009-settings-profile-kyc/` — **Profile as single KYC source of truth (Settings)**: one
+  **Settings → Profile** page to complete/backfill the whole profile (reuses the onboarding `Step*`
+  editors + `saveOnboardingStep` + `profileCompleteness`), with a strength bar + "what's missing (+X%)"
+  list; section save → `router.refresh()` recomputes strength. Retire the duplicate **studio profile**
+  (delete `/proposals/profile` + `StudioProfileForm` + the Proposals button + CommandPalette entry) after
+  re-homing its only unique concept — **testimonials** — as a profile section (`TestimonialsEditor`). Replace
+  the Proposals button with a **strength nudge** hidden at/above 80%. Extract snapshot loader +
+  strength mapping to `lib/profile/snapshot.ts` (shared with onboarding). **No new fields/columns, no
+  migration.** Plan: [specs/009-settings-profile-kyc/plan.md](specs/009-settings-profile-kyc/plan.md).
+  spec+plan done → **tasks next**.
+Active (`.specify/feature.json`): **009** (planning done → tasks).
 <!-- SPECKIT END -->

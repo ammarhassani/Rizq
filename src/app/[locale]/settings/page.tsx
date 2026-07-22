@@ -14,6 +14,8 @@ import { SettingsClient } from "@/components/settings/SettingsClient";
 import { AccountIntegrations } from "@/components/settings/AccountIntegrations";
 import { listProviderConnections } from "@/app/actions/projects/integrations/connect";
 import { isGithubConfigured } from "@/lib/integrations/github";
+import { loadProfileSnapshot } from "@/lib/profile/snapshot";
+import { computeStrength } from "@/lib/profile/strength";
 import { User, Crown, Calendar, ArrowLeft } from "lucide-react";
 
 type Params = { locale: string };
@@ -63,6 +65,10 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
 
   const role = (profile?.role ?? "free") as string;
   const memberSince = formatDate(profile?.created_at ?? null, locale as "ar" | "en");
+
+  // Profile strength for the summary (same model as onboarding + the profile page).
+  const { snapshot: profileSnapshot } = await loadProfileSnapshot(supabase, userData.user.id);
+  const profileStrength = computeStrength(profileSnapshot);
   const confirmPhrase = isAr ? "حذف" : "DELETE";
 
   // Tier display
@@ -147,15 +153,33 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
               </div>
             </div>
 
+            {/* Profile strength */}
+            <div className={`mt-5 pt-5 border-t border-rizq-gold/20 ${font}`}>
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className={`text-xs text-rizq-ink-soft/70 ${font}`}>
+                  {isAr ? "قوة الملف المهني" : "Profile strength"}
+                </span>
+                <span className="tabular font-sans text-sm font-bold text-rizq-green">
+                  {profileStrength}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-rizq-gold/15">
+                <div
+                  className="h-full rounded-full bg-rizq-green transition-[width] duration-500 motion-reduce:transition-none"
+                  style={{ width: `${Math.max(0, Math.min(100, profileStrength))}%` }}
+                />
+              </div>
+            </div>
+
             {/* Edit / upgrade links */}
             <div
               className={`mt-4 pt-4 border-t border-rizq-gold/20 flex flex-wrap gap-3 ${font}`}
             >
               <Link
-                href="/proposals/profile"
+                href="/settings/profile"
                 className={`text-sm text-rizq-green hover:underline ${font}`}
               >
-                {t("editProfileLink")}
+                {isAr ? "أكمل ملفك ←" : "Complete your profile →"}
               </Link>
               {role === "free" && (
                 <Link

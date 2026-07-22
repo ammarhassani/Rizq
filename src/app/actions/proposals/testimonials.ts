@@ -160,6 +160,6 @@ export async function saveTestimonials(
     }
   }
 
-  revalidatePath("/[locale]/proposals/profile", "page");
+  revalidatePath("/[locale]/settings/profile", "page");
   return { ok: true };
 }

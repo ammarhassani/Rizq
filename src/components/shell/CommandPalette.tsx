@@ -67,7 +67,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: "newInvoice", href: "/invoices/new", icon: ReceiptText },
   { id: "newGig", href: "/income/new", icon: TrendingUp },
   { id: "newClient", href: "/clients/new", icon: UserPlus },
-  { id: "studioProfile", href: "/proposals/profile", icon: Palette },
+  { id: "profile", href: "/settings/profile", icon: Palette },
   { id: "methodology", href: "/methodology", icon: BookOpen },
 ];
 

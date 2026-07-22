@@ -11,11 +11,13 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
-import { Briefcase } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { ProposalCard } from "@/components/proposals/ProposalCard";
 import type { ProposalRow } from "@/components/proposals/ProposalCard";
+import { loadProfileSnapshot } from "@/lib/profile/snapshot";
+import { computeStrength } from "@/lib/profile/strength";
+import { ProfileStrengthNudge } from "@/components/proposals/ProfileStrengthNudge";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -63,6 +65,10 @@ export default async function ProposalsListPage({
 
   const t = await getTranslations({ locale, namespace: "Proposals.list" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
+
+  // Profile-strength nudge (replaces the retired studio-profile button). Hidden when strong.
+  const { snapshot: profileSnapshot } = await loadProfileSnapshot(supabase, userData.user.id);
+  const profileStrength = computeStrength(profileSnapshot);
   const isAr = locale === "ar";
 
   // Fetch proposals for this user (RLS enforces owner-only)
@@ -88,15 +94,9 @@ export default async function ProposalsListPage({
             </p>
           </div>
 
-          {/* Actions: Studio profile (feeds the "About you" section) + New proposal */}
+          {/* Actions: profile-strength nudge (hidden when strong) + New proposal */}
           <div className="shrink-0 flex items-center gap-2">
-            <Link
-              href="/proposals/profile"
-              className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink px-4 py-3 text-sm font-medium hover:border-rizq-green/40 hover:text-rizq-green transition-all ${font}`}
-            >
-              <Briefcase size={16} strokeWidth={1.7} aria-hidden />
-              <span>{isAr ? "ملف الاستوديو" : "Studio profile"}</span>
-            </Link>
+            <ProfileStrengthNudge locale={locale as "ar" | "en"} strength={profileStrength} />
             <Link
               href="/proposals/new"
               className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-3 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
