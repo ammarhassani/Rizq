@@ -30,7 +30,7 @@ export function HadafStreakBar({ streak, required, locale }: Props) {
           <motion.div
             key={i}
             className={`h-3 flex-1 rounded-full ${
-              filled ? "bg-rizq-green" : "bg-rizq-gold/20"
+              filled ? "aurora-fill shadow-[0_0_10px_-3px_var(--acc)]" : "bg-[var(--track)]"
             }`}
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
