@@ -1,89 +1,75 @@
 import { describe, it, expect } from "vitest";
 import { computeStrength, strengthItems, OPTIMAL_THRESHOLD, type StrengthProfile } from "./strength";
 
-/** Every one of the 15 dimensions filled (using the fields the editors persist). */
-const FULL: StrengthProfile = {
+/** All 10 CORE (required) dimensions filled — nothing a newcomer couldn't provide. No history. */
+const FULL_CORE: StrengthProfile = {
   full_name_ar: "أحمد",
-  fl_number: "12345678",
   specialties: ["web-dev"],
   city: "riyadh",
-  years_experience: 10,
+  years_experience: 0, // a brand-new freelancer — 0 years is a valid answer
   current_hourly_rate_sar: 350,
   income_goal_monthly_sar: 12000,
   brand_name: "Studio",
   tagline_ar: "شعار",
   bio_ar: "نبذة",
-  logo_url: "https://x/logo.png",
   contact_email: "a@b.com",
-  portfolio_samples: [{ title: "x" }],
-  notable_clients: ["ClientA"],
-  linkedin_url: "https://linkedin.com/x",
 };
 
-describe("computeStrength (granular, honest)", () => {
+describe("computeStrength — setup, not track record", () => {
   it("is 0 for an empty profile", () => {
     expect(computeStrength({})).toBe(0);
   });
 
-  it("is 100 only when EVERY dimension is filled", () => {
-    expect(computeStrength(FULL)).toBe(100);
+  it("a newcomer with NO history (no FL, logo, samples, clients, platforms) can still reach 100%", () => {
+    expect(computeStrength(FULL_CORE)).toBe(100);
   });
 
-  it("KYC essentials alone are far from 100 (brand/tagline/bio/logo/samples/clients/platforms empty)", () => {
-    const kyc: StrengthProfile = {
-      full_name_ar: "أحمد",
+  it("0 years of experience counts as answered (not held against a newcomer)", () => {
+    expect(computeStrength({ years_experience: 0 })).toBe(10); // experience weight
+    // and a full-core profile with 0 years is still 100
+    expect(computeStrength({ ...FULL_CORE, years_experience: 0 })).toBe(100);
+  });
+
+  it("optional extras NEVER change the score (present or absent = same %)", () => {
+    const withExtras = {
+      ...FULL_CORE,
       fl_number: "12345678",
-      specialties: ["web-dev"],
-      city: "riyadh",
-      years_experience: 10,
-      current_hourly_rate_sar: 350,
-      income_goal_monthly_sar: 12000,
+      logo_url: "https://x/logo.png",
+      portfolio_samples: [{ title: "x" }],
+      notable_clients: ["A"],
+      linkedin_url: "https://linkedin.com/x",
     };
-    // 6+11+8+8+11+7+5 = 56
-    expect(computeStrength(kyc)).toBe(56);
+    expect(computeStrength(withExtras)).toBe(100);
+    expect(computeStrength(FULL_CORE)).toBe(100);
   });
 
-  it("each unfilled section is honestly missing — e.g. no logo, no tagline, no platforms drops the score", () => {
-    const noExtras = { ...FULL, logo_url: null, tagline_ar: null, tagline_en: null };
-    // 100 - logo(5) - tagline(5) = 90
-    expect(computeStrength(noExtras)).toBe(90);
-    const noPlatforms = { ...FULL, linkedin_url: null };
-    // platforms had only linkedin → now unmet → 100 - 5 = 95
-    expect(computeStrength(noPlatforms)).toBe(95);
-    const noSamples = { ...FULL, portfolio_samples: [] as unknown[] };
-    expect(computeStrength(noSamples)).toBe(95);
+  it("missing a REQUIRED field lowers the score", () => {
+    expect(computeStrength({ ...FULL_CORE, tagline_ar: null })).toBe(94); // -tagline(6)
+    expect(computeStrength({ ...FULL_CORE, specialties: [] as string[] })).toBe(86); // -specialty(14)
   });
 
   it("accepts the fields the editors persist (slug/text/years), not only *_id", () => {
-    expect(computeStrength({ specialties: ["web-dev"] })).toBe(11);
-    expect(computeStrength({ city: "riyadh" })).toBe(8);
-    expect(computeStrength({ years_experience: 5 })).toBe(8);
-  });
-
-  it("platforms is met by any presence signal (a URL or a used-platform flag)", () => {
-    expect(computeStrength({ behance_url: "https://be/x" })).toBe(5);
-    expect(computeStrength({ uses_bahr: true })).toBe(5);
-  });
-
-  it("clearing the only specialty drops its weight (the reported bug)", () => {
-    expect(computeStrength(FULL)).toBe(100);
-    expect(computeStrength({ ...FULL, specialties: [] as string[] })).toBe(89); // 100 - specialty(11)
+    expect(computeStrength({ specialties: ["web-dev"] })).toBe(14);
+    expect(computeStrength({ city: "riyadh" })).toBe(10);
   });
 });
 
 describe("strengthItems", () => {
-  it("returns 15 dimensions whose weights sum to 100", () => {
+  it("returns 15 items: 10 required (weights sum 100) + 5 optional (weight 0)", () => {
     const items = strengthItems({});
     expect(items).toHaveLength(15);
-    expect(items.reduce((s, i) => s + i.weight, 0)).toBe(100);
-    expect(items.every((i) => !i.met)).toBe(true);
+    const required = items.filter((i) => !i.optional);
+    const optional = items.filter((i) => i.optional);
+    expect(required).toHaveLength(10);
+    expect(optional).toHaveLength(5);
+    expect(required.reduce((s, i) => s + i.weight, 0)).toBe(100);
+    expect(optional.every((i) => i.weight === 0)).toBe(true);
   });
-  it("marks the unfilled sections as missing", () => {
-    const items = strengthItems({ specialties: ["web-dev"], city: "riyadh" });
-    expect(items.find((i) => i.key === "logo")?.met).toBe(false);
-    expect(items.find((i) => i.key === "tagline")?.met).toBe(false);
-    expect(items.find((i) => i.key === "platforms")?.met).toBe(false);
-    expect(items.find((i) => i.key === "specialty")?.met).toBe(true);
+  it("history dimensions are flagged optional", () => {
+    const items = strengthItems({});
+    for (const key of ["fl_number", "logo", "samples", "clients", "platforms"]) {
+      expect(items.find((i) => i.key === key)?.optional).toBe(true);
+    }
   });
 });
 
