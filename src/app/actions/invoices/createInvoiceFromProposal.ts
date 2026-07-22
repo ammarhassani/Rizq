@@ -60,7 +60,7 @@ export async function createInvoiceFromProposal(
   // Load the proposal (owner-scoped via RLS + explicit eq)
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, client_id, price_anchor, status")
+    .select("id, client_id, price_anchor, status, project_id")
     .eq("id", proposal_id)
     .eq("user_id", userId)
     .single();
@@ -74,6 +74,9 @@ export async function createInvoiceFromProposal(
 
   const subtotalSar = Number(proposal.price_anchor);
   const clientId = (proposal.client_id as string | null) ?? null;
+  // Inherit the proposal's project (if it's already part of a project lifecycle) so the
+  // invoice is discoverable by project-scoped queries and the lifecycle can complete.
+  const projectId = (proposal.project_id as string | null) ?? null;
 
   // Build a description — generic since proposals don't have a client_name column
   const description = "عرض مقبول";
@@ -90,6 +93,7 @@ export async function createInvoiceFromProposal(
       user_id: userId,
       client_id: clientId,
       proposal_id,
+      project_id: projectId,
       description,
       items: [],
       subtotal_sar: subtotalSar,

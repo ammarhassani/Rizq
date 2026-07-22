@@ -60,7 +60,7 @@ export async function createInvoiceFromGig(
   const { data: gig, error: gigErr } = await supabase
     .from("gigs")
     .select(
-      "id, title, amount_sar, client_id, proposal_id, delivery_date, payment_method"
+      "id, title, amount_sar, client_id, proposal_id, project_id, delivery_date, payment_method"
     )
     .eq("id", gig_id)
     .eq("user_id", userId)
@@ -72,6 +72,10 @@ export async function createInvoiceFromGig(
   const subtotalSar = Number(gig.amount_sar);
   const clientId = (gig.client_id as string | null) ?? null;
   const proposalId = (gig.proposal_id as string | null) ?? null;
+  // Inherit the gig's project so the invoice is discoverable by project-scoped queries
+  // (e.g. the dashboard lifecycle list). Without this the invoice is orphaned from its
+  // project and the lifecycle stays stuck at "create invoice" even after it's paid.
+  const projectId = (gig.project_id as string | null) ?? null;
 
   // feature 006 — the invoice inherits the freelancer's profile: VAT defaults to
   // KSA 15% when they're VAT-registered, and payment terms default from settings.
@@ -112,6 +116,7 @@ export async function createInvoiceFromGig(
       client_id: clientId,
       gig_id,
       proposal_id: proposalId,
+      project_id: projectId,
       description: gigTitle,
       items,
       subtotal_sar: subtotalSar,
