@@ -4,6 +4,7 @@ import { useState, useMemo, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
 import { GigStatusQuickEdit } from "./GigStatusQuickEdit";
@@ -113,6 +114,33 @@ export function IncomeListClient({ gigs, locale }: Props) {
     return list;
   }, [gigs, filter, sort]);
 
+  // Board stat band + monthly bars (Wahaj DC income screen), computed from gigs.
+  const stats = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const sameMonth = (d: Date, off: number) => {
+      const t = new Date(y, now.getMonth() + off, 1);
+      return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth();
+    };
+    let thisMonth = 0, lastMonth = 0, thisYear = 0, yearCount = 0;
+    const monthly = Array(6).fill(0) as number[];
+    for (const g of gigs) {
+      if (!g.delivery_date) continue;
+      const d = new Date(g.delivery_date);
+      const amt = g.amount_sar || 0;
+      if (sameMonth(d, 0)) thisMonth += amt;
+      if (sameMonth(d, -1)) lastMonth += amt;
+      if (d.getFullYear() === y) { thisYear += amt; yearCount++; }
+      for (let i = 0; i < 6; i++) if (sameMonth(d, -(5 - i))) monthly[i] += amt;
+    }
+    const monthFmt = new Intl.DateTimeFormat(isAr ? "ar-SA-u-ca-gregory" : "en-US", { month: "short" });
+    const labels = Array.from({ length: 6 }, (_, i) => monthFmt.format(new Date(y, now.getMonth() - (5 - i), 1)));
+    const avg = Math.round(thisYear / (now.getMonth() + 1));
+    const changePct = lastMonth > 0 ? Math.round(((thisMonth - lastMonth) / lastMonth) * 100) : null;
+    const max = Math.max(1, ...monthly);
+    return { thisMonth, thisYear, avg, yearCount, monthly, labels, changePct, max, year: y };
+  }, [gigs, isAr]);
+
   const chips: Array<{ key: FilterChip; label: string }> = [
     { key: "all", label: t("filterAll") },
     { key: "paid", label: t("filterPaid") },
@@ -201,6 +229,72 @@ export function IncomeListClient({ gigs, locale }: Props) {
         reason={upgradeReason}
       />
     <div className="space-y-4 pb-20">
+      {/* ── Board stat band + monthly bars (Wahaj DC income screen) ───────── */}
+      <section dir={dir} className="space-y-[18px]">
+        <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-3">
+          <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "دخل هذا الشهر" : "This month"}</div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="aurora-text tabular font-sans text-[34px] font-bold leading-none">
+                <AnimatedNumber value={stats.thisMonth} locale={locale} duration={1.1} />
+              </span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+            </div>
+            {stats.changePct !== null && (
+              <div className={`mt-1 text-[10px] text-[var(--acc)] ${font}`}>
+                {stats.changePct >= 0 ? "+" : ""}{stats.changePct}% {isAr ? "عن الشهر الماضي" : "vs last month"}
+              </div>
+            )}
+          </div>
+          <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "دخل هذا العام" : "This year"}</div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="tabular font-sans text-[34px] font-bold leading-none text-[var(--content)]">
+                <AnimatedNumber value={stats.thisYear} locale={locale} duration={1.1} />
+              </span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+            </div>
+            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{fmtPrice(stats.yearCount, locale)} {isAr ? "عملًا" : "gigs"}</div>
+          </div>
+          <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "المتوسّط الشهريّ" : "Monthly average"}</div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="tabular font-sans text-[34px] font-bold leading-none text-[var(--content)]">
+                <AnimatedNumber value={stats.avg} locale={locale} duration={1.1} />
+              </span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+            </div>
+            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "هذا العام" : "this year"}</div>
+          </div>
+        </div>
+        <div className="nm-raised rounded-[20px] bg-[var(--raised)] px-[22px] py-5">
+          <div className={`mb-4 text-xs font-semibold text-[var(--content)] ${font}`}>
+            {isAr ? "الدخل الشهريّ" : "Monthly income"} · {stats.year}
+          </div>
+          <div className="flex h-[150px] items-end gap-3.5">
+            {stats.monthly.map((v, i) => {
+              const h = Math.max(4, Math.round((v / stats.max) * 100));
+              const latest = i === stats.monthly.length - 1;
+              return (
+                <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+                  <div
+                    className="w-full rounded-t-lg transition-[height] duration-700"
+                    style={{
+                      height: `${h}%`,
+                      background: latest ? "var(--fill)" : "var(--track)",
+                      boxShadow: latest ? "0 0 22px -4px rgba(52,230,168,.6)" : "none",
+                    }}
+                  />
+                  <span className={`text-[9px] ${latest ? "font-semibold text-[var(--acc)]" : "text-[var(--content-faint)]"} ${font}`}>
+                    {stats.labels[i]}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Filter chips */}
       <div dir={dir} className="flex flex-wrap gap-2">
         {chips.map((c) => (
@@ -210,8 +304,8 @@ export function IncomeListClient({ gigs, locale }: Props) {
             onClick={() => setFilter(c.key)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
               filter === c.key
-                ? "bg-rizq-green text-rizq-cream"
-                : "border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                ? "aurora-fill"
+                : "nm-raised-sm bg-[var(--raised)] text-[var(--content-2)] hover:text-[var(--acc)]"
             } ${font}`}
           >
             {c.label}
