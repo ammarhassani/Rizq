@@ -283,7 +283,10 @@ export function InsightsWidget({ locale }: Props) {
   const isStreaming = streaming;
 
   return (
-    <div dir={dir} className="card-wahaj p-6 sm:p-8 col-span-full">
+    // Aurora rotating border — this is the live AI surface, so it earns the
+    // "magic" frame the board gives it (REDLINE §4: aurora border = AI/generation).
+    <div dir={dir} className="aurora-ring col-span-full">
+      <div className="rounded-[20px] bg-[var(--panel)] p-6 sm:p-8">
       {/* Header — the title + chevron toggle collapse; state persists. */}
       <div className={`flex items-center justify-between ${collapsed ? "" : "mb-5"} ${font}`}>
         <button
@@ -407,6 +410,7 @@ export function InsightsWidget({ locale }: Props) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

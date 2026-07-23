@@ -327,7 +327,8 @@
 }
 .display-2 {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.6vw + 0.6rem, 3.25rem);
+  /* app-page H1 — board scale ~44px desktop, 32px mobile (was 52px, too large) */
+  font-size: clamp(2rem, 2.2vw + 0.85rem, 2.75rem);
   line-height: 1.08;
   letter-spacing: -0.01em;
   font-weight: 700;
