@@ -180,7 +180,7 @@ export function DemoRate({ locale }: Props) {
         {figures.map(({ labelKey, value }) => (
           <div
             key={labelKey}
-            className="flex flex-col items-center gap-1 rounded-xl border border-rizq-gold/20 bg-white px-2 py-2.5 text-center"
+            className="flex flex-col items-center gap-1 rounded-xl border border-rizq-gold/20 bg-rizq-cream px-2 py-2.5 text-center"
           >
             <span className="text-base sm:text-lg font-bold text-rizq-ink tabular leading-none">
               <AnimatedNumber value={value} duration={0.6} locale={locale} />

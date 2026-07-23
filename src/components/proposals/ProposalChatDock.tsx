@@ -255,7 +255,7 @@ export function ProposalChatDock({
           onClick={send}
           disabled={pending || !draft.trim()}
           aria-label={t("send")}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rizq-green text-white transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl aurora-fill transition-colors hover:bg-rizq-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rizq-green disabled:bg-rizq-green/60"
         >
           {pending ? (
             <Loader2 size={15} className="animate-spin" aria-hidden="true" />
@@ -281,10 +281,10 @@ export function ProposalChatDock({
           <div className="sticky top-20 flex h-[calc(100vh-6rem)] flex-col gap-3 print:hidden">
             <header className="flex items-center gap-2 text-rizq-green">
               <span
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-rizq-green"
+                className="flex h-7 w-7 items-center justify-center rounded-full aurora-fill"
                 aria-hidden="true"
               >
-                <Sparkles size={14} strokeWidth={2.2} className="text-white" />
+                <Sparkles size={14} strokeWidth={2.2} className="text-[var(--on-accent)]" />
               </span>
               <span className="text-sm font-semibold">{aiLabel}</span>
             </header>
@@ -313,7 +313,7 @@ export function ProposalChatDock({
                     className="flex justify-end"
                   >
                     <p
-                      className="max-w-[88%] rounded-2xl bg-rizq-green px-3.5 py-2 text-[13px] leading-snug text-white"
+                      className="max-w-[88%] rounded-2xl aurora-fill px-3.5 py-2 text-[13px] leading-snug"
                       dir="auto"
                     >
                       {m.text}

@@ -227,7 +227,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
               type="button"
               onClick={handleMarkPaid}
               disabled={isMarkingPaid}
-              className={`inline-flex items-center gap-2 rounded-full bg-emerald-600 text-white px-5 py-2.5 text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-70 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full aurora-fill px-5 py-2.5 text-sm font-medium hover:brightness-105 transition-colors disabled:opacity-70 ${font}`}
             >
               {isMarkingPaid ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
               {t("markPaid")}

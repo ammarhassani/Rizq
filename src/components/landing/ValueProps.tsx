@@ -53,7 +53,7 @@ export async function ValueProps({ locale }: Props) {
             const Icon = VALUE_ICONS[i];
             return (
               <Reveal key={titleKey} delay={i * 0.07}>
-                <div className="group relative flex h-full flex-col gap-3 rounded-2xl border border-rizq-gold/20 bg-white p-5 sm:p-6 transition-all duration-200 hover:border-rizq-green/30 hover:shadow-[0_8px_30px_-12px_rgba(26,95,63,0.2)]">
+                <div className="group relative flex h-full flex-col gap-3 rounded-2xl border border-rizq-gold/20 bg-rizq-cream p-5 sm:p-6 transition-all duration-200 hover:border-rizq-green/30 hover:shadow-[0_8px_30px_-12px_rgba(26,95,63,0.2)]">
                   {/* numbered + icon row */}
                   <div className="flex items-center gap-3">
                     <span

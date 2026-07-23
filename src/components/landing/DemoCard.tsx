@@ -25,7 +25,7 @@ export function DemoCard({ title, caption, windowLabel, isAr, children }: Props)
   const font = isAr ? "font-arabic" : "font-sans";
 
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-rizq-gold/25 bg-white shadow-[0_18px_50px_-22px_rgba(26,95,63,0.32)] transition-shadow duration-300 hover:shadow-[0_24px_60px_-20px_rgba(26,95,63,0.4)]">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-rizq-gold/25 bg-rizq-cream shadow-[0_18px_50px_-22px_rgba(26,95,63,0.32)] transition-shadow duration-300 hover:shadow-[0_24px_60px_-20px_rgba(26,95,63,0.4)]">
       {/* gold accent line at the very top */}
       <span
         aria-hidden
@@ -49,7 +49,7 @@ export function DemoCard({ title, caption, windowLabel, isAr, children }: Props)
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col gap-5 bg-gradient-to-b from-white to-rizq-cream/30 p-5 sm:p-6">
+      <div className="flex flex-1 flex-col gap-5 bg-gradient-to-b from-rizq-cream to-rizq-cream-dark/30 p-5 sm:p-6">
         <div className="flex flex-col gap-1.5">
           <h3 className={`text-lg font-semibold text-rizq-ink leading-snug ${font}`}>
             {title}

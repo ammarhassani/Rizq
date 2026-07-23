@@ -53,7 +53,7 @@ export function DemoInvoice({ locale }: Props) {
   return (
     <div className="flex flex-col gap-5">
       {/* Mini invoice — mirrors InvoiceArtifact's structure */}
-      <div className="overflow-hidden rounded-2xl border border-rizq-gold/20 bg-white">
+      <div className="overflow-hidden rounded-2xl border border-rizq-gold/20 bg-rizq-cream">
         {/* Brand header with accent + status badge */}
         <div
           className="flex items-center justify-between gap-3 border-s-[3px] border-rizq-green bg-rizq-cream/40 px-4 py-3"

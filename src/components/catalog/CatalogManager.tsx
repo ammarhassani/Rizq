@@ -352,7 +352,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
               </button>
             )}
             <button type="button" disabled={isMutating} onClick={() => setConfirm({ op: "delete", kind: tab, ids: [...sel] })}
-              className={cn("inline-flex items-center gap-1.5 rounded-full border border-[var(--over-line)] bg-white px-3.5 py-2 text-sm text-[var(--over)] transition-all hover:bg-[var(--over-soft)] disabled:opacity-60", font)}>
+              className={cn("inline-flex items-center gap-1.5 rounded-full border border-[var(--over-line)] bg-[var(--raised)] px-3.5 py-2 text-sm text-[var(--over)] transition-all hover:bg-[var(--over-soft)] disabled:opacity-60", font)}>
               <Trash2 size={14} aria-hidden /> <span>{t("bulkDelete")}</span>
             </button>
           </div>

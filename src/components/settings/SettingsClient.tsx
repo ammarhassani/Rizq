@@ -211,7 +211,7 @@ function DeleteSection({
 
           {/* Dialog */}
           <div
-            className={`relative z-10 w-full max-w-md rounded-3xl border border-[var(--over-line)] bg-white shadow-2xl p-6 sm:p-8 ${font}`}
+            className={`relative z-10 w-full max-w-md rounded-3xl border border-[var(--over-line)] bg-[var(--raised)] shadow-2xl p-6 sm:p-8 ${font}`}
             dir={locale === "ar" ? "rtl" : "ltr"}
           >
             {/* Close */}

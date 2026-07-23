@@ -78,7 +78,7 @@ export function WorkflowStory({ locale }: Props) {
                   <li className="group flex lg:flex-col items-start gap-4 lg:gap-0 lg:h-full">
                     <div className="flex flex-col items-center lg:items-start lg:w-full">
                       <span
-                        className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-rizq-green/20 bg-white text-rizq-green shadow-[0_4px_16px_-6px_rgba(26,95,63,0.25)] transition-colors group-hover:border-rizq-green/40"
+                        className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-rizq-green/20 bg-rizq-cream text-rizq-green shadow-[0_4px_16px_-6px_rgba(26,95,63,0.25)] transition-colors group-hover:border-rizq-green/40"
                         aria-hidden
                       >
                         <Icon size={24} strokeWidth={1.5} />

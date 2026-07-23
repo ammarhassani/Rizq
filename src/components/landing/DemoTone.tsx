@@ -46,7 +46,7 @@ export function DemoTone({ locale }: Props) {
               className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors min-h-[40px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 ${font} ${
                 selected
                   ? "border-rizq-green bg-rizq-green text-rizq-cream"
-                  : "border-rizq-gold/30 bg-white text-rizq-ink-soft hover:border-rizq-green/40 hover:text-rizq-ink"
+                  : "border-rizq-gold/30 bg-rizq-cream text-rizq-ink-soft hover:border-rizq-green/40 hover:text-rizq-ink"
               }`}
             >
               {t(TONE_LABEL_KEY[option])}
@@ -56,7 +56,7 @@ export function DemoTone({ locale }: Props) {
       </div>
 
       {/* Proposal snippet card — mirrors the artifact's accented section shell */}
-      <div className="relative overflow-hidden rounded-2xl border border-rizq-gold/20 border-s-[3px] border-s-rizq-green bg-white p-5">
+      <div className="relative overflow-hidden rounded-2xl border border-rizq-gold/20 border-s-[3px] border-s-rizq-green bg-rizq-cream p-5">
         {/* watermark quote glyph */}
         <Quote
           size={56}
