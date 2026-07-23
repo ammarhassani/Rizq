@@ -216,7 +216,8 @@
   --content-2: #c7d3cc;
   --content-3: #a9b6ae;
   --content-muted: #93a19a;
-  --content-faint: #6b7972;
+  /* faint: #6b7972 measured 3.93:1 on --raised (fails AA); lifted to clear 4.5 */
+  --content-faint: #7e8b84;
   /* lines */
   --line: rgba(255, 255, 255, 0.09);
   --line-2: rgba(255, 255, 255, 0.05);
@@ -672,5 +673,27 @@
   .bar-rise {
     animation: none !important;
     transform: none !important;
+  }
+}
+
+/* ── Aurora flow (aliveness pass — founder-picked, DC-blessed L2 ambient) ──────
+   Drifts the aurora FILL surfaces only (buttons / active-nav / chips). The money
+   figure + wordmark (aurora-TEXT) stay calm per REDLINE §4 guardrail — and because
+   the light gradient's gold stop (#b8862e) is AA-large-fail as text. Ink-on-fill
+   stays 6.5–12:1 in both themes, so drifting the fill never drops below AA. */
+@keyframes aurora-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.aurora-fill,
+.aurora-btn {
+  background-size: 200% 100%;
+  animation: aurora-flow 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-fill,
+  .aurora-btn {
+    animation: none !important;
+    background-position: 0 50% !important;
   }
 }
