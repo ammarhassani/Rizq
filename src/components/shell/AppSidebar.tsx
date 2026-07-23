@@ -14,7 +14,6 @@ import {
 import {
   PanelLeftClose,
   PanelLeftOpen,
-  ChevronRight,
   Loader2,
   type LucideIcon,
 } from "lucide-react";
@@ -94,7 +93,7 @@ function SidebarNav({
             {/* Group label — hidden when collapsed */}
             {!collapsed && (
               <p
-                className={`mb-0.5 px-2 text-[10px] uppercase tracking-[0.18em] text-[var(--content-faint)] select-none ${font}`}
+                className={`mt-2.5 mb-1.5 px-1.5 text-[9px] uppercase tracking-[0.2em] text-[var(--content-faint)] select-none ${font}`}
               >
                 {t(`groups.${group}`)}
               </p>
@@ -109,12 +108,12 @@ function SidebarNav({
                   aria-label={t(`apps.${app.id}.name`)}
                   aria-current={active ? "page" : undefined}
                   className={[
-                    "group relative flex items-center gap-3 rounded-xl px-2.5 min-h-[44px]",
-                    "transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.98]",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
+                    "group relative flex items-center gap-3 rounded-[13px] px-3 py-2.5 mb-[3px]",
+                    "transition-colors duration-150 ease-out",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)]",
                     active
-                      ? "aurora-fill shadow-md"
-                      : "text-rizq-ink hover:bg-rizq-green/8 hover:text-rizq-green hover:-translate-y-px",
+                      ? "aurora-fill shadow-[0_0_18px_-4px_rgba(52,230,168,.6)] font-bold"
+                      : "text-[var(--content-2)] hover:bg-[var(--line-2)] hover:text-[var(--content)]",
                     collapsed ? "justify-center" : "",
                   ]
                     .filter(Boolean)
@@ -126,19 +125,9 @@ function SidebarNav({
                       {t(`apps.${app.id}.name`)}
                     </span>
                   )}
-                  {/* Gold hairline indicator for active when not collapsed */}
-                  {active && !collapsed && (
-                    <ChevronRight
-                      size={12}
-                      aria-hidden
-                      className="ms-auto shrink-0 opacity-60"
-                    />
-                  )}
                 </Link>
               );
             })}
-            {/* Hairline separator between groups — calmer than the old gold rule (audit §O4) */}
-            <div className="mt-1 mb-1 h-px bg-[var(--line-2)] mx-2" aria-hidden />
           </div>
         );
       })}
@@ -172,7 +161,7 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
   }
 
   // RTL: sidebar sits on the inline-end (right in ar)
-  const sidebarWidth = collapsed ? "w-[60px]" : "w-[220px]";
+  const sidebarWidth = collapsed ? "w-[64px]" : "w-[248px]";
 
   return (
     <>
@@ -181,16 +170,24 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
         className={[
           "hidden lg:flex flex-col shrink-0 transition-[width] duration-200 ease-in-out print:!hidden",
           "sticky top-0 h-screen overflow-y-auto overflow-x-hidden",
-          "bg-[var(--surface)] border-s border-[var(--line)]",
+          "bg-[var(--panel)] border-s border-[var(--line-2)]",
           sidebarWidth,
         ].join(" ")}
         aria-label={t("topbar.openSidebar")}
       >
         {/* Brand mark at top */}
-        <div className="flex items-center justify-between gap-2 px-3 py-4 border-b border-[var(--line)] shrink-0">
+        <div className="flex items-center justify-between gap-2 px-4 pt-[18px] pb-3 shrink-0">
           {!collapsed && (
-            <Link href="/" className="truncate" aria-label="رِزق">
-              <span className="font-display text-2xl font-bold leading-none aurora-text">رِزق</span>
+            <Link href="/" aria-label="رِزق">
+              <span
+                className="inline-flex items-center rounded-2xl bg-[var(--raised)] px-4 py-1.5 font-display text-[22px] font-bold leading-none aurora-text"
+                style={{
+                  boxShadow:
+                    "4px 4px 9px var(--nm-dark), -4px -4px 9px var(--nm-light), 0 0 20px -6px rgba(52,230,168,.5)",
+                }}
+              >
+                رِزق
+              </span>
             </Link>
           )}
           <button

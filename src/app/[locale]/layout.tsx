@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Tajawal, Inter, El_Messiri } from "next/font/google";
+import { Tajawal, Inter, El_Messiri, Reem_Kufi, Space_Grotesk, Space_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -27,6 +27,29 @@ const elMessiri = El_Messiri({
   subsets: ["arabic", "latin"],
   weight: ["500", "600", "700"],
   variable: "--font-el-messiri",
+  display: "swap",
+});
+
+// Wahaj type system (per the DC board): Reem Kufi eyebrows, Space Grotesk
+// Latin/numerals, Space Mono for mono figures.
+const reemKufi = Reem_Kufi({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-reem-kufi",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
   display: "swap",
 });
 
@@ -68,7 +91,7 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${tajawal.variable} ${inter.variable} ${elMessiri.variable} h-full`}
+      className={`${tajawal.variable} ${inter.variable} ${elMessiri.variable} ${reemKufi.variable} ${spaceGrotesk.variable} ${spaceMono.variable} h-full`}
       suppressHydrationWarning
     >
       <body

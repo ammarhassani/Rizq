@@ -26,9 +26,9 @@ export function ThemeToggle({ locale }: { locale: "ar" | "en" }) {
       aria-label={label}
       title={label}
       className={[
-        "inline-flex items-center justify-center h-11 w-11 rounded-xl shrink-0",
-        "text-rizq-ink hover:bg-rizq-green/10 hover:text-rizq-green transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/60",
+        "inline-flex items-center justify-center h-9 w-9 rounded-[11px] shrink-0 nm-raised-sm",
+        "bg-[var(--raised)] text-[var(--content-2)] hover:text-[var(--acc)] transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)]",
       ].join(" ")}
     >
       {isDark ? (
