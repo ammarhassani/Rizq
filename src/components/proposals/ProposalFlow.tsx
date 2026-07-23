@@ -248,7 +248,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
           value={briefText}
           onChange={(e) => setBriefText(e.target.value)}
           rows={5}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 resize-none ${font}`}
+          className={`w-full rounded-xl nm-inset bg-[var(--raised)] px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 resize-none ${font}`}
         />
         <div className="flex flex-wrap gap-3">
           <button
@@ -392,7 +392,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
           onChange={(e) => setBriefText(e.target.value)}
           rows={6}
           placeholder={t("briefPlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
+          className={`w-full rounded-xl nm-inset bg-[var(--raised)] px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
         />
       </div>
 
@@ -411,7 +411,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
           onChange={(e) => setGoalsText(e.target.value)}
           rows={2}
           placeholder={t("goalsPlaceholder")}
-          className={`w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
+          className={`w-full rounded-xl nm-inset bg-[var(--raised)] px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream transition-colors resize-none placeholder:text-rizq-ink-soft/50 ${font}`}
         />
       </div>
 
