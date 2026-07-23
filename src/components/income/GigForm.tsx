@@ -211,7 +211,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
     <form
       onSubmit={handleSubmit}
       dir={dir}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-5 animate-fade-in ${font}`}
+      className={`card-wahaj p-7 sm:p-10 space-y-5 animate-fade-in ${font}`}
       noValidate
     >
       <div>

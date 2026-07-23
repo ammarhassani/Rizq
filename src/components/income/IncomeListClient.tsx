@@ -278,11 +278,12 @@ export function IncomeListClient({ gigs, locale }: Props) {
               return (
                 <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
                   <div
-                    className="w-full rounded-t-lg transition-[height] duration-700"
+                    className="bar-rise w-full rounded-t-lg"
                     style={{
                       height: `${h}%`,
                       background: latest ? "var(--fill)" : "var(--track)",
-                      boxShadow: latest ? "0 0 22px -4px rgba(52,230,168,.6)" : "none",
+                      boxShadow: latest ? "var(--acc-glow-strong)" : "none",
+                      animationDelay: `${i * 90}ms`,
                     }}
                   />
                   <span className={`text-[9px] ${latest ? "font-semibold text-[var(--acc)]" : "text-[var(--content-faint)]"} ${font}`}>

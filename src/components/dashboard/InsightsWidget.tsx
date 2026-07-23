@@ -239,7 +239,7 @@ export function InsightsWidget({ locale }: Props) {
 
   if (status === "loading") {
     return (
-      <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">
+      <div dir={dir} className="card-wahaj p-6 sm:p-8">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="h-4 w-4 text-rizq-gold animate-pulse" />
           <div className="h-4 w-32 bg-rizq-gold/20 rounded animate-pulse" />
@@ -253,7 +253,7 @@ export function InsightsWidget({ locale }: Props) {
 
   if (status === "empty") {
     return (
-      <div dir={dir} className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 text-center ${font}`}>
+      <div dir={dir} className={`card-wahaj p-6 sm:p-8 text-center ${font}`}>
         <Sparkles className="h-8 w-8 text-rizq-gold mx-auto mb-3 opacity-50" />
         <p className={`text-sm text-rizq-ink-soft ${font}`}>
           {isAr ? "أنشئ أول عرض لتفعيل التحليلات" : "Create your first proposal to activate insights"}
@@ -283,7 +283,10 @@ export function InsightsWidget({ locale }: Props) {
   const isStreaming = streaming;
 
   return (
-    <div dir={dir} className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 col-span-full">
+    // Aurora rotating border — this is the live AI surface, so it earns the
+    // "magic" frame the board gives it (REDLINE §4: aurora border = AI/generation).
+    <div dir={dir} className="aurora-ring col-span-full">
+      <div className="rounded-[20px] bg-[var(--panel)] p-6 sm:p-8">
       {/* Header — the title + chevron toggle collapse; state persists. */}
       <div className={`flex items-center justify-between ${collapsed ? "" : "mb-5"} ${font}`}>
         <button
@@ -407,6 +410,7 @@ export function InsightsWidget({ locale }: Props) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

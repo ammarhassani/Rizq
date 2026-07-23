@@ -106,7 +106,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
             {t("profileSectionTitle")}
           </h2>
 
-          <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6">
+          <div className="card-wahaj p-6">
             <div className="flex items-start gap-4">
               {/* Avatar placeholder */}
               <div className="h-12 w-12 rounded-2xl bg-rizq-green/10 border border-rizq-green/20 flex items-center justify-center shrink-0">
@@ -201,7 +201,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
         />
 
         {/* ── PDPL: Privacy & data + Danger zone ─────────────────────── */}
-        <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">
+        <div className="card-wahaj p-6 sm:p-8">
           <SettingsClient locale={locale as "ar" | "en"} confirmPhrase={confirmPhrase} />
         </div>
       </div>

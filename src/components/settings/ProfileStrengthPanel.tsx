@@ -23,7 +23,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
   return (
     <div
       dir={dir}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/70 p-6 sm:p-7 ${font}`}
+      className={`card-wahaj p-6 sm:p-7 ${font}`}
     >
       <div className="flex items-center justify-between gap-3">
         <span className={`text-sm font-semibold text-rizq-ink ${font}`}>

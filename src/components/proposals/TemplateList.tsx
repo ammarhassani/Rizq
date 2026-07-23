@@ -50,7 +50,7 @@ export function TemplateList({ locale, templates }: Props) {
     return (
       <div
         dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 text-center ${font}`}
+        className={`card-wahaj p-8 text-center ${font}`}
       >
         <p className={`text-rizq-ink font-semibold mb-2 ${font}`}>
           {t("emptyTitle")}
@@ -98,7 +98,7 @@ export function TemplateList({ locale, templates }: Props) {
         return (
           <div
             key={tpl.id}
-            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 transition-opacity ${isBusy ? "opacity-70" : ""}`}
+            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-wahaj-sm p-5 transition-opacity ${isBusy ? "opacity-70" : ""}`}
           >
             {/* Left: name + meta */}
             <div className="flex-1 min-w-0">

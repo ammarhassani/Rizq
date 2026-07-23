@@ -136,8 +136,10 @@
   --acc: #0a6b4b;
   --acc-tint: #0a6b4b;
   --gold: #b8862e;
-  --grad: linear-gradient(100deg, #0a8f66, #0e8fa0 50%, #b8862e);
-  --grad-m: linear-gradient(100deg, #0a8f66, #b8862e);
+  /* gradient-TEXT poles deepened to clear AA-large on --raised (warm #b8862e=2.76
+     failed). --gold #b8862e kept below for fills/strokes (3:1 UI threshold). */
+  --grad: linear-gradient(100deg, #0a7d59, #0e8fa0 50%, #8a5a12);
+  --grad-m: linear-gradient(100deg, #0a7d59, #8a5a12);
   --fill: linear-gradient(120deg, #12c58c, #12a6b8);
   --acc-soft: rgba(11, 123, 87, 0.12);
   --acc-line: rgba(11, 123, 87, 0.32);
@@ -216,7 +218,8 @@
   --content-2: #c7d3cc;
   --content-3: #a9b6ae;
   --content-muted: #93a19a;
-  --content-faint: #6b7972;
+  /* faint: #6b7972 measured 3.93:1 on --raised (fails AA); lifted to clear 4.5 */
+  --content-faint: #7e8b84;
   /* lines */
   --line: rgba(255, 255, 255, 0.09);
   --line-2: rgba(255, 255, 255, 0.05);
@@ -326,7 +329,9 @@
 }
 .display-2 {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.6vw + 0.6rem, 3.25rem);
+  /* app-page H1 — pinned 32px (board/REDLINE canonical); ~28 mobile. Landing
+     hero (Hero.tsx) is the 44px title, capped there separately. */
+  font-size: clamp(1.75rem, 1vw + 1.35rem, 2rem);
   line-height: 1.08;
   letter-spacing: -0.01em;
   font-weight: 700;
@@ -594,5 +599,105 @@
   .print-region .aurora-text-m {
     -webkit-text-fill-color: #0a0a0a !important;
     color: #0a0a0a !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   WAHAJ PATCH — append this whole block to the END of src/app/globals.css
+   ---------------------------------------------------------------------------
+   Additive only. It defines:
+   • theme-scoped --acc-glow tokens (later-declared → win over nothing; they are
+     NEW names, so no conflict) — these replace the dark-neon hex hardcoded in
+     components so glows follow the light/dark theme;
+   • recipe classes the codemod maps legacy card/input/pill strings onto;
+   • motion utilities (drifting orbs, rising bars).
+   Pair with the per-file edits in APPLY.md and codemod-wahaj.mjs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="light"] {
+  /* Accent glow — soft, deep on light (components hardcoded dark neon before). */
+  --acc-glow: 0 0 20px -4px rgba(10, 143, 102, 0.42);
+  --acc-glow-strong: 0 0 26px -3px rgba(10, 143, 102, 0.52);
+}
+[data-theme="dark"] {
+  --acc-glow: 0 0 20px -4px rgba(52, 230, 168, 0.55);
+  --acc-glow-strong: 0 0 26px -3px rgba(52, 230, 168, 0.6);
+}
+
+/* ── Coverage recipe classes (targets for codemod-wahaj.mjs) ──────────────── */
+.card-wahaj {
+  border-radius: 22px;
+  background: var(--raised);
+  box-shadow: 7px 7px 16px var(--nm-dark), -7px -7px 16px var(--nm-light);
+}
+.card-wahaj-sm {
+  border-radius: 18px;
+  background: var(--raised);
+  box-shadow: 4px 4px 9px var(--nm-dark), -4px -4px 9px var(--nm-light);
+}
+.input-wahaj {
+  border-radius: 13px;
+  background: var(--raised);
+  box-shadow: inset 3px 3px 8px var(--nm-dark), inset -3px -3px 8px var(--nm-light);
+  border: 0;
+  color: var(--content);
+}
+.input-wahaj::placeholder { color: var(--content-faint); }
+.input-wahaj:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.btn-pill {
+  border-radius: 9999px;
+  background: var(--fill);
+  color: var(--on-accent);
+  box-shadow: var(--acc-glow);
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+.btn-pill:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn-pill:active { filter: brightness(0.96); transform: none; }
+.btn-ghost-wahaj {
+  border-radius: 9999px;
+  background: var(--line-2);
+  color: var(--content-2);
+  border: 1px solid var(--line);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.btn-ghost-wahaj:hover { color: var(--acc); }
+
+/* ── Motion utilities ─────────────────────────────────────────────────────
+   floata / floatb / ringfill / barrise keyframes already exist in globals.css
+   (ringfill/aurora-spin were defined but never applied — these wire them). */
+.orb-drift-a { animation: floata 14s ease-in-out infinite; will-change: transform; }
+.orb-drift-b { animation: floatb 18s ease-in-out infinite; will-change: transform; }
+
+@keyframes barrise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.bar-rise { transform-origin: bottom; animation: barrise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-drift-a,
+  .orb-drift-b,
+  .bar-rise {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ── Aurora flow (aliveness pass — founder-picked, DC-blessed L2 ambient) ──────
+   Drifts the aurora FILL surfaces only (buttons / active-nav / chips). The money
+   figure + wordmark (aurora-TEXT) stay calm per REDLINE §4 guardrail — and because
+   the light gradient's gold stop (#b8862e) is AA-large-fail as text. Ink-on-fill
+   stays 6.5–12:1 in both themes, so drifting the fill never drops below AA. */
+@keyframes aurora-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.aurora-fill,
+.aurora-btn {
+  background-size: 200% 100%;
+  animation: aurora-flow 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-fill,
+  .aurora-btn {
+    animation: none !important;
+    background-position: 0 50% !important;
   }
 }

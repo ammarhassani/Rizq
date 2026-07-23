@@ -205,7 +205,7 @@ export function ProposalDetailActions({
     <>
       <div
         dir={dir}
-        className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 space-y-4 ${font}`}
+        className={`card-wahaj-sm p-5 space-y-4 ${font}`}
       >
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase">
           {/* Section label reuse from ProposalFlow */}

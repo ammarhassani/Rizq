@@ -151,7 +151,7 @@ export default async function ClientDetailPage({
         />
 
         {/* Header */}
-        <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 mb-6 ${font}`}>
+        <div className={`card-wahaj p-7 sm:p-10 mb-6 ${font}`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <h1 className={`text-2xl font-bold text-rizq-ink leading-snug ${font}`}>

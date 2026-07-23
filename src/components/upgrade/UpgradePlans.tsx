@@ -129,7 +129,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
     return (
       <div
         dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 sm:p-10 text-center animate-fade-in ${font}`}
+        className={`card-wahaj p-8 sm:p-10 text-center animate-fade-in ${font}`}
       >
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rizq-gold/10 mb-5">
           <Mail size={24} className="text-rizq-gold-dark" />

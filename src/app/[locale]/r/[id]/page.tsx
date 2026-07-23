@@ -136,7 +136,7 @@ export default async function SharedResultPage({
           {city} · {tier}
         </p>
 
-        <article className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 shadow-[0_30px_60px_-30px_rgba(26,95,63,0.18)] animate-fade-in">
+        <article className="card-wahaj p-7 sm:p-10 shadow-[0_30px_60px_-30px_rgba(26,95,63,0.18)] animate-fade-in">
           <p className="eyebrow mb-6">{t("eyebrow")}</p>
 
           <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">

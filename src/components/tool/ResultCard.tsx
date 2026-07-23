@@ -114,7 +114,7 @@ export function ResultCard({
 
   return (
     <article
-      className="relative rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 backdrop-blur-sm p-7 sm:p-10 shadow-[0_30px_60px_-30px_rgba(26,95,63,0.18)] animate-fade-in"
+      className="relative card-wahaj backdrop-blur-sm p-7 sm:p-10 shadow-[0_30px_60px_-30px_rgba(26,95,63,0.18)] animate-fade-in"
     >
       <p className="eyebrow mb-4">{t("eyebrow")}</p>
 

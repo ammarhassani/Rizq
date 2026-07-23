@@ -61,3 +61,6 @@ next-env.d.ts
 
 # superpowers plugin scratch (brainstorm sessions, ephemeral server state)
 /.superpowers/
+
+# stray design bundles (content lives in docs/design/board/)
+*.zip

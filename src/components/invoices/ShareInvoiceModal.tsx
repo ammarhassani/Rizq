@@ -173,7 +173,7 @@ export function ShareInvoiceModal({
       {/* Sheet / modal panel */}
       <div
         dir={dir}
-        className={`relative w-full sm:max-w-md mx-4 sm:mx-auto rounded-t-3xl sm:rounded-3xl border border-rizq-gold/25 bg-rizq-cream/98 shadow-xl p-6 sm:p-8 animate-fade-in ${font}`}
+        className={`relative w-full sm:max-w-md mx-4 sm:mx-auto rounded-t-3xl sm:card-wahaj shadow-xl p-6 sm:p-8 animate-fade-in ${font}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

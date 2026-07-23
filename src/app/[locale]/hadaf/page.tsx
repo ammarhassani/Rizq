@@ -98,7 +98,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
         {/* ── Status card ────────────────────────────────────────────────── */}
         {status.current_month_status === "no_data" ? (
           /* No-data state */
-          <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-9 mb-8 text-center ${font}`}>
+          <div className={`card-wahaj p-7 sm:p-9 mb-8 text-center ${font}`}>
             <div
               aria-hidden
               className="mx-auto mb-5 h-14 w-14 rounded-2xl border-2 border-rizq-gold/30 bg-rizq-green/8 flex items-center justify-center"
@@ -174,7 +174,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
           </div>
         ) : (
           /* Not-qualifying / in-progress streak state */
-          <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-9 mb-8 ${font}`}>
+          <div className={`card-wahaj p-7 sm:p-9 mb-8 ${font}`}>
             <div className="flex items-start gap-4 mb-5">
               {/* A 1–2 month streak is PROGRESS, not failure — show a building icon, not an X.
                   X is only for a broken/zero streak this month. */}

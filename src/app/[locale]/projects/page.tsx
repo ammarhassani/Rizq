@@ -66,7 +66,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
         </div>
 
         {items.length === 0 ? (
-          <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/70 p-10 text-center ${font}`}>
+          <div className={`card-wahaj p-10 text-center ${font}`}>
             <p className={`text-lg font-semibold text-rizq-ink ${font}`}>{t("indexEmptyTitle")}</p>
             <p className={`mt-1.5 text-sm text-rizq-ink-soft ${font}`}>{t("indexEmptySubtitle")}</p>
             <div className="mt-5 flex justify-center">

@@ -157,7 +157,7 @@ export default async function InvoiceDetailPage({
         {/* Invoice header summary strip */}
         <div
           dir={dir}
-          className={`print:hidden flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 px-6 py-4 mb-6 ${font}`}
+          className={`print:hidden flex flex-wrap items-center justify-between gap-3 card-wahaj-sm px-6 py-4 mb-6 ${font}`}
         >
           <div className="flex items-center gap-3 flex-wrap">
             <span className="tabular font-sans text-lg font-bold text-rizq-ink">
