@@ -15,23 +15,8 @@ export async function AppsGrid({ locale }: Props) {
     <section
       id="apps"
       aria-labelledby="apps-heading"
-      className="relative border-t border-rizq-gold/20 bg-rizq-cream/40"
+      className="relative border-t border-[var(--line-2)] bg-[var(--surface)]/50"
     >
-      {/* subtle dot grid */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.35] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(26,95,63,0.12) 1px, transparent 1.6px)",
-          backgroundSize: "28px 28px",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
-        }}
-      />
-
       <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12 py-16 sm:py-20 lg:py-24">
         {/* Section intro */}
         <Reveal>
@@ -64,15 +49,15 @@ export async function AppsGrid({ locale }: Props) {
               <Reveal key={app.id} delay={i * 0.04}>
                 <Link
                   href={app.href}
-                  className={`group relative flex flex-col items-start gap-3 p-4 sm:p-5 rounded-2xl border border-rizq-gold/20 bg-rizq-cream hover:border-rizq-green/30 hover:bg-white hover:shadow-[0_4px_20px_-4px_rgba(26,95,63,0.18)] transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green focus-visible:ring-offset-2 min-h-[44px] ${font}`}
+                  className={`nm-raised group relative flex flex-col items-start gap-3 rounded-2xl bg-[var(--raised)] p-4 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] sm:p-5 ${font}`}
                   aria-label={`${name}: ${tagline}`}
                 >
-                  {/* Icon tile */}
+                  {/* Icon tile — inset neumorph */}
                   <span
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-rizq-green/15 bg-rizq-green/6 text-rizq-green transition-colors group-hover:border-rizq-green/30 group-hover:bg-rizq-green/10"
+                    className="nm-inset inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--raised)] text-[var(--acc)]"
                     aria-hidden
                   >
-                    <Icon size={18} strokeWidth={1.5} />
+                    <Icon size={18} strokeWidth={1.6} />
                   </span>
 
                   {/* Name */}

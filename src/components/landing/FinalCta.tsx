@@ -4,76 +4,54 @@ import { Reveal } from "@/components/motion/Reveal";
 
 type Props = { locale: "ar" | "en" };
 
+/** Final CTA — board: an aurora rotating-border card on a panel surface. */
 export async function FinalCta({ locale }: Props) {
   const t = await getTranslations({ locale, namespace: "Landing" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
   return (
-    <section
-      aria-labelledby="final-cta-heading"
-      className="relative overflow-hidden border-t border-rizq-gold/20 bg-rizq-green"
-    >
-      {/* Decorative faded رِزق glyph */}
-      <p
-        aria-hidden
-        className="pointer-events-none select-none absolute inset-0 flex items-center justify-center font-arabic font-bold text-rizq-cream leading-none"
-        style={{
-          fontSize: "clamp(12rem, 36vw, 34rem)",
-          opacity: 0.05,
-          letterSpacing: "-0.02em",
-        }}
-      >
-        رِزق
-      </p>
-
-      {/* Gold dot grid overlay */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-[0.18] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(200, 169, 81, 0.4) 1px, transparent 1.6px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-
-      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16 py-20 sm:py-24 lg:py-28 flex flex-col items-center text-center">
+    <section aria-labelledby="final-cta-heading" className="relative border-t border-[var(--line-2)]">
+      <div className="mx-auto w-full max-w-7xl px-6 py-16 sm:px-10 sm:py-20 lg:px-16">
         <Reveal asMount>
-          <h2
-            id="final-cta-heading"
-            className={`display-1 text-rizq-cream max-w-3xl ${font}`}
-          >
-            {t("finalCta.heading")}
-          </h2>
-        </Reveal>
-
-        <Reveal asMount delay={0.14}>
-          <p
-            className={`mt-6 sm:mt-8 max-w-xl text-lg sm:text-xl leading-relaxed text-rizq-cream/75 ${font}`}
-          >
-            {t("finalCta.sub")}
-          </p>
-        </Reveal>
-
-        <Reveal asMount delay={0.26}>
-          <Link
-            href="/signup"
-            className={`mt-10 sm:mt-12 group inline-flex items-center justify-center gap-2 rounded-full bg-rizq-cream text-rizq-green px-8 py-4 text-base sm:text-lg font-semibold tracking-wide shadow-[0_2px_0_0_rgba(0,0,0,0.12)] hover:bg-white transition-all hover:shadow-[0_6px_24px_-4px_rgba(0,0,0,0.22)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-green min-h-[52px] ${font}`}
-          >
-            <span>{t("finalCta.cta")}</span>
-            <span
-              className="inline-block rtl:rotate-180 transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
-              aria-hidden
-            >
-              →
-            </span>
-          </Link>
-        </Reveal>
-
-        {/* Gold decorative rule below */}
-        <Reveal asMount delay={0.4}>
-          <div className="mt-16 rule-gold-h h-px w-24 mx-auto opacity-40" aria-hidden />
+          <div className="aurora-ring">
+            <div className="relative overflow-hidden rounded-[20px] bg-[var(--panel)] px-8 py-14 text-center sm:py-16">
+              {/* aurora orb */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-40 h-96 w-96 rounded-full"
+                style={{
+                  insetInlineStart: "35%",
+                  filter: "blur(120px)",
+                  opacity: 0.2,
+                  background: "radial-gradient(circle,#34E6A8,transparent 70%)",
+                }}
+              />
+              <div className="relative">
+                <h2
+                  id="final-cta-heading"
+                  className={`font-display text-[clamp(2rem,5vw,2.4rem)] font-bold text-rizq-ink ${font}`}
+                >
+                  {t("finalCta.heading")}
+                </h2>
+                <p className={`mx-auto mt-2 max-w-md text-sm text-[var(--content-muted)] ${font}`}>
+                  {t("finalCta.sub")}
+                </p>
+                <Link
+                  href="/signup"
+                  className={`aurora-btn group mt-6 inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-base font-semibold tracking-wide transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)] ${font}`}
+                >
+                  <span>{t("finalCta.cta")}</span>
+                  <span
+                    className="inline-block transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                    aria-hidden
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </Reveal>
       </div>
     </section>
