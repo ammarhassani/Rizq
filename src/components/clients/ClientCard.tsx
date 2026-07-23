@@ -1,5 +1,6 @@
 /**
- * ClientCard — Client Book. Phase-3 task 3.2.
+ * ClientCard — Client Book. Pixel-matched to the Wahaj DC clients board:
+ * aurora avatar (initial), name + type, priority chip, Space Mono gigs/total footer.
  */
 import { Link } from "@/i18n/navigation";
 
@@ -21,83 +22,65 @@ export type ClientRow = {
 type Props = {
   client: ClientRow;
   locale: "ar" | "en";
-  /** Optional interactive control (e.g. the follow-up priority quick-edit)
-   *  rendered inline in the card's meta row. Kept out of the title/price area
-   *  so it never overlaps existing content. */
+  /** Optional interactive control (the follow-up priority quick-edit); when
+   *  present it takes the board's priority-chip slot. */
   prioritySlot?: React.ReactNode;
 };
 
-function relativeDate(iso: string | null, locale: "ar" | "en"): string {
-  if (!iso) return locale === "ar" ? "لم يُتواصل بعد" : "Never contacted";
-  try {
-    const diffDays = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-    if (diffDays === 0) return locale === "ar" ? "اليوم" : "Today";
-    if (diffDays === 1) return locale === "ar" ? "أمس" : "Yesterday";
-    if (locale === "ar") return `منذ ${diffDays} يومًا`;
-    return `${diffDays} days ago`;
-  } catch { return ""; }
-}
-
-function followUpDot(lastContactedAt: string | null, priority: string | null): string {
-  if (priority === "high") return "bg-[var(--over)]";
-  if (!lastContactedAt) return "bg-[var(--over)]";
-  const days = Math.floor((Date.now() - new Date(lastContactedAt).getTime()) / 86400000);
-  if (days > 30) return "bg-[var(--over)]";
-  if (days > 14) return "bg-[var(--warn)]";
-  return "bg-[var(--acc)]";
-}
-
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
-  if (!n || !isFinite(n)) return "";
+  if (!n || !isFinite(n)) return locale === "ar" ? "٠" : "0";
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function ClientCard({ client, locale, prioritySlot }: Props) {
+const PRIORITY: Record<string, { cls: string; ar: string; en: string }> = {
+  high: { cls: "status-positive", ar: "أولويّة عالية", en: "High" },
+  medium: { cls: "status-pending", ar: "متوسّطة", en: "Medium" },
+  low: { cls: "status-neutral", ar: "منخفضة", en: "Low" },
+};
+
+export function ClientCard({ client, locale }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const dotColor = followUpDot(client.last_contacted_at, client.follow_up_priority);
-  const dateLabel = relativeDate(client.last_contacted_at, locale);
-  const priceFormatted = fmtPrice(client.total_value_sar, locale);
+
+  const initial = (client.name || "؟").trim().charAt(0) || "؟";
+  const type = client.company || client.client_type || "";
+  const prio = client.follow_up_priority ? PRIORITY[client.follow_up_priority] : undefined;
 
   return (
     <Link
       href={`/clients/${client.id}` as `/clients/${string}`}
-      className={`group block rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] hover:bg-rizq-cream/90 hover:border-rizq-green/30 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all duration-200 p-5 ${font}`}
+      dir={dir}
+      className="nm-raised block rounded-[18px] bg-[var(--raised)] p-[18px] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)]"
     >
-      <div dir={dir} className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1 flex items-start gap-3">
-          {/* Follow-up dot */}
-          <span className={`mt-1.5 flex-shrink-0 h-2.5 w-2.5 rounded-full ${dotColor}`} aria-hidden />
-          <div className="min-w-0">
-            <p className="text-base font-semibold text-rizq-ink leading-snug group-hover:text-rizq-green transition-colors truncate">
-              {client.name}
-            </p>
-            {client.company && (
-              <p className="mt-0.5 text-sm text-rizq-ink-soft truncate">{client.company}</p>
-            )}
-          </div>
+      <div className="mb-3.5 flex items-center gap-3">
+        <span
+          aria-hidden
+          className="aurora-fill grid h-11 w-11 shrink-0 place-items-center rounded-[14px] font-display text-[17px] font-bold"
+        >
+          {initial}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className={`truncate text-[13px] font-bold text-[var(--content)] ${font}`}>{client.name}</div>
+          {type && <div className={`truncate text-[10px] text-[var(--content-faint)] ${font}`}>{type}</div>}
         </div>
-        {priceFormatted && (
-          <div className="shrink-0 text-end">
-            <p className="tabular font-sans text-base font-semibold text-rizq-green leading-none">{priceFormatted}</p>
-            <p className={`text-xs text-rizq-ink-soft/70 mt-0.5 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
-          </div>
-        )}
-      </div>
-      <div dir={dir} className="mt-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {prioritySlot}
-          {client.total_gigs != null && client.total_gigs > 0 && (
-            <span className={`text-xs text-rizq-ink-soft ${font}`}>
-              {client.total_gigs} {isAr ? "مشروع" : "projects"}
+        <div className="shrink-0">
+          {prio && (
+            <span className={`inline-flex items-center rounded-[10px] px-2 py-0.5 text-[8px] font-semibold ${prio.cls} ${font}`}>
+              {isAr ? prio.ar : prio.en}
             </span>
           )}
-          {client.rating && (
-            <span className="text-xs text-rizq-gold">{"★".repeat(client.rating)}</span>
-          )}
         </div>
-        <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{dateLabel}</span>
+      </div>
+      <div className="flex justify-between border-t border-[var(--line-2)] pt-3">
+        <div>
+          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{isAr ? "أعمال" : "Gigs"}</div>
+          <div className="font-mono text-[13px] font-bold text-[var(--content)]">{fmtPrice(client.total_gigs, locale)}</div>
+        </div>
+        <div className="text-end">
+          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{isAr ? "إجماليّ" : "Total"}</div>
+          <div className="font-mono text-[13px] font-bold text-[var(--acc)]">{fmtPrice(client.total_value_sar, locale)}</div>
+        </div>
       </div>
     </Link>
   );

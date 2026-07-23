@@ -115,8 +115,8 @@ export function ClientListClient({ clients, locale }: Props) {
             onClick={() => setFilter(c.key)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
               filter === c.key
-                ? "bg-rizq-green text-rizq-cream"
-                : "border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                ? "aurora-fill"
+                : "nm-raised-sm bg-[var(--raised)] text-[var(--content-2)] hover:text-[var(--acc)]"
             } ${font}`}
           >
             {c.label}
@@ -143,7 +143,7 @@ export function ClientListClient({ clients, locale }: Props) {
       {filtered.length === 0 ? (
         <p className={`text-sm text-rizq-ink-soft/70 py-8 text-center ${font}`}>{t("noResults")}</p>
       ) : (
-        <MotionList className="space-y-3">
+        <MotionList className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c) => (
             <MotionItem key={c.id}>
               {/* Priority quick-edit sits inline in the card's meta row, no overlap. */}

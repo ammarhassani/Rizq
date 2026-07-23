@@ -62,6 +62,16 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoices, filter]);
 
+  const counts = useMemo(() => {
+    let paid = 0, sent = 0;
+    for (const inv of invoices) {
+      if (inv.status === "paid") paid++;
+      else if (inv.status === "sent" || inv.status === "viewed") sent++;
+    }
+    return { paid, sent };
+  }, [invoices]);
+  const outstanding = Math.max(0, summary.issuedTotal - summary.paidTotal);
+
   const chips: Array<{ key: FilterChip; label: string }> = [
     { key: "all", label: t("filterAll") },
     { key: "draft", label: t("filterDraft") },
@@ -72,52 +82,45 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
 
   return (
     <div className="space-y-4 pb-20">
-      {/* Month summary card */}
-      <div
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 ${font}`}
-        dir={dir}
-      >
-        <div className="flex flex-wrap gap-6">
-          <div>
-            <p className={`text-xs text-rizq-ink-soft/60 mb-0.5 ${font}`}>
-              {t("summaryIssued")}
-            </p>
-            <p className="tabular font-sans text-xl font-bold text-rizq-ink leading-none">
-              <AnimatedNumber value={summary.issuedTotal} locale={locale} duration={0.9} />
-              <span className={`ms-1.5 text-xs font-normal text-rizq-ink-soft/60 ${font}`}>
-                {isAr ? "ر.س" : "SAR"}
-              </span>
-            </p>
+      {/* ── Board summary tiles (Wahaj DC invoices) ─────────────────────── */}
+      <div dir={dir} className="grid grid-cols-1 gap-[18px] sm:grid-cols-3">
+        <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-[18px]">
+          <div className={`mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>
+            <span className="h-2 w-2 rounded-full" style={{ background: "var(--acc)" }} />
+            {t("summaryPaid")}
           </div>
-          <div>
-            <p className={`text-xs text-rizq-ink-soft/60 mb-0.5 ${font}`}>
-              {t("summaryPaid")}
-            </p>
-            <p className="tabular font-sans text-xl font-bold text-[var(--acc)] leading-none">
-              <AnimatedNumber value={summary.paidTotal} locale={locale} duration={0.9} />
-              <span className={`ms-1.5 text-xs font-normal text-[var(--acc)]/60 ${font}`}>
-                {isAr ? "ر.س" : "SAR"}
-              </span>
-            </p>
+          <div className="font-mono text-2xl font-bold text-[var(--content)]">
+            <AnimatedNumber value={summary.paidTotal} locale={locale} duration={0.9} />
           </div>
-          {summary.overdueTotal > 0 && (
-            <div>
-              <p className={`text-xs text-rizq-ink-soft/60 mb-0.5 ${font}`}>
-                {t("summaryOverdue")}
-                {summary.overdueCount > 0 && (
-                  <span className={`ms-1 text-[var(--over)] font-semibold ${font}`}>
-                    ({summary.overdueCount})
-                  </span>
-                )}
-              </p>
-              <p className="tabular font-sans text-xl font-bold text-[var(--over)] leading-none">
-                {fmtMoney(summary.overdueTotal, locale)}
-                <span className={`ms-1.5 text-xs font-normal text-[var(--over)]/60 ${font}`}>
-                  {isAr ? "ر.س" : "SAR"}
-                </span>
-              </p>
-            </div>
-          )}
+          <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
+            {fmtMoney(counts.paid, locale)} {isAr ? "فاتورة" : "invoices"}
+          </div>
+        </div>
+        <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-[18px]">
+          <div className={`mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>
+            <span className="h-2 w-2 rounded-full" style={{ background: "var(--warn)" }} />
+            {t("filterSent")}
+          </div>
+          <div className="font-mono text-2xl font-bold text-[var(--content)]">
+            <AnimatedNumber value={outstanding} locale={locale} duration={0.9} />
+          </div>
+          <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
+            {fmtMoney(counts.sent, locale)} {isAr ? "فاتورة" : "invoices"}
+          </div>
+        </div>
+        <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-[18px]">
+          <div className={`mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>
+            <span className="h-2 w-2 rounded-full" style={{ background: "var(--over)" }} />
+            {t("summaryOverdue")}
+          </div>
+          <div className="font-mono text-2xl font-bold text-[var(--over)]">
+            {fmtMoney(summary.overdueTotal, locale)}
+          </div>
+          <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
+            {summary.overdueCount > 0
+              ? `${fmtMoney(summary.overdueCount, locale)} ${isAr ? "فاتورة" : "invoices"}`
+              : isAr ? "لا شيء" : "none"}
+          </div>
         </div>
       </div>
 
@@ -130,8 +133,8 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
             onClick={() => setFilter(c.key)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
               filter === c.key
-                ? "bg-rizq-green text-rizq-cream"
-                : "border border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink hover:border-rizq-green/40"
+                ? "aurora-fill"
+                : "nm-raised-sm bg-[var(--raised)] text-[var(--content-2)] hover:text-[var(--acc)]"
             } ${font}`}
           >
             {c.label}
