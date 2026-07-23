@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleToggle } from "@/components/landing/LocaleToggle";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AuthNavSlot } from "./AuthNavSlot";
 
 type Props = {
@@ -36,10 +37,6 @@ export async function SiteNav({ locale, sticky = true, hideLogout = false }: Pro
           <span className="font-display text-2xl font-bold aurora-text tracking-tight">
             رِزق
           </span>
-          <span aria-hidden className="hidden md:inline-block h-3 w-px bg-rizq-gold/50" />
-          <span className="hidden md:inline-block text-[10px] tracking-[0.24em] uppercase text-rizq-ink-soft/70">
-            beta
-          </span>
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2 md:gap-4">
@@ -55,6 +52,7 @@ export async function SiteNav({ locale, sticky = true, hideLogout = false }: Pro
           <AuthNavSlot locale={locale} hideLogout={hideLogout} />
 
           <span aria-hidden className="hidden sm:inline-block h-4 w-px bg-rizq-gold/25" />
+          <ThemeToggle locale={locale} />
           <LocaleToggle />
         </nav>
       </div>
