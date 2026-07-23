@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { Wallet, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { WidgetError } from "./WidgetError";
@@ -28,108 +28,132 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
+/**
+ * Money hero — pixel-matched to the DC board (Rizq Wahaj): Space Grotesk 46px
+ * aurora figure, solid +% chip, Space Mono paid/pending, a 78px goal ring, and
+ * the goal line. Data is real (feature 006 goal).
+ */
 export function MonthlyIncomeWidget({ current, previous, trend, error, locale, goalSar }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-
   const unitLabel = isAr ? "ريال" : "SAR";
-  const conv = (sar: number | null): number | null => sar;
 
   const totalSar = current?.total_sar ?? 0;
   const prevTotal = previous?.total_sar ?? null;
   const changePercent =
-    prevTotal && prevTotal > 0
-      ? Math.round(((totalSar - prevTotal) / prevTotal) * 100)
-      : null;
+    prevTotal && prevTotal > 0 ? Math.round(((totalSar - prevTotal) / prevTotal) * 100) : null;
 
-  // Progress toward the freelancer's own monthly goal (feature 006 — the profile
-  // income goal becomes a parameter the dashboard renders against).
-  const goalPct =
-    goalSar && goalSar > 0 ? Math.min(100, Math.round((totalSar / goalSar) * 100)) : null;
+  const goalFrac = goalSar && goalSar > 0 ? Math.min(1, totalSar / goalSar) : 0;
+  const goalPct = goalSar && goalSar > 0 ? Math.min(100, Math.round((totalSar / goalSar) * 100)) : null;
+  const pctLabel = (n: number) => `${fmt(n, locale)}${isAr ? "٪" : "%"}`;
 
   return (
-    <div dir={dir} className="nm-raised rounded-[22px] bg-[var(--raised)] p-5 sm:p-6 flex flex-col gap-4">
-      <div className={`flex items-center justify-between ${font}`}>
-        <div className="flex items-center gap-2">
-          <Wallet className="h-4 w-4 text-rizq-green opacity-70" />
-          <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-            {isAr ? "دخل الشهر" : "Monthly Income"}
-          </span>
-        </div>
-        <Link href="/income" className={`text-xs text-rizq-green hover:underline ${font}`}>
-          {isAr ? "عرض الكل ←" : "View all →"}
-        </Link>
-      </div>
+    <div
+      dir={dir}
+      className="nm-raised relative overflow-hidden rounded-[22px] bg-[var(--raised)] px-6 py-[22px]"
+    >
+      {/* aurora orb — top inline-end */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-16 h-56 w-56 rounded-full"
+        style={{
+          insetInlineEnd: "-30px",
+          filter: "blur(70px)",
+          opacity: 0.2,
+          background: "radial-gradient(circle,#34E6A8,transparent 70%)",
+        }}
+      />
 
       {error ? (
         <WidgetError locale={locale} />
       ) : totalSar === 0 && !current ? (
-        <div className={`text-center py-4 ${font}`}>
-          <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
+        <div className={`relative py-4 text-center ${font}`}>
+          <p className={`mb-1 text-sm font-medium text-[var(--content-muted)] ${font}`}>
+            {isAr ? "دخل هذا الشهر" : "This month"}
+          </p>
+          <p className={`mb-3 text-sm text-[var(--content-muted)] ${font}`}>
             {isAr ? "ما سجّلت أي مشاريع هذا الشهر." : "No income logged this month."}
           </p>
           <Link
             href="/income/new"
-            className={`inline-flex items-center gap-1 text-sm text-rizq-green hover:underline ${font}`}
+            className={`inline-flex items-center gap-1 text-sm text-[var(--acc)] hover:underline ${font}`}
           >
-            <Plus className="h-3 w-3" />
+            <Plus className="h-3.5 w-3.5" />
             {isAr ? "سجّل مشروع" : "Log a project"}
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          <div className="flex items-end justify-between gap-2">
+        <div className="relative">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="tabular font-sans text-4xl sm:text-5xl font-bold aurora-text-m leading-none">
-                <AnimatedNumber value={conv(totalSar) ?? 0} locale={locale} duration={0.9} />
-              </p>
-              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>
-                {isAr ? `${unitLabel} هذا الشهر` : `${unitLabel} this month`}
-              </p>
+              <div className={`mb-2 text-xs font-medium text-[var(--content-muted)] ${font}`}>
+                {isAr ? "دخل هذا الشهر" : "This month"}
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="aurora-text tabular font-sans text-[46px] font-bold leading-none tracking-tight">
+                  <AnimatedNumber value={totalSar} locale={locale} duration={1.4} />
+                </span>
+                <span className={`text-[15px] text-[var(--content-muted)] ${font}`}>{unitLabel}</span>
+                {changePercent !== null && (
+                  <span
+                    className="font-mono text-[11px] font-bold"
+                    style={{
+                      color: "#0A0F0D",
+                      background: "#34E6A8",
+                      padding: "3px 8px",
+                      borderRadius: "20px",
+                      boxShadow: "0 0 14px -3px rgba(52,230,168,.6)",
+                    }}
+                  >
+                    {changePercent >= 0 ? "+" : ""}
+                    {changePercent}%
+                  </span>
+                )}
+              </div>
+              {current && (
+                <div className="mt-4 flex gap-6">
+                  <div>
+                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "مدفوع" : "Paid"}</div>
+                    <div className="font-mono text-[15px] font-bold text-[var(--acc)]">{fmt(current.paid_sar, locale)}</div>
+                  </div>
+                  <div>
+                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "قيد الدفع" : "Pending"}</div>
+                    <div className="font-mono text-[15px] font-bold text-[var(--warn)]">{fmt(current.pending_sar, locale)}</div>
+                  </div>
+                </div>
+              )}
             </div>
-            {changePercent !== null && (
-              <span className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular ${
-                changePercent >= 0 ? "status-positive" : "status-overdue"
-              }`}>
-                {changePercent >= 0 ? "↑" : "↓"}{Math.abs(changePercent)}%
-              </span>
+
+            {/* Goal ring dial */}
+            {goalPct !== null && (
+              <div
+                className="grid h-[78px] w-[78px] shrink-0 place-items-center rounded-full"
+                style={{
+                  background: `conic-gradient(#34E6A8 0turn ${goalFrac}turn, var(--track) ${goalFrac}turn 1turn)`,
+                  boxShadow: "0 0 20px -4px rgba(52,230,168,.55)",
+                }}
+                aria-hidden
+              >
+                <div className="nm-inset grid h-[58px] w-[58px] place-items-center rounded-full bg-[var(--raised)]">
+                  <span className="font-mono text-[15px] font-bold text-[var(--content)]">{pctLabel(goalPct)}</span>
+                </div>
+              </div>
             )}
           </div>
 
-          {goalPct !== null && (
-            <div className="pt-1">
-              <div className={`flex items-center justify-between text-xs mb-1 ${font}`}>
-                <span className="text-rizq-ink-soft/70">{isAr ? "هدفك الشهري" : "Your monthly goal"}</span>
-                <span className="tabular font-semibold text-rizq-green">
-                  {goalPct}% · {fmt(conv(goalSar ?? 0), locale)} {unitLabel}
-                </span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-[var(--track)] overflow-hidden">
-                <div
-                  className="h-full rounded-full aurora-fill transition-[width] duration-700"
-                  style={{ width: `${goalPct}%` }}
-                />
-              </div>
-            </div>
-          )}
-
           {trend && trend.length >= 2 && (
-            <div className="pt-3 border-t border-[var(--line)]">
-              <TrendChart points={trend} locale={locale} height={96} showLatest={false} />
+            <div className="mt-3">
+              <TrendChart points={trend} locale={locale} height={52} showLatest={false} />
             </div>
           )}
 
-          {current && (
-            <div className="flex gap-4 pt-2 border-t border-[var(--line)]">
-              <div>
-                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "مدفوع" : "Paid"}</p>
-                <p className="tabular text-sm font-semibold text-[var(--acc)]">{fmt(conv(current.paid_sar), locale)}</p>
-              </div>
-              <div>
-                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "قيد الدفع" : "Pending"}</p>
-                <p className="tabular text-sm font-semibold text-[var(--warn)]">{fmt(conv(current.pending_sar), locale)}</p>
-              </div>
+          {goalPct !== null && (
+            <div className={`mt-2 flex justify-between text-[10px] text-[var(--content-faint)] ${font}`}>
+              <span>
+                {isAr ? "الهدف الشهري" : "Monthly goal"} {fmt(goalSar ?? 0, locale)} {unitLabel}
+              </span>
+              <span className="text-[var(--acc)]">{pctLabel(goalPct)} {isAr ? "مكتمل" : "reached"}</span>
             </div>
           )}
         </div>
