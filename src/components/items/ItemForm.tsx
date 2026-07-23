@@ -120,7 +120,7 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
       className={
         embedded
           ? `space-y-5 ${font}`
-          : `rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-5 animate-fade-in ${font}`
+          : `card-wahaj p-7 sm:p-10 space-y-5 animate-fade-in ${font}`
       }
       noValidate
     >

@@ -112,7 +112,7 @@ function SidebarNav({
                     "transition-colors duration-150 ease-out",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--acc)]",
                     active
-                      ? "aurora-fill shadow-[0_0_18px_-4px_rgba(52,230,168,.6)] font-bold"
+                      ? "aurora-fill shadow-[var(--acc-glow)] font-bold"
                       : "text-[var(--content-2)] hover:bg-[var(--line-2)] hover:text-[var(--content)]",
                     collapsed ? "justify-center" : "",
                   ]
@@ -183,7 +183,7 @@ export function AppSidebar({ locale, mobileOpen, onMobileClose }: Props) {
                 className="inline-flex items-center rounded-2xl bg-[var(--raised)] px-4 py-1.5 font-display text-[22px] font-bold leading-none aurora-text"
                 style={{
                   boxShadow:
-                    "4px 4px 9px var(--nm-dark), -4px -4px 9px var(--nm-light), 0 0 20px -6px rgba(52,230,168,.5)",
+                    "4px 4px 9px var(--nm-dark), -4px -4px 9px var(--nm-light), var(--acc-glow)",
                 }}
               >
                 رِزق

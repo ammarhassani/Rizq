@@ -65,7 +65,7 @@ export function HadafActionPlanClient({ locale, initialAr, initialEn }: Props) {
   return (
     <div
       dir={dir}
-      className={`rounded-2xl border border-rizq-gold/25 bg-rizq-cream/85 p-5 sm:p-6 ${font}`}
+      className={`card-wahaj-sm p-5 sm:p-6 ${font}`}
     >
       {/* Card header */}
       <div className="flex items-center justify-between gap-3 mb-4">

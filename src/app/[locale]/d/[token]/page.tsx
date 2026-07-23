@@ -79,7 +79,7 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
       />
       <SiteNav locale={locale as "ar" | "en"} />
       <main className="relative z-10 flex-1 mx-auto w-full max-w-2xl px-4 sm:px-8 py-10 sm:py-14">
-        <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 sm:p-10 ${font}`}>
+        <div className={`card-wahaj p-8 sm:p-10 ${font}`}>
           {/* Doc icon + title */}
           <div className="flex items-start gap-4 mb-6">
             <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-rizq-green/8 flex items-center justify-center text-rizq-green">

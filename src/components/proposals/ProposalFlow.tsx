@@ -226,7 +226,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
         {/* Invisible placeholder so layout doesn't collapse behind the modal */}
         <div
           dir={dir}
-          className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 text-center ${font}`}
+          className={`card-wahaj p-8 text-center ${font}`}
           aria-hidden="true"
         />
       </>
@@ -238,7 +238,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
     return (
       <div
         dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 space-y-4 animate-fade-in ${font}`}
+        className={`card-wahaj p-8 space-y-4 animate-fade-in ${font}`}
       >
         <p className="eyebrow">{t("errors.extractionFailedEyebrow")}</p>
         <h2 className="text-lg font-semibold text-rizq-ink">{t("errors.extractionFailedTitle")}</h2>
@@ -278,7 +278,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
     return (
       <div
         dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-8 text-center animate-fade-in ${font}`}
+        className={`card-wahaj p-8 text-center animate-fade-in ${font}`}
       >
         <p className="text-sm text-rizq-ink-soft mb-4">{view.message}</p>
         <button

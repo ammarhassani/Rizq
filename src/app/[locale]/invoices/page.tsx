@@ -109,7 +109,7 @@ export default async function InvoicesPage({ params }: { params: Promise<Params>
         {invoices.length === 0 ? (
           <div
             dir={dir}
-            className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-10 text-center ${font}`}
+            className={`card-wahaj p-10 text-center ${font}`}
           >
             <div
               aria-hidden

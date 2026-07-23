@@ -77,7 +77,7 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
 
         {/* Document list or empty state */}
         {docs.length === 0 ? (
-          <div dir={dir} className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-10 text-center ${font}`}>
+          <div dir={dir} className={`card-wahaj p-10 text-center ${font}`}>
             <div aria-hidden className="mx-auto mb-6 h-16 w-16 rounded-2xl border-2 border-rizq-gold/30 bg-rizq-green/8 flex items-center justify-center">
               <span className="font-arabic text-2xl font-bold text-rizq-green leading-none">ر</span>
             </div>

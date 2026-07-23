@@ -159,7 +159,7 @@ export function UpgradeModal({ open, onClose, locale, reason }: Props) {
       {/* Panel — bottom sheet on mobile, centered modal on sm+ */}
       <div
         dir={dir}
-        className={`relative w-full sm:max-w-md mx-4 sm:mx-auto rounded-t-3xl sm:rounded-3xl border border-rizq-gold/25 bg-rizq-cream/98 shadow-xl p-6 sm:p-8 animate-fade-in ${font}`}
+        className={`relative w-full sm:max-w-md mx-4 sm:mx-auto rounded-t-3xl sm:card-wahaj shadow-xl p-6 sm:p-8 animate-fade-in ${font}`}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-5">

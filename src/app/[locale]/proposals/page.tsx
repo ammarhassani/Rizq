@@ -141,7 +141,7 @@ function EmptyState({
   return (
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-10 text-center ${font}`}
+      className={`card-wahaj p-10 text-center ${font}`}
     >
       {/* Decorative seal placeholder */}
       <div

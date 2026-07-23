@@ -51,7 +51,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
       <h2 className={`eyebrow mb-4 text-rizq-green ${font}`}>{tp("moneyTitle")}</h2>
 
       {/* Amount + status header */}
-      <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 mb-4 ${font}`}>
+      <div className={`card-wahaj p-6 sm:p-8 mb-4 ${font}`}>
         <div dir={dir} className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             {gig.description && (

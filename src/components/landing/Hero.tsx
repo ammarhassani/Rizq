@@ -151,7 +151,11 @@ export async function Hero({ locale }: Props) {
                   {/* Goal ring dial */}
                   <div
                     className="relative h-16 w-16 shrink-0 rounded-full"
-                    style={{ background: "conic-gradient(var(--acc) 0turn 0.74turn, var(--track) 0.74turn 1turn)" }}
+                    style={{
+                      ["--gp"]: 0.74,
+                      background: "conic-gradient(var(--acc) 0turn calc(var(--gp) * 1turn), var(--track) calc(var(--gp) * 1turn) 1turn)",
+                      animation: "ringfill 1.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+                    } as React.CSSProperties}
                     aria-hidden
                   >
                     <div className="absolute inset-[6px] rounded-full bg-[var(--raised)] flex items-center justify-center">

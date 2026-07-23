@@ -69,7 +69,7 @@ export function AccountIntegrations({
         </div>
       )}
 
-      <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6">
+      <div className="card-wahaj p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <span className="h-10 w-10 rounded-2xl bg-rizq-ink text-rizq-cream flex items-center justify-center shrink-0">

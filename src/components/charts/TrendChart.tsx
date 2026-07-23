@@ -61,7 +61,7 @@ export function TrendChart({
     return (
       <div
         dir={isAr ? "rtl" : "ltr"}
-        className={`flex items-center justify-center rounded-2xl border border-rizq-gold/20 bg-rizq-cream/50 px-4 py-6 text-center text-sm text-rizq-ink-soft ${font}`}
+        className={`flex items-center justify-center card-wahaj-sm px-4 py-6 text-center text-sm text-rizq-ink-soft ${font}`}
         style={{ minHeight: height }}
       >
         {isAr ? "ما فيه بيانات كافية بعد" : "Not enough data yet"}
@@ -153,13 +153,13 @@ export function TrendChart({
       >
         <defs aria-hidden>
           <linearGradient id={`${uid}-area`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1A5F3F" stopOpacity="0.18" />
-            <stop offset="55%" stopColor="#C8A951" stopOpacity="0.10" />
-            <stop offset="100%" stopColor="#C8A951" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--acc)" stopOpacity="0.18" />
+            <stop offset="55%" stopColor="var(--gold)" stopOpacity="0.10" />
+            <stop offset="100%" stopColor="var(--gold)" stopOpacity="0" />
           </linearGradient>
           <linearGradient id={`${uid}-line`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1A5F3F" />
-            <stop offset="100%" stopColor="#C8A951" />
+            <stop offset="0%" stopColor="var(--acc)" />
+            <stop offset="100%" stopColor="var(--gold)" />
           </linearGradient>
         </defs>
 
@@ -189,12 +189,12 @@ export function TrendChart({
           cx={latestMarker.x}
           cy={latestMarker.y}
           r="4.5"
-          fill="#FAF5EC"
-          stroke="#1A5F3F"
+          fill="var(--raised)"
+          stroke="var(--acc)"
           strokeWidth="1.5"
           className="chart-dot-pop motion-reduce:opacity-100"
         />
-        <circle aria-hidden cx={latestMarker.x} cy={latestMarker.y} r="2" fill="#C8A951" />
+        <circle aria-hidden cx={latestMarker.x} cy={latestMarker.y} r="2" fill="var(--gold)" />
       </svg>
 
       {/* First / last month labels (calendar order; flexbox handles RTL flip) */}

@@ -235,7 +235,7 @@ export function InvoiceForm({
       <form
         onSubmit={handleSubmit}
         dir={dir}
-        className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-7 animate-fade-in ${font}`}
+        className={`card-wahaj p-7 sm:p-10 space-y-7 animate-fade-in ${font}`}
         noValidate
       >
         <div>

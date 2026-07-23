@@ -432,7 +432,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
         <DialogPrimitive.Portal>
           <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-rizq-ink/30 supports-backdrop-filter:backdrop-blur-sm data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 motion-reduce:animate-none" />
           <DialogPrimitive.Popup dir={isAr ? "rtl" : "ltr"}
-            className={cn("fixed start-1/2 top-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 sm:max-w-md rounded-3xl border border-rizq-gold/25 bg-rizq-cream/98 p-6 shadow-xl sm:p-8 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:animate-none", font)}>
+            className={cn("fixed start-1/2 top-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2 sm:max-w-md card-wahaj p-6 shadow-xl sm:p-8 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:animate-none", font)}>
             <div className="flex items-start gap-3">
               <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--over-soft)] text-[var(--over)]">
                 <TriangleAlert size={18} strokeWidth={2} aria-hidden />

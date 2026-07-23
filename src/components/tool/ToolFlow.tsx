@@ -194,7 +194,7 @@ export function ToolFlow({
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 space-y-6 animate-fade-in"
+      className="card-wahaj p-7 sm:p-10 space-y-6 animate-fade-in"
       noValidate
     >
       <SelectField

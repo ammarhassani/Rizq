@@ -19,12 +19,12 @@ export async function FinalCta({ locale }: Props) {
               {/* aurora orb */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -top-40 h-96 w-96 rounded-full"
+                className="orb-drift-b pointer-events-none absolute -top-40 h-96 w-96 rounded-full"
                 style={{
                   insetInlineStart: "35%",
                   filter: "blur(120px)",
                   opacity: 0.2,
-                  background: "radial-gradient(circle,#34E6A8,transparent 70%)",
+                  background: "radial-gradient(circle, var(--acc), transparent 70%)",
                 }}
               />
               <div className="relative">

@@ -105,7 +105,7 @@ export function DemoRate({ locale }: Props) {
       </div>
 
       {/* Hero result panel — mirrors the real ResultCard */}
-      <div className="rounded-2xl border border-rizq-gold/20 bg-rizq-cream/50 p-5">
+      <div className="card-wahaj-sm p-5">
         {/* Big anchor number */}
         <div className="flex flex-col items-center text-center">
           <span className={`text-[0.7rem] tracking-[0.16em] uppercase text-rizq-gold-deep ${font}`}>

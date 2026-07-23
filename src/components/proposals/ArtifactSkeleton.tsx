@@ -46,7 +46,7 @@ export function ArtifactSkeleton({ locale, activeStep = 0 }: Props) {
       aria-busy="true"
       aria-label={locale === "ar" ? "جارٍ إنشاء العرض" : "Generating proposal"}
       dir={dir}
-      className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 animate-fade-in space-y-8 ${font}`}
+      className={`card-wahaj p-7 sm:p-10 animate-fade-in space-y-8 ${font}`}
     >
       {/* Processing step tracker */}
       <div className="space-y-3">

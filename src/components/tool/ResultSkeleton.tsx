@@ -4,7 +4,7 @@ export function ResultSkeleton() {
       role="status"
       aria-busy="true"
       aria-label="Calculating"
-      className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-7 sm:p-10 animate-fade-in"
+      className="card-wahaj p-7 sm:p-10 animate-fade-in"
     >
       <div className="h-3 w-24 mb-6 rounded-full bg-rizq-gold/15 overflow-hidden">
         <span

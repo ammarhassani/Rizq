@@ -60,7 +60,7 @@ export default async function DocumentNewPage({ params }: { params: Promise<Para
           {isAr ? "رفع وثيقة جديدة" : "Upload a new document"}
         </h1>
 
-        <div className="rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8">
+        <div className="card-wahaj p-6 sm:p-8">
           <DocumentUploadForm locale={locale as "ar" | "en"} categories={categories} />
         </div>
       </div>

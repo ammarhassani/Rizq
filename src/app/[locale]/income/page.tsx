@@ -168,7 +168,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
         </div>
 
         {/* Month summary card */}
-        <div className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-6 sm:p-8 mb-8 ${font}`}>
+        <div className={`card-wahaj p-6 sm:p-8 mb-8 ${font}`}>
           <div dir={dir} className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs text-rizq-ink-soft/60 uppercase tracking-wide mb-1">{currentMonthLabel}</p>
@@ -259,7 +259,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
 
         {/* Gig list or empty state */}
         {gigs.length === 0 ? (
-          <div dir={dir} className={`rounded-3xl border border-rizq-gold/25 bg-rizq-cream/85 p-10 text-center ${font}`}>
+          <div dir={dir} className={`card-wahaj p-10 text-center ${font}`}>
             <div aria-hidden className="mx-auto mb-6 h-16 w-16 rounded-2xl border-2 border-rizq-gold/30 bg-rizq-green/8 flex items-center justify-center">
               <span className="font-arabic text-2xl font-bold text-rizq-green leading-none">ر</span>
             </div>

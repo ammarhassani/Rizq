@@ -56,12 +56,12 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
       {/* aurora orb — top inline-end */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-16 h-56 w-56 rounded-full"
+        className="orb-drift-a pointer-events-none absolute -top-16 h-56 w-56 rounded-full"
         style={{
           insetInlineEnd: "-30px",
           filter: "blur(70px)",
           opacity: 0.2,
-          background: "radial-gradient(circle,#34E6A8,transparent 70%)",
+          background: "radial-gradient(circle, var(--acc), transparent 70%)",
         }}
       />
 
@@ -99,11 +99,11 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
                   <span
                     className="font-mono text-[11px] font-bold"
                     style={{
-                      color: "#0A0F0D",
-                      background: "#34E6A8",
+                      color: "var(--on-accent)",
+                      background: "var(--fill)",
                       padding: "3px 8px",
                       borderRadius: "20px",
-                      boxShadow: "0 0 14px -3px rgba(52,230,168,.6)",
+                      boxShadow: "var(--acc-glow)",
                     }}
                   >
                     {changePercent >= 0 ? "+" : ""}
@@ -130,9 +130,12 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
               <div
                 className="grid h-[78px] w-[78px] shrink-0 place-items-center rounded-full"
                 style={{
-                  background: `conic-gradient(#34E6A8 0turn ${goalFrac}turn, var(--track) ${goalFrac}turn 1turn)`,
-                  boxShadow: "0 0 20px -4px rgba(52,230,168,.55)",
-                }}
+                  ["--gp"]: goalFrac,
+                  background:
+                    "conic-gradient(var(--acc) 0turn calc(var(--gp) * 1turn), var(--track) calc(var(--gp) * 1turn) 1turn)",
+                  boxShadow: "var(--acc-glow-strong)",
+                  animation: "ringfill 1.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+                } as React.CSSProperties}
                 aria-hidden
               >
                 <div className="nm-inset grid h-[58px] w-[58px] place-items-center rounded-full bg-[var(--raised)]">

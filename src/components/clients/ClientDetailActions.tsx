@@ -227,7 +227,7 @@ export function ClientDetailActions({
       {/* ── Standard actions bar ─────────────────────────────────────────── */}
       <div
         dir={dir}
-        className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/85 p-5 ${font}`}
+        className={`card-wahaj-sm p-5 ${font}`}
       >
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-4">
           {isAr ? "الإجراءات" : "Actions"}
