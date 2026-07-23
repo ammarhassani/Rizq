@@ -50,24 +50,20 @@ export async function Hero({ locale }: Props) {
               <p className="eyebrow mb-5">{t("eyebrow")}</p>
             </Reveal>
 
-            {/* رِزق glyph — the aurora signature. Painted at full opacity (LCP). */}
-            <div className="flex flex-col items-start gap-1 mb-5">
-              <p
-                aria-label="Rizq"
-                className="font-display font-bold aurora-text leading-[0.82] tracking-tight"
-                style={{
-                  fontSize: "clamp(4rem, 9vw, 7.5rem)",
-                  fontFeatureSettings: '"liga", "calt", "kern"',
-                }}
+            {/* Board hero: the OS statement is the H1; the tagline is the aurora
+                subline underneath (resolves audit §L1 — the board's own call). */}
+            <Reveal asMount delay={0.2} direction="side">
+              <h1
+                id="hero-heading"
+                className={`max-w-xl font-display text-[clamp(2.2rem,4.6vw,3.25rem)] font-bold leading-[1.15] text-rizq-ink ${font}`}
               >
-                رِزق
-              </p>
-            </div>
-
-            <Reveal asMount delay={0.32} direction="side">
-              <h1 id="hero-heading" className={`display-2 max-w-xl text-rizq-ink ${font}`}>
-                {t("tagline")}
+                {isAr ? "نظام التشغيل الكامل لِعملك المستقلّ." : "The complete operating system for your freelance work."}
               </h1>
+            </Reveal>
+            <Reveal asMount delay={0.3} direction="side">
+              <div className={`mt-2 max-w-xl font-display text-2xl font-bold leading-tight aurora-text sm:text-[34px] ${font}`}>
+                {t("tagline")}
+              </div>
             </Reveal>
 
             <Reveal asMount delay={0.42}>
