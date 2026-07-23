@@ -59,12 +59,12 @@ export function AccountIntegrations({
       <h2 className={`text-base font-semibold text-rizq-ink mb-4 ${font}`}>{tS("integrationsSectionTitle")}</h2>
 
       {status === "connected" && (
-        <div className={`mb-4 flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ${font}`}>
+        <div className={`mb-4 flex items-center gap-2 rounded-xl border border-[var(--acc-line)] bg-[var(--acc-soft)] px-4 py-3 text-sm text-emerald-800 ${font}`}>
           <CheckCircle2 size={16} /> {t("connectedBanner")}
         </div>
       )}
       {(status === "error" || status === "not_configured") && (
-        <div role="alert" className={`mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-[var(--over)] ${font}`}>
+        <div role="alert" className={`mb-4 rounded-xl border border-[var(--over-line)] bg-[var(--over-soft)] px-4 py-3 text-sm text-[var(--over)] ${font}`}>
           {t("connectErrorBanner")}
         </div>
       )}
@@ -90,7 +90,7 @@ export function AccountIntegrations({
               type="button"
               onClick={() => disconnect(github.id)}
               disabled={pending}
-              className={`inline-flex items-center gap-1.5 rounded-full border border-red-300/50 text-[var(--over)] px-4 py-2 text-sm font-medium hover:bg-red-50 transition disabled:opacity-60 ${font}`}
+              className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--over-line)] text-[var(--over)] px-4 py-2 text-sm font-medium hover:bg-[var(--over-soft)] transition disabled:opacity-60 ${font}`}
             >
               {pending ? <Loader2 size={13} className="animate-spin" /> : <Unplug size={13} />}
               {t("revokeConnection")}

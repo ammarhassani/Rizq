@@ -300,7 +300,7 @@ export function ProposalDetailActions({
                 type="button"
                 onClick={handleMarkAccepted}
                 disabled={isMarkingStatus}
-                className={`inline-flex items-center gap-2 rounded-full border border-emerald-400/40 text-[var(--acc)] px-6 py-3 text-sm font-medium hover:bg-emerald-50 transition-all disabled:opacity-70 ${font}`}
+                className={`inline-flex items-center gap-2 rounded-full border border-[var(--acc-line)] text-[var(--acc)] px-6 py-3 text-sm font-medium hover:bg-[var(--acc-soft)] transition-all disabled:opacity-70 ${font}`}
               >
                 {isMarkingStatus ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -314,7 +314,7 @@ export function ProposalDetailActions({
                 type="button"
                 onClick={handleMarkDeclined}
                 disabled={isMarkingStatus}
-                className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-6 py-3 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
+                className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] text-[var(--over)] px-6 py-3 text-sm font-medium hover:bg-[var(--over-soft)] transition-all disabled:opacity-70 ${font}`}
               >
                 {isMarkingStatus ? (
                   <Loader2 size={14} className="animate-spin" />
@@ -331,7 +331,7 @@ export function ProposalDetailActions({
         {showDeclineReason && !isMarkingStatus && (
           <div
             dir={dir}
-            className={`rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3 animate-fade-in ${font}`}
+            className={`rounded-xl border border-[var(--over-line)] bg-[var(--over-soft)] p-4 space-y-3 animate-fade-in ${font}`}
           >
             <label
               htmlFor="decline-reason"
@@ -345,7 +345,7 @@ export function ProposalDetailActions({
               onChange={(e) => setDeclineReason(e.target.value)}
               rows={3}
               placeholder={t("declineReasonPlaceholder")}
-              className={`w-full rounded-xl border border-red-200 bg-[var(--raised)] px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 resize-none ${font}`}
+              className={`w-full rounded-xl border border-[var(--over-line)] bg-[var(--raised)] px-4 py-3 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 resize-none ${font}`}
             />
             <div className="flex gap-3">
               <button

@@ -141,6 +141,10 @@
   --fill: linear-gradient(120deg, #12c58c, #12a6b8);
   --acc-soft: rgba(11, 123, 87, 0.12);
   --acc-line: rgba(11, 123, 87, 0.32);
+  --warn-soft: rgba(148, 103, 31, 0.1);
+  --warn-line: rgba(148, 103, 31, 0.3);
+  --over-soft: rgba(190, 67, 38, 0.1);
+  --over-line: rgba(190, 67, 38, 0.3);
   --on-accent: #06110c;
   /* status */
   --warn: #94671f;
@@ -225,6 +229,10 @@
   --fill: linear-gradient(120deg, #34e6a8, #31d0de);
   --acc-soft: rgba(52, 230, 168, 0.1);
   --acc-line: rgba(52, 230, 168, 0.25);
+  --warn-soft: rgba(233, 193, 95, 0.1);
+  --warn-line: rgba(233, 193, 95, 0.25);
+  --over-soft: rgba(240, 113, 90, 0.1);
+  --over-line: rgba(240, 113, 90, 0.25);
   --on-accent: #06110c;
   /* status */
   --warn: #e9c15f;

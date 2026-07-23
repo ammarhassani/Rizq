@@ -81,7 +81,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
         <div
           dir="ltr"
           className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
-            flValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"
+            flValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-[var(--over-line)]"
           }`}
         >
           <span className="flex items-center px-3.5 bg-rizq-green/10 text-rizq-green font-semibold text-sm border-e border-[#8f7e48] select-none">

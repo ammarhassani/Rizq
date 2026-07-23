@@ -102,7 +102,7 @@ export function WaitlistForm({ locale }: Props) {
       <div
         className={`group flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 sm:rounded-full sm:border sm:bg-rizq-cream/70 sm:p-1.5 sm:backdrop-blur-sm transition-all ${
           errors.email
-            ? "sm:border-red-500/50"
+            ? "sm:border-[var(--over-line)]"
             : "sm:border-rizq-gold/30 focus-within:sm:border-rizq-green/50 focus-within:sm:shadow-[0_4px_24px_-12px_rgba(26,95,63,0.35)]"
         }`}
       >
@@ -115,7 +115,7 @@ export function WaitlistForm({ locale }: Props) {
           aria-invalid={errors.email ? "true" : "false"}
           {...register("email")}
           className={`flex-1 bg-transparent border rounded-full sm:rounded-none sm:border-0 px-5 py-4 text-base text-rizq-ink placeholder:text-rizq-ink-soft/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
-            errors.email ? "border-red-500/50" : "border-rizq-gold/30"
+            errors.email ? "border-[var(--over-line)]" : "border-rizq-gold/30"
           } ${font}`}
         />
         <button

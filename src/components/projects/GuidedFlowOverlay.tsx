@@ -106,9 +106,9 @@ export function GuidedFlowOverlay({
             {lifecycle.stages.map((s) => {
               const cls =
                 s.state === "done"
-                  ? "bg-emerald-500"
+                  ? "bg-[var(--acc)]"
                   : s.state === "current"
-                    ? "bg-amber-500 animate-breathe-amber motion-reduce:animate-none"
+                    ? "bg-[var(--warn)] animate-breathe-amber motion-reduce:animate-none"
                     : s.state === "skipped"
                       ? "bg-rizq-ink/15"
                       : "bg-[#C8A951]/40";

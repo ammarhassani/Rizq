@@ -21,10 +21,10 @@ type InsightItem = {
 /** Small kind dot so the consolidated banner stays one surface (no per-insight
  *  colored boxes) while still hinting the category at a glance. */
 const kindDot: Record<InsightItem["kind"], string> = {
-  income: "bg-emerald-500",
-  client: "bg-blue-500",
-  proposal: "bg-amber-500",
-  deadline: "bg-red-500",
+  income: "bg-[var(--acc)]",
+  client: "bg-[var(--acc-tint)]",
+  proposal: "bg-[var(--warn)]",
+  deadline: "bg-[var(--over)]",
   general: "bg-rizq-gold",
 };
 
@@ -264,7 +264,7 @@ export function InsightsWidget({ locale }: Props) {
 
   if (status === "error") {
     return (
-      <div dir={dir} className={`rounded-3xl border border-red-100 bg-red-50/50 p-6 sm:p-8 ${font}`}>
+      <div dir={dir} className={`rounded-3xl border border-[var(--over-line)] bg-[var(--over-soft)] p-6 sm:p-8 ${font}`}>
         <p className={`text-sm text-[var(--over)] ${font}`}>
           {isAr ? "تعذّر تحميل التحليلات. حاول مجددًا." : "Could not load insights. Try again."}
         </p>

@@ -199,7 +199,7 @@ export default async function ProposalDetailPage({
         {/* Expired notice */}
         {isExpired && (
           <div
-            className={`print:hidden mb-6 rounded-2xl border border-amber-300/50 bg-amber-50/80 px-5 py-4 text-sm text-amber-800 ${font}`}
+            className={`print:hidden mb-6 rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] px-5 py-4 text-sm text-amber-800 ${font}`}
             role="alert"
           >
             {t("expiredNotice")}

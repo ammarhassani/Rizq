@@ -314,7 +314,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
               placeholder="you@example.com"
-              className={`${inputCls} ps-11 ${emailValid ? "" : "!border-red-500"}`}
+              className={`${inputCls} ps-11 ${emailValid ? "" : "!border-[var(--over-line)]"}`}
               maxLength={200}
               dir="ltr"
               aria-invalid={!emailValid}
@@ -331,7 +331,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           <div
             dir="ltr"
             className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
-              phoneValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"
+              phoneValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-[var(--over-line)]"
             }`}
           >
             <span className="flex items-center gap-1.5 border-e border-[#8f7e48] px-3 text-sm text-rizq-ink-soft select-none">
@@ -372,7 +372,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
             dir="ltr"
             className={`flex items-stretch overflow-hidden rounded-xl border bg-rizq-cream/60 transition-colors focus-within:ring-2 focus-within:ring-rizq-green/40 ${
               waSameAsPhone ? "opacity-60" : ""
-            } ${waValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-red-500"}`}
+            } ${waValid ? "border-[#8f7e48] focus-within:border-rizq-green" : "border-[var(--over-line)]"}`}
           >
             <span className="flex items-center gap-1.5 border-e border-[#8f7e48] px-3 text-sm text-rizq-ink-soft select-none">
               <WhatsappIcon className="h-4 w-4 text-[#25D366]" />

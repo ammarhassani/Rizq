@@ -72,7 +72,7 @@ export function OAuthButtons({ locale }: Props) {
       {error && (
         <p
           role="alert"
-          className={`mt-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 ${font}`}
+          className={`mt-2 text-sm text-amber-800 bg-[var(--warn-soft)] border border-[var(--warn-line)] rounded-xl px-4 py-3 ${font}`}
         >
           {error}
         </p>

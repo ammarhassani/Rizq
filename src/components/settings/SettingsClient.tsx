@@ -193,7 +193,7 @@ function DeleteSection({
           setConfirmInput("");
           setDeleteError(null);
         }}
-        className={`inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-[var(--over)] px-5 py-2.5 text-sm font-medium transition-all ${font}`}
+        className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] bg-[var(--over-soft)] hover:bg-red-100 text-[var(--over)] px-5 py-2.5 text-sm font-medium transition-all ${font}`}
       >
         <Trash2 size={15} strokeWidth={1.8} />
         <span>{t("deleteButton")}</span>
@@ -211,7 +211,7 @@ function DeleteSection({
 
           {/* Dialog */}
           <div
-            className={`relative z-10 w-full max-w-md rounded-3xl border border-red-200 bg-white shadow-2xl p-6 sm:p-8 ${font}`}
+            className={`relative z-10 w-full max-w-md rounded-3xl border border-[var(--over-line)] bg-white shadow-2xl p-6 sm:p-8 ${font}`}
             dir={locale === "ar" ? "rtl" : "ltr"}
           >
             {/* Close */}
@@ -227,7 +227,7 @@ function DeleteSection({
 
             {/* Icon + title */}
             <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+              <div className="h-10 w-10 rounded-2xl bg-[var(--over-soft)] border border-[var(--over-line)] flex items-center justify-center shrink-0">
                 <AlertTriangle size={20} strokeWidth={1.8} className="text-[var(--over)]" />
               </div>
               <h3 className={`text-lg font-semibold text-rizq-ink ${font}`}>
@@ -260,7 +260,7 @@ function DeleteSection({
                 placeholder={confirmPhrase}
                 autoComplete="off"
                 dir={locale === "ar" ? "rtl" : "ltr"}
-                className={`w-full rounded-2xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2.5 text-sm text-rizq-ink placeholder:text-rizq-ink-soft/40 focus:outline-none focus:border-red-300 focus:ring-1 focus:ring-red-200 transition disabled:opacity-60 ${font}`}
+                className={`w-full rounded-2xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2.5 text-sm text-rizq-ink placeholder:text-rizq-ink-soft/40 focus:outline-none focus:border-[var(--over-line)] focus:ring-1 focus:ring-red-200 transition disabled:opacity-60 ${font}`}
               />
             </div>
 

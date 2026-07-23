@@ -46,12 +46,12 @@ type Props = {
 
 const SOURCE_COLORS: Record<string, { dot: string; badge: string; icon: React.FC<{ size?: number; className?: string }> }> = {
   proposal: {
-    dot: "bg-blue-500",
+    dot: "bg-[var(--acc-tint)]",
     badge: "status-info",
     icon: FileText,
   },
   gig: {
-    dot: "bg-emerald-500",
+    dot: "bg-[var(--acc)]",
     badge: "status-positive",
     icon: Briefcase,
   },
@@ -359,7 +359,7 @@ function MonthView({
                 className={`
                   min-h-[56px] sm:min-h-[72px] p-1.5 text-start flex flex-col transition-colors
                   ${cell.isCurrentMonth ? "bg-[var(--raised)]" : "bg-rizq-cream/30"}
-                  ${weekend && cell.isCurrentMonth ? "bg-amber-50/40" : ""}
+                  ${weekend && cell.isCurrentMonth ? "bg-[var(--warn-soft)]" : ""}
                   ${isSelected ? "ring-2 ring-inset ring-rizq-green/60 bg-rizq-green/5" : ""}
                   hover:bg-rizq-cream/80
                 `}
@@ -531,7 +531,7 @@ function WeekView({
               isToday
                 ? "border-rizq-green/40 bg-rizq-green/5"
                 : isWeekend
-                ? "border-amber-200/40 bg-amber-50/20"
+                ? "border-[var(--warn-line)] bg-[var(--warn-soft)]"
                 : "border-rizq-gold/15 bg-[var(--raised)]"
             }`}
           >

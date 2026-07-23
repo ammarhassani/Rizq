@@ -268,7 +268,7 @@ export function ClientDetailActions({
           <button
             type="button"
             onClick={() => setShowArchiveConfirm(true)}
-            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--over-soft)] transition-all ${font}`}
           >
             <Archive size={14} />
             {t("archive")}
@@ -380,14 +380,14 @@ export function ClientDetailActions({
 
         {/* Insight error / upgrade hint */}
         {insightError && (
-          <p className={`mt-3 text-xs text-[var(--warn)] bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
+          <p className={`mt-3 text-xs text-[var(--warn)] bg-[var(--warn-soft)] rounded-lg px-3 py-2 ${font}`}>
             {insightError}
           </p>
         )}
 
         {/* Persona error / upgrade hint */}
         {personaError && (
-          <p className={`mt-3 text-xs text-[var(--warn)] bg-amber-50 rounded-lg px-3 py-2 ${font}`}>
+          <p className={`mt-3 text-xs text-[var(--warn)] bg-[var(--warn-soft)] rounded-lg px-3 py-2 ${font}`}>
             {personaError}
           </p>
         )}
@@ -445,7 +445,7 @@ export function ClientDetailActions({
                     href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-full border border-green-400/50 text-[var(--acc)] px-5 py-2.5 text-sm font-medium hover:bg-green-50 transition-colors ${font}`}
+                    className={`inline-flex items-center gap-2 rounded-full border border-[var(--acc-line)] text-[var(--acc)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--acc-soft)] transition-colors ${font}`}
                   >
                     <Send size={14} />
                     {tAi("whatsapp")}
@@ -470,7 +470,7 @@ export function ClientDetailActions({
       {showArchiveConfirm && (
         <div
           dir={dir}
-          className={`rounded-2xl border border-red-200 bg-red-50/60 p-5 space-y-3 animate-fade-in ${font}`}
+          className={`rounded-2xl border border-[var(--over-line)] bg-[var(--over-soft)] p-5 space-y-3 animate-fade-in ${font}`}
         >
           <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("archiveConfirm", { name: clientName })}</p>
           <div className="flex gap-3">

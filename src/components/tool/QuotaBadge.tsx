@@ -32,7 +32,7 @@ export async function QuotaBadge({ locale, mode, remaining, limit = 3 }: Props) 
     tone === "good"
       ? "border-rizq-green/30 bg-rizq-green/5 text-rizq-green"
       : tone === "warn"
-        ? "border-amber-400/40 bg-amber-50 text-amber-800"
+        ? "border-[var(--warn-line)] bg-[var(--warn-soft)] text-amber-800"
         : "border-rizq-gold/30 bg-rizq-cream/60 text-rizq-ink";
 
   return (

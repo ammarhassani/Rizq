@@ -152,7 +152,7 @@ export function TemplateList({ locale, templates }: Props) {
                 type="button"
                 onClick={() => handleDelete(tpl.id)}
                 disabled={isBusy}
-                className={`inline-flex items-center gap-1.5 rounded-full border border-red-300/50 text-[var(--over)] px-4 py-2 text-xs font-medium hover:bg-red-50 transition-all disabled:pointer-events-none ${font}`}
+                className={`inline-flex items-center gap-1.5 rounded-full border border-[var(--over-line)] text-[var(--over)] px-4 py-2 text-xs font-medium hover:bg-[var(--over-soft)] transition-all disabled:pointer-events-none ${font}`}
               >
                 {isDeleting ? (
                   <>

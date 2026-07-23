@@ -113,7 +113,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
             </p>
             <Link
               href="/income/new"
-              className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-3.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
+              className={`aurora-btn inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium hover:-translate-y-0.5 ${font}`}
             >
               {t("noDataCta")}
               <span className="inline-block rtl:rotate-180">→</span>
@@ -121,7 +121,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
           </div>
         ) : status.current_streak >= rules.consecutive_months_required ? (
           /* Fully qualifying state */
-          <div className={`rounded-3xl border border-emerald-200 bg-emerald-50/70 p-7 sm:p-9 mb-8 ${font}`}>
+          <div className={`nm-raised rounded-3xl border border-[var(--acc-line)] bg-[var(--acc-soft)] p-7 sm:p-9 mb-8 ${font}`}>
             <div className="flex items-start gap-4 mb-5">
               <CheckCircle2 size={28} className="text-[var(--acc)] shrink-0 mt-0.5" />
               <div>
@@ -156,7 +156,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
 
             {/* Estimated subsidy */}
             {status.estimated_subsidy != null && (
-              <div className={`mt-4 pt-4 border-t border-emerald-200 ${font}`}>
+              <div className={`mt-4 pt-4 border-t border-[var(--acc-line)] ${font}`}>
                 <p className="text-xs text-rizq-ink-soft/60 mb-1">
                   {t("estimatedSubsidyLabel")}
                 </p>
@@ -319,7 +319,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
 
         {/* ── Disclaimer (always visible, M5.3) ──────────────────────────── */}
         <div
-          className={`rounded-2xl border border-amber-200 bg-amber-50/70 p-5 sm:p-6 mb-6 ${font}`}
+          className={`rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] p-5 sm:p-6 mb-6 ${font}`}
           role="note"
           aria-label={isAr ? "إخلاء مسؤولية" : "Disclaimer"}
         >

@@ -124,7 +124,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
       {gig.ai_anomaly_flag && gig.ai_anomaly_reason && (
         <div
           dir={dir}
-          className={`mt-4 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 flex items-start gap-3 ${font}`}
+          className={`mt-4 rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] px-5 py-4 flex items-start gap-3 ${font}`}
         >
           <span className="text-amber-500 text-lg mt-0.5" aria-hidden>
             ❗

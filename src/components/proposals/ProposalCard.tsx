@@ -39,7 +39,7 @@ const STATUS_STYLES: Record<StatusKey, string> = {
   sent:     "status-info",
   viewed:   "bg-purple-50 text-purple-700",
   accepted: "status-positive",
-  declined: "bg-red-50 text-[var(--over)]",
+  declined: "bg-[var(--over-soft)] text-[var(--over)]",
   expired:  "status-pending",
 };
 

@@ -52,7 +52,7 @@ export function ProjectDeleteControl({ locale, projectId }: Props) {
           {t("delete")}
         </button>
       ) : (
-        <div className={`rounded-xl border border-red-200 bg-red-50/60 p-4 space-y-3 ${font}`}>
+        <div className={`rounded-xl border border-[var(--over-line)] bg-[var(--over-soft)] p-4 space-y-3 ${font}`}>
           <p className={`text-sm text-rizq-ink ${font}`}>{t("deleteConfirm")}</p>
           <div className="flex gap-3">
             <button

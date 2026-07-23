@@ -114,7 +114,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
         <button
           onClick={handleDelete}
           disabled={isPending}
-          className={`inline-flex items-center gap-2 rounded-full border border-red-200 text-[var(--over)] px-5 py-2.5 text-sm hover:bg-red-50 disabled:opacity-50 transition-all ${font}`}
+          className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] text-[var(--over)] px-5 py-2.5 text-sm hover:bg-[var(--over-soft)] disabled:opacity-50 transition-all ${font}`}
         >
           <Trash2 size={15} />
           {confirmDelete

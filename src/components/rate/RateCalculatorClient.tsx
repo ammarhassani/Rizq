@@ -321,7 +321,7 @@ export function RateCalculatorClient({
         <div className="space-y-4">
           {/* Market unavailable notice */}
           {marketUnavailable && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-2 text-sm text-amber-800">
+            <div className="rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] px-4 py-3 flex items-start gap-2 text-sm text-amber-800">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
               <span className={font}>{t("marketUnavailable")}</span>
             </div>
@@ -459,8 +459,8 @@ export function RateCalculatorClient({
             <div
               className={`rounded-2xl border p-4 flex items-start gap-3 ${
                 output.is_realistic
-                  ? "border-emerald-200 bg-emerald-50"
-                  : "border-amber-200 bg-amber-50"
+                  ? "border-[var(--acc-line)] bg-[var(--acc-soft)]"
+                  : "border-[var(--warn-line)] bg-[var(--warn-soft)]"
               }`}
             >
               {output.is_realistic ? (

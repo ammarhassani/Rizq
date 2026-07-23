@@ -56,8 +56,8 @@ export async function LifecycleStepper({
           const dot = isCurrent ? (
             // Active step: solid amber dot + a live pulsing halo.
             <span className="relative flex-shrink-0 h-7 w-7" aria-hidden>
-              <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
-              <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white shadow-[0_0_10px_2px_rgba(245,158,11,0.5)]">
+              <span className="absolute inset-0 rounded-full bg-[var(--warn)]/40 animate-ping" />
+              <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-[var(--warn)] text-[10px] font-bold text-white shadow-[0_0_10px_2px_rgba(245,158,11,0.5)]">
                 ◆
               </span>
             </span>

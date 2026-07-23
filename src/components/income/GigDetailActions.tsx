@@ -240,7 +240,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
               type="button"
               onClick={handleMarkOverdue}
               disabled={isMarkingOverdue}
-              className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all disabled:opacity-70 ${font}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--over-soft)] transition-all disabled:opacity-70 ${font}`}
             >
               {isMarkingOverdue ? <Loader2 size={14} className="animate-spin" /> : <AlertCircle size={14} />}
               {t("markOverdue")}
@@ -251,7 +251,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className={`inline-flex items-center gap-2 rounded-full border border-red-300/50 text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-red-50 transition-all ${font}`}
+            className={`inline-flex items-center gap-2 rounded-full border border-[var(--over-line)] text-[var(--over)] px-5 py-2.5 text-sm font-medium hover:bg-[var(--over-soft)] transition-all ${font}`}
           >
             <Trash2 size={14} />
             {t("delete")}
@@ -261,7 +261,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
 
       {/* Delete confirm */}
       {showDeleteConfirm && (
-        <div dir={dir} className={`rounded-2xl border border-red-200 bg-red-50/60 p-5 space-y-3 animate-fade-in ${font}`}>
+        <div dir={dir} className={`rounded-2xl border border-[var(--over-line)] bg-[var(--over-soft)] p-5 space-y-3 animate-fade-in ${font}`}>
           <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("deleteConfirm")}</p>
           <div className="flex gap-3">
             <button

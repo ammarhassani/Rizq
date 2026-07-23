@@ -110,7 +110,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
                       <span className="inline-flex items-center gap-1.5 text-xs">
                         <span
                           className={`h-2 w-2 rounded-full ${
-                            lc.complete ? "bg-emerald-500" : "bg-amber-500 animate-breathe-amber"
+                            lc.complete ? "bg-[var(--acc)]" : "bg-[var(--warn)] animate-breathe-amber"
                           }`}
                           aria-hidden
                         />

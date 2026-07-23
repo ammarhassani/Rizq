@@ -174,7 +174,7 @@ export default async function GigDetailPage({
 
         {/* Anomaly banner */}
         {gig.ai_anomaly_flag && gig.ai_anomaly_reason && (
-          <div dir={dir} className={`rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 mb-6 flex items-start gap-3 ${font}`}>
+          <div dir={dir} className={`rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] px-5 py-4 mb-6 flex items-start gap-3 ${font}`}>
             <span className="text-amber-500 text-lg mt-0.5" aria-hidden>❗</span>
             <div>
               <p className={`text-sm font-semibold text-amber-900 mb-0.5 ${font}`}>{t("anomalyTitle")}</p>

@@ -68,7 +68,7 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
               <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{isAr ? "إجمالي العملاء" : "Total clients"}</p>
             </div>
             {needsFollowup.length > 0 && (
-              <div className="flex items-center gap-1.5 rounded-xl bg-amber-50 border border-amber-100 px-3 py-1.5">
+              <div className="flex items-center gap-1.5 rounded-xl bg-[var(--warn-soft)] border border-[var(--warn-line)] px-3 py-1.5">
                 <AlertCircle className="h-3 w-3 text-[var(--warn)] shrink-0" />
                 <p className={`text-xs text-[var(--warn)] ${font}`}>
                   {needsFollowup.length} {isAr ? "يحتاج متابعة" : "need follow-up"}

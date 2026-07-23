@@ -107,7 +107,7 @@ export function ResetPasswordForm({ locale }: Props) {
             {...register("password")}
             aria-invalid={errors.password ? "true" : "false"}
             className={`w-full rounded-xl border bg-rizq-cream/60 px-4 py-3 pe-12 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors ${
-              errors.password ? "border-red-500/60" : "border-rizq-gold/30"
+              errors.password ? "border-[var(--over-line)]" : "border-rizq-gold/30"
             } ${font}`}
           />
           <button
@@ -140,7 +140,7 @@ export function ResetPasswordForm({ locale }: Props) {
           {...register("confirm")}
           aria-invalid={errors.confirm ? "true" : "false"}
           className={`w-full rounded-xl border bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink placeholder:text-rizq-ink-soft/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors ${
-            errors.confirm ? "border-red-500/60" : "border-rizq-gold/30"
+            errors.confirm ? "border-[var(--over-line)]" : "border-rizq-gold/30"
           } ${font}`}
         />
         {errors.confirm && (
