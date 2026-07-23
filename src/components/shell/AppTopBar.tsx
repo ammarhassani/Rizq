@@ -141,7 +141,7 @@ export function AppTopBar({
               }}
               className={[
                 "hidden sm:inline-flex items-center gap-1.5 rounded-[11px] h-9 px-3 shrink-0",
-                "text-[var(--warn)] text-xs font-semibold transition-all hover:brightness-105",
+                "text-[#7a5310] dark:text-[var(--warn)] text-xs font-semibold transition-all hover:brightness-105",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--warn)]",
                 font,
               ].join(" ")}
