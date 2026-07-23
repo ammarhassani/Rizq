@@ -136,8 +136,10 @@
   --acc: #0a6b4b;
   --acc-tint: #0a6b4b;
   --gold: #b8862e;
-  --grad: linear-gradient(100deg, #0a8f66, #0e8fa0 50%, #b8862e);
-  --grad-m: linear-gradient(100deg, #0a8f66, #b8862e);
+  /* gradient-TEXT poles deepened to clear AA-large on --raised (warm #b8862e=2.76
+     failed). --gold #b8862e kept below for fills/strokes (3:1 UI threshold). */
+  --grad: linear-gradient(100deg, #0a7d59, #0e8fa0 50%, #8a5a12);
+  --grad-m: linear-gradient(100deg, #0a7d59, #8a5a12);
   --fill: linear-gradient(120deg, #12c58c, #12a6b8);
   --acc-soft: rgba(11, 123, 87, 0.12);
   --acc-line: rgba(11, 123, 87, 0.32);
@@ -327,8 +329,9 @@
 }
 .display-2 {
   font-family: var(--font-display);
-  /* app-page H1 — board scale ~44px desktop, 32px mobile (was 52px, too large) */
-  font-size: clamp(2rem, 2.2vw + 0.85rem, 2.75rem);
+  /* app-page H1 — pinned 32px (board/REDLINE canonical); ~28 mobile. Landing
+     hero (Hero.tsx) is the 44px title, capped there separately. */
+  font-size: clamp(1.75rem, 1vw + 1.35rem, 2rem);
   line-height: 1.08;
   letter-spacing: -0.01em;
   font-weight: 700;

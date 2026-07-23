@@ -55,7 +55,7 @@ export async function Hero({ locale }: Props) {
             <Reveal asMount delay={0.2} direction="side">
               <h1
                 id="hero-heading"
-                className={`max-w-xl font-display text-[clamp(2.2rem,4.6vw,3.25rem)] font-bold leading-[1.15] text-rizq-ink ${font}`}
+                className={`max-w-xl font-display text-[clamp(2.2rem,4.6vw,2.75rem)] font-bold leading-[1.15] text-rizq-ink ${font}`}
               >
                 {isAr ? "نظام التشغيل الكامل لِعملك المستقلّ." : "The complete operating system for your freelance work."}
               </h1>
