@@ -345,6 +345,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
           </label>
           <Combobox
             id="template"
+            aria-label={t("templatePicker")}
             locale={locale}
             value={selectedTemplateId || null}
             onChange={(v) => setSelectedTemplateId(v ?? "")}

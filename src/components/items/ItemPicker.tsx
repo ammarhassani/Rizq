@@ -78,6 +78,8 @@ export function ItemPicker({ locale, items, onPick, id }: Props) {
         onChange={handlePick}
         options={options}
         placeholder={t("placeholder")}
+        // No visible label of its own: named by the placeholder, which IS the visible affordance.
+        aria-label={t("placeholder")}
         searchPlaceholder={t("searchPlaceholder")}
         emptyText={t("noResults")}
         footer={

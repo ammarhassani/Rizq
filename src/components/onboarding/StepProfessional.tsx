@@ -98,6 +98,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip, auto
       <div>
         <label className={labelCls}>{t("primarySpecialty")}</label>
         <Combobox
+          aria-label={t("primarySpecialty")}
           locale={locale}
           value={primarySpecialtySlug || null}
           onChange={(v) => setPrimarySpecialtySlug(v ?? "")}

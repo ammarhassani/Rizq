@@ -165,6 +165,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           {isAr ? "التصنيف" : "Category"}
         </label>
         <Combobox
+          aria-label={isAr ? "التصنيف" : "Category"}
           locale={locale}
           value={category || null}
           onChange={(v) => setCategory(v ?? "")}

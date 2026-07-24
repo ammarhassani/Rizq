@@ -91,6 +91,7 @@ export function OnboardingForm({ locale }: Props) {
         </label>
         <Combobox
           id="city-select"
+          aria-label={t("cityLabel")}
           locale={locale}
           value={city || null}
           onChange={(v) => setCity(v ?? "")}
@@ -112,6 +113,7 @@ export function OnboardingForm({ locale }: Props) {
         </label>
         <Combobox
           id="specialty-select"
+          aria-label={t("specialtyLabel")}
           locale={locale}
           value={specialty || null}
           onChange={(v) => setSpecialty(v ?? "")}

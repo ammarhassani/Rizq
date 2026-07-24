@@ -254,6 +254,7 @@ export function RateCalculatorClient({
         <div>
           <label className={labelClass}>{t("specialtyLabel")}</label>
           <Combobox
+            aria-label={t("specialtyLabel")}
             locale={locale}
             value={specialtyId || null}
             onChange={(v) => setSpecialtyId(v ?? "")}
@@ -273,6 +274,7 @@ export function RateCalculatorClient({
           <div>
             <label className={labelClass}>{t("cityLabel")}</label>
             <Combobox
+              aria-label={t("cityLabel")}
               locale={locale}
               value={cityId || null}
               onChange={(v) => setCityId(v ?? "")}
@@ -289,6 +291,7 @@ export function RateCalculatorClient({
           <div>
             <label className={labelClass}>{t("tierLabel")}</label>
             <Combobox
+              aria-label={t("tierLabel")}
               locale={locale}
               value={tierId || null}
               onChange={(v) => setTierId(v ?? "")}

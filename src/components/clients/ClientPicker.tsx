@@ -78,6 +78,8 @@ export function ClientPicker({
         onChange={(v) => onChange(v ?? "")}
         options={options}
         placeholder={noneLabel ?? t("clientPicker.none")}
+        // No visible label of its own: named by the placeholder, which IS the visible affordance.
+        aria-label={noneLabel ?? t("clientPicker.none")}
         searchPlaceholder={t("clientPicker.searchPlaceholder")}
         emptyText={t("clientPicker.noResults")}
         allowClear

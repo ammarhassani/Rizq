@@ -36,11 +36,16 @@ type Props = {
   /** Rendered under the option list — e.g. a "+ Add client" action. */
   footer?: React.ReactNode;
   /**
-   * Accessible name for the trigger. `role=combobox` does NOT take its name from the visible
-   * text, so without this (or a placeholder) screen readers announce an unnamed control.
-   * Defaults to `placeholder`.
+   * Accessible name for the trigger. REQUIRED — `role=combobox` does not take its name from
+   * the visible text, and a `<label for>` cannot name it either (the trigger is a button, not
+   * a labelable element). This used to fall back to `placeholder`, which silently produced a
+   * name that disagreed with the visible label — e.g. a field labelled "Years of experience"
+   * announcing as "Pick your level" (WCAG 2.5.3, Label in Name).
+   *
+   * Pass the VISIBLE label text when the field has one; pass the placeholder only for pickers
+   * that render no visible label of their own.
    */
-  "aria-label"?: string;
+  "aria-label": string;
 };
 
 /**
@@ -214,7 +219,7 @@ export function Combobox({
         type="button"
         id={id}
         role="combobox"
-        aria-label={ariaLabel ?? placeholder ?? undefined}
+        aria-label={ariaLabel}
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-controls={open ? listboxId : undefined}

@@ -507,6 +507,7 @@ function SelectField({
         name={name}
         render={({ field }) => (
           <Combobox
+            aria-label={label}
             id={id}
             locale={locale}
             value={(field.value as string) || null}

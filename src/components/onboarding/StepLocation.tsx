@@ -62,6 +62,7 @@ export function StepLocation({ locale, profile, onNext, onBack, onSkip, autosave
         </label>
         <Combobox
           id="city-select-v2"
+          aria-label={t("cityLabel")}
           locale={locale}
           value={citySlug || null}
           onChange={(v) => setCitySlug(v ?? "")}
