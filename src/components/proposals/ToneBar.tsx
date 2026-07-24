@@ -47,9 +47,13 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
       const result = await adjustProposalTone({ proposal_id: proposalId, tone });
       if (!result.ok) {
         setError(
-          isAr
-            ? "تعذّر تطبيق النبرة. حاول مرة أخرى."
-            : "Could not apply tone. Please try again."
+          result.code === "quota_exhausted"
+            ? isAr
+              ? "بلغت حدّ ٣ تعديلات للنبرة هذا الشهر. الترقية للاستخدام غير المحدود."
+              : "You've reached 3 tone edits this month. Upgrade for unlimited."
+            : isAr
+              ? "تعذّر تطبيق النبرة. حاول مرة أخرى."
+              : "Could not apply tone. Please try again."
         );
         setActiveTone(null);
         return;

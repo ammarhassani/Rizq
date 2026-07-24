@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { ARTIFACT_SECTIONS, type ArtifactSection } from "@/lib/proposals/artifact";
 import { adjustTone, rewriteSectionTone, type ToneSection } from "@/lib/ai/tone";
 import { stripDashes } from "@/lib/ai/proseDraft";
+import { isProActive } from "@/lib/billing/tier";
+import {
+  FREE_MONTHLY_TONE_USES,
+  startOfMonthRiyadhMs,
+  countToneUsesSince,
+} from "@/lib/proposals/toneQuota";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -42,7 +48,7 @@ type AdjustToneResult =
       modified: string[];
       artifact_json: import("@/lib/proposals/artifact").ArtifactData;
     }
-  | { ok: false; code: "unauthorized" | "not_found" | "error" };
+  | { ok: false; code: "unauthorized" | "not_found" | "error" | "quota_exhausted" };
 
 // ---------------------------------------------------------------------------
 // Section text extractor
@@ -56,8 +62,8 @@ type AdjustToneResult =
 //   milestones:    trigger labels joined (milestone trigger names)
 //   timeline:      startDate + deliveryDate (strings — AI must preserve them)
 //
-// Note: free-tier "3 tone uses/month" quota enforcement is deferred to a
-// follow-up task per spec; the action currently runs for all authenticated users.
+// Free-tier "3 tone uses/month" quota is enforced in adjustProposalTone() below
+// (counted from the tone_adjustments logs; pro/admin unlimited).
 // ---------------------------------------------------------------------------
 
 function extractSectionText(section: ArtifactSection): string {
@@ -270,6 +276,26 @@ export async function adjustProposalTone(rawInput: unknown): Promise<AdjustToneR
   // Auth check.
   const { data: userResult } = await supabase.auth.getUser();
   if (!userResult.user) return { ok: false, code: "unauthorized" };
+
+  // Free-tier tone quota: 3 rewrites/month. Pro/admin (active) unlimited.
+  // ponytail: count-then-act is not atomic — concurrent rapid clicks could let a
+  // 4th slip past. Accepted: low stakes (a couple extra AI rewrites, self-heals
+  // next month). Move to a DB trigger like the pricing quota if it ever matters.
+  const { data: prof } = await supabase
+    .from("users")
+    .select("role, pro_until")
+    .eq("id", userResult.user.id)
+    .single();
+  const role = (prof?.role ?? "free") as "free" | "pro" | "admin";
+  const proUntil = (prof?.pro_until as string | null) ?? null;
+  if (!isProActive(role, proUntil)) {
+    const { data: adjRows } = await supabase
+      .from("proposals")
+      .select("tone_adjustments")
+      .eq("user_id", userResult.user.id);
+    const used = countToneUsesSince(adjRows ?? [], startOfMonthRiyadhMs(Date.now()));
+    if (used >= FREE_MONTHLY_TONE_USES) return { ok: false, code: "quota_exhausted" };
+  }
 
   // Load proposal (RLS scopes to owner).
   const { data: proposal, error: proposalErr } = await supabase
