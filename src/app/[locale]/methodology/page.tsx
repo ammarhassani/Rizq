@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { AppShell } from "@/components/shell/AppShell";
+import { WidgetError } from "@/components/dashboard/WidgetError";
 import { createClient } from "@/lib/supabase/server";
 import {
   Layers,
@@ -112,13 +113,23 @@ export default async function MethodologyPage({
 
   // Fetch sections from Supabase (anon read; RLS policy enabled=true)
   const supabase = await createClient();
-  const { data: rows } = await supabase
-    .from("methodology_sections")
-    .select(
-      "id, sort_order, title_ar, title_en, content_ar, content_en, icon, deep_link, last_updated"
-    )
-    .eq("enabled", true)
-    .order("sort_order", { ascending: true });
+  // A failed read must not render as an empty methodology page (Principle V).
+  // try/catch too, so a THROWN failure gets the inline retry, not a 500.
+  let rows: unknown[] | null = null;
+  let loadError = false;
+  try {
+    const { data, error } = await supabase
+      .from("methodology_sections")
+      .select(
+        "id, sort_order, title_ar, title_en, content_ar, content_en, icon, deep_link, last_updated"
+      )
+      .eq("enabled", true)
+      .order("sort_order", { ascending: true });
+    rows = data;
+    loadError = !!error;
+  } catch {
+    loadError = true;
+  }
 
   const sections: MethodologySection[] = (rows ?? []) as MethodologySection[];
 
@@ -187,7 +198,12 @@ export default async function MethodologyPage({
           </nav>
         )}
 
-        {/* Sections */}
+        {/* Sections — or error+retry if the read failed (error ≠ empty) */}
+        {loadError && (
+          <div className="border-t border-rizq-gold/15 pt-10">
+            <WidgetError locale={locale as "ar" | "en"} />
+          </div>
+        )}
         <div className="space-y-10 sm:space-y-12 border-t border-rizq-gold/15 pt-10">
           {sections.map((s) => {
             const title = isAr ? s.title_ar : s.title_en;

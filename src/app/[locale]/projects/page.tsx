@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { StartProjectButton } from "@/components/wizard/StartProjectButton";
 import { listProjects } from "@/app/actions/projects/listProjects";
+import { WidgetError } from "@/components/dashboard/WidgetError";
 import type { LifecycleStageKey } from "@/lib/projects/lifecycle";
 
 type Params = { locale: string };
@@ -48,8 +49,18 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
   const dir = isAr ? "rtl" : "ltr";
   const font = isAr ? "font-arabic" : "font-sans";
 
-  const result = await listProjects();
-  const items = result.ok ? result.items : [];
+  // A failed list must not read as "no projects yet" (Principle V). try/catch too,
+  // so a THROWN failure gets the same inline retry instead of a 500 page.
+  type ProjectItem = Extract<Awaited<ReturnType<typeof listProjects>>, { ok: true }>["items"][number];
+  let items: ProjectItem[] = [];
+  let loadError = false;
+  try {
+    const result = await listProjects();
+    items = result.ok ? result.items : [];
+    loadError = !result.ok;
+  } catch {
+    loadError = true;
+  }
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={isAr ? "المشاريع" : "Projects"} maxWidth="wide">
@@ -65,7 +76,11 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
           </div>
         </div>
 
-        {items.length === 0 ? (
+        {loadError ? (
+          <div className={`card-wahaj p-10 ${font}`}>
+            <WidgetError locale={locale as "ar" | "en"} />
+          </div>
+        ) : items.length === 0 ? (
           <div className={`card-wahaj p-10 text-center ${font}`}>
             <p className={`text-lg font-semibold text-rizq-ink ${font}`}>{t("indexEmptyTitle")}</p>
             <p className={`mt-1.5 text-sm text-rizq-ink-soft ${font}`}>{t("indexEmptySubtitle")}</p>

@@ -11,6 +11,7 @@ import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { CalendarClient } from "@/components/calendar/CalendarClient";
+import { WidgetError } from "@/components/dashboard/WidgetError";
 import type { CalendarEvent } from "@/lib/calendar/group";
 
 type Params = { locale: string };
@@ -113,23 +114,39 @@ export default async function CalendarPage({ params }: { params: Promise<Params>
   const t = await getTranslations({ locale, namespace: "Calendar" });
 
   // Fetch calendar_events (view RLS-scoped to auth.uid())
-  const { data: eventsRaw } = await supabase
-    .from("calendar_events")
-    .select(
-      "event_id, event_type, user_id, client_id, event_date, title_ar, title_en, status, source_module, source_id, metadata"
-    )
-    .order("event_date", { ascending: true });
+  // A failed events read must not render as an empty calendar (Principle V).
+  // try/catch too, so a THROWN failure gets the inline retry, not a 500.
+  let eventsRaw: unknown[] | null = null;
+  let loadError = false;
+  try {
+    const { data, error } = await supabase
+      .from("calendar_events")
+      .select(
+        "event_id, event_type, user_id, client_id, event_date, title_ar, title_en, status, source_module, source_id, metadata"
+      )
+      .order("event_date", { ascending: true });
+    eventsRaw = data;
+    loadError = !!error;
+  } catch {
+    loadError = true;
+  }
 
   const events: CalendarEvent[] = (eventsRaw ?? []).map((row) =>
     narrowEvent(row as Record<string, unknown>)
   );
 
   // Fetch calendar_preferences (owner-scoped, may not exist)
-  const { data: prefsRaw } = await supabase
+  // Preferences are non-critical — defaults are a safe, honest fallback (not a
+  // false claim), so a failure here degrades rather than blocking the calendar.
+  // But it must not be SILENT: log it so the degradation is observable.
+  const { data: prefsRaw, error: prefsError } = await supabase
     .from("calendar_preferences")
     .select("*")
     .eq("user_id", userData.user.id)
     .maybeSingle();
+  if (prefsError) {
+    console.error("[calendar] preferences read failed — falling back to defaults", prefsError.code);
+  }
 
   const prefs = parsePrefs(prefsRaw as CalendarPreferencesRow | null);
 
@@ -143,12 +160,18 @@ export default async function CalendarPage({ params }: { params: Promise<Params>
           <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>{t("subtitle")}</p>
         </div>
 
-        {/* Calendar client island */}
-        <CalendarClient
-          events={events}
-          prefs={prefs}
-          locale={locale as "ar" | "en"}
-        />
+        {/* Calendar client island — or error+retry if the events read failed */}
+        {loadError ? (
+          <div className="card-wahaj p-10">
+            <WidgetError locale={locale as "ar" | "en"} />
+          </div>
+        ) : (
+          <CalendarClient
+            events={events}
+            prefs={prefs}
+            locale={locale as "ar" | "en"}
+          />
+        )}
       </div>
     </AppShell>
   );

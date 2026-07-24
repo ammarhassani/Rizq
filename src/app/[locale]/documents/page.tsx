@@ -10,6 +10,7 @@ import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { DocumentCard, type DocumentRow } from "@/components/documents/DocumentCard";
+import { WidgetError } from "@/components/dashboard/WidgetError";
 
 type Params = { locale: string };
 
@@ -51,11 +52,21 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
   const catsMap = Object.fromEntries(cats.map((c) => [c.id, { name_ar: c.name_ar, name_en: c.name_en }]));
 
   // Fetch documents
-  const { data: docsRaw } = await supabase
-    .from("documents")
-    .select("id, title_ar, file_name, file_type, category, expiry_date, reminder_days_before, tags, created_at")
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false });
+  // try/catch as well as the returned `error`: a THROWN failure (network, client
+  // init) must land on the same inline retry, not a 500 page (Principle V).
+  let docsRaw: unknown[] | null = null;
+  let loadError = false;
+  try {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("id, title_ar, file_name, file_type, category, expiry_date, reminder_days_before, tags, created_at")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+    docsRaw = data;
+    loadError = !!error;
+  } catch {
+    loadError = true;
+  }
 
   const docs = (docsRaw ?? []) as DocumentRow[];
 
@@ -75,8 +86,12 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
           </p>
         </div>
 
-        {/* Document list or empty state */}
-        {docs.length === 0 ? (
+        {/* Document list, empty state, or error+retry (error ≠ empty) */}
+        {loadError ? (
+          <div className="card-wahaj p-10">
+            <WidgetError locale={locale as "ar" | "en"} />
+          </div>
+        ) : docs.length === 0 ? (
           <div dir={dir} className={`card-wahaj p-10 text-center ${font}`}>
             <div aria-hidden className="mx-auto mb-6 h-16 w-16 rounded-2xl border-2 border-rizq-gold/30 bg-rizq-green/8 flex items-center justify-center">
               <span className="font-arabic text-2xl font-bold text-rizq-green leading-none">ر</span>
