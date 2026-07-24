@@ -312,6 +312,12 @@ function SelectField({
         onChange={(v) => onChange(v ?? "")}
         options={options.map((o) => ({ value: o.slug, label: o.label, hint: o.hint }))}
         placeholder={placeholder}
+        // The visible <label> can't name a role=combobox trigger (it isn't a
+        // labelable element), and Combobox otherwise falls back to the
+        // placeholder — so a screen reader would announce "Pick your level"
+        // for a field visibly labelled "Years of experience" (WCAG 2.5.3,
+        // Label in Name). Name it from the visible label instead.
+        aria-label={label}
         searchPlaceholder={tCommon("combobox.searchPlaceholder")}
         emptyText={tCommon("combobox.noResults")}
       />

@@ -68,11 +68,18 @@ test.describe("sidebar click navigation", () => {
       }
 
       // Destination actually rendered — not an error boundary or a blank shell.
+      // Same assertion all-routes-smoke uses: main OR a heading, whichever the
+      // page settles on. waitForURL resolves the moment the URL changes while the
+      // RSC payload is still streaming, so this must be awaited, and pinning it to
+      // a specific heading level is too brittle mid-transition.
       const body = page.locator("body");
       await expect(body).not.toContainText(/Internal Server Error|Application error|Unhandled Runtime Error/i);
-      const heading = page.locator("h1, h2").first();
-      if ((await heading.count()) === 0) {
-        failures.push(`${target}: navigated but no heading rendered`);
+      try {
+        const main = page.getByRole("main");
+        const heading = page.getByRole("heading").first();
+        await expect(main.or(heading).first()).toBeVisible({ timeout: 20_000 });
+      } catch {
+        failures.push(`${target}: navigated but the destination never rendered`);
       }
     }
 

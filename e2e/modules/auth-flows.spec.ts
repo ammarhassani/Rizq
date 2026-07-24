@@ -19,20 +19,20 @@ test.describe("Auth", () => {
     expect(page.url()).toMatch(/returnTo=/);
   });
 
-  // FINDING (recorded in the maturity report): page-level gated routes (invoices, income,
-  // clients, ...) redirect("/login") WITHOUT a returnTo param — only the middleware-gated
-  // /dashboard + /onboarding preserve it. So deep-linking to a page-gated route loses the
-  // destination after login (lands on dashboard). This test pins that ACTUAL behavior.
-  test("deep-link to a page-gated route loses returnTo after login (known gap)", async ({ page }) => {
+  // This previously pinned a FINDING (deep links dropped returnTo, so you always landed on
+  // the dashboard). Feature 008 fixed it: src/proxy.ts now gates the whole authenticated tree
+  // (PROTECTED_PATTERN includes `invoices`), so the redirect carries ?returnTo and login
+  // resumes the original destination. The test now asserts the corrected behavior.
+  test("deep-link to a gated route preserves returnTo and resumes after login", async ({ page }) => {
     const { email, password } = mainCreds();
-    await page.goto("/en/invoices"); // page-level redirect -> /login WITHOUT returnTo
+    await page.goto("/en/invoices"); // middleware redirect -> /login WITH returnTo
     await expect(page).toHaveURL(/\/en\/login/);
-    expect(page.url(), "invoices redirect omits returnTo (finding)").not.toMatch(/returnTo=/);
+    expect(page.url(), "invoices redirect must carry returnTo").toMatch(/returnTo=/);
     await robustFill(page.getByRole("textbox", { name: /email/i }), email);
     await robustFill(page.getByRole("textbox", { name: /password/i }).first(), password);
     await page.getByRole("button", { name: /sign in|log in|login/i }).click();
-    // Lands on the default (dashboard), not the originally requested /invoices.
-    await expect(page).toHaveURL(/\/en\/dashboard/, { timeout: 20_000 });
+    // Resumes the originally requested destination, not the dashboard default.
+    await expect(page).toHaveURL(/\/en\/invoices/, { timeout: 20_000 });
   });
 
   test("fresh signup gets an immediate session (email confirmation OFF)", async ({ page }) => {
