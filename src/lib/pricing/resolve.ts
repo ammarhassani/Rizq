@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { aggregate, type AggRow, type ProvenanceSource } from "./aggregate";
 import { buildCitation } from "./citation";
 import { applyKAnonymity } from "./contribution";
+import { computeMarketTrend, type MarketTrend } from "./trend";
 import type { BenchmarkProvenance } from "./provenance";
 
 export type ResolveInput = {
@@ -33,6 +34,8 @@ export type ResolveResult =
       provenance_citation_ar: string;
       provenance_citation_en: string;
       date_range: { earliest: string; latest: string };
+      /** Real directional signal from dated rows, or null if data too thin (M4 trend). */
+      trend: MarketTrend | null;
       ids: ResolvedIds;
     }
   | { status: "insufficient_data"; sample_size: number; ids: ResolvedIds }
@@ -187,6 +190,10 @@ async function finalize(
     provenance_citation_ar: citation.ar,
     provenance_citation_en: citation.en,
     date_range: agg.date_range,
+    // Only show a trend for an EXACT-match market. When the band widened to
+    // region/specialty fallback, a "this market moved X%" line would attribute
+    // fallback-wide rows to the specific query — honesty gap (Principle I).
+    trend: fallback === "none" ? computeMarketTrend(rows, now) : null,
     ids,
   };
 }

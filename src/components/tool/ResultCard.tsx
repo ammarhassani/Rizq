@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Copy, Globe, HandCoins, Lock, RotateCcw, FileText } from "lucide-react";
+import { Check, Copy, Globe, HandCoins, Lock, RotateCcw, FileText, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "./AnimatedNumber";
-import { toggleShare } from "@/app/actions/tool/calculate";
+import { toggleShare, getMarketTrendNarrative } from "@/app/actions/tool/calculate";
 import { track } from "@/lib/analytics/track";
 import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
+import type { MarketTrend } from "@/lib/pricing/trend";
 
 /** Maps dominant provenance kind to the corresponding methodology section anchor. */
 function methodologyFragment(kind: BenchmarkProvenance | undefined): string {
@@ -40,6 +41,11 @@ type Props = {
   confidenceScore?: number;     // 0..1
   /** Raw dominant provenance kind — used to deep-link the methodology page */
   provenanceKind?: BenchmarkProvenance;
+  /** Computed market-trend signal (M4), or null if data too thin to show one. */
+  trend?: MarketTrend | null;
+  /** Localized specialty/city names — fed to the trend AI narrative. */
+  specialtyName?: string;
+  cityName?: string;
   // Whether the user is authenticated and can toggle share (anon = readonly)
   canShare: boolean;
   // Whether public_share is already on (e.g. when revisiting the result)
@@ -63,6 +69,9 @@ export function ResultCard({
   provenanceCitation,
   confidenceScore,
   provenanceKind,
+  trend,
+  specialtyName,
+  cityName,
   canShare,
   initiallyShared = false,
   isAuthed,
@@ -71,6 +80,28 @@ export function ResultCard({
   const t = useTranslations("Tool.result");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const methodologyHref = `/methodology${methodologyFragment(provenanceKind)}`;
+
+  // AI interpretation of the computed trend — best-effort, non-blocking. The
+  // computed line renders immediately; this only enriches it when it arrives.
+  const [trendNarrative, setTrendNarrative] = useState<{ ar: string; en: string } | null>(null);
+  useEffect(() => {
+    if (!trend) return;
+    let alive = true;
+    getMarketTrendNarrative({
+      trend,
+      specialty_name: specialtyName ?? "",
+      city_name: cityName ?? "",
+    })
+      .then((res) => {
+        if (alive && res.ok) setTrendNarrative(res.narrative);
+      })
+      .catch(() => {
+        /* graceful — keep the computed line only */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [trend, specialtyName, cityName]);
 
   const [isShared, setIsShared] = useState(initiallyShared);
   const [shareUrl, setShareUrl] = useState<string | null>(
@@ -205,6 +236,35 @@ export function ResultCard({
           <span className="inline-block rtl:rotate-180">→</span>
         </Link>
       </div>
+
+      {/* Market trend — computed signal (cited), optionally AI-interpreted.
+          Only rendered when the data was thick enough to support a direction. */}
+      {trend && (
+        <div className="mb-8 rounded-2xl border border-rizq-gold/20 bg-rizq-cream/40 p-4">
+          <p className={`flex items-center gap-2 text-sm text-rizq-ink ${font}`}>
+            {trend.direction === "rising" ? (
+              <TrendingUp size={16} className="text-rizq-green shrink-0" aria-hidden />
+            ) : trend.direction === "falling" ? (
+              <TrendingDown size={16} className="text-[var(--warn)] shrink-0" aria-hidden />
+            ) : (
+              <Minus size={16} className="text-rizq-ink-soft shrink-0" aria-hidden />
+            )}
+            <span>
+              {locale === "ar"
+                ? `تحرّك السوق ${trend.percent > 0 ? "+" : ""}${numberFmt.format(trend.percent)}% خلال ${numberFmt.format(trend.span_months)} أشهر تقريبًا (بناءً على ${numberFmt.format(trend.sample_size)} سجل).`
+                : `Market moved ${trend.percent > 0 ? "+" : ""}${numberFmt.format(trend.percent)}% over ~${numberFmt.format(trend.span_months)} months (based on ${numberFmt.format(trend.sample_size)} records).`}
+            </span>
+          </p>
+          {trendNarrative && (
+            <p className={`mt-2 text-sm text-rizq-ink-soft ${font}`}>
+              <span className="font-semibold text-rizq-green">
+                {locale === "ar" ? "تحليل رِزق — " : "Rizq Insight — "}
+              </span>
+              {locale === "ar" ? trendNarrative.ar : trendNarrative.en}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Share row */}
       <div className="border-t border-rizq-gold/20 pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

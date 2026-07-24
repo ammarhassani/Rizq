@@ -7,6 +7,8 @@ import { resolvePrice, type ResolveResult } from "@/lib/pricing/resolve";
 import { getQuotaState } from "@/lib/pricing/quota";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, maybeSweep } from "@/lib/rateLimit";
+import { isAIConfigured } from "@/lib/ai/client";
+import { generateMarketTrendNarrative } from "@/lib/ai/marketTrend";
 
 const InputSchema = z.object({
   specialty_slug: z.string().min(1).max(64),
@@ -195,4 +197,43 @@ export async function toggleShare(input: unknown): Promise<{ ok: boolean }> {
     .eq("user_id", userResult.user.id);
 
   return { ok: !error };
+}
+
+// ─── Market-trend AI narrative (M4 trend layer, AI half) ───────────────────────
+
+const TrendNarrativeSchema = z.object({
+  trend: z.object({
+    direction: z.enum(["rising", "falling", "stable"]),
+    percent: z.number(),
+    recent_median: z.number(),
+    older_median: z.number(),
+    recent_count: z.number(),
+    older_count: z.number(),
+    span_months: z.number(),
+    sample_size: z.number(),
+    date_range: z.object({ earliest: z.string(), latest: z.string() }),
+  }),
+  specialty_name: z.string().max(120),
+  city_name: z.string().max(120),
+});
+
+export type TrendNarrativeResult =
+  | { ok: true; narrative: { ar: string; en: string } }
+  | { ok: false };
+
+/**
+ * Interprets a pre-COMPUTED market-trend signal into a one-line bilingual
+ * insight (labeled "تحليل رِزق —" by the UI). The direction/percent come from
+ * real dated rows — this only narrates them. Non-blocking and best-effort:
+ * returns { ok: false } when AI is unconfigured or the model errors, so the UI
+ * keeps the plain computed trend line.
+ */
+export async function getMarketTrendNarrative(input: unknown): Promise<TrendNarrativeResult> {
+  const parsed = TrendNarrativeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false };
+  if (!isAIConfigured()) return { ok: false };
+
+  const narrative = await generateMarketTrendNarrative(parsed.data);
+  if (!narrative) return { ok: false };
+  return { ok: true, narrative };
 }

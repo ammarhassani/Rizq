@@ -184,6 +184,9 @@ export function ToolFlow({
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
         provenanceKind={r.dominant_provenance}
+        trend={r.trend}
+        specialtyName={specialties.find((s) => s.slug === specialty)?.label}
+        cityName={cities.find((c) => c.slug === city)?.label}
         canShare={canShare}
         isAuthed={isAuthed}
         onReset={reset}
