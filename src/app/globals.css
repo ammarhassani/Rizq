@@ -701,3 +701,58 @@
     background-position: 0 50% !important;
   }
 }
+
+/* ── Scrollbars ───────────────────────────────────────────────────────────────
+   The OS default scrollbar ignores the theme entirely: a light-grey Windows bar
+   sits on the dark surfaces and a chunky track breaks the neumorphic chrome.
+   These tokens follow the same light/dark split as every other surface token, so
+   the bar re-tints with the theme toggle instead of staying stuck.
+
+   `color-scheme` is deliberately NOT set here: next-themes (enableColorScheme,
+   on by default) writes it inline on <html>, and an inline style beats any rule
+   in this file — declaring it here would be dead code that reads as if it were
+   doing the work. */
+:root,
+[data-theme="light"] {
+  --scrollbar-thumb: rgba(60, 45, 20, 0.22);
+  --scrollbar-thumb-hover: rgba(60, 45, 20, 0.38);
+}
+
+[data-theme="dark"] {
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.30);
+}
+
+/* Firefox. `scrollbar-color` inherits, so setting it once on the root covers
+   every nested scroll container (sidebar, listboxes, the shell's main column). */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* WebKit / Chromium. Transparent track + padding-box border gives a floating
+   pill with breathing room rather than a full-height grey gutter. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Without this the corner where the two bars meet renders as an opaque UA square. */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
