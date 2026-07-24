@@ -122,5 +122,14 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   **core/optional** strength model (`lib/profile/strength.ts` — track-record is optional, never
   penalizes newcomers; retired `completeness.ts`); studio profile deleted (testimonials re-homed as a
   profile section); proposals strength nudge hidden ≥80%.
-Active (`.specify/feature.json`): **009** — shipped; no feature in flight, next TBD.
+- `specs/010-gap-remediation/` — **Gap Remediation & Growth**: close highest-ratio post-009 gaps in
+  priority-ordered independent slices. P1: `WidgetError` error+retry on M7/M9/M12/Projects (retire
+  swallowed-error false-empty states) + localize Recent-Proposals status enum (no raw enum to `en`).
+  P2: enforce `pro_until` expiry at the single `isPro` helper (`upgrade.ts:43` — grant never lapses
+  today) + wire tone-AI quota + regression-guard pricing free tier = 5. P3: M4 AI-trend layer
+  (labeled, non-blocking) + M8 FL verification (`fl_verified`, step-6 URLs, step-5 insight). P3
+  **FOUNDER-GATED**: Tap payments (migration + external dep; contract authored, DO NOT BUILD until
+  greenlit). No migration except the gated Tap slice. Plan:
+  [specs/010-gap-remediation/plan.md](specs/010-gap-remediation/plan.md).
+Active (`.specify/feature.json`): **010** — spec+plan done → **/speckit-tasks next**. US4 (Tap) blocked on founder approval.
 <!-- SPECKIT END -->
