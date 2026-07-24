@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
+import { isProActive } from "@/lib/billing/tier";
 
 export type QuotaState =
   | {
@@ -42,17 +43,20 @@ export async function getQuotaState(): Promise<QuotaState> {
     // Pull role + bonus from public.users
     const { data: profile } = await supabase
       .from("users")
-      .select("role, bonus_quota")
+      .select("role, bonus_quota, pro_until")
       .eq("id", user.id)
       .single();
 
     const role = (profile?.role ?? "free") as "free" | "pro" | "admin";
     const bonus = profile?.bonus_quota ?? 0;
+    const proUntil = (profile?.pro_until as string | null) ?? null;
 
-    if (role === "pro" || role === "admin") {
+    // Unlimited only while the grant is active; an expired pro_until falls
+    // through to the free-tier counting below (see src/lib/billing/tier.ts).
+    if (isProActive(role, proUntil)) {
       return {
         ok: true,
-        mode: role,
+        mode: role === "admin" ? "admin" : "pro",
         remaining: "unlimited",
         limit: "unlimited",
         session_id: null,
@@ -60,13 +64,19 @@ export async function getQuotaState(): Promise<QuotaState> {
       };
     }
 
-    // Free user — count queries this calendar month (Riyadh time)
+    // Free user — count queries this calendar month (Riyadh time). If a Pro grant
+    // lapsed mid-month, only count from the lapse onward: queries made while Pro
+    // (legitimately unlimited) must not retroactively exhaust the free allowance.
     const monthStart = startOfMonthRiyadh();
+    const countFrom =
+      proUntil && new Date(proUntil).getTime() > new Date(monthStart).getTime()
+        ? proUntil
+        : monthStart;
     const { count } = await supabase
       .from("queries")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
-      .gte("created_at", monthStart);
+      .gte("created_at", countFrom);
 
     const used = count ?? 0;
     const limit = FREE_MONTHLY_QUERIES + bonus;

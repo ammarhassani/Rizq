@@ -18,6 +18,7 @@
 
 import { z } from "zod";
 import { createClient as createSupabaseClient } from "@/lib/supabase/server";
+import { isProActive } from "@/lib/billing/tier";
 
 // ─── Shared auth helper ───────────────────────────────────────────────────────
 
@@ -40,9 +41,8 @@ async function getAuthContext() {
   };
 }
 
-function isPro(role: "free" | "pro" | "admin"): boolean {
-  return role === "pro" || role === "admin";
-}
+// Tier gating routes through the shared resolver so an expired pro_until lapses
+// everywhere (see src/lib/billing/tier.ts).
 
 // ─── Return types ─────────────────────────────────────────────────────────────
 
@@ -170,6 +170,6 @@ export async function getMyTierAction(): Promise<MyTierResult> {
     ok: true,
     role: ctx.role,
     pro_until: ctx.pro_until,
-    isPro: isPro(ctx.role),
+    isPro: isProActive(ctx.role, ctx.pro_until),
   };
 }

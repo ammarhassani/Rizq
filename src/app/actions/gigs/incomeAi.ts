@@ -14,6 +14,7 @@ import { suggestCategory } from "@/lib/ai/incomeCategory";
 import { explainAnomaly } from "@/lib/ai/incomeAnomaly";
 import { forecastIncome, type ForecastCtx } from "@/lib/ai/incomeForecast";
 import { isPriceAnomaly } from "@/lib/income/anomaly";
+import { isProActive } from "@/lib/billing/tier";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ async function getAuthContext() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role, pro_until")
     .eq("id", userData.user.id)
     .single();
 
@@ -32,11 +33,8 @@ async function getAuthContext() {
     supabase,
     user: userData.user,
     role: (profile?.role ?? "free") as "free" | "pro" | "admin",
+    pro_until: (profile?.pro_until as string | null) ?? null,
   };
-}
-
-function isPro(role: "free" | "pro" | "admin"): boolean {
-  return role === "pro" || role === "admin";
 }
 
 // ─── Return types ─────────────────────────────────────────────────────────────
@@ -231,7 +229,7 @@ export async function checkGigAnomalyAction(input: {
 export async function forecastIncomeAction(): Promise<ForecastResult> {
   const ctx = await getAuthContext();
   if (!ctx) return { ok: false, code: "unauthorized" };
-  if (!isPro(ctx.role)) return { ok: false, code: "upgrade" };
+  if (!isProActive(ctx.role, ctx.pro_until)) return { ok: false, code: "upgrade" };
 
   const { supabase, user } = ctx;
   const now = new Date();
