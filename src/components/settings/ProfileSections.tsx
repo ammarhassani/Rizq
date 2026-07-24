@@ -16,6 +16,7 @@ import { StepIdentity } from "@/components/onboarding/StepIdentity";
 import { StepLocation } from "@/components/onboarding/StepLocation";
 import { StepProfessional } from "@/components/onboarding/StepProfessional";
 import { StepRates } from "@/components/onboarding/StepRates";
+import { StepPlatforms } from "@/components/onboarding/StepPlatforms";
 import { StepPortfolio } from "@/components/onboarding/StepPortfolio";
 import { StepBrand } from "@/components/onboarding/StepBrand";
 import { StepDefaults } from "@/components/onboarding/StepDefaults";
@@ -51,6 +52,7 @@ export function ProfileSections({ locale, snapshot, testimonials }: Props) {
     { key: "location", ar: "المدينة", en: "Location", el: <StepLocation {...stepProps} /> },
     { key: "professional", ar: "التخصص والخبرة", en: "Specialty & experience", el: <StepProfessional {...stepProps} /> },
     { key: "rates", ar: "الأسعار", en: "Rates", el: <StepRates {...stepProps} /> },
+    { key: "platforms", ar: "المنصّات", en: "Platforms", el: <StepPlatforms {...stepProps} /> },
     { key: "portfolio", ar: "أعمالك", en: "Portfolio", el: <StepPortfolio {...stepProps} /> },
     { key: "brand", ar: "العلامة والتواصل", en: "Brand & contact", el: <StepBrand {...stepProps} /> },
     { key: "defaults", ar: "الإعدادات الافتراضية", en: "Business defaults", el: <StepDefaults {...stepProps} /> },

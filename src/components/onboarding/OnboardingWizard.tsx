@@ -20,13 +20,14 @@ import { StepIdentity } from "./StepIdentity";
 import { StepLocation } from "./StepLocation";
 import { StepProfessional } from "./StepProfessional";
 import { StepRates } from "./StepRates";
+import { StepPlatforms } from "./StepPlatforms";
 import { StepPortfolio } from "./StepPortfolio";
 import { StepBrand } from "./StepBrand";
 import { StepDefaults } from "./StepDefaults";
 import { StepGoals } from "./StepGoals";
 import { StepReview } from "./StepReview";
 
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 11;
 
 // Per-step PAYOFF (feature 006) — what completing this step unlocks in the app,
 // so the freelancer feels their data feeding every module. Bilingual, RTL-safe.
@@ -35,6 +36,7 @@ const STEP_PAYOFF: Record<string, { ar: string; en: string }> = {
   location: { ar: "تسعير دقيق حسب سوق مدينتك", en: "Unlocks accurate pricing for your city's market" },
   professional: { ar: "تخصصك وخبرتك يحددان كل سعر", en: "Your specialty & experience drive every price" },
   rates: { ar: "التسعير يعكس سعرك من أول عرض", en: "Pricing reflects your own rate from proposal #1" },
+  platforms: { ar: "روابط منصّاتك تعزّز مصداقيتك", en: "Your platform links boost proposal credibility" },
   portfolio: { ar: "يبرز أعمالك التي تكسب العملاء", en: "Showcases the work that wins clients" },
   brand: { ar: "اسمك وشعارك وألوانك على كل عرض وفاتورة", en: "Your name, logo & colors on every proposal & invoice" },
   defaults: { ar: "فواتير أسرع بشروطك المعتادة", en: "Faster invoices with your standard terms" },
@@ -48,6 +50,7 @@ const STEP_KEYS = [
   "location",
   "professional",
   "rates",
+  "platforms",
   "portfolio",
   "brand",
   "defaults",
@@ -168,6 +171,7 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
           {stepKey === "location" && <StepLocation {...stepProps} />}
           {stepKey === "professional" && <StepProfessional {...stepProps} />}
           {stepKey === "rates" && <StepRates {...stepProps} />}
+          {stepKey === "platforms" && <StepPlatforms {...stepProps} />}
           {stepKey === "portfolio" && <StepPortfolio {...stepProps} />}
           {stepKey === "brand" && <StepBrand {...stepProps} />}
           {stepKey === "defaults" && <StepDefaults {...stepProps} />}

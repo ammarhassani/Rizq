@@ -77,7 +77,10 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
       {/* Live market-rate preview (feature 006) — the freelancer sees what the
           engine derives from their specialty/city/experience while setting their
           own rate. Ephemeral; cites provenance. */}
-      <OnboardingPricePreview locale={locale} />
+      <OnboardingPricePreview
+        locale={locale}
+        userRate={projectMin ? parseFloat(projectMin) : null}
+      />
 
       {/* Hourly rate + min/floor project rate (daily is derived = hourly × 8). */}
       <div className="grid grid-cols-2 gap-4">

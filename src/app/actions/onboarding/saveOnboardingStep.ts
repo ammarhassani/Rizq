@@ -6,9 +6,9 @@
  * Each step writes only its own columns; bumps onboarding_step to max(current, thisStep).
  * Returns updated profile_completeness_pct.
  *
- * NOTE: FL document upload is DEFERRED (no storage bucket yet).
- * fl_number is captured as text; fl_document_url is never written here.
- * The upload control in the UI renders as a disabled "قريبًا" placeholder.
+ * NOTE: FL *document verification* is intentionally NOT a feature — a boolean set on
+ * upload would be a false credibility claim (Constitution Principle I). fl_number is
+ * captured as plain text in the identity step; nothing here asserts "verified".
  */
 
 import { z } from "zod";
@@ -49,6 +49,17 @@ const StepRatesSchema = z.object({
   previous_year_income_sar: z.number().nonnegative().optional().nullable(),
   income_goal_monthly_sar: z.number().nonnegative().optional().nullable(),
   rate_confidence: z.enum(["exact", "approximate", "estimate"]).optional(),
+});
+
+const urlOrEmpty = z.string().url().max(500).optional().nullable().or(z.literal(""));
+
+const StepPlatformsSchema = z.object({
+  bahr_profile_url: urlOrEmpty,
+  mostaql_profile_url: urlOrEmpty,
+  khamsat_profile_url: urlOrEmpty,
+  linkedin_url: urlOrEmpty,
+  behance_url: urlOrEmpty,
+  personal_website_url: urlOrEmpty,
 });
 
 const StepPortfolioSchema = z.object({
@@ -125,24 +136,33 @@ const STEP_SCHEMAS = {
   location: StepLocationSchema,
   professional: StepProfessionalSchema,
   rates: StepRatesSchema,
+  platforms: StepPlatformsSchema,
   portfolio: StepPortfolioSchema,
   brand: StepBrandSchema,
   defaults: StepDefaultsSchema,
   goals: StepGoalsSchema,
 } as const;
 
-// Map step_key → step number (for bumping onboarding_step)
+// Map step_key → step number (for bumping onboarding_step). 11-step wizard with
+// platforms restored between rates and portfolio — these numbers now match the
+// onboarding_steps table's sort_order exactly (platforms=6 … review=11).
+//
+// ponytail: restoring platforms shifted portfolio..review up by one, so a user
+// who paused mid-onboarding under the old 10-step numbering resumes one step
+// earlier than they left off. Harmless (the wizard clamps the index and every
+// step is re-editable), and there is no production data to migrate.
 const STEP_KEY_TO_NUM: Record<string, number> = {
   welcome: 1,
   identity: 2,
   location: 3,
   professional: 4,
   rates: 5,
-  portfolio: 6,
-  brand: 7,
-  defaults: 8,
-  goals: 9,
-  review: 10,
+  platforms: 6,
+  portfolio: 7,
+  brand: 8,
+  defaults: 9,
+  goals: 10,
+  review: 11,
 };
 
 export type SaveOnboardingStepKey = keyof typeof STEP_SCHEMAS;

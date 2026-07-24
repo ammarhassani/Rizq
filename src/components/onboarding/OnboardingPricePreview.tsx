@@ -15,7 +15,14 @@ function fmt(n: number, locale: "ar" | "en"): string {
   return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
 }
 
-export function OnboardingPricePreview({ locale }: { locale: "ar" | "en" }) {
+export function OnboardingPricePreview({
+  locale,
+  userRate,
+}: {
+  locale: "ar" | "en";
+  /** The freelancer's own floor/project rate — compared against the band for an honest reality check. */
+  userRate?: number | null;
+}) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const [state, setState] = useState<PricePreview | "loading">("loading");
@@ -51,6 +58,33 @@ export function OnboardingPricePreview({ locale }: { locale: "ar" | "en" }) {
 
   const citation = isAr ? state.citation_ar : state.citation_en;
 
+  // Rate reality check (spec M8 step-5): where the freelancer's own floor sits
+  // relative to the cited band. Factual comparison against the shown numbers —
+  // encouraging, never discouraging (Principle: empower, don't deflate).
+  let reality: { tone: "below" | "within" | "above"; text: string } | null = null;
+  if (typeof userRate === "number" && userRate > 0) {
+    if (userRate < state.min) {
+      reality = {
+        tone: "below",
+        text: isAr
+          ? "سعرك أقل من نطاق السوق — قد يكون هناك مجال لرفعه."
+          : "Your rate is below the market range — there may be room to raise it.",
+      };
+    } else if (userRate > state.max) {
+      reality = {
+        tone: "above",
+        text: isAr
+          ? "سعرك أعلى من النطاق — تأكّد أن تموضعك وخبرتك يدعمانه."
+          : "Your rate is above the range — make sure your positioning backs it up.",
+      };
+    } else {
+      reality = {
+        tone: "within",
+        text: isAr ? "سعرك ضمن نطاق السوق." : "Your rate sits within the market range.",
+      };
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -72,6 +106,19 @@ export function OnboardingPricePreview({ locale }: { locale: "ar" | "en" }) {
           <span className={`text-xs text-rizq-ink-soft ms-1 ${font}`}>{isAr ? "ريال" : "SAR"}</span>
         </div>
         {citation && <p className={`text-[11px] text-rizq-ink-soft/70 mt-2 ${font}`}>{citation}</p>}
+        {reality && (
+          <p
+            className={`text-xs mt-2 ${font} ${
+              reality.tone === "below"
+                ? "text-[var(--warn)]"
+                : reality.tone === "above"
+                  ? "text-rizq-gold-dark"
+                  : "text-rizq-green"
+            }`}
+          >
+            {reality.text}
+          </p>
+        )}
       </div>
     </motion.div>
   );
