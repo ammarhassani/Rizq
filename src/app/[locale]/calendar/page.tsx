@@ -139,13 +139,22 @@ export default async function CalendarPage({ params }: { params: Promise<Params>
   // Preferences are non-critical — defaults are a safe, honest fallback (not a
   // false claim), so a failure here degrades rather than blocking the calendar.
   // But it must not be SILENT: log it so the degradation is observable.
-  const { data: prefsRaw, error: prefsError } = await supabase
-    .from("calendar_preferences")
-    .select("*")
-    .eq("user_id", userData.user.id)
-    .maybeSingle();
-  if (prefsError) {
-    console.error("[calendar] preferences read failed — falling back to defaults", prefsError.code);
+  // try/catch as well as the returned error: a transient fetch blip makes
+  // supabase-js throw while parsing an empty body, which would otherwise escape
+  // and 500 the whole calendar over a preferences row.
+  let prefsRaw: unknown = null;
+  try {
+    const { data, error } = await supabase
+      .from("calendar_preferences")
+      .select("*")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+    prefsRaw = data;
+    if (error) {
+      console.error("[calendar] preferences read failed — falling back to defaults", error.code);
+    }
+  } catch (err) {
+    console.error("[calendar] preferences read threw — falling back to defaults", err);
   }
 
   const prefs = parsePrefs(prefsRaw as CalendarPreferencesRow | null);
