@@ -2,6 +2,31 @@ import { chromium, type FullConfig } from "@playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { provisionUser, type DisposableUser } from "../fixtures/users";
+import { signedInClient } from "../fixtures/supabaseClient";
+
+/**
+ * Clears the reused main user's clients (and the gigs that FK-depend on them) so
+ * a repeated run starts under the free-tier client cap. Without this, every full
+ * run leaves ~1 more client behind; after ~10 runs the reused user hits the cap
+ * and client-creation specs fail against a paywall the app is CORRECT to show —
+ * a data-exhaustion false negative, not a bug. Best-effort: logs and continues.
+ */
+async function resetMainUserClients(): Promise<void> {
+  try {
+    const { client, userId } = await signedInClient("main");
+    // gigs first — they reference clients; delete only this user's rows (RLS also scopes).
+    await client.from("gigs").delete().eq("user_id", userId);
+    const { error } = await client.from("clients").delete().eq("user_id", userId);
+    if (error) {
+      console.log(`[global-setup] client reset skipped: ${error.message}`);
+    } else {
+      console.log("[global-setup] reset reused main user's clients (repeatable run)");
+    }
+    await client.auth.signOut();
+  } catch (err) {
+    console.log(`[global-setup] client reset skipped: ${(err as Error).message}`);
+  }
+}
 
 /**
  * Provisions two disposable users (main + isolation) once per run and saves their
@@ -24,6 +49,9 @@ export default async function globalSetup(config: FullConfig) {
       existsSync(MAIN_STATE) && existsSync(ISOLATION_STATE)) {
     // eslint-disable-next-line no-console
     console.log("[global-setup] reusing existing e2e/.auth sessions (set FORCE_PROVISION=1 to refresh)");
+    // Freshly-provisioned users start empty; a REUSED main user accumulates
+    // clients across runs and eventually trips the free-tier cap, so reset it.
+    await resetMainUserClients();
     return;
   }
 
