@@ -1,5 +1,23 @@
 # Rizq — Project Context for Claude Code
 
+## How every agent answers here (caveman)
+**Applies to Claude Code and every other coding agent in this repo.** Reply terse, like a smart
+caveman: drop articles, filler and pleasantries; fragments are fine; keep every bit of technical
+substance. Technical terms, identifiers, error strings and commit-type keywords stay exact.
+
+- Pattern: `[thing] [action] [reason]. [next step].`
+- Not: "Sure! I'd be happy to help you with that. The issue you're experiencing is..."
+- Yes: "Bug in auth middleware. Token expiry check uses `<` not `<=`. Fix:"
+- **Written artifacts stay normal prose:** code, comments, commit messages, PR bodies, and the
+  Arabic/English user-facing copy in `messages/*.json`. Compress the chat, never the product.
+- **Drop caveman** for security warnings, irreversible-action confirmations, and any multi-step
+  sequence where clipped grammar could be misread. Resume after.
+
+The same rule is mirrored for other tools in [`AGENTS.md`](../AGENTS.md),
+`.cursor/rules/caveman.mdc`, `.windsurf/rules/caveman.md`, `.clinerules/caveman.md`,
+`.github/copilot-instructions.md` and `.opencode/AGENTS.md` — regenerate them all with
+`/caveman-init`. Turn it off per-session with "stop caveman" / "normal mode".
+
 ## Product
 Rizq (رِزق) is a **Saudi Freelancer Operating System (FLRP — Freelancer Resource
 Planning)**. It manages a freelancer's professional life end-to-end. Proposals are the
@@ -133,3 +151,16 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   [specs/010-gap-remediation/plan.md](specs/010-gap-remediation/plan.md).
 Active (`.specify/feature.json`): **010** — spec+plan done → **/speckit-tasks next**. US4 (Tap) blocked on founder approval.
 <!-- SPECKIT END -->
+## Validation history (read before trusting a "SHIPPED" tag)
+- `docs/validation/business-logic-audit.md` — static spec-vs-code audit (2026-07-22).
+- `docs/validation/production-maturity-report.md` — pass 1 verdict (2026-07-22). **Partly superseded.**
+- `docs/validation/power-user-pass-2026-07-26.md` — **pass 2**: the app driven as a freelancer would
+  use it. Found 22 defects the static audit could not see, incl. three P0s that type-checked,
+  unit-tested and conformed to spec while being visibly wrong in the product:
+  onboarding never wrote `primary_specialty_id`/`city_id`/`experience_tier_id`; every proposal
+  priced at the band ceiling and ignored the client's stated budget; a share link on a draft was
+  dead and told the client the freelancer had revoked it. All 22 fixed and re-verified in-browser.
+
+**Lesson encoded here:** a spec doc saying a field is "captured at onboarding" is not evidence.
+Check the row. `docs/profile-source-of-truth.md` asserted exactly that for ~4 weeks while the
+column was NULL for every user, and four features were built on top of the claim.

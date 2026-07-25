@@ -8,6 +8,9 @@
 > onboarding gained a profile-strength meter + per-step payoff + URL prefill +
 > a live brand preview **and a live price preview** (StepRates → real resolver +
 > provenance, ephemeral). All four phases are wired. See `specs/006-*`.
+>
+> **2026-07-26:** wired *in truth* only from this date. The FK columns the whole feature
+> depends on were never written by onboarding until then — see the correction below.
 
 ## The principle (stop the loop)
 A freelancer **is** "a senior graphic designer in Riyadh who charges ~X, transfers IP, takes
@@ -17,6 +20,19 @@ cosmetic (brand on the artifact). Engines **default from the profile**; AI/extra
 what is genuinely *brief-specific*. We keep patching downstream (specialty disambiguation,
 years→tier derivation) because the profile data isn't being threaded through. Thread it, and the
 downstream guesswork disappears.
+
+> **CORRECTION (2026-07-26).** The line below — "`primary_specialty_id` is captured at
+> onboarding" — was **never true**. `StepLocation` sent `city_id: null` behind a "deferred to a
+> future refactor" comment and `StepProfessional` sent only the slug array, so
+> `primary_specialty_id`, `city_id` and `experience_tier_id` stayed NULL for every user who
+> completed onboarding. All four phases below were built on top of that assumption, and every
+> engine reading those FKs quietly fell back to defaults while the strength meter reported 100%.
+> Resolution now happens server-side in `saveOnboardingStep` (the one choke point the wizard and
+> Settings → Profile share). See
+> [`validation/power-user-pass-2026-07-26.md`](./validation/power-user-pass-2026-07-26.md) P0-1.
+>
+> Lesson for this document: a "captured" column means *a step editor sends it and the row shows
+> it*, verified against the database — not that the schema has the column and a step owns the UI.
 
 ## The proof
 - `primary_specialty_id` is captured at onboarding **and consumed by dashboard + rate-calculator
@@ -37,7 +53,7 @@ downstream guesswork disappears.
 | defaults: `deposit_pct`, `revisions`, `ip_terms`, `milestone_structure`, `payment_method/details`, `warranty_days` | StepDefaults | proposals ✓ | extend to invoices + the project money-setup |
 | `preferred_tone` | StepDefaults | proposal prose ✓ | confirm across AI copy (insights, reminders) |
 | platforms, `platform_ratings`, `portfolio_samples`, `notable_clients`, `total_projects_completed` | StepPlatforms/Portfolio | proposal artifact (some) | feed credibility into proposal + a public profile; ratings → trust signal |
-| identity: `fl_number`, `commercial_reg`, `vat_*`, `fl_verified` | StepIdentity | invoices (VAT) partial | wire VAT into invoice math + verified badge |
+| identity: `fl_number`, `commercial_reg`, `vat_*`, `fl_verified` | StepIdentity ✓ (VAT inputs added 2026-07-26; before that `vat_registered` had **no UI anywhere**) | invoices ✓ (15% when registered; states "not applicable" when not) | `fl_verified` badge still unwired (spec 010) |
 | `primary_goal`, `goals` | StepGoals | dashboard (some) | drive the dashboard's "what to do next" + HADAF framing |
 
 **Headline gaps:** (1) proposals ignore the freelancer's own specialty; (2) pricing ignores the

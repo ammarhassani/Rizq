@@ -4,6 +4,12 @@
 **Method:** static spec-vs-code audit + a committed Playwright e2e harness driving the real app
 against real Supabase + real DeepSeek + live power-user exploration.
 
+> **SUPERSEDED IN PART (2026-07-26).** A live power-user pass found 22 further defects —
+> including three P0s that this static audit could not see, because each one type-checked,
+> unit-tested and conformed to spec while being visibly wrong in the product. Two fixes recorded
+> below were also revised. Read
+> [`power-user-pass-2026-07-26.md`](./power-user-pass-2026-07-26.md) alongside this report.
+
 ---
 
 ## Verdict: 🟢 SHIP-WITH-CONFIDENCE (after the post-deploy checks below)
@@ -23,14 +29,14 @@ icon, `returnTo`) are verified by types + unit tests + review, and should be **r
 
 | Finding | Sev | Fix | Verified by |
 |---|---|---|---|
-| M1 price-band inflation | HIGH | Complexity now moves the anchor **within** the cited band; never scales min/max | `proposalPricing.test.ts` (rewritten) |
+| M1 price-band inflation | HIGH | Complexity now moves the anchor **within** the cited band; never scales min/max. **Revised 2026-07-26 — clamping to the band made every mid-size proposal return the ceiling; the band stays honest, the quote may exceed it with its basis declared** | `proposalPricing.test.ts` (rewritten) |
 | M0 uncited Quick Pricing | HIGH | Widget now renders the provenance citation the resolver already returned | typecheck + review |
 | M10 `is_realistic` always true | HIGH | Percentile extrapolates above 90 past the band → above-market targets read "not realistic" | `rate/calculate.test.ts` (rewritten) |
 | Projects duplicate on re-tap | HIGH | Idempotency guard returns the existing project/gig instead of creating a second | typecheck + review |
 | Swallowed DB errors → false empty state | MED | Per-widget error flags + a `WidgetError` retry state on the dashboard | typecheck + review |
 | HADAF 1–2 month streak mis-rendered | MED | In-progress streak shows a "building" icon, not a failure X | typecheck + review |
 | WhatsApp link malformed for local numbers | MED | Tested `waLink` normalizes 05XX → 96650XX | `contact/whatsapp.test.ts` (new) |
-| Pricing free tier 3 vs advertised 5 | MED | `FREE_MONTHLY_QUERIES` → 5 (matches spec-v2 + upgrade page) | review |
+| Pricing free tier 3 vs advertised 5 | MED | `FREE_MONTHLY_QUERIES` → 5 (matches spec-v2 + upgrade page). **Incomplete — the marketing copy still said 3 in five places until 2026-07-26** | review |
 | Critical a11y — unnamed form controls | MED | `Combobox` + client-type/source selects + invoice inputs now have accessible names | typecheck + review |
 | Auth `returnTo` dropped on deep links | LOW | Middleware now gates all authed routes → redirect carries `returnTo` | review |
 

@@ -63,9 +63,13 @@ Sentry keys are optional for local development.
 pnpm dev         # start the dev server (Turbopack)
 pnpm build       # production build
 pnpm typecheck   # tsc --noEmit
-pnpm test        # vitest run
+pnpm test        # vitest run  (751 unit tests)
+pnpm test:e2e    # playwright — drives the real app vs real Supabase + DeepSeek
 pnpm lint        # eslint
 ```
+
+The e2e harness self-signs-up disposable users, so **email confirmation must be OFF** in
+Supabase Auth and signup is rate-limited 5 / 5 min / IP. See [`e2e/README.md`](./e2e/README.md).
 
 ## Spec-driven development
 
@@ -74,16 +78,32 @@ This repo uses **GitHub Spec Kit**. The engineering charter lives in
 specced via the `speckit-*` skills (`/speckit.specify` → `/speckit.plan` →
 `/speckit.tasks` → `/speckit.implement`).
 
+## Working with coding agents
+
+Every agent in this repo answers in **caveman style** — terse, no filler, all technical
+substance kept. Code, commits and the shipped Arabic/English copy stay normal prose. The rule
+lives in [`AGENTS.md`](./AGENTS.md) and is mirrored to Cursor, Windsurf, Cline, Copilot and
+OpenCode rule files (regenerate with `/caveman-init`).
+
 ## Documentation
 
 - [`docs/spec-v2-flrp.md`](./docs/spec-v2-flrp.md) — **master spec (source of truth)**
 - [`.specify/memory/constitution.md`](./.specify/memory/constitution.md) — engineering principles
-- [`.claude/CLAUDE.md`](./.claude/CLAUDE.md) — context for Claude Code
+- [`.claude/CLAUDE.md`](./.claude/CLAUDE.md) — context for Claude Code + validation history
+- [`AGENTS.md`](./AGENTS.md) — conventions for every other coding agent
+- [`docs/validation/`](./docs/validation/) — audit + power-user validation passes, newest last
 
 ## Status
 
-Revived as the FLRP suite; feature-complete across the six build phases of the v2 spec
-and in pre-launch hardening / dogfooding.
+Revived as the FLRP suite; feature-complete across the six build phases of the v2 spec and in
+pre-launch hardening / dogfooding. Two validation passes are on record — a static spec-vs-code
+audit and a live power-user pass ([2026-07-26](./docs/validation/power-user-pass-2026-07-26.md),
+22 defects found and fixed).
+
+**Known gaps before launch:** payments are not live (Tap is founder-gated), email needs a
+verified Resend domain, `pro_until` expiry is not yet enforced, and there is no ZATCA
+e-invoicing (QR / simplified tax invoice) yet. The pricing benchmark itself is thin — n=5 on
+most specialty/city pairs, which every price honestly cites.
 
 ---
 
