@@ -23,11 +23,11 @@ export function QuickPricingWidget({ anchor, specialty, citation, locale }: Prop
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-rizq-green opacity-70" />
           <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-            {isAr ? "تسعيرة سريعة" : "Quick Pricing"}
+            {tI18n("quickPricingTitle")}
           </span>
         </div>
         <Link href="/tool" className={`text-xs text-rizq-green hover:underline ${font}`}>
-          {isAr ? "أداة التسعير ←" : "Pricing tool →"}
+          {tI18n("quickPricingViewTool")}
         </Link>
       </div>
 
@@ -47,19 +47,19 @@ export function QuickPricingWidget({ anchor, specialty, citation, locale }: Prop
             href="/tool"
             className={`mt-3 inline-flex items-center gap-1 text-xs text-rizq-green hover:underline ${font}`}
           >
-            {isAr ? "استعلم بتفاصيل أكثر" : "Query with more details"}
+            {tI18n("quickPricingQueryMore")}
           </Link>
         </div>
       ) : (
         <div className={`text-center py-3 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
-            {isAr ? "تحقق من سعر السوق لتخصصك." : "Check the market rate for your specialty."}
+            {tI18n("quickPricingEmpty")}
           </p>
           <Link
             href="/tool"
             className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-4 py-2 text-sm font-medium hover:bg-rizq-green-dark transition-colors ${font}`}
           >
-            {isAr ? "احسب سعرك ←" : "Check market rate →"}
+            {tI18n("quickPricingEmptyCta")}
           </Link>
         </div>
       )}

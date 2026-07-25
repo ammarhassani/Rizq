@@ -2,6 +2,8 @@
  * ClientTimeline — activity timeline. Phase-3 task 3.2.
  */
 
+import { useTranslations } from "next-intl";
+
 type TimelineEvent = {
   id: string;
   event_type: string;
@@ -57,10 +59,11 @@ function fmtDate(iso: string, locale: "ar" | "en"): string {
 
 export function ClientTimeline({ locale, events }: Props) {
   if (events.length === 0) return null;
+  const tI18n = useTranslations("Clients.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const heading = isAr ? "سجل النشاط" : "Activity";
+  const heading = tI18n("timeline");
   const labels = isAr ? EVENT_LABELS_AR : EVENT_LABELS_EN;
 
   return (

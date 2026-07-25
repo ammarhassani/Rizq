@@ -13,6 +13,7 @@
  */
 
 import { useState, useRef, useEffect, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
@@ -61,6 +62,7 @@ export function InvoiceStatusQuickEdit({
   current: string;
   locale: "ar" | "en";
 }) {
+  const tI18n = useTranslations("Invoices.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const router = useRouter();
@@ -104,7 +106,7 @@ export function InvoiceStatusQuickEdit({
           toast.success(isAr ? `الحالة: ${label} · يمكنك التراجع` : `Marked ${label} · Undo`, {
             duration: 7000,
             action: {
-              label: isAr ? "تراجع" : "Undo",
+              label: tI18n("undo"),
               // Reverse is rarely a legal forward transition, so force it.
               onClick: () => apply(prev, { isUndo: true, allowReverse: true }),
             },
@@ -112,7 +114,7 @@ export function InvoiceStatusQuickEdit({
         }
       } else {
         setValue(prev); // roll back
-        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+        toast.error(tI18n("couldnTUpdateStatus"));
       }
     });
   }

@@ -47,7 +47,7 @@ export default async function ClientsListPage({ params }: { params: Promise<Para
   const rows = (clients ?? []) as ClientRow[];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "دفتر العملاء" : "Client Book"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={t("eyebrow")} maxWidth="wide">
       <div dir={isAr ? "rtl" : "ltr"}>
         <div className="mb-6 sm:mb-8 flex items-end justify-between gap-4">
           <div>

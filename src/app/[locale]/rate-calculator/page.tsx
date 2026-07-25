@@ -151,7 +151,7 @@ export default async function RateCalculatorPage({ params }: { params: Promise<P
   };
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "حاسبة السعر" : "Rate Calculator"} maxWidth="form">
+    <AppShell locale={locale as "ar" | "en"} title={t("pageTitle")} maxWidth="form">
       <div className={font} dir={isAr ? "rtl" : "ltr"}>
         <Link
           href="/dashboard"

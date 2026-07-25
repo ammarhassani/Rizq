@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { previewPrice, type PricePreview } from "@/app/actions/pricing/previewPrice";
@@ -23,6 +24,7 @@ export function OnboardingPricePreview({
   /** The freelancer's own floor/project rate — compared against the band for an honest reality check. */
   userRate?: number | null;
 }) {
+  const tI18n = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const [state, setState] = useState<PricePreview | "loading">("loading");
@@ -80,7 +82,7 @@ export function OnboardingPricePreview({
     } else {
       reality = {
         tone: "within",
-        text: isAr ? "سعرك ضمن نطاق السوق." : "Your rate sits within the market range.",
+        text: tI18n("rateSitsWithinMarketRange"),
       };
     }
   }
@@ -95,7 +97,7 @@ export function OnboardingPricePreview({
       <div className="p-4">
         <p className={`flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-rizq-green mb-2 ${font}`}>
           <Sparkles size={13} aria-hidden />
-          {isAr ? "نطاق سعرك في السوق (معاينة)" : "Your market rate (preview)"}
+          {tI18n("marketRatePreview")}
         </p>
         <div className="flex items-baseline gap-2" dir="ltr">
           <span className="tabular text-sm text-rizq-ink-soft">{fmt(state.min, locale)}</span>
@@ -103,7 +105,7 @@ export function OnboardingPricePreview({
           <span className="tabular text-2xl font-bold text-rizq-green">{fmt(state.anchor, locale)}</span>
           <span className="text-rizq-ink-soft/50">–</span>
           <span className="tabular text-sm text-rizq-ink-soft">{fmt(state.max, locale)}</span>
-          <span className={`text-xs text-rizq-ink-soft ms-1 ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+          <span className={`text-xs text-rizq-ink-soft ms-1 ${font}`}>{tI18n("sar")}</span>
         </div>
         {citation && <p className={`text-[11px] text-rizq-ink-soft/70 mt-2 ${font}`}>{citation}</p>}
         {reality && (

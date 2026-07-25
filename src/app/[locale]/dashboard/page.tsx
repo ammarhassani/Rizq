@@ -234,19 +234,21 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     } catch { /* skip gracefully */ }
   }
 
+  const t = await getTranslations({ locale, namespace: "Dashboard" });
   const t2 = await getTranslations({ locale, namespace: "AppShell" });
-  const shellTitle = isAr ? t2("apps.dashboard.name") : t2("apps.dashboard.name");
+  // Same key both ways — the app name is not locale-branched.
+  const shellTitle = t2("apps.dashboard.name");
 
   return (
     <AppShell locale={locale as "ar" | "en"} title={shellTitle} maxWidth="wide">
       <div dir={dir}>
         {/* Page header */}
         <div className="mb-6 sm:mb-8">
-          <p className="eyebrow mb-3">{isAr ? "لوحة التحكم" : "Dashboard"}</p>
+          <p className="eyebrow mb-3">{t("dashboardTitle")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>
             {userName
               ? (isAr ? `أهلًا، ${userName}` : `Welcome, ${userName}`)
-              : (isAr ? "أهلًا بك في رِزق" : "Welcome to Rizq")}
+              : (t("welcomeGuest"))}
           </h1>
         </div>
 

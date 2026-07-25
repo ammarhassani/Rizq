@@ -199,7 +199,8 @@
       "size": "الحجم",
       "expiry": "تاريخ الانتهاء",
       "tags": "الوسوم"
-    }
+    },
+    "uploadDocument2": "رفع وثيقة"
   },
   "Legal": {
     "lastUpdated": "آخر تحديث: مايو 2026",
@@ -592,7 +593,13 @@
         }
       },
       "profileStrength": "قوة ملفك",
-      "someLinksLookOffFix": "بعض الروابط غير صحيحة — صحّحها وأعد الحفظ."
+      "someLinksLookOffFix": "بعض الروابط غير صحيحة — صحّحها وأعد الحفظ.",
+      "sar": "ر.س",
+      "monthlyIncomeGoal": "هدف الدخل الشهري",
+      "increase": "زيادة",
+      "decrease": "إنقاص",
+      "rateSitsWithinMarketRange": "سعرك ضمن نطاق السوق.",
+      "marketRatePreview": "نطاق سعرك في السوق (معاينة)"
     }
   },
   "Dashboard": {
@@ -674,7 +681,9 @@
     "currencySarShort": "ر.س",
     "showLess": "عرض أقل",
     "untitledProposal": "عرض بدون عنوان",
-    "text": "٪"
+    "text": "٪",
+    "couldnTLoad": "تعذّر تحميل البيانات.",
+    "tapRetry": "إعادة المحاولة ←"
   },
   "Tool": {
     "eyebrow": "أداة التسعير",
@@ -727,7 +736,9 @@
       "min2": "الأدنى",
       "max2": "الأعلى",
       "marketAnchor": "وسيط السوق",
-      "rate": "سعرك"
+      "rate": "سعرك",
+      "enoughDataYet": "ما فيه بيانات كافية بعد",
+      "peak": "الذروة"
     },
     "insufficient": {
       "title": "بيانات غير كافية بعد.",
@@ -751,7 +762,10 @@
     "title": "نتيجة رِزق",
     "byline": "نتيجة من معيار التسعير لرِزق",
     "viewMore": "احسب سعرك أنت",
-    "openTool": "افتح الأداة"
+    "openTool": "افتح الأداة",
+    "downloadFile": "تحميل الملف",
+    "couldPrepareDownloadLink": "تعذّر تحضير رابط التحميل.",
+    "sharedViaRizqPriceConfidence": "مُنشأ بواسطة رِزق. سعّر بثقة، اقبض رزقك"
   },
   "Submit": {
     "eyebrow": "ساهم في البيانات",
@@ -1151,7 +1165,9 @@
       "proposalDataAvailable": "العرض غير متوفر حاليًا.",
       "downloadWordDocx": "تنزيل ملف Word",
       "pdfPrint": "PDF / طباعة",
-      "proposal": "عرض سعر"
+      "proposal": "عرض سعر",
+      "profileStrengthCompleteStrongerWork": "قوة ملفك — أكمِله لعروض أقوى",
+      "rizqInsightAdjustTone": "تحليل رِزق: ضبط النبرة"
     },
     "refine": {
       "edit": "تعديل",
@@ -1256,7 +1272,11 @@
       "monthProjected": "هذا الشهر (متوقع)",
       "nextMonthProjected": "الشهر القادم (متوقع)",
       "refresh": "تحديث",
-      "incomeTrend": "اتجاه الدخل"
+      "incomeTrend": "اتجاه الدخل",
+      "anomalyDetected": "تنبيه تحليل",
+      "due": "التسليم:",
+      "undo": "تراجع",
+      "couldnTUpdateStatus": "تعذّر تحديث الحالة."
     },
     "form": {
       "addTitle": "سجّل مشروع جديد",
@@ -1499,7 +1519,12 @@
       "unlinkedClient": "عميل غير محدد",
       "due": "الاستحقاق:",
       "sar": "ر.س",
-      "invoices2": "الفواتير"
+      "invoices2": "الفواتير",
+      "amountDue": "المبلغ المستحق",
+      "dueDate": "تاريخ الاستحقاق",
+      "viewInvoice": "عرض الفاتورة",
+      "undo": "تراجع",
+      "couldnTUpdateStatus": "تعذّر تحديث الحالة."
     },
     "form": {
       "addTitle": "فاتورة جديدة",
@@ -1643,7 +1668,13 @@
       "sortLastContacted": "آخر تواصل",
       "sortAlphabetical": "أبجدياً",
       "sortTotalValue": "إجمالي القيمة",
-      "noResults": "لا توجد نتائج."
+      "noResults": "لا توجد نتائج.",
+      "gigs": "أعمال",
+      "total": "إجماليّ",
+      "contact": "التواصل",
+      "whatsapp": "واتساب",
+      "couldnTUpdatePriority": "تعذّر تحديث الأولوية.",
+      "followUpPriority": "أولوية المتابعة"
     },
     "detail": {
       "totalGigs": "المشاريع",
@@ -2328,7 +2359,11 @@
     "profileComplete": "ملفك مكتمل بالكامل.",
     "optionalExtrasIfHaveThem": "إضافات اختيارية (لمن لديه): تقوّي عرضك، وليست مطلوبة.",
     "delete": "حذف",
-    "completeProfile": "أكمل ملفك ←"
+    "completeProfile": "أكمل ملفك ←",
+    "profile": "ملفك المهني",
+    "completeProfile2": "أكمل ملفك",
+    "couldnTSaveCheckConnection": "لم يتم الحفظ — تحقق من اتصالك وحاول مجددًا",
+    "testimonials": "شهادات العملاء"
   },
   "StudioProfile": {
     "testimonials": {

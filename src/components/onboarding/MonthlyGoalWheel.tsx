@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const SEGMENTS: { lo: number; hi: number }[] = [
   { lo: 5_000, hi: 10_000 },
@@ -36,8 +37,9 @@ export function MonthlyGoalWheel({
   onChange: (v: string) => void;
   locale: "ar" | "en";
 }) {
+  const tI18n = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = tI18n("sar");
   const disp = (sar: number) => short(sar);
   const font = isAr ? "font-arabic" : "font-sans";
   const ref = useRef<HTMLDivElement>(null);
@@ -80,7 +82,7 @@ export function MonthlyGoalWheel({
     <div dir={isAr ? "rtl" : "ltr"}>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <span className={`text-sm font-medium text-rizq-ink ${font}`}>
-          {isAr ? "هدف الدخل الشهري" : "Monthly income goal"}
+          {tI18n("monthlyIncomeGoal")}
         </span>
         {value && sel && (
           <span className={`tabular text-sm font-bold text-rizq-green ${font}`}>
@@ -103,7 +105,7 @@ export function MonthlyGoalWheel({
           onTouchStart={() => (interacted.current = true)}
           onPointerDown={() => (interacted.current = true)}
           role="listbox"
-          aria-label={isAr ? "هدف الدخل الشهري" : "Monthly income goal"}
+          aria-label={tI18n("monthlyIncomeGoal")}
           className="relative h-[132px] snap-y snap-mandatory overflow-y-scroll [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             paddingTop: PAD,

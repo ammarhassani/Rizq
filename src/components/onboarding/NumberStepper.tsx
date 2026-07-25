@@ -8,6 +8,7 @@
  */
 
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   value: string;
@@ -35,6 +36,7 @@ export function NumberStepper({
   ariaLabel,
   suffix,
 }: Props) {
+  const tI18n = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
 
   const handleType = (raw: string) => {
@@ -72,7 +74,7 @@ export function NumberStepper({
         <button
           type="button"
           onClick={() => stepBy(step)}
-          aria-label={isAr ? "زيادة" : "Increase"}
+          aria-label={tI18n("increase")}
           className="flex flex-1 cursor-pointer items-center justify-center px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
         >
           <ChevronUp size={14} />
@@ -80,7 +82,7 @@ export function NumberStepper({
         <button
           type="button"
           onClick={() => stepBy(-step)}
-          aria-label={isAr ? "إنقاص" : "Decrease"}
+          aria-label={tI18n("decrease")}
           className="flex flex-1 items-center justify-center border-t border-[#8f7e48] px-2.5 text-rizq-ink-soft hover:text-rizq-green hover:bg-rizq-green/5 transition-colors"
         >
           <ChevronDown size={14} />

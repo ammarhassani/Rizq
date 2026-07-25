@@ -11,6 +11,7 @@
  */
 
 import { useState, useRef, useEffect, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { markGigStatus } from "@/app/actions/gigs/gigs";
@@ -51,6 +52,7 @@ export function GigStatusQuickEdit({
   current: string;
   locale: "ar" | "en";
 }) {
+  const tI18n = useTranslations("Income.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const router = useRouter();
@@ -91,14 +93,14 @@ export function GigStatusQuickEdit({
           toast.success(isAr ? `الحالة: ${label}` : `Status: ${label}`, {
             duration: 7000,
             action: {
-              label: isAr ? "تراجع" : "Undo",
+              label: tI18n("undo"),
               onClick: () => apply(prev as GigStatus, true),
             },
           });
         }
       } else {
         setValue(prev); // roll back
-        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+        toast.error(tI18n("couldnTUpdateStatus"));
       }
     });
   }

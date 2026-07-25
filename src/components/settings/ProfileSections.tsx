@@ -9,6 +9,7 @@
  */
 
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { ProfileSnapshot } from "@/components/onboarding/types";
 import type { TestimonialRow } from "@/app/actions/proposals/testimonials";
@@ -33,6 +34,7 @@ const noop = () => {};
 
 export function ProfileSections({ locale, snapshot, testimonials }: Props) {
   const router = useRouter();
+  const tI18n = useTranslations("Settings");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -42,7 +44,7 @@ export function ProfileSections({ locale, snapshot, testimonials }: Props) {
 
   // Surface a failed autosave (was silent — a failed save left the meter and the field out of sync).
   const onSaveError = () =>
-    toast.error(isAr ? "لم يتم الحفظ — تحقق من اتصالك وحاول مجددًا" : "Couldn't save — check your connection and try again");
+    toast.error(tI18n("couldnTSaveCheckConnection"));
 
   // autosave: each editor saves on change (debounced) and hides its Save/Back/Skip buttons.
   const stepProps = { locale, profile: snapshot, onNext: onSaved, onBack: noop, onSkip: noop, autosave: true, onSaveError };
@@ -71,7 +73,7 @@ export function ProfileSections({ locale, snapshot, testimonials }: Props) {
       {/* Testimonials — re-homed from the retired studio profile. */}
       <section className={`rounded-3xl border border-rizq-gold/25 bg-[var(--raised)] p-5 sm:p-6 ${font}`}>
         <h2 className={`text-sm font-semibold text-rizq-ink mb-4 ${font}`}>
-          {isAr ? "شهادات العملاء" : "Testimonials"}
+          {tI18n("testimonials")}
         </h2>
         <TestimonialsEditor locale={locale} initial={testimonials} />
       </section>

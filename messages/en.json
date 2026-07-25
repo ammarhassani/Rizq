@@ -199,7 +199,8 @@
       "size": "Size",
       "expiry": "Expiry",
       "tags": "Tags"
-    }
+    },
+    "uploadDocument2": "Upload Document"
   },
   "Legal": {
     "lastUpdated": "Last updated: May 2026",
@@ -592,7 +593,13 @@
         }
       },
       "profileStrength": "Profile strength",
-      "someLinksLookOffFix": "Some links look off — fix them and save again."
+      "someLinksLookOffFix": "Some links look off — fix them and save again.",
+      "sar": "SAR",
+      "monthlyIncomeGoal": "Monthly income goal",
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "rateSitsWithinMarketRange": "Your rate sits within the market range.",
+      "marketRatePreview": "Your market rate (preview)"
     }
   },
   "Dashboard": {
@@ -674,7 +681,9 @@
     "currencySarShort": "SAR",
     "showLess": "Show less",
     "untitledProposal": "Untitled proposal",
-    "text": "%"
+    "text": "%",
+    "couldnTLoad": "Couldn't load this.",
+    "tapRetry": "Tap to retry →"
   },
   "Tool": {
     "eyebrow": "Pricing tool",
@@ -727,7 +736,9 @@
       "min2": "Min",
       "max2": "Max",
       "marketAnchor": "Market anchor",
-      "rate": "Your rate"
+      "rate": "Your rate",
+      "enoughDataYet": "Not enough data yet",
+      "peak": "Peak"
     },
     "insufficient": {
       "title": "Not enough data yet.",
@@ -751,7 +762,10 @@
     "title": "Rizq result",
     "byline": "From the Rizq pricing benchmark",
     "viewMore": "Find your own rate",
-    "openTool": "Open the tool"
+    "openTool": "Open the tool",
+    "downloadFile": "Download file",
+    "couldPrepareDownloadLink": "Could not prepare download link.",
+    "sharedViaRizqPriceConfidence": "Shared via Rizq. Price with confidence, earn your rizq"
   },
   "Submit": {
     "eyebrow": "Contribute data",
@@ -1151,7 +1165,9 @@
       "proposalDataAvailable": "Proposal data is not available.",
       "downloadWordDocx": "Download Word (.docx)",
       "pdfPrint": "PDF / Print",
-      "proposal": "Proposal"
+      "proposal": "Proposal",
+      "profileStrengthCompleteStrongerWork": "profile strength — complete it for stronger work",
+      "rizqInsightAdjustTone": "Rizq Insight: Adjust tone"
     },
     "refine": {
       "edit": "Edit",
@@ -1256,7 +1272,11 @@
       "monthProjected": "This month (projected)",
       "nextMonthProjected": "Next month (projected)",
       "refresh": "Refresh",
-      "incomeTrend": "Income trend"
+      "incomeTrend": "Income trend",
+      "anomalyDetected": "Anomaly detected",
+      "due": "Due:",
+      "undo": "Undo",
+      "couldnTUpdateStatus": "Couldn't update status."
     },
     "form": {
       "addTitle": "Log a new project",
@@ -1499,7 +1519,12 @@
       "unlinkedClient": "Unlinked client",
       "due": "Due:",
       "sar": "SAR",
-      "invoices2": "Invoices"
+      "invoices2": "Invoices",
+      "amountDue": "Amount due",
+      "dueDate": "Due date",
+      "viewInvoice": "View invoice",
+      "undo": "Undo",
+      "couldnTUpdateStatus": "Couldn't update status."
     },
     "form": {
       "addTitle": "New invoice",
@@ -1643,7 +1668,13 @@
       "sortLastContacted": "Last contacted",
       "sortAlphabetical": "Alphabetical",
       "sortTotalValue": "Total value",
-      "noResults": "No results."
+      "noResults": "No results.",
+      "gigs": "Gigs",
+      "total": "Total",
+      "contact": "Contact",
+      "whatsapp": "WhatsApp",
+      "couldnTUpdatePriority": "Couldn't update priority.",
+      "followUpPriority": "Follow-up priority"
     },
     "detail": {
       "totalGigs": "Projects",
@@ -2328,7 +2359,11 @@
     "profileComplete": "Your profile is complete.",
     "optionalExtrasIfHaveThem": "Optional extras (if you have them): strengthen your pitch, never required.",
     "delete": "DELETE",
-    "completeProfile": "Complete your profile →"
+    "completeProfile": "Complete your profile →",
+    "profile": "Your profile",
+    "completeProfile2": "Complete your profile",
+    "couldnTSaveCheckConnection": "Couldn't save — check your connection and try again",
+    "testimonials": "Testimonials"
   },
   "StudioProfile": {
     "testimonials": {

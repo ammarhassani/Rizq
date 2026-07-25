@@ -2,6 +2,7 @@
  * GigCard — Income Ledger card for a single gig. Phase-3 task 3.7.
  */
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export type GigRow = {
   id: string;
@@ -72,6 +73,7 @@ function fmtPrice(n: number, locale: "ar" | "en"): string {
 }
 
 export function GigCard({ gig, locale, statusSlot }: Props) {
+  const tI18n = useTranslations("Income.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -97,7 +99,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
               {gig.title}
             </p>
             {gig.ai_anomaly_flag && (
-              <span title={isAr ? "تنبيه تحليل" : "Anomaly detected"} className="text-[var(--warn)] text-sm" aria-label="anomaly">
+              <span title={tI18n("anomalyDetected")} className="text-[var(--warn)] text-sm" aria-label="anomaly">
                 ❗
               </span>
             )}
@@ -107,7 +109,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
           )}
           {gig.delivery_date && (
             <p className="mt-1 text-xs text-rizq-ink-soft/60">
-              {isAr ? "التسليم:" : "Due:"} {fmtDate(gig.delivery_date, locale)}
+              {tI18n("due")} {fmtDate(gig.delivery_date, locale)}
             </p>
           )}
         </div>
@@ -115,7 +117,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
           <p className="tabular font-sans text-base font-bold text-rizq-green leading-none">
             {fmtPrice(gig.amount_sar, locale)}
           </p>
-          <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+          <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{tI18n("sar")}</p>
           {statusSlot ?? (
             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}>
               {statusLabel}

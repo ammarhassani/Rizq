@@ -12,6 +12,7 @@
  */
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { setInvoiceShare } from "./shareActions";
 import { isEmailConfigured, sendEmail } from "@/lib/email/send";
@@ -81,6 +82,7 @@ export async function sendInvoiceEmail(rawInput: unknown): Promise<SendInvoiceEm
   const shared = await setInvoiceShare({ invoice_id, share: true });
   if (!shared.ok || !shared.token) return { ok: false, code: "error" };
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Invoices.list" });
   const isAr = locale === "ar";
   const senderName =
     (isAr ? (profile?.brand_name_ar as string | null) : (profile?.brand_name as string | null)) ??
@@ -111,19 +113,19 @@ export async function sendInvoiceEmail(rawInput: unknown): Promise<SendInvoiceEm
       )}</p>
       <h1 style="margin:0 0 12px;font-size:20px;color:#1A5F3F;">${escapeHtml(subject)}</h1>
       <p style="margin:0 0 8px;font-size:15px;">${
-        isAr ? "المبلغ المستحق" : "Amount due"
-      }: <strong>${escapeHtml(amount)} ${isAr ? "ر.س" : "SAR"}</strong></p>
+        tI18n("amountDue")
+      }: <strong>${escapeHtml(amount)} ${tI18n("sar")}</strong></p>
       ${
         invoice.due_date
           ? `<p style="margin:0 0 20px;font-size:14px;color:#5b5b5b;">${
-              isAr ? "تاريخ الاستحقاق" : "Due date"
+              tI18n("dueDate")
             }: ${escapeHtml(String(invoice.due_date))}</p>`
           : ""
       }
       <p style="margin:24px 0;">
         <a href="${escapeHtml(link)}"
            style="display:inline-block;background:#1A5F3F;color:#FAF5EC;text-decoration:none;padding:12px 24px;border-radius:999px;font-size:15px;">
-          ${isAr ? "عرض الفاتورة" : "View invoice"}
+          ${tI18n("viewInvoice")}
         </a>
       </p>
       <p style="margin:0;font-size:12px;color:#8a8a8a;">${escapeHtml(

@@ -3,6 +3,7 @@
  * aurora avatar (initial), name + type, priority chip, Space Mono gigs/total footer.
  */
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export type ClientRow = {
   id: string;
@@ -39,6 +40,7 @@ const PRIORITY: Record<string, { cls: string; ar: string; en: string }> = {
 };
 
 export function ClientCard({ client, locale }: Props) {
+  const tI18n = useTranslations("Clients.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -74,11 +76,11 @@ export function ClientCard({ client, locale }: Props) {
       </div>
       <div className="flex justify-between border-t border-[var(--line-2)] pt-3">
         <div>
-          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{isAr ? "أعمال" : "Gigs"}</div>
+          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{tI18n("gigs")}</div>
           <div className="font-mono text-[13px] font-bold text-[var(--content)]">{fmtPrice(client.total_gigs, locale)}</div>
         </div>
         <div className="text-end">
-          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{isAr ? "إجماليّ" : "Total"}</div>
+          <div className={`text-[9px] text-[var(--content-faint)] ${font}`}>{tI18n("total")}</div>
           <div className="font-mono text-[13px] font-bold text-[var(--acc)]">{fmtPrice(client.total_value_sar, locale)}</div>
         </div>
       </div>

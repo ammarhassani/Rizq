@@ -2,6 +2,8 @@
  * ClientGigHistory — gig history list. Phase-3 task 3.2.
  */
 
+import { useTranslations } from "next-intl";
+
 type Gig = {
   id: string;
   title: string;
@@ -50,10 +52,11 @@ function fmtDate(iso: string | null, locale: "ar" | "en"): string {
 
 export function ClientGigHistory({ locale, gigs }: Props) {
   if (gigs.length === 0) return null;
+  const tI18n = useTranslations("Clients.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const heading = isAr ? "سجل المشاريع" : "Project history";
+  const heading = tI18n("gigs");
 
   return (
     <section className="mt-6 mb-6">
@@ -78,7 +81,7 @@ export function ClientGigHistory({ locale, gigs }: Props) {
             </div>
             <div className="shrink-0 text-end">
               <p className="tabular font-sans text-sm font-semibold text-rizq-ink leading-none">{fmtPrice(g.amount_sar, locale)}</p>
-              <p className={`text-xs text-rizq-ink-soft/60 mt-0.5 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+              <p className={`text-xs text-rizq-ink-soft/60 mt-0.5 ${font}`}>{tI18n("sar")}</p>
             </div>
           </div>
         ))}

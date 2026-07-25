@@ -62,7 +62,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
             <p className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
               {fmtPrice(gig.amount_sar, locale)}
             </p>
-            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
             <p className="tabular font-sans text-sm font-semibold text-rizq-ink">
               {fmtPrice(gig.deposit_sar ?? null, locale)}
             </p>
-            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
           </div>
         </div>
 
@@ -115,7 +115,7 @@ export async function ProjectMoneyPanel({ gig, locale }: { gig: Gig; locale: Loc
             <p className="tabular font-sans text-sm font-semibold text-rizq-ink">
               {fmtPrice(gig.remaining_sar ?? null, locale)}
             </p>
-            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+            <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
           </div>
         </div>
       </div>

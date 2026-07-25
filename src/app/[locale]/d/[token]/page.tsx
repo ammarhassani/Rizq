@@ -5,7 +5,7 @@
  */
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations} from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -51,6 +51,7 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
   const doc = await fetchSharedDocument(token);
   if (!doc) notFound();
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Share" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -107,11 +108,11 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
               className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-6 py-3 text-sm font-medium hover:bg-rizq-green-dark transition-all ${font}`}
             >
               <Download size={15} />
-              {isAr ? "تحميل الملف" : "Download file"}
+              {tI18n("downloadFile")}
             </a>
           ) : (
             <p className={`text-sm text-[var(--over)] ${font}`}>
-              {isAr ? "تعذّر تحضير رابط التحميل." : "Could not prepare download link."}
+              {tI18n("couldPrepareDownloadLink")}
             </p>
           )}
         </div>
@@ -119,7 +120,7 @@ export default async function DocumentSharePage({ params }: { params: Promise<Pa
         {/* Rizq attribution */}
         <div className={`mt-6 text-center ${font}`}>
           <Link href="/" className="text-xs text-rizq-ink-soft/50 hover:text-rizq-green transition-colors">
-            {isAr ? "مُنشأ بواسطة رِزق. سعّر بثقة، اقبض رزقك" : "Shared via Rizq. Price with confidence, earn your rizq"}
+            {tI18n("sharedViaRizqPriceConfidence")}
           </Link>
         </div>
       </main>

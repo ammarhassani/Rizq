@@ -1,9 +1,11 @@
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Zap, FilePlus, PlusCircle, UserPlus, Receipt } from "lucide-react";
 
 type Props = { locale: "ar" | "en" };
 
 export function QuickActionsWidget({ locale }: Props) {
+  const tI18n = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -44,7 +46,7 @@ export function QuickActionsWidget({ locale }: Props) {
       <div className="flex items-center gap-2">
         <Zap className="h-4 w-4 text-rizq-gold opacity-80" />
         <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-          {isAr ? "إجراءات سريعة" : "Quick Actions"}
+          {tI18n("quickActionsTitle")}
         </span>
       </div>
 

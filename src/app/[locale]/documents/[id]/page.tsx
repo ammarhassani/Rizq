@@ -4,7 +4,7 @@
  */
 import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations} from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -29,6 +29,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<P
     redirect(loginPath);
   }
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Documents" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -63,7 +64,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<P
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
         >
           <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "الوثائق" : "Documents"}
+          {tI18n("backToDocuments")}
         </Link>
 
         <div className="mb-6">

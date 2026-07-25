@@ -29,7 +29,7 @@ export function SalesHistoryDialog({ open, onOpenChange, item, locale }: Props) 
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = t("sar");
 
   const [history, setHistory] = React.useState<ItemSalesHistory | null>(null);
   const [error, setError] = React.useState(false);

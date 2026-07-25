@@ -4,7 +4,7 @@
  */
 import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations} from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -30,6 +30,7 @@ export default async function DocumentNewPage({ params }: { params: Promise<Para
     redirect(loginPath);
   }
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Documents" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -43,7 +44,7 @@ export default async function DocumentNewPage({ params }: { params: Promise<Para
   const categories = (catsRaw ?? []) as { id: string; name_ar: string; name_en: string }[];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "رفع وثيقة" : "Upload Document"}>
+    <AppShell locale={locale as "ar" | "en"} title={tI18n("uploadDocument2")}>
       <div
         className="mx-auto w-full max-w-2xl px-6 sm:px-10 py-12 sm:py-16"
         dir={dir}
@@ -53,11 +54,11 @@ export default async function DocumentNewPage({ params }: { params: Promise<Para
           className={`inline-flex items-center gap-1.5 text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors mb-8 ${font}`}
         >
           <span className="inline-block ltr:rotate-180">→</span>
-          {isAr ? "الوثائق" : "Documents"}
+          {tI18n("backToDocuments")}
         </Link>
 
         <h1 className={`text-2xl font-bold text-rizq-ink mb-6 ${font}`}>
-          {isAr ? "رفع وثيقة جديدة" : "Upload a new document"}
+          {tI18n("uploadNew")}
         </h1>
 
         <div className="card-wahaj p-6 sm:p-8">

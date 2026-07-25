@@ -74,7 +74,7 @@ export async function ProjectInvoicesList({
                   <span className={`text-xs text-rizq-ink-soft/70 ${font}`}>{label}</span>
                 </span>
                 <span className="tabular font-sans text-sm font-semibold text-rizq-ink">
-                  {fmtPrice(inv.total_sar, locale)} {isAr ? "ر.س" : "SAR"}
+                  {fmtPrice(inv.total_sar, locale)} {t("sar")}
                 </span>
               </Link>
             );

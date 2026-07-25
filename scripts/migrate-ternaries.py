@@ -114,7 +114,10 @@ def main() -> int:
     left = sum(1 for m in PAIR.finditer(out) if ARABIC.search(m.group(1)))
     print(f"  remaining in file: {left}")
 
-    if not planned:
+    # Bail on "no CHANGE", not "no NEW KEYS": when every string maps to a key that
+    # already exists the plan is empty, but `out` still has real substitutions —
+    # returning here silently threw those rewrites away.
+    if out == src:
         print("  nothing to do")
         return 0
     if not apply:

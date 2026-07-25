@@ -34,7 +34,7 @@ export async function ContinueLifecycleList({ locale }: { locale: "ar" | "en" })
   return (
     <div dir={dir} className="aurora-ring">
       <section className={`rounded-[20px] bg-[var(--raised)] p-5 ${font}`}>
-        <p className={`eyebrow mb-2 ${font}`}>{isAr ? "أكمل ما بدأته" : "Pick up where you left off"}</p>
+        <p className={`eyebrow mb-2 ${font}`}>{t("continueTitle")}</p>
         <h2 className={`text-base font-semibold text-rizq-ink mb-3 ${font}`}>{t("continueTitle")}</h2>
         <ul className="space-y-2">
         {result.items.map((item) => (

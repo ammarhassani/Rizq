@@ -56,7 +56,7 @@ export function MethodologyFaq({ locale, sectionsText }: Props) {
   };
 
   return (
-    <section className={`${font}`} aria-label={isAr ? "اسأل عن منهجيتنا" : "Ask about our methodology"}>
+    <section className={`${font}`} aria-label={t("heading")}>
       <div className="flex items-center gap-2 mb-4">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-rizq-green/10 text-rizq-green">
           <Sparkles size={15} strokeWidth={1.8} />

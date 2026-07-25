@@ -11,6 +11,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { updateClient } from "@/app/actions/clients/clients";
@@ -35,6 +36,7 @@ export function PriorityQuickEdit({
   current: string | null;
   locale: "ar" | "en";
 }) {
+  const tI18n = useTranslations("Clients.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const router = useRouter();
@@ -56,7 +58,7 @@ export function PriorityQuickEdit({
         router.refresh();
       } else {
         setValue(prev); // roll back
-        toast.error(isAr ? "تعذّر تحديث الأولوية." : "Couldn't update priority.");
+        toast.error(tI18n("couldnTUpdatePriority"));
       }
     });
   }
@@ -64,7 +66,7 @@ export function PriorityQuickEdit({
   return (
     <div
       role="radiogroup"
-      aria-label={isAr ? "أولوية المتابعة" : "Follow-up priority"}
+      aria-label={tI18n("followUpPriority")}
       dir={isAr ? "rtl" : "ltr"}
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
       className={`inline-flex items-center gap-1 rounded-full border border-rizq-gold/30 bg-rizq-cream/90 p-1 shadow-sm print:hidden ${font}`}

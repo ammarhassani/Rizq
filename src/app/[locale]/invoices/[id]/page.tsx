@@ -4,7 +4,7 @@
  */
 import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations} from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -72,6 +72,7 @@ export default async function InvoiceDetailPage({
     }
   }
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Invoices.list" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -174,7 +175,7 @@ export default async function InvoiceDetailPage({
             <span className="tabular font-sans text-lg font-bold text-rizq-green">
               <AnimatedNumber value={Number(invoice.total_sar)} locale={locale as "ar" | "en"} duration={0.9} />
               <span className={`ms-1 text-sm font-normal text-rizq-ink-soft/60 ${font}`}>
-                {isAr ? "ر.س" : "SAR"}
+                {tI18n("sar")}
               </span>
             </span>
             <span

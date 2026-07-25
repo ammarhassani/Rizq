@@ -14,6 +14,8 @@
  * aria-hidden.
  */
 
+import { useTranslations } from "next-intl";
+
 type Point = { label: string; value: number };
 
 type Props = {
@@ -52,6 +54,7 @@ export function TrendChart({
   valueFormat = "money",
   showLatest = true,
 }: Props) {
+  const tI18n = useTranslations("Tool.result");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const curr = isAr && currency === "SAR" ? "ريال" : currency;
@@ -64,7 +67,7 @@ export function TrendChart({
         className={`flex items-center justify-center card-wahaj-sm px-4 py-6 text-center text-sm text-rizq-ink-soft ${font}`}
         style={{ minHeight: height }}
       >
-        {isAr ? "ما فيه بيانات كافية بعد" : "Not enough data yet"}
+        {tI18n("enoughDataYet")}
       </div>
     );
   }
@@ -134,7 +137,7 @@ export function TrendChart({
           <p className={`mt-0.5 text-xs text-rizq-ink-soft ${font}`}>{latest.label}</p>
         </div>
         <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>
-          {isAr ? "الذروة" : "Peak"}{" "}
+          {tI18n("peak")}{" "}
           <span className="tabular font-sans font-semibold text-rizq-ink-soft">
             {fmtNumber(peakValue, locale)}
           </span>

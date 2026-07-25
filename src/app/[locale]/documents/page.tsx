@@ -4,7 +4,7 @@
  */
 import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations} from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -37,6 +37,7 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
     redirect(loginPath);
   }
 
+  const tI18n = await getTranslations({ locale: locale as "ar" | "en", namespace: "Documents" });
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -71,13 +72,13 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
   const docs = (docsRaw ?? []) as DocumentRow[];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "خزنة الوثائق" : "Document Vault"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={tI18n("pageTitle")} maxWidth="wide">
       <div dir={dir}>
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <p className="eyebrow mb-3">{isAr ? "خزنة الوثائق" : "Document Vault"}</p>
+          <p className="eyebrow mb-3">{tI18n("pageTitle")}</p>
           <h1 className={`display-2 text-rizq-ink ${font}`}>
-            {isAr ? "وثائقي" : "My documents"}
+            {tI18n("myDocuments")}
           </h1>
           <p className={`mt-2 text-base text-rizq-ink-soft max-w-md ${font}`}>
             {isAr
@@ -97,7 +98,7 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
               <span className="font-arabic text-2xl font-bold text-rizq-green leading-none">ر</span>
             </div>
             <h2 className={`text-xl font-semibold text-rizq-ink mb-2 ${font}`}>
-              {isAr ? "لا توجد وثائق بعد" : "No documents yet"}
+              {tI18n("noDocumentsTitle")}
             </h2>
             <p className={`text-sm text-rizq-ink-soft mb-6 max-w-sm mx-auto ${font}`}>
               {isAr
@@ -108,7 +109,7 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
               href="/documents/new"
               className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-7 py-3.5 text-sm font-medium hover:bg-rizq-green-dark hover:-translate-y-0.5 transition-all ${font}`}
             >
-              {isAr ? "رفع وثيقة" : "Upload document"}
+              {tI18n("uploadDocument")}
               <span className="inline-block rtl:rotate-180">→</span>
             </Link>
           </div>
@@ -135,7 +136,7 @@ export default async function DocumentsPage({ params }: { params: Promise<Params
           <Link
             href="/documents/new"
             className={`fixed bottom-6 end-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-rizq-green text-rizq-cream shadow-lg hover:bg-rizq-green-dark hover:scale-105 transition-all ${font}`}
-            aria-label={isAr ? "رفع وثيقة" : "Upload document"}
+            aria-label={tI18n("uploadDocument")}
           >
             <span className="text-2xl leading-none">+</span>
           </Link>

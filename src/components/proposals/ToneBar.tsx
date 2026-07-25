@@ -10,6 +10,7 @@
  */
 
 import { useTransition, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { adjustProposalTone } from "@/app/actions/proposals/adjustToneAction";
 import type { ArtifactData } from "@/lib/proposals/artifact";
@@ -34,6 +35,7 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
   const [activeTone, setActiveTone] = useState<Tone | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const tI18n = useTranslations("Proposals.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -69,7 +71,7 @@ export function ToneBar({ locale, proposalId, onApplied }: Props) {
     >
       {/* Label */}
       <p className="text-xs font-medium text-rizq-gold-dark tracking-wide uppercase">
-        {isAr ? "تحليل رِزق: ضبط النبرة" : "Rizq Insight: Adjust tone"}
+        {tI18n("rizqInsightAdjustTone")}
       </p>
 
       {/* Tone buttons */}
