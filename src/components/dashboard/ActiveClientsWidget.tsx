@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Users, AlertCircle, Plus } from "lucide-react";
 import { WidgetError } from "./WidgetError";
@@ -22,6 +23,7 @@ function daysSince(iso: string | null): number | null {
 }
 
 export function ActiveClientsWidget({ clients, error, locale }: Props) {
+  const t = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -37,11 +39,11 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-rizq-green opacity-70" />
           <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-            {isAr ? "العملاء النشطون" : "Active Clients"}
+            {t("activeClientsTitle")}
           </span>
         </div>
         <Link href="/clients" className={`text-xs text-rizq-green hover:underline ${font}`}>
-          {isAr ? "عرض الكل ←" : "View all →"}
+          {t("viewAll")}
         </Link>
       </div>
 
@@ -50,14 +52,14 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
       ) : clients.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
-            {isAr ? "ما عندك عملاء بعد." : "No clients yet."}
+            {t("noClientsYet")}
           </p>
           <Link
             href="/clients/new"
             className={`inline-flex items-center gap-1 text-sm text-rizq-green hover:underline ${font}`}
           >
             <Plus className="h-3 w-3" />
-            {isAr ? "أضف أول عميل" : "Add your first client"}
+            {t("addFirstClient")}
           </Link>
         </div>
       ) : (
@@ -65,13 +67,13 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
           <div className="flex items-center gap-4 px-1">
             <div>
               <p className="tabular text-2xl font-bold text-rizq-green leading-none">{clients.length}</p>
-              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{isAr ? "إجمالي العملاء" : "Total clients"}</p>
+              <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{t("totalClients")}</p>
             </div>
             {needsFollowup.length > 0 && (
               <div className="flex items-center gap-1.5 rounded-xl bg-[var(--warn-soft)] border border-[var(--warn-line)] px-3 py-1.5">
                 <AlertCircle className="h-3 w-3 text-[var(--warn)] shrink-0" />
                 <p className={`text-xs text-[var(--warn)] ${font}`}>
-                  {needsFollowup.length} {isAr ? "يحتاج متابعة" : "need follow-up"}
+                  {needsFollowup.length} {t("needFollowUp")}
                 </p>
               </div>
             )}

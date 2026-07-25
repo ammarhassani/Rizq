@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { CalendarClock, Plus } from "lucide-react";
 import type { UpcomingInvoice } from "@/lib/invoices/queries";
@@ -27,6 +28,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
+  const t = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -37,11 +39,11 @@ export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
         <div className="flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-rizq-green opacity-70" />
           <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-            {isAr ? "المواعيد القادمة" : "Upcoming Deadlines"}
+            {t("upcomingDeadlines")}
           </span>
         </div>
         <Link href="/calendar" className={`text-xs text-rizq-green hover:underline ${font}`}>
-          {isAr ? "عرض الكل ←" : "View all →"}
+          {t("viewAll")}
         </Link>
       </div>
 
@@ -50,14 +52,14 @@ export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
       ) : invoices.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
-            {isAr ? "لا توجد مواعيد قادمة." : "No upcoming deadlines."}
+            {t("noUpcomingDeadlines")}
           </p>
           <Link
             href="/invoices/new"
             className={`inline-flex items-center gap-1 text-sm text-rizq-green hover:underline ${font}`}
           >
             <Plus className="h-3 w-3" />
-            {isAr ? "أنشئ فاتورة" : "Create an invoice"}
+            {t("createInvoice")}
           </Link>
         </div>
       ) : (
@@ -71,7 +73,7 @@ export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
               <div className="min-w-0">
                 <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{inv.invoice_number}</p>
                 <p className={`text-xs tabular text-rizq-ink-soft ${font}`}>
-                  {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(inv.total_sar)} {isAr ? "ر.س" : "SAR"}
+                  {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(inv.total_sar)} {t("currencySarShort")}
                 </p>
               </div>
               <div className="shrink-0 text-right">

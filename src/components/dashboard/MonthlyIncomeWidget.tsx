@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
@@ -34,10 +35,11 @@ function fmt(n: number | null, locale: "ar" | "en"): string {
  * the goal line. Data is real (feature 006 goal).
  */
 export function MonthlyIncomeWidget({ current, previous, trend, error, locale, goalSar }: Props) {
+  const t = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const unitLabel = isAr ? "ريال" : "SAR";
+  const unitLabel = t("currencySar");
 
   const totalSar = current?.total_sar ?? 0;
   const prevTotal = previous?.total_sar ?? null;
@@ -70,17 +72,17 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
       ) : totalSar === 0 && !current ? (
         <div className={`relative py-4 text-center ${font}`}>
           <p className={`mb-1 text-sm font-medium text-[var(--content-muted)] ${font}`}>
-            {isAr ? "دخل هذا الشهر" : "This month"}
+            {t("thisMonth")}
           </p>
           <p className={`mb-3 text-sm text-[var(--content-muted)] ${font}`}>
-            {isAr ? "ما سجّلت أي مشاريع هذا الشهر." : "No income logged this month."}
+            {t("noIncomeThisMonth")}
           </p>
           <Link
             href="/income/new"
             className={`inline-flex items-center gap-1 text-sm text-[var(--acc)] hover:underline ${font}`}
           >
             <Plus className="h-3.5 w-3.5" />
-            {isAr ? "سجّل مشروع" : "Log a project"}
+            {t("logProject")}
           </Link>
         </div>
       ) : (
@@ -88,7 +90,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className={`mb-2 text-xs font-medium text-[var(--content-muted)] ${font}`}>
-                {isAr ? "دخل هذا الشهر" : "This month"}
+                {t("thisMonth")}
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="aurora-text tabular font-sans text-[46px] font-bold leading-none tracking-tight">
@@ -114,11 +116,11 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
               {current && (
                 <div className="mt-4 flex gap-6">
                   <div>
-                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "مدفوع" : "Paid"}</div>
+                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{t("paidLabel")}</div>
                     <div className="font-mono text-[15px] font-bold text-[var(--acc)]">{fmt(current.paid_sar, locale)}</div>
                   </div>
                   <div>
-                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "قيد الدفع" : "Pending"}</div>
+                    <div className={`text-[10px] text-[var(--content-faint)] ${font}`}>{t("pendingLabel")}</div>
                     <div className="font-mono text-[15px] font-bold text-[var(--warn)]">{fmt(current.pending_sar, locale)}</div>
                   </div>
                 </div>
@@ -154,9 +156,9 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
           {goalPct !== null && (
             <div className={`mt-2 flex justify-between text-[10px] text-[var(--content-faint)] ${font}`}>
               <span>
-                {isAr ? "الهدف الشهري" : "Monthly goal"} {fmt(goalSar ?? 0, locale)} {unitLabel}
+                {t("monthlyGoal")} {fmt(goalSar ?? 0, locale)} {unitLabel}
               </span>
-              <span className="text-[var(--acc)]">{pctLabel(goalPct)} {isAr ? "مكتمل" : "reached"}</span>
+              <span className="text-[var(--acc)]">{pctLabel(goalPct)} {t("goalReached")}</span>
             </div>
           )}
         </div>
