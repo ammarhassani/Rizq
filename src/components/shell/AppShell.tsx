@@ -14,6 +14,7 @@
  *   </AppShell>
  */
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayName } from "@/lib/profile/displayName";
 import { AppShellClient } from "./AppShellClient";
 
 /**
@@ -55,11 +56,11 @@ export async function AppShell({ locale, title, maxWidth = "wide", children }: A
         .eq("id", userData.user.id)
         .maybeSingle();
 
-      name =
-        (profile?.full_name_ar as string | null) ??
-        (profile?.name as string | null) ??
-        email?.split("@")[0] ??
-        null;
+      name = resolveDisplayName(
+        profile?.full_name_ar as string | null,
+        profile?.name as string | null,
+        email
+      );
       role = (profile?.role as string | null) ?? null;
     }
   } catch {

@@ -338,6 +338,61 @@ describe("computeProposalPrice — deliverable_count complexity (anchor lever, h
   });
 });
 
+describe("computeProposalPrice — quote vs cited band (saturation + client budget)", () => {
+  // The band that shipped in production for ui-ux-design / riyadh / senior (n=5).
+  const NARROW = band(6180, 12250, 17850);
+
+  it("two different scopes no longer collapse to the same number", () => {
+    const small = computeProposalPrice(NARROW, { ...NO_MODS, deliverable_count: 2 }, []);
+    const big = computeProposalPrice(
+      NARROW,
+      { ...NO_MODS, deliverable_count: 5, ip_transfer: "full_transfer" },
+      []
+    );
+    // Both anchors saturate at the band max — that was the bug.
+    expect(small.anchor).toBeLessThanOrEqual(NARROW.max);
+    expect(big.anchor).toBe(big.max);
+    // The quote separates them.
+    expect(big.quote).toBeGreaterThan(small.quote);
+    expect(big.quote_basis).toBe("scope");
+  });
+
+  it("never quotes under a budget the client already stated", () => {
+    const r = computeProposalPrice(
+      NARROW,
+      { ...NO_MODS, deliverable_count: 5, ip_transfer: "full_transfer", budget_mentioned: 40000 },
+      []
+    );
+    expect(r.quote).toBe(40000);
+    expect(r.quote_basis).toBe("client_budget");
+  });
+
+  it("a lowball stated budget never drags the quote down", () => {
+    const withLowball = computeProposalPrice(NARROW, { ...NO_MODS, budget_mentioned: 500 }, []);
+    const without = computeProposalPrice(NARROW, NO_MODS, []);
+    expect(withLowball.quote).toBe(without.quote);
+    expect(withLowball.quote_basis).toBe("market");
+  });
+
+  it("the cited band is never widened to cover the quote (Principle I)", () => {
+    const r = computeProposalPrice(
+      NARROW,
+      { ...NO_MODS, deliverable_count: 8, budget_mentioned: 90000 },
+      []
+    );
+    expect(r.min).toBe(6180);
+    expect(r.max).toBe(17850);
+    expect(r.quote).toBeGreaterThan(r.max);
+    expect(r.quote_basis).toBe("client_budget");
+  });
+
+  it("an ordinary in-band job quotes the anchor and cites the market", () => {
+    const r = computeProposalPrice(band(1000, 2000, 8000), NO_MODS, []);
+    expect(r.quote).toBe(r.anchor);
+    expect(r.quote_basis).toBe("market");
+  });
+});
+
 describe("computeProposalPrice — stated-rate personal anchor (feature 006)", () => {
   const b = band(2000, 5000, 9000);
   it("a stated rate counts as a personal anchor (no past history)", () => {

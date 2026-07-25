@@ -32,12 +32,17 @@ function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {
   } catch { return iso; }
 }
 
-function StarRating({ rating }: { rating: number | null }) {
+function StarRating({ rating, label }: { rating: number | null; label: string }) {
   if (!rating) return null;
+  // The five glyphs differ only by colour, so a screen reader hears "★★★★★" for
+  // every rating. One label on the group carries the actual value; the glyphs are
+  // decoration.
   return (
-    <span className="inline-flex gap-0.5">
+    <span className="inline-flex gap-0.5" role="img" aria-label={label}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <span key={i} className={i <= rating ? "text-rizq-gold" : "text-rizq-gold/25"}>★</span>
+        <span key={i} aria-hidden className={i <= rating ? "text-rizq-gold" : "text-rizq-gold/25"}>
+          ★
+        </span>
       ))}
     </span>
   );
@@ -69,7 +74,11 @@ const PROPOSAL_STATUS_EN: Record<string, string> = {
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  return { title: "عميل · رِزق" };
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase.from("clients").select("name").eq("id", id).maybeSingle();
+  const name = (data?.name as string | null) ?? null;
+  return { title: name ? `${name} · رِزق` : "عميل · رِزق" };
 }
 
 export default async function ClientDetailPage({
@@ -94,6 +103,7 @@ export default async function ClientDetailPage({
   }
 
   const t = await getTranslations({ locale, namespace: "Clients.detail" });
+  const tCommon = await getTranslations({ locale, namespace: "Common" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const isAr = locale === "ar";
   const dir = isAr ? "rtl" : "ltr";
@@ -171,7 +181,10 @@ export default async function ClientDetailPage({
               <span className={`inline-flex items-center rounded-full bg-rizq-green/10 text-rizq-green px-3 py-1 text-xs font-medium ${font}`}>
                 {clientTypeLabel}
               </span>
-              <StarRating rating={client.rating} />
+              <StarRating
+                rating={client.rating}
+                label={tCommon("ratingStars", { n: client.rating ?? 0 })}
+              />
             </div>
           </div>
 

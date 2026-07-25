@@ -228,7 +228,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                 <div>
                   <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("daysRemainingLabel")}</p>
                   <p className={`text-lg font-bold text-rizq-ink ${font}`}>
-                    {daysLeft} {t("days")}
+                    {t("daysCount", { n: daysLeft })}
                   </p>
                 </div>
               </div>

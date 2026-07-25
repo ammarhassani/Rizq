@@ -22,7 +22,7 @@ const SetShareSchema = z.object({
 });
 
 type SetShareResult =
-  | { ok: true; token?: string }
+  | { ok: true; token?: string; statusBumped?: boolean }
   | { ok: false; code: "unauthorized" | "not_found" | "error" };
 
 /**
@@ -184,7 +184,7 @@ export async function setInvoiceShare(
     }
   }
 
-  return share ? { ok: true, token } : { ok: true };
+  return share ? { ok: true, token, statusBumped } : { ok: true };
 }
 
 // ---------------------------------------------------------------------------

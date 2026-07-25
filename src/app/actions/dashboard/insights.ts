@@ -200,14 +200,17 @@ export async function getBusinessInsightsAction(opts?: {
 
     if (cache && cache.valid_until) {
       const validUntil = new Date(cache.valid_until as string);
-      if (validUntil > new Date()) {
-        const insights = (cache.insights as InsightItem[]) ?? [];
+      const insights = (cache.insights as InsightItem[]) ?? [];
+      // An empty cached entry is treated as a miss — it only ever meant "you had no
+      // data an hour ago", which stops being true the moment the user adds anything.
+      // (Also drains rows written by the old behaviour.)
+      if (validUntil > new Date() && insights.length > 0) {
         return {
           ok: true,
           insights,
           generated_at: cache.generated_at as string,
           cached: true,
-          empty: insights.length === 0,
+          empty: false,
           source: "ai",
         };
       }
@@ -219,13 +222,10 @@ export async function getBusinessInsightsAction(opts?: {
   const { ctx, hasData } = await buildInsightsContext(supabase, userId);
 
   if (!hasData) {
-    // Cache empty result
-    await supabase.from("dashboard_insights_cache").upsert({
-      user_id: userId,
-      insights: [],
-      generated_at: now.toISOString(),
-      valid_until: new Date(now.getTime() + 60 * 60 * 1000).toISOString(),
-    });
+    // Deliberately NOT cached. "No data yet" is the state a new user leaves within
+    // minutes — caching it for an hour meant someone who signed up, added a client
+    // and won a proposal still read "create your first proposal to activate
+    // insights". The aggregate query is cheap; the empty case costs no AI call.
     return { ok: true, insights: [], generated_at: now.toISOString(), cached: false, empty: true, source: "summary" };
   }
 

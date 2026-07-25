@@ -8,6 +8,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname, Link } from "@/i18n/navigation";
+import { resolveDisplayName } from "@/lib/profile/displayName";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { SettingsClient } from "@/components/settings/SettingsClient";
@@ -59,7 +60,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
   // Fetch user profile
   const { data: profile } = await supabase
     .from("users")
-    .select("id, email, name, role, created_at")
+    .select("id, email, name, full_name_ar, role, created_at")
     .eq("id", userData.user.id)
     .single();
 
@@ -114,7 +115,11 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-base font-semibold text-rizq-ink truncate ${font}`}>
-                  {profile?.name ?? userData.user.email ?? "—"}
+                  {resolveDisplayName(
+                    profile?.full_name_ar as string | null,
+                    profile?.name as string | null,
+                    userData.user.email
+                  ) ?? "—"}
                 </p>
                 <p className={`text-sm text-rizq-ink-soft truncate mt-0.5 ${font}`}>
                   {profile?.email ?? userData.user.email ?? "—"}

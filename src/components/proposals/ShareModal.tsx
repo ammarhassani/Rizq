@@ -198,6 +198,9 @@ export function ShareModal({
             onClick={handleToggle}
             disabled={isPending}
             aria-pressed={isShared}
+            // The label sits in a sibling <span>, so without this the switch has no
+            // accessible name at all — a screen reader announces just "button".
+            aria-label={isShared ? t("disableShare") : t("enableShare")}
             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/50 disabled:opacity-60 ${
               isShared ? "bg-rizq-green" : "bg-rizq-ink/20"
             }`}

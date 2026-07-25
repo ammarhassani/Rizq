@@ -8,6 +8,7 @@ import { isAIConfigured } from "@/lib/ai/client";
 import { resolvePrice } from "@/lib/pricing/resolve";
 import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
 import { resolveSpecialty } from "@/lib/pricing/specialtyResolve";
+import { quoteBasisCitation } from "@/lib/pricing/citation";
 import {
   computeProposalPrice,
 } from "@/lib/pricing/proposalPricing";
@@ -310,17 +311,27 @@ export async function generateProposal(
       client_type: scope.client_type,
       ip_transfer: scope.ip_transfer,
       deliverable_count: scope.deliverable_count,
+      // The client already told us what they're willing to pay — never quote under it.
+      budget_mentioned: scope.budget_mentioned,
     },
     pastAnchors,
     statedAnchor // feature 006 — the freelancer's stated rate as a personal anchor
   );
 
-  // 9. Pick provenance citation by language
+  // 9. Pick provenance citation by language.
+  //    Honesty (Principle I): the benchmark citation may only vouch for a figure the
+  //    benchmark actually produced. When the quote is lifted by scope size or by a
+  //    budget the client named, say so instead of crediting the benchmark for it.
   const briefLang = detectBriefLanguage(input.brief_text);
-  const provenanceCitation =
+  const marketCitation =
     briefLang === "en"
       ? resolveResult.provenance_citation_en
       : resolveResult.provenance_citation_ar;
+  const provenanceCitation = quoteBasisCitation(
+    proposalPrice.quote_basis,
+    marketCitation,
+    briefLang === "en" ? "en" : "ar"
+  );
 
   // 10. Load user brand defaults (M8 columns) for artifact personalisation.
   const brand = await loadUserBrandDefaults(
@@ -378,7 +389,7 @@ export async function generateProposal(
     deliverableDescriptions: null,
     proseAiGenerated: false,
     priceMin: proposalPrice.min,
-    priceAnchor: proposalPrice.anchor,
+    priceAnchor: proposalPrice.quote,
     priceMax: proposalPrice.max,
     provenanceCitation,
     included: null,
@@ -417,7 +428,7 @@ export async function generateProposal(
       city_id: cityId,
       experience_tier_id: tierId,
       price_min: proposalPrice.min,
-      price_anchor: proposalPrice.anchor,
+      price_anchor: proposalPrice.quote,
       price_max: proposalPrice.max,
       sample_size: resolveResult.sample_size,
       dominant_provenance: resolveResult.dominant_provenance,
@@ -501,7 +512,7 @@ export async function generateProposal(
     follow_ups: followUps,
     price: {
       min: proposalPrice.min,
-      anchor: proposalPrice.anchor,
+      anchor: proposalPrice.quote, // the quoted figure, not the raw band anchor
       max: proposalPrice.max,
     },
     confidence: aggregateConfidence(scope.field_confidence),

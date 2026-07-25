@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { artifactTitle } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -34,7 +35,7 @@ export type CreateGigFromProposalResult =
  * One-tap "Create gig from proposal" — Phase-3 task 3.10 (M1→M3).
  *
  * Loads the owner's proposal, creates a gig pre-filled from proposal data:
- *   - title: first deliverable from scope_json, or specialty name, or "مشروع"
+ *   - title: the proposal title, else first deliverable, else specialty name, else "مشروع"
  *   - amount_sar: price_anchor
  *   - client_id: proposal.client_id (if present)
  *   - proposal_id: the proposal
@@ -63,7 +64,7 @@ export async function createGigFromProposal(
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
     .select(
-      "id, price_anchor, client_id, scope_json, specialty_id, specialties(slug, name_ar)"
+      "id, price_anchor, client_id, scope_json, artifact_json, specialty_id, specialties(slug, name_ar)"
     )
     .eq("id", proposal_id)
     .eq("user_id", userId)
@@ -71,7 +72,7 @@ export async function createGigFromProposal(
 
   if (fetchErr || !proposal) return { ok: false, code: "not_found" };
 
-  // Derive gig title: first deliverable > specialty name > fallback
+  // Derive gig title: proposal title > first deliverable > specialty name > fallback
   const scopeJson = proposal.scope_json as {
     deliverables?: string[];
     specialty?: string;
@@ -89,7 +90,11 @@ export async function createGigFromProposal(
   const specialtySlug =
     specialtyRaw?.slug ?? scopeJson?.specialty ?? null;
 
-  const title: string = firstDeliverable ?? specialtyName ?? "مشروع";
+  // The proposal's own title wins, so the money row, its project and the invoice
+  // line all carry the same name the client saw on the proposal. Falling straight
+  // to the first deliverable produced ledger rows called "Home page".
+  const title: string =
+    artifactTitle(proposal.artifact_json) ?? firstDeliverable ?? specialtyName ?? "مشروع";
 
   const priceAnchor = Number(proposal.price_anchor);
   const clientId = (proposal.client_id as string | null) ?? null;

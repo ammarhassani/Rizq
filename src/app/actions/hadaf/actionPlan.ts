@@ -41,14 +41,19 @@ export async function generateHadafActionPlanAction(): Promise<HadafActionPlanRe
   const { data: cached } = await supabase
     .from("hadaf_status_cache")
     .select(
-      "current_month_status, current_month_income"
+      "current_streak, current_month_status, current_month_income, months_to_qualify"
     )
     .eq("user_id", userId)
     .maybeSingle();
 
-  // Only generate when not qualifying
-  const status = cached?.current_month_status as string | null;
-  if (!cached || status !== "not_qualifying") {
+  // Generate whenever the freelancer is NOT YET ELIGIBLE — that's what the page
+  // above the button says ("you need 2 more months") and what the plan is for.
+  // Gating on the CURRENT month alone meant a freelancer who had a great month but
+  // is still one month short was told "the plan is only available when you're not
+  // eligible", contradicting the same screen.
+  const streak = Number(cached?.current_streak ?? 0);
+  const monthsNeeded = Number(cached?.months_to_qualify ?? 3);
+  if (!cached || streak >= monthsNeeded) {
     return { ok: false, code: "not_applicable" };
   }
 

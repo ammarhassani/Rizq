@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { completeOnboarding } from "@/app/actions/onboarding/completeOnboarding";
+import { getProfileSnapshot } from "@/app/actions/onboarding/getProfileSnapshot";
 import { useRouter } from "@/i18n/navigation";
-import type { StepProps } from "./types";
+import type { ProfileSnapshot, StepProps } from "./types";
 
 export function StepReview({ locale, profile, onBack, onNext, onSkip }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.review");
@@ -18,42 +19,62 @@ export function StepReview({ locale, profile, onBack, onNext, onSkip }: StepProp
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  // The wizard's snapshot is the one the page was server-rendered with; only the
+  // completeness pct is patched as steps save. Re-read so the section chips below
+  // describe what is actually stored, not what was there before onboarding started.
+  const [live, setLive] = useState<ProfileSnapshot>(profile);
+  useEffect(() => {
+    let alive = true;
+    getProfileSnapshot()
+      .then((p) => {
+        if (alive && p) setLive(p);
+      })
+      .catch(() => {
+        /* keep the wizard's snapshot */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const handleComplete = () => {
     setError(null);
     startTransition(async () => {
       const result = await completeOnboarding();
       if (result.ok) {
         setDone(true);
-        router.push("/dashboard");
-        router.refresh();
+        // A plain push here raced with refresh() and left users stranded on the
+        // success screen with no way forward. `replace` also drops the finished
+        // wizard from history so Back doesn't return to it.
+        router.replace("/dashboard");
       } else {
         setError(tv2("errorComplete"));
       }
     });
   };
 
-  const pct = profile.profile_completeness_pct ?? 0;
+  const pct = live.profile_completeness_pct ?? profile.profile_completeness_pct ?? 0;
 
   const sections = [
     {
       label: t("sectionIdentity"),
-      filled: Boolean(profile.full_name_ar || profile.fl_number),
+      filled: Boolean(live.full_name_ar || live.fl_number),
     },
     {
       label: t("sectionProfessional"),
-      filled: Boolean(profile.specialties?.length || profile.years_experience),
+      filled: Boolean(live.specialties?.length || live.years_experience),
     },
     {
       label: t("sectionRates"),
       filled: Boolean(
-        profile.current_hourly_rate_sar ||
-          profile.current_daily_rate_sar ||
-          profile.income_goal_monthly_sar
+        live.current_hourly_rate_sar ||
+          live.current_daily_rate_sar ||
+          live.income_goal_monthly_sar
       ),
     },
     {
       label: t("sectionBrand"),
-      filled: Boolean(profile.tagline_ar || profile.bio_ar),
+      filled: Boolean(live.tagline_ar || live.bio_ar),
     },
   ];
 

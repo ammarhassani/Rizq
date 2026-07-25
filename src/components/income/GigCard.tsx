@@ -12,6 +12,8 @@ export type GigRow = {
   remaining_sar: number | null;
   status: string;
   delivery_date: string | null;
+  /** When this income counts, mirroring the monthly_income view's coalesce. */
+  income_date?: string | null;
   ai_anomaly_flag: boolean | null;
   client_id: string | null;
   client_name?: string | null; // joined in

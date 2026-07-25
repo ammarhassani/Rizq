@@ -20,6 +20,15 @@ import type { InvoiceRowForArtifact } from "./_artifact";
 
 const InputSchema = z.object({
   gig_id: z.string().uuid(),
+  /**
+   * Which slice of the agreed money this invoice bills.
+   *  - "full"      the whole amount (default; unchanged behaviour)
+   *  - "deposit"   just the up-front deposit the proposal agreed
+   *  - "balance"   the amount left after the deposit
+   * The project screen already shows a deposit/final split; billing 100% up front
+   * contradicted the payment plan the client agreed to on the proposal.
+   */
+  portion: z.enum(["full", "deposit", "balance"]).optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -47,7 +56,7 @@ export async function createInvoiceFromGig(
 ): Promise<CreateInvoiceFromGigResult> {
   const parsed = InputSchema.safeParse(rawInput);
   if (!parsed.success) return { ok: false, code: "invalid" };
-  const { gig_id } = parsed.data;
+  const { gig_id, portion = "full" } = parsed.data;
 
   const supabase = await createClient();
 
@@ -60,7 +69,7 @@ export async function createInvoiceFromGig(
   const { data: gig, error: gigErr } = await supabase
     .from("gigs")
     .select(
-      "id, title, amount_sar, client_id, proposal_id, project_id, delivery_date, payment_method"
+      "id, title, amount_sar, deposit_sar, remaining_sar, client_id, proposal_id, project_id, delivery_date, payment_method"
     )
     .eq("id", gig_id)
     .eq("user_id", userId)
@@ -69,7 +78,23 @@ export async function createInvoiceFromGig(
   if (gigErr || !gig) return { ok: false, code: "not_found" };
 
   const gigTitle = gig.title as string;
-  const subtotalSar = Number(gig.amount_sar);
+  const fullAmount = Number(gig.amount_sar);
+  const depositAmount = Number(gig.deposit_sar ?? 0);
+  const balanceAmount = Number(gig.remaining_sar ?? fullAmount - depositAmount);
+  // Fall back to the full amount when the requested slice isn't defined, so this
+  // can never produce a zero-value invoice.
+  const subtotalSar =
+    portion === "deposit" && depositAmount > 0
+      ? depositAmount
+      : portion === "balance" && balanceAmount > 0
+        ? balanceAmount
+        : fullAmount;
+  const lineDescription =
+    subtotalSar === fullAmount
+      ? gigTitle
+      : portion === "deposit"
+        ? `${gigTitle} — دفعة مقدمة / Deposit`
+        : `${gigTitle} — الدفعة النهائية / Balance`;
   const clientId = (gig.client_id as string | null) ?? null;
   const proposalId = (gig.proposal_id as string | null) ?? null;
   // Inherit the gig's project so the invoice is discoverable by project-scoped queries
@@ -101,7 +126,7 @@ export async function createInvoiceFromGig(
   // Synthesise items from gig title + amount
   const items = [
     {
-      description: gigTitle,
+      description: lineDescription,
       quantity: 1,
       unit_price_sar: subtotalSar,
       total_sar: subtotalSar,
@@ -117,7 +142,7 @@ export async function createInvoiceFromGig(
       gig_id,
       proposal_id: proposalId,
       project_id: projectId,
-      description: gigTitle,
+      description: lineDescription,
       items,
       subtotal_sar: subtotalSar,
       vat_pct: vatPct,

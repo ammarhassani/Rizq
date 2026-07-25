@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { createGigFromProposal } from "@/app/actions/gigs/createGigFromProposal";
 import { deriveProjectTitle } from "@/lib/projects/title";
+import { artifactTitle } from "@/lib/proposals/artifact";
 
 const InputSchema = z.object({
   proposal_id: z.string().uuid(),
@@ -47,7 +48,7 @@ export async function createProjectFromProposal(
   // Load the proposal (owner-scoped) for title + client derivation.
   const { data: proposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, client_id, project_id, scope_json, specialties(name_ar, name_en, slug)")
+    .select("id, client_id, project_id, scope_json, artifact_json, specialties(name_ar, name_en, slug)")
     .eq("id", proposal_id)
     .eq("user_id", userId)
     .single();
@@ -85,7 +86,8 @@ export async function createProjectFromProposal(
     specialtyRaw?.name_ar ?? specialtyRaw?.name_en ?? null;
   const title = deriveProjectTitle(
     proposal.scope_json as { deliverables?: unknown } | null,
-    specialtyName
+    specialtyName,
+    artifactTitle(proposal.artifact_json)
   );
   const clientId = (proposal.client_id as string | null) ?? null;
 

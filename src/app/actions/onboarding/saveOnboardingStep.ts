@@ -14,6 +14,8 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { computeStrength } from "@/lib/profile/strength";
+import { getCities, getSpecialties, getExperienceTiers } from "@/lib/pricing/refDataDb";
+import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
 
 // ── Per-step Zod schemas ─────────────────────────────────────────────────────
 
@@ -167,6 +169,46 @@ const STEP_KEY_TO_NUM: Record<string, number> = {
 
 export type SaveOnboardingStepKey = keyof typeof STEP_SCHEMAS;
 
+/**
+ * Maps the slugs a step editor knows (`city`, `specialties[0]`, `years_experience`)
+ * onto the FK columns the engines read (`city_id`, `primary_specialty_id`,
+ * `experience_tier_id`). Mutates `payload`. Best-effort: an unmatched slug leaves the
+ * FK untouched rather than nulling a previously-good value.
+ */
+async function resolveProfileForeignKeys(
+  key: SaveOnboardingStepKey,
+  data: Record<string, unknown>,
+  payload: Record<string, unknown>
+): Promise<void> {
+  if (key === "location") {
+    const slug = typeof data["city"] === "string" ? data["city"] : null;
+    if (!slug) return;
+    const city = (await getCities()).find((c) => c.slug === slug);
+    if (city) payload["city_id"] = city.id;
+    return;
+  }
+
+  if (key !== "professional") return;
+
+  const specialtySlug = Array.isArray(data["specialties"])
+    ? (data["specialties"] as unknown[]).find((s): s is string => typeof s === "string")
+    : undefined;
+  if (specialtySlug) {
+    const specialty = (await getSpecialties()).find((s) => s.slug === specialtySlug);
+    if (specialty) payload["primary_specialty_id"] = specialty.id;
+  }
+
+  // Tier is DERIVED from years (same rule the pricing engine uses) — never a second
+  // input that can disagree with the years the user typed.
+  const years = typeof data["years_experience"] === "number" ? data["years_experience"] : null;
+  if (years != null) {
+    const tiers = await getExperienceTiers();
+    const tierSlug = tierSlugFromYears(years, tiers);
+    const tier = tiers.find((t) => t.slug === tierSlug);
+    if (tier) payload["experience_tier_id"] = tier.id;
+  }
+}
+
 export type SaveOnboardingStepResult =
   | { ok: true; completeness: number }
   | { ok: false; code: "no_session" | "invalid" | "unknown_step" | "error" };
@@ -205,6 +247,12 @@ export async function saveOnboardingStep(
     ...cleanData,
     profile_last_updated: new Date().toISOString(),
   };
+
+  // The pricing engine, HADAF and every "profile as source of truth" reader key off
+  // the FK columns, not the slug/text ones. The step editors only know slugs, so the
+  // slug → uuid lookup happens HERE — the single choke point every caller (onboarding
+  // wizard AND Settings → Profile) already routes through.
+  await resolveProfileForeignKeys(key, cleanData, updatePayload);
 
   // First: fetch the current row so completeness is computed over the WHOLE profile (must
   // include every column the strength model reads, else the stored pct undercounts vs the

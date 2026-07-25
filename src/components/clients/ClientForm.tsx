@@ -48,6 +48,7 @@ const RATINGS = [1, 2, 3, 4, 5] as const;
 
 export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, embedded = false }: Props) {
   const t = useTranslations("Clients.form");
+  const tCommon = useTranslations("Common");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -277,7 +278,8 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
               type="button"
               onClick={() => setRating(rating === r ? null : r)}
               className={`text-2xl transition-colors ${rating && r <= rating ? "text-rizq-gold" : "text-rizq-gold/30 hover:text-rizq-gold/60"}`}
-              aria-label={`${r} stars`}
+              aria-label={tCommon("ratingStars", { n: r })}
+              aria-pressed={rating === r}
             >
               ★
             </button>

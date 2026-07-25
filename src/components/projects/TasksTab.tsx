@@ -62,6 +62,30 @@ export function TasksTab({
 
   const fieldCls = `rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`;
 
+  const addTask = () =>
+    newTask.trim() &&
+    busy !== "add-task" &&
+    run("add-task", async () => {
+      await createTask({ project_id: projectId, title: newTask.trim() });
+      setNewTask("");
+    });
+
+  const addMilestone = () =>
+    newMilestone.trim() &&
+    busy !== "add-milestone" &&
+    run("add-milestone", async () => {
+      await createMilestone({ project_id: projectId, name: newMilestone.trim() });
+      setNewMilestone("");
+    });
+
+  /** Enter submits. These inputs sit outside a <form>, so without this the key
+   *  does nothing and it reads as "the app ignored me". */
+  const submitOnEnter = (fn: () => void) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    fn();
+  };
+
   const groups = [
     { id: null as string | null, name: t("ungrouped"), target: null as string | null },
     ...milestones.map((m) => ({ id: m.id, name: m.name, target: m.target_date })),
@@ -103,18 +127,14 @@ export function TasksTab({
         <input
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
+          onKeyDown={submitOnEnter(addTask)}
           placeholder={t("taskPlaceholder")}
+          aria-label={t("addTask")}
           className={`${fieldCls} flex-1`}
         />
         <button
           type="button"
-          onClick={() =>
-            newTask.trim() &&
-            run("add-task", async () => {
-              await createTask({ project_id: projectId, title: newTask.trim() });
-              setNewTask("");
-            })
-          }
+          onClick={addTask}
           disabled={busy === "add-task"}
           className={`inline-flex items-center justify-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-2.5 text-sm font-medium hover:bg-rizq-green-dark transition-colors disabled:opacity-70 ${font}`}
         >
@@ -166,22 +186,18 @@ export function TasksTab({
         <input
           value={newMilestone}
           onChange={(e) => setNewMilestone(e.target.value)}
+          onKeyDown={submitOnEnter(addMilestone)}
           placeholder={t("milestonePlaceholder")}
+          aria-label={t("addMilestone")}
           className={`${fieldCls} flex-1`}
         />
         <button
           type="button"
-          onClick={() =>
-            newMilestone.trim() &&
-            run("add-ms", async () => {
-              await createMilestone({ project_id: projectId, name: newMilestone.trim() });
-              setNewMilestone("");
-            })
-          }
-          disabled={busy === "add-ms"}
+          onClick={addMilestone}
+          disabled={busy === "add-milestone"}
           className={`inline-flex items-center justify-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-5 py-2.5 text-sm font-medium hover:bg-rizq-green/8 transition-colors disabled:opacity-70 ${font}`}
         >
-          {busy === "add-ms" ? <Loader2 size={14} className="animate-spin" /> : <Flag size={14} />}
+          {busy === "add-milestone" ? <Loader2 size={14} className="animate-spin" /> : <Flag size={14} />}
           {t("addMilestone")}
         </button>
       </div>

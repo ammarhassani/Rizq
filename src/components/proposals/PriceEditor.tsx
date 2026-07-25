@@ -68,12 +68,16 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
       dir={dir}
       className={`print:hidden mt-3 rounded-2xl border border-rizq-green/20 bg-[var(--raised)] p-4 ${font}`}
     >
-      <label className={`block text-xs font-medium text-rizq-ink-soft/70 uppercase tracking-wide mb-2 ${font}`}>
+      <label
+        htmlFor="manual-price"
+        className={`block text-xs font-medium text-rizq-ink-soft/70 uppercase tracking-wide mb-2 ${font}`}
+      >
         {tI18n("adjustPriceManually")}
       </label>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <input
+            id="manual-price"
             type="number"
             inputMode="decimal"
             min={0}
