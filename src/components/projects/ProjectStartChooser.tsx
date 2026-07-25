@@ -42,7 +42,7 @@ export function ProjectStartChooser({
   function setupDirectly() {
     setError(null);
     startTransition(async () => {
-      const r = await createBlankProject({ title: isAr ? "مشروع جديد" : "New project" });
+      const r = await createBlankProject({ title: t("newProject") });
       if (r.ok) router.push(`/projects/${r.project_id}?guided=1` as `/projects/${string}`);
       else setError(t("error"));
     });

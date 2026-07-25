@@ -234,7 +234,7 @@ export default async function ProposalDetailPage({
           <div
             className={`rounded-2xl border border-rizq-gold/20 bg-rizq-cream/60 p-8 text-center text-sm text-rizq-ink-soft ${font}`}
           >
-            {isAr ? "العرض غير متوفر حاليًا." : "Proposal data is not available."}
+            {t("proposalDataAvailable")}
           </div>
         )}
 
@@ -246,10 +246,10 @@ export default async function ProposalDetailPage({
                 {/* Word is the deliverable a client expects; PDF/print is secondary. */}
                 <DownloadWordButton
                   proposalId={id}
-                  label={isAr ? "تنزيل ملف Word" : "Download Word (.docx)"}
+                  label={t("downloadWordDocx")}
                   locale={locale as "ar" | "en"}
                 />
-                <PrintButton label={isAr ? "PDF / طباعة" : "PDF / Print"} locale={locale as "ar" | "en"} />
+                <PrintButton label={t("pdfPrint")} locale={locale as "ar" | "en"} />
               </div>
               <p className={`mt-2 text-xs text-rizq-ink-soft/70 ${font}`}>
                 {isAr
@@ -332,7 +332,7 @@ export default async function ProposalDetailPage({
   return (
     <AppShell
       locale={locale as "ar" | "en"}
-      title={isAr ? "عرض سعر" : "Proposal"}
+      title={t("proposal")}
       maxWidth={canEdit ? "full" : "reading"}
     >
       {/* Guided step indicator — shows here (the "price & propose" action), not on the project hub */}

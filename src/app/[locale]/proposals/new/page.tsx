@@ -94,7 +94,7 @@ export default async function ProposalNewPage({
   }));
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عرض جديد" : "New Proposal"} maxWidth="reading">
+    <AppShell locale={locale as "ar" | "en"} title={t("newProposal2")} maxWidth="reading">
       {forProjectId && (
         <GuidedFlowOverlay
           locale={locale as "ar" | "en"}

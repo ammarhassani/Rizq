@@ -39,6 +39,7 @@ export default async function InvoicesNewPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: "Invoices.form" });
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) {
@@ -118,7 +119,7 @@ export default async function InvoicesNewPage({
   }
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "فاتورة جديدة" : "New Invoice"} maxWidth="form">
+    <AppShell locale={locale as "ar" | "en"} title={t("newInvoice")} maxWidth="form">
       <div dir={isAr ? "rtl" : "ltr"}>
         <ContextualBackLink
           locale={locale as "ar" | "en"}

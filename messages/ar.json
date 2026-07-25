@@ -11,7 +11,14 @@
     "ctaPrimary": "ابدأ مجانًا",
     "ctaSecondary": "استكشف الأدوات",
     "trustBadge": "صنع في السعودية",
-    "comingSoon": "مُطلَقة الآن: ١٣ أداة"
+    "comingSoon": "مُطلَقة الآن: ١٣ أداة",
+    "n74": "٧٤٪",
+    "n18": "+٪١٨",
+    "completeOperatingSystemFreelanceWork": "نظام التشغيل الكامل لِعملك المستقلّ.",
+    "noonCoProposalReady": "عرض «شركة نون» جاهز",
+    "month": "دخل هذا الشهر",
+    "sar": "ريال",
+    "monthlyGoal": "الهدف الشهري"
   },
   "HowItWorks": {
     "eyebrow": "كيف يعمل",
@@ -395,7 +402,8 @@
         "welcome": {
           "title": "مرحباً في رِزق",
           "description": "دعنا نبني ملفك المهني معًا. هذا سيساعدك تسعّر بثقة وتحصل رزقك.",
-          "cta": "ابدأ الآن"
+          "cta": "ابدأ الآن",
+          "firstChoosePreferredLanguage": "أولًا، اختر لغتك المفضلة"
         },
         "identity": {
           "title": "الهوية ووثيقة العمل الحر",
@@ -413,7 +421,10 @@
           "commercialRegPlaceholder": "إن كنت صاحب منشأة",
           "vatRegistered": "مسجّل في ضريبة القيمة المضافة",
           "vatNumber": "الرقم الضريبي",
-          "vatNumberPlaceholder": "3XXXXXXXXXXXXXXXXX"
+          "vatNumberPlaceholder": "3XXXXXXXXXXXXXXXXX",
+          "documentNumberMustBe5": "رقم الوثيقة يجب أن يكون ٥–١٢ رقمًا.",
+          "fullName": "الاسم الكامل",
+          "asId": "كما في هويتك"
         },
         "location": {
           "title": "المدينة",
@@ -434,7 +445,8 @@
           "languages": "لغات العمل",
           "langAr": "العربية",
           "langEn": "الإنجليزية",
-          "langFr": "الفرنسية"
+          "langFr": "الفرنسية",
+          "level": "مستواك: "
         },
         "rates": {
           "title": "سجل الأسعار",
@@ -476,7 +488,8 @@
           "totalProjects": "إجمالي مشاريعك المنجزة",
           "totalProjectsPlaceholder": "مثال: 48",
           "notableClients": "أبرز عملائك (اختياري)",
-          "notableClientsPlaceholder": "اسم شركة أو مؤسسة، افصل بفاصلة"
+          "notableClientsPlaceholder": "اسم شركة أو مؤسسة، افصل بفاصلة",
+          "remove": "إزالة"
         },
         "brand": {
           "title": "الهوية التجارية",
@@ -503,7 +516,27 @@
           "aiTaglineGenerating": "جارٍ التفكير...",
           "aiTaglineDisclaimer": "هذه اقتراحات رِزق. راجعها وعدّلها قبل الاستخدام.",
           "aiTaglineUse": "استخدم هذا الشعار",
-          "aiTaglineError": "تعذّر اقتراح شعار. حاول مجددًا."
+          "aiTaglineError": "تعذّر اقتراح شعار. حاول مجددًا.",
+          "checkEmailPhoneNumber": "تحقّق من البريد أو رقم الجوال.",
+          "letRizqWriteIdentity": "دع رِزق يكتب هويتك",
+          "writing": "يكتب…",
+          "aiSuggestionEditFreely": "✦ اقتراح ذكاء اصطناعي — عدّله كما تشاء.",
+          "couldnTGenerateTryAgain": "تعذّر التوليد. حاول مرة أخرى.",
+          "brandName2": "اسم علامتك التجارية",
+          "livePreviewProposal": "معاينة حية لعرضك",
+          "brand": "اسمك التجاري",
+          "proposal": "عرض سعر",
+          "tagline": "الشعار (Tagline)",
+          "eGDesignReflects": "مثال: تصميم يعكس هويتك",
+          "shortBio": "نبذة عنك",
+          "lineTwoAboutExperienceWhat": "سطران عن خبرتك وما يميّزك",
+          "logo": "شعارك",
+          "logoPreview": "معاينة الشعار",
+          "pasteLogoImageLinkHttps": "الصق رابط صورة الشعار (https://…)",
+          "enterValidEmail": "بريد إلكتروني غير صحيح.",
+          "enterValidSaudiMobile9": "جوال سعودي غير صحيح (٩ أرقام تبدأ بـ ٥).",
+          "sameAsPhone": "نفس رقم الجوال",
+          "enterValidSaudiMobile": "جوال سعودي غير صحيح."
         },
         "defaults": {
           "title": "الإعدادات الافتراضية",
@@ -539,7 +572,10 @@
           "preferredTone": "أسلوب التواصل مع العملاء",
           "toneFormal": "رسمي",
           "toneBalanced": "متوازن",
-          "toneFriendly": "ودّي"
+          "toneFriendly": "ودّي",
+          "bahr": "بحر",
+          "mostaql": "مستقل",
+          "khamsat": "خمسات"
         },
         "review": {
           "title": "المراجعة والإنهاء",
@@ -554,7 +590,9 @@
           "successTitle": "أهلًا بك في رِزق!",
           "successBody": "ملفك جاهز. ابدأ بأداة التسعير الآن."
         }
-      }
+      },
+      "profileStrength": "قوة ملفك",
+      "someLinksLookOffFix": "بعض الروابط غير صحيحة — صحّحها وأعد الحفظ."
     }
   },
   "Dashboard": {
@@ -635,7 +673,8 @@
     "createInvoice": "أنشئ فاتورة",
     "currencySarShort": "ر.س",
     "showLess": "عرض أقل",
-    "untitledProposal": "عرض بدون عنوان"
+    "untitledProposal": "عرض بدون عنوان",
+    "text": "٪"
   },
   "Tool": {
     "eyebrow": "أداة التسعير",
@@ -705,7 +744,8 @@
       "anonExhaustedBody": "أنشئ حسابًا مجانًا للحصول على ٣ استعلامات شهريًا.",
       "anonExhaustedCta": "إنشاء حساب",
       "pro": "غير محدود"
-    }
+    },
+    "pricingTool": "أداة التسعير"
   },
   "Share": {
     "title": "نتيجة رِزق",
@@ -833,13 +873,15 @@
       "placeholder": "اختر بندًا…",
       "searchPlaceholder": "ابحث في منتجاتك…",
       "noResults": "لا يوجد بند بهذا الاسم",
-      "footerAdd": "إضافة بند جديد"
+      "footerAdd": "إضافة بند جديد",
+      "sar": "ر.س"
     },
     "feePicker": {
       "placeholder": "أضف رسومًا…",
       "searchPlaceholder": "ابحث في الرسوم…",
       "noResults": "لا توجد رسوم بهذا الاسم",
-      "footerAdd": "إضافة رسوم جديدة"
+      "footerAdd": "إضافة رسوم جديدة",
+      "sar": "ر.س"
     },
     "addClient": {
       "title": "عميل جديد",
@@ -982,7 +1024,9 @@
         "extractionFailedBody": "قد تكون خدمة التحليل الذكي غير متاحة مؤقتًا. حاول مرة أخرى بعد لحظات، أو عدّل الرسالة أدناه وأعد المحاولة.",
         "extractionRetry": "حاول مجددًا",
         "generic": "حدث خطأ. حاول مرة أخرى."
-      }
+      },
+      "newProposal2": "عرض جديد",
+      "selectClientAddNewOne": "اختر عميلاً أو أضِف عميلاً جديدًا."
     },
     "share": {
       "downloadPdf": "تحميل PDF",
@@ -1019,7 +1063,8 @@
       "updated": "تم تحديث: {sections}",
       "scopeChange": "هذا يضيف عملًا جديدًا («{deliverable}») مما يغيّر السعر. أضِفه من المحرّر بالأسفل لإعادة التسعير.",
       "unavailable": "تحرير الذكاء الاصطناعي غير متاح حاليًا.",
-      "error": "حدث خطأ. حاول مرة أخرى."
+      "error": "حدث خطأ. حاول مرة أخرى.",
+      "text": "، "
     },
     "list": {
       "eyebrow": "عروضي",
@@ -1043,7 +1088,8 @@
       "yesterdayAgo": "أمس",
       "emptyTitle": "ما عندك أي عروض حتى الآن.",
       "emptyBody": "ألصق رسالة عميلك لإنشاء أول عرض احترافي بختم رِزق.",
-      "emptyCta": "أنشئ أول عرض"
+      "emptyCta": "أنشئ أول عرض",
+      "myProposals": "عروضي"
     },
     "detail": {
       "versionHistory": "سجل النسخ",
@@ -1071,7 +1117,8 @@
         "priceRange": "ضمن النطاق {min} إلى {max} ريال",
         "saveChanges": "حفظ التعديلات",
         "cancel": "إلغاء",
-        "savedAs": "تم الحفظ كنسخة {n}"
+        "savedAs": "تم الحفظ كنسخة {n}",
+        "saving": "جارٍ الحفظ…"
       },
       "shareModal": {
         "title": "مشاركة العرض",
@@ -1100,7 +1147,11 @@
       "projectTitleSaved": "تم حفظ عنوان المشروع",
       "couldnTSaveTitle": "تعذّر حفظ العنوان.",
       "projectTitle": "عنوان المشروع",
-      "eGBrandIdentityCoffee": "مثال: هوية بصرية لمحمصة قهوة"
+      "eGBrandIdentityCoffee": "مثال: هوية بصرية لمحمصة قهوة",
+      "proposalDataAvailable": "العرض غير متوفر حاليًا.",
+      "downloadWordDocx": "تنزيل ملف Word",
+      "pdfPrint": "PDF / طباعة",
+      "proposal": "عرض سعر"
     },
     "refine": {
       "edit": "تعديل",
@@ -1151,7 +1202,8 @@
       "namePromptSubmitting": "جارٍ الحفظ…",
       "setAsDefault": "تعيين كافتراضي",
       "startFromTemplate": "ابدأ من قالب / Start from a template",
-      "noTemplate": "بدون قالب"
+      "noTemplate": "بدون قالب",
+      "proposalTemplates": "قوالب العروض"
     },
     "followUps": {
       "doneGenerateProposal": "تم. أنشئ العرض",
@@ -1203,7 +1255,8 @@
       "generatingForecast": "جارٍ توليد الإسقاط…",
       "monthProjected": "هذا الشهر (متوقع)",
       "nextMonthProjected": "الشهر القادم (متوقع)",
-      "refresh": "تحديث"
+      "refresh": "تحديث",
+      "incomeTrend": "اتجاه الدخل"
     },
     "form": {
       "addTitle": "سجّل مشروع جديد",
@@ -1234,7 +1287,9 @@
         "amountRequired": "أدخل مبلغًا صحيحًا أكبر من الصفر.",
         "quotaExhausted": "وصلت للحد المجاني (٢٠ مشروع/شهر). ترقَّ للاحترافي.",
         "generic": "حدث خطأ. حاول مرة أخرى."
-      }
+      },
+      "logProject": "سجّل مشروع",
+      "sar": "ريال"
     },
     "detail": {
       "paymentTimeline": "سجل الدفعات",
@@ -1265,7 +1320,8 @@
       "deleted": "تم الحذف",
       "couldnTDelete": "تعذّر الحذف.",
       "linkedInvoice": "الفاتورة المرتبطة",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "sar": "ريال"
     },
     "ai": {
       "suggestedCategory": "تصنيف مقترح:",
@@ -1371,7 +1427,13 @@
     "connectInSettings": "اربط من الإعدادات",
     "noRepos": "لا توجد مستودعات عامة.",
     "attach": "إرفاق",
-    "attached": "مُرفَق"
+    "attached": "مُرفَق",
+    "sar": "ريال",
+    "status": "الحالة",
+    "linkedClient": "العميل المرتبط",
+    "couldSaveTryAgain": "تعذّر الحفظ. حاول مرة أخرى.",
+    "close": "إغلاق",
+    "edit": "تعديل"
   },
   "Wizard": {
     "startProject": "ابدأ مشروعاً",
@@ -1409,7 +1471,9 @@
     "pickerEmptyCta": "أنشئ عرضاً جديداً",
     "pickerNoResults": "لا توجد نتائج.",
     "setUpValue": "حدّد قيمة العمل",
-    "setUpValueDesc": "أضِف مبلغ المشروع لتبدأ الفوترة."
+    "setUpValueDesc": "أضِف مبلغ المشروع لتبدأ الفوترة.",
+    "newProject": "مشروع جديد",
+    "amountSar": "المبلغ (ريال)"
   },
   "Invoices": {
     "list": {
@@ -1434,7 +1498,8 @@
       "none": "لا شيء",
       "unlinkedClient": "عميل غير محدد",
       "due": "الاستحقاق:",
-      "sar": "ر.س"
+      "sar": "ر.س",
+      "invoices2": "الفواتير"
     },
     "form": {
       "addTitle": "فاتورة جديدة",
@@ -1470,7 +1535,11 @@
       "taxAndFeesLabel": "الضريبة والرسوم",
       "vatToggleLabel": "ضريبة القيمة المضافة (15%)",
       "vatToggleHint": "تُطبَّق على البنود والرسوم.",
-      "feesLabel": "الرسوم"
+      "feesLabel": "الرسوم",
+      "newInvoice": "فاتورة جديدة",
+      "sar": "ر.س",
+      "removeItem": "حذف البند",
+      "removeFee": "حذف الرسوم"
     },
     "detail": {
       "markSent": "تعيين كمُرسَلة",
@@ -1608,7 +1677,11 @@
       "couldnTDraftMessageTry": "حدث خطأ في صياغة الرسالة. حاول مرة أخرى.",
       "actions": "الإجراءات",
       "rizqAi": "ميزات رِزق AI",
-      "refreshPriority": "تحديث الأولوية"
+      "refreshPriority": "تحديث الأولوية",
+      "days": "يوم",
+      "sar": "ريال",
+      "due": "الاستحقاق:",
+      "overdue": "⚠ متأخرة"
     },
     "form": {
       "addTitle": "إضافة عميل جديد",
@@ -1657,7 +1730,8 @@
         "nameRequired": "اسم العميل مطلوب.",
         "quotaExhausted": "وصلت للحد المجاني (١٠ عملاء). ترقَّ للاحترافي.",
         "generic": "حدث خطأ. حاول مرة أخرى."
-      }
+      },
+      "newClient": "عميل جديد"
     },
     "ai": {
       "generateInsights": "تحليل رِزق: توليد ملاحظات",
@@ -1904,7 +1978,12 @@
       },
       "cta": "الترقية إلى برو",
       "dismiss": "ليس الآن"
-    }
+    },
+    "earlyProAccessRizq": "وصول احترافي مبكر، رِزق",
+    "n0Sar": "٠ ريال",
+    "somethingWentWrongTryAgain": "حدث خطأ. حاول مرة أخرى.",
+    "upgrade": "ترقية الحساب",
+    "close": "إغلاق"
   },
   "Hadaf": {
     "eyebrow": "برنامج هدف",
@@ -1943,7 +2022,13 @@
     "actionPlanError": "تعذّر توليد الخطة. حاول مرة أخرى.",
     "collapse": "إخفاء",
     "expand": "إظهار",
-    "navLink": "هدف"
+    "navLink": "هدف",
+    "hadaf": "هدف",
+    "hadafEligibility": "أهلية هدف",
+    "sarMonth": "ريال/شهر",
+    "sar": "ريال",
+    "days": "يوم",
+    "disclaimer": "إخلاء مسؤولية"
   },
   "AppShell": {
     "groups": {
@@ -2199,7 +2284,8 @@
       "sub": "مجاني للبدء. لا بطاقة ائتمان. ٣ استعلامات شهريًا في الباقة المجانية.",
       "cta": "ابدأ مجانًا"
     },
-    "footerApps": "الأدوات"
+    "footerApps": "الأدوات",
+    "sar": "ر.س"
   },
   "Settings": {
     "pageTitle": "الإعدادات",
@@ -2240,7 +2326,9 @@
     "profileStrength": "قوة ملفك",
     "completeProfileStrengthen": "أكمل ملفك لتقويته:",
     "profileComplete": "ملفك مكتمل بالكامل.",
-    "optionalExtrasIfHaveThem": "إضافات اختيارية (لمن لديه): تقوّي عرضك، وليست مطلوبة."
+    "optionalExtrasIfHaveThem": "إضافات اختيارية (لمن لديه): تقوّي عرضك، وليست مطلوبة.",
+    "delete": "حذف",
+    "completeProfile": "أكمل ملفك ←"
   },
   "StudioProfile": {
     "testimonials": {
@@ -2262,7 +2350,8 @@
       "save": "حفظ التوصيات",
       "saving": "جارٍ الحفظ…",
       "savedConfirm": "تم الحفظ",
-      "errorSave": "حدث خطأ. حاول مرة أخرى."
+      "errorSave": "حدث خطأ. حاول مرة أخرى.",
+      "stars": "نجوم"
     }
   },
   "Items": {
@@ -2282,7 +2371,8 @@
         "priceRequired": "أدخل سعرًا صحيحًا أكبر من صفر.",
         "generic": "حدث خطأ. حاول مرة أخرى."
       },
-      "saveChanges": "حفظ التغييرات"
+      "saveChanges": "حفظ التغييرات",
+      "sar": "ر.س"
     },
     "dialog": {
       "title": "بند جديد",
@@ -2377,6 +2467,7 @@
     "archivedToast": "تمت الأرشفة ({count})",
     "restoredToast": "تمت الاستعادة",
     "deletedToast": "تم الحذف ({count})",
-    "undo": "تراجع"
+    "undo": "تراجع",
+    "sar": "ر.س"
   }
 }

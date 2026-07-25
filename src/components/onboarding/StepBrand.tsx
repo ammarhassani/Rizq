@@ -88,7 +88,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
   const handleSave = () => {
     setError(null);
     if (!emailValid || !phoneValid || !waValid) {
-      setError(isAr ? "تحقّق من البريد أو رقم الجوال." : "Check your email or phone number.");
+      setError(t("checkEmailPhoneNumber"));
       return;
     }
     const fullPhone = contactPhone ? `+966${contactPhone}` : null;
@@ -144,7 +144,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <p className={`text-sm font-medium text-rizq-ink ${font}`}>
-              {isAr ? "دع رِزق يكتب هويتك" : "Let Rizq write your identity"}
+              {t("letRizqWriteIdentity")}
             </p>
             <p className={`text-xs text-rizq-ink-soft ${font}`}>
               {isAr
@@ -161,7 +161,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
             {isAiPending ? (
               <>
                 <Loader2 size={14} className="animate-spin" />
-                <span>{isAr ? "يكتب…" : "Writing…"}</span>
+                <span>{t("writing")}</span>
               </>
             ) : (
               <>
@@ -181,23 +181,23 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
         </div>
         {aiFilled && (
           <p className={`text-xs text-rizq-green ${font}`}>
-            {isAr ? "✦ اقتراح ذكاء اصطناعي — عدّله كما تشاء." : "✦ AI suggestion — edit it freely."}
+            {t("aiSuggestionEditFreely")}
           </p>
         )}
         {aiError && (
           <p className={`text-xs text-[var(--over)] ${font}`}>
-            {isAr ? "تعذّر التوليد. حاول مرة أخرى." : "Couldn't generate. Try again."}
+            {t("couldnTGenerateTryAgain")}
           </p>
         )}
       </div>
 
       <div>
-        <label className={labelCls}>{isAr ? "اسم علامتك التجارية" : "Brand name"}</label>
+        <label className={labelCls}>{t("brandName2")}</label>
         <input
           type="text"
           value={brandName}
           onChange={(e) => setBrandName(e.target.value)}
-          placeholder={isAr ? "مثال: استوديو التصميم" : "e.g. DesignStudio"}
+          placeholder={t("brandNamePlaceholder")}
           className={inputCls}
           maxLength={120}
           dir="auto"
@@ -215,14 +215,14 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           <div className="h-1.5 bg-gradient-to-r from-rizq-green to-rizq-gold" />
           <div className="p-4">
             <p className={`text-[10px] uppercase tracking-wide text-rizq-ink-soft/60 mb-2 ${font}`}>
-              {isAr ? "معاينة حية لعرضك" : "Live preview of your proposal"}
+              {t("livePreviewProposal")}
             </p>
             <div className="flex items-baseline justify-between gap-3">
               <span className={`text-base font-bold text-rizq-green ${font}`} dir="auto">
-                {brandName || (isAr ? "اسمك التجاري" : "Your brand")}
+                {brandName || (t("brand"))}
               </span>
               <span className={`text-[11px] text-rizq-ink-soft ${font}`}>
-                {isAr ? "عرض سعر" : "Proposal"}
+                {t("proposal")}
               </span>
             </div>
             {tagline && (
@@ -236,12 +236,12 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
 
       {/* Tagline */}
       <div>
-        <label className={labelCls}>{isAr ? "الشعار (Tagline)" : "Tagline"}</label>
+        <label className={labelCls}>{t("tagline")}</label>
         <input
           type="text"
           value={tagline}
           onChange={(e) => setTagline(e.target.value)}
-          placeholder={isAr ? "مثال: تصميم يعكس هويتك" : "e.g. Design that reflects you"}
+          placeholder={t("eGDesignReflects")}
           className={inputCls}
           maxLength={200}
           dir="auto"
@@ -250,11 +250,11 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
 
       {/* Bio — single field */}
       <div>
-        <label className={labelCls}>{isAr ? "نبذة عنك" : "Short bio"}</label>
+        <label className={labelCls}>{t("shortBio")}</label>
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          placeholder={isAr ? "سطران عن خبرتك وما يميّزك" : "A line or two about your experience and what sets you apart"}
+          placeholder={t("lineTwoAboutExperienceWhat")}
           className={`${inputCls} resize-none h-24`}
           maxLength={1000}
           dir="auto"
@@ -263,13 +263,13 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
 
       {/* Logo — paste an image link; live preview. (Real file upload needs a public bucket.) */}
       <div>
-        <label className={labelCls}>{isAr ? "شعارك" : "Your logo"}</label>
+        <label className={labelCls}>{t("logo")}</label>
         <div className="flex items-center gap-3">
           {logoUrl.trim() && !logoBroken ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
-              alt={isAr ? "معاينة الشعار" : "Logo preview"}
+              alt={t("logoPreview")}
               onError={() => setLogoBroken(true)}
               className="h-14 w-14 shrink-0 rounded-xl border border-rizq-gold/25 bg-white object-contain p-1"
             />
@@ -286,7 +286,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
                 setLogoUrl(e.target.value);
                 setLogoBroken(false);
               }}
-              placeholder={isAr ? "الصق رابط صورة الشعار (https://…)" : "Paste a logo image link (https://…)"}
+              placeholder={t("pasteLogoImageLinkHttps")}
               className={`${inputCls} font-sans`}
               dir="ltr"
             />
@@ -322,7 +322,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           </div>
           {!emailValid && (
             <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
-              {isAr ? "بريد إلكتروني غير صحيح." : "Enter a valid email."}
+              {t("enterValidEmail")}
             </p>
           )}
         </div>
@@ -351,7 +351,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           </div>
           {!phoneValid && (
             <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
-              {isAr ? "جوال سعودي غير صحيح (٩ أرقام تبدأ بـ ٥)." : "Enter a valid Saudi mobile (9 digits, starts with 5)."}
+              {t("enterValidSaudiMobile9")}
             </p>
           )}
         </div>
@@ -365,7 +365,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
                 onChange={(e) => setWaSameAsPhone(e.target.checked)}
                 className="h-3.5 w-3.5 accent-rizq-green"
               />
-              {isAr ? "نفس رقم الجوال" : "Same as phone"}
+              {t("sameAsPhone")}
             </label>
           </div>
           <div
@@ -392,7 +392,7 @@ export function StepBrand({ locale, profile, onNext, onBack, onSkip, autosave, o
           </div>
           {!waValid && (
             <p className={`mt-1 text-xs text-[var(--over)] ${font}`}>
-              {isAr ? "جوال سعودي غير صحيح." : "Enter a valid Saudi mobile."}
+              {t("enterValidSaudiMobile")}
             </p>
           )}
         </div>

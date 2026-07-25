@@ -256,7 +256,7 @@ export function EditProposalForm({
               {isPending ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  {isAr ? "جارٍ الحفظ…" : "Saving…"}
+                  {t("saving")}
                 </>
               ) : (
                 t("saveChanges")

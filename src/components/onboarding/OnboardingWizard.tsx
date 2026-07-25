@@ -150,7 +150,7 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
         {stepKey !== "welcome" && (
           <div className="pt-1">
             <div className={`flex items-center justify-between text-[11px] text-rizq-ink-soft/70 mb-1 ${font}`}>
-              <span>{isAr ? "قوة ملفك" : "Profile strength"}</span>
+              <span>{tv2("profileStrength")}</span>
               <span className="tabular font-semibold text-rizq-green">{profile.profile_completeness_pct}%</span>
             </div>
             <div className="h-1 rounded-full bg-rizq-gold/15 overflow-hidden">

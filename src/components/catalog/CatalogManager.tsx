@@ -51,7 +51,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = t("sar");
 
   const [tab, setTab] = React.useState<Tab>("items");
   const [status, setStatus] = React.useState<StatusFilter>("active");

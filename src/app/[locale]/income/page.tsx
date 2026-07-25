@@ -146,7 +146,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
   const pendingCount = currentMonthRow?.pending_count ?? 0;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "دفتر الدخل" : "Income Ledger"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={t("eyebrow")} maxWidth="wide">
       <div dir={dir}>
         {/* Page header — primary action top-start, consistent with the other
             list pages (Projects/Proposals/Clients/Invoices). (Audit P2) */}
@@ -226,7 +226,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
             <div dir={dir} className={`mt-4 pt-4 border-t border-rizq-gold/20 flex items-center gap-2 ${font}`}>
               <span className="text-xs text-rizq-ink-soft/50 tracking-wide uppercase">{t("projectionLabel")}</span>
               <span className="tabular font-sans text-sm font-semibold text-rizq-ink-soft">
-                {fmtPrice(projectionRow.current_month_projection, locale as "ar" | "en")} {isAr ? "ريال" : "SAR"}
+                {fmtPrice(projectionRow.current_month_projection, locale as "ar" | "en")} {t("sar")}
               </span>
               {projectionRow.confidence_low != null && projectionRow.confidence_high != null && (
                 <span className="text-xs text-rizq-ink-soft/50">
@@ -240,7 +240,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
         {/* Monthly income trend */}
         {incomeTrend.length >= 2 && (
           <div className={`rounded-3xl border border-rizq-gold/25 bg-[var(--raised)] p-6 sm:p-7 mb-8 ${font}`} dir={dir}>
-            <p className="eyebrow mb-4">{isAr ? "اتجاه الدخل" : "Income trend"}</p>
+            <p className="eyebrow mb-4">{t("incomeTrend")}</p>
             <TrendChart points={incomeTrend} locale={locale as "ar" | "en"} height={140} />
           </div>
         )}
@@ -252,7 +252,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
               {fmtMonth(prevMonthStart, locale as "ar" | "en")}
             </p>
             <p className="tabular font-sans text-sm font-semibold text-rizq-ink">
-              {fmtPrice(prevMonthRow.total_sar ?? 0, locale as "ar" | "en")} <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+              {fmtPrice(prevMonthRow.total_sar ?? 0, locale as "ar" | "en")} <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</span>
             </p>
           </div>
         )}

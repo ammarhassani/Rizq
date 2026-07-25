@@ -234,7 +234,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
             dir="ltr"
           />
           <span className={`absolute ${isAr ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 text-sm text-rizq-ink-soft/60 pointer-events-none ${font}`}>
-            {isAr ? "ريال" : "SAR"}
+            {t("sar")}
           </span>
         </div>
       </div>

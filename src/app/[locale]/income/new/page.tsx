@@ -35,6 +35,7 @@ export default async function IncomeNewPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const t = await getTranslations({ locale, namespace: "Income.form" });
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) {
@@ -58,7 +59,7 @@ export default async function IncomeNewPage({
   }));
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "سجّل مشروع" : "Log a Project"} maxWidth="form">
+    <AppShell locale={locale as "ar" | "en"} title={t("logProject")} maxWidth="form">
       <div dir={isAr ? "rtl" : "ltr"}>
         <ContextualBackLink
           locale={locale as "ar" | "en"}

@@ -158,7 +158,7 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
               dir="ltr"
             />
             <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
-              {isAr ? "ر.س" : "SAR"}
+              {t("sar")}
             </span>
           </div>
         </div>

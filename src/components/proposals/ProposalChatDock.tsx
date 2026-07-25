@@ -203,7 +203,7 @@ export function ProposalChatDock({
       const meta =
         res.modified.length > 0
           ? t("updated", {
-              sections: res.modified.map(labelFor).join(isAr ? "، " : ", "),
+              sections: res.modified.map(labelFor).join(t("text")),
             })
           : undefined;
       setMessages((m) => [...m, { id: nextId(), role: "ai", text: replyText, meta }]);

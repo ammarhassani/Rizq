@@ -82,7 +82,7 @@ export default async function InvoicesPage({ params }: { params: Promise<Params>
   const summary = { issuedTotal, paidTotal, overdueTotal, overdueCount };
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "الفواتير" : "Invoices"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={t("invoices2")} maxWidth="wide">
       <div dir={dir}>
         {/* Page header — primary action lives top-start, consistent with the
             other list pages (Projects/Proposals/Clients). (Audit P2) */}

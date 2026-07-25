@@ -81,7 +81,7 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosav
       }
       if (bad.size > 0) {
         // Valid links saved; stay on the step so the user can fix the flagged one(s).
-        setError(isAr ? "بعض الروابط غير صحيحة — صحّحها وأعد الحفظ." : "Some links look off — fix them and save again.");
+        setError(tv2("someLinksLookOffFix"));
         return;
       }
       onNext(result.completeness);

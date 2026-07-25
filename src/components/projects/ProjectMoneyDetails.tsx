@@ -65,7 +65,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
         },
       });
       if (!result.ok) {
-        setError(isAr ? "تعذّر الحفظ. حاول مرة أخرى." : "Could not save. Try again.");
+        setError(t("couldSaveTryAgain"));
         return;
       }
       setSaved(true);
@@ -86,7 +86,7 @@ export function ProjectMoneyDetails({ locale, gigId, initial }: Props) {
           className={`inline-flex items-center gap-1.5 rounded-full border border-rizq-gold/30 bg-[var(--raised)] px-3 py-1.5 text-xs font-medium text-rizq-ink-soft hover:text-rizq-ink hover:border-rizq-green/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 ${font}`}
         >
           <ChevronDown size={13} className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
-          {open ? (isAr ? "إغلاق" : "Close") : (isAr ? "تعديل" : "Edit")}
+          {open ? (t("close")) : (t("edit"))}
         </button>
       </div>
       {open && (

@@ -44,7 +44,7 @@ export function SetUpValuePanel({ locale, projectId }: { locale: "ar" | "en"; pr
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label htmlFor="setup-amount" className={`block text-xs text-rizq-ink-soft/70 mb-1 ${font}`}>
-              {isAr ? "المبلغ (ريال)" : "Amount (SAR)"}
+              {t("amountSar")}
             </label>
             <input
               id="setup-amount"

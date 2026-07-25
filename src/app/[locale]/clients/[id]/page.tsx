@@ -205,7 +205,7 @@ export default async function ClientDetailPage({
             {client.avg_payment_days != null && (
               <div>
                 <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("avgPaymentDays")}</p>
-                <p className={`text-sm font-medium text-rizq-ink ${font}`}>{Math.round(client.avg_payment_days)} {isAr ? "يوم" : "days"}</p>
+                <p className={`text-sm font-medium text-rizq-ink ${font}`}>{Math.round(client.avg_payment_days)} {t("days")}</p>
               </div>
             )}
           </div>
@@ -265,7 +265,7 @@ export default async function ClientDetailPage({
                   </span>
                   <span className="tabular font-sans text-sm font-semibold text-rizq-ink">
                     {p.price_anchor ? fmtPrice(p.price_anchor, locale as "ar" | "en") : "—"}
-                    {p.price_anchor ? <span className={`ms-1 text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</span> : null}
+                    {p.price_anchor ? <span className={`ms-1 text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</span> : null}
                   </span>
                 </Link>
               ))}

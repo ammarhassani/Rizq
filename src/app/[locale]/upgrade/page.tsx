@@ -57,7 +57,7 @@ export default async function UpgradePage({
   const font = isAr ? "font-arabic" : "font-sans";
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "ترقية الحساب" : "Upgrade"} maxWidth="reading">
+    <AppShell locale={locale as "ar" | "en"} title={t("upgrade")} maxWidth="reading">
       <div>
         {/* Header */}
         <div className={`mb-8 sm:mb-10 ${isAr ? "text-right" : "text-left"}`}>

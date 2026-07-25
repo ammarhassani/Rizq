@@ -43,7 +43,7 @@ export function DemoInvoice({ locale }: Props) {
   const nf = new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
     maximumFractionDigits: 0,
   });
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = t("sar");
   const brand = isAr ? BRAND_AR : BRAND_EN;
   const client = isAr ? CLIENT_AR : CLIENT_EN;
 

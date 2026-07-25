@@ -11,7 +11,14 @@
     "ctaPrimary": "Start free",
     "ctaSecondary": "Explore the apps",
     "trustBadge": "Made in Saudi",
-    "comingSoon": "Live now: 13 tools"
+    "comingSoon": "Live now: 13 tools",
+    "n74": "74%",
+    "n18": "+18%",
+    "completeOperatingSystemFreelanceWork": "The complete operating system for your freelance work.",
+    "noonCoProposalReady": "Noon Co. proposal ready",
+    "month": "This month",
+    "sar": "SAR",
+    "monthlyGoal": "Monthly goal"
   },
   "HowItWorks": {
     "eyebrow": "How it works",
@@ -395,7 +402,8 @@
         "welcome": {
           "title": "Welcome to Rizq",
           "description": "Let's build your professional profile together. This helps you price with confidence and earn your rizq.",
-          "cta": "Let's go"
+          "cta": "Let's go",
+          "firstChoosePreferredLanguage": "First, choose your preferred language"
         },
         "identity": {
           "title": "Identity & FL Number",
@@ -413,7 +421,10 @@
           "commercialRegPlaceholder": "If you have a registered business",
           "vatRegistered": "VAT registered",
           "vatNumber": "VAT number",
-          "vatNumberPlaceholder": "3XXXXXXXXXXXXXXXXX"
+          "vatNumberPlaceholder": "3XXXXXXXXXXXXXXXXX",
+          "documentNumberMustBe5": "Document number must be 5–12 digits.",
+          "fullName": "Full name",
+          "asId": "As on your ID"
         },
         "location": {
           "title": "City & Location",
@@ -434,7 +445,8 @@
           "languages": "Working languages",
           "langAr": "Arabic",
           "langEn": "English",
-          "langFr": "French"
+          "langFr": "French",
+          "level": "Level: "
         },
         "rates": {
           "title": "Rate History",
@@ -476,7 +488,8 @@
           "totalProjects": "Total projects completed",
           "totalProjectsPlaceholder": "e.g. 48",
           "notableClients": "Notable clients (optional)",
-          "notableClientsPlaceholder": "Company or brand name, comma-separated"
+          "notableClientsPlaceholder": "Company or brand name, comma-separated",
+          "remove": "Remove"
         },
         "brand": {
           "title": "Brand Identity",
@@ -503,7 +516,27 @@
           "aiTaglineGenerating": "Thinking…",
           "aiTaglineDisclaimer": "These are Rizq suggestions. Review and edit before using.",
           "aiTaglineUse": "Use this tagline",
-          "aiTaglineError": "Could not generate a tagline. Please try again."
+          "aiTaglineError": "Could not generate a tagline. Please try again.",
+          "checkEmailPhoneNumber": "Check your email or phone number.",
+          "letRizqWriteIdentity": "Let Rizq write your identity",
+          "writing": "Writing…",
+          "aiSuggestionEditFreely": "✦ AI suggestion — edit it freely.",
+          "couldnTGenerateTryAgain": "Couldn't generate. Try again.",
+          "brandName2": "Brand name",
+          "livePreviewProposal": "Live preview of your proposal",
+          "brand": "Your brand",
+          "proposal": "Proposal",
+          "tagline": "Tagline",
+          "eGDesignReflects": "e.g. Design that reflects you",
+          "shortBio": "Short bio",
+          "lineTwoAboutExperienceWhat": "A line or two about your experience and what sets you apart",
+          "logo": "Your logo",
+          "logoPreview": "Logo preview",
+          "pasteLogoImageLinkHttps": "Paste a logo image link (https://…)",
+          "enterValidEmail": "Enter a valid email.",
+          "enterValidSaudiMobile9": "Enter a valid Saudi mobile (9 digits, starts with 5).",
+          "sameAsPhone": "Same as phone",
+          "enterValidSaudiMobile": "Enter a valid Saudi mobile."
         },
         "defaults": {
           "title": "Business Defaults",
@@ -539,7 +572,10 @@
           "preferredTone": "Communication style with clients",
           "toneFormal": "Formal",
           "toneBalanced": "Balanced",
-          "toneFriendly": "Friendly"
+          "toneFriendly": "Friendly",
+          "bahr": "Bahr",
+          "mostaql": "Mostaql",
+          "khamsat": "Khamsat"
         },
         "review": {
           "title": "Review & Complete",
@@ -554,7 +590,9 @@
           "successTitle": "Welcome to Rizq!",
           "successBody": "Your profile is ready. Start the pricing tool now."
         }
-      }
+      },
+      "profileStrength": "Profile strength",
+      "someLinksLookOffFix": "Some links look off — fix them and save again."
     }
   },
   "Dashboard": {
@@ -635,7 +673,8 @@
     "createInvoice": "Create an invoice",
     "currencySarShort": "SAR",
     "showLess": "Show less",
-    "untitledProposal": "Untitled proposal"
+    "untitledProposal": "Untitled proposal",
+    "text": "%"
   },
   "Tool": {
     "eyebrow": "Pricing tool",
@@ -705,7 +744,8 @@
       "anonExhaustedBody": "Create a free account for 3 queries per month.",
       "anonExhaustedCta": "Create account",
       "pro": "Unlimited"
-    }
+    },
+    "pricingTool": "Pricing Tool"
   },
   "Share": {
     "title": "Rizq result",
@@ -833,13 +873,15 @@
       "placeholder": "Select an item…",
       "searchPlaceholder": "Search your items…",
       "noResults": "No item by that name",
-      "footerAdd": "Add a new item"
+      "footerAdd": "Add a new item",
+      "sar": "SAR"
     },
     "feePicker": {
       "placeholder": "Add a fee…",
       "searchPlaceholder": "Search fees…",
       "noResults": "No fee by that name",
-      "footerAdd": "Add a new fee"
+      "footerAdd": "Add a new fee",
+      "sar": "SAR"
     },
     "addClient": {
       "title": "New client",
@@ -982,7 +1024,9 @@
         "extractionFailedBody": "The AI analysis service may be temporarily unavailable. Try again in a moment, or edit the message below and retry.",
         "extractionRetry": "Try again",
         "generic": "Something went wrong. Please try again."
-      }
+      },
+      "newProposal2": "New Proposal",
+      "selectClientAddNewOne": "Select a client, or add a new one."
     },
     "share": {
       "downloadPdf": "Download PDF",
@@ -1019,7 +1063,8 @@
       "updated": "Updated: {sections}",
       "scopeChange": "That adds new work (\"{deliverable}\"), which changes the price. Add it in the editor below to re-price.",
       "unavailable": "AI editing isn't available right now.",
-      "error": "Something went wrong. Please try again."
+      "error": "Something went wrong. Please try again.",
+      "text": ", "
     },
     "list": {
       "eyebrow": "My proposals",
@@ -1043,7 +1088,8 @@
       "yesterdayAgo": "Yesterday",
       "emptyTitle": "No proposals yet.",
       "emptyBody": "Paste a client message to create your first professional proposal with a Rizq stamp.",
-      "emptyCta": "Create your first proposal"
+      "emptyCta": "Create your first proposal",
+      "myProposals": "My Proposals"
     },
     "detail": {
       "versionHistory": "Version history",
@@ -1071,7 +1117,8 @@
         "priceRange": "within {min} to {max} SAR",
         "saveChanges": "Save changes",
         "cancel": "Cancel",
-        "savedAs": "Saved as v{n}"
+        "savedAs": "Saved as v{n}",
+        "saving": "Saving…"
       },
       "shareModal": {
         "title": "Share proposal",
@@ -1100,7 +1147,11 @@
       "projectTitleSaved": "Project title saved",
       "couldnTSaveTitle": "Couldn't save the title.",
       "projectTitle": "Project title",
-      "eGBrandIdentityCoffee": "e.g. Brand identity for a coffee roastery"
+      "eGBrandIdentityCoffee": "e.g. Brand identity for a coffee roastery",
+      "proposalDataAvailable": "Proposal data is not available.",
+      "downloadWordDocx": "Download Word (.docx)",
+      "pdfPrint": "PDF / Print",
+      "proposal": "Proposal"
     },
     "refine": {
       "edit": "Edit",
@@ -1151,7 +1202,8 @@
       "namePromptSubmitting": "Saving…",
       "setAsDefault": "Set as default",
       "startFromTemplate": "Start from a template",
-      "noTemplate": "No template"
+      "noTemplate": "No template",
+      "proposalTemplates": "Proposal Templates"
     },
     "followUps": {
       "doneGenerateProposal": "Done. Generate proposal",
@@ -1203,7 +1255,8 @@
       "generatingForecast": "Generating forecast…",
       "monthProjected": "This month (projected)",
       "nextMonthProjected": "Next month (projected)",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "incomeTrend": "Income trend"
     },
     "form": {
       "addTitle": "Log a new project",
@@ -1234,7 +1287,9 @@
         "amountRequired": "Enter a valid amount greater than zero.",
         "quotaExhausted": "Free limit reached (20 projects/month). Upgrade to Pro.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "logProject": "Log a Project",
+      "sar": "SAR"
     },
     "detail": {
       "paymentTimeline": "Payment timeline",
@@ -1265,7 +1320,8 @@
       "deleted": "Deleted",
       "couldnTDelete": "Couldn't delete.",
       "linkedInvoice": "Linked invoice",
-      "actions": "Actions"
+      "actions": "Actions",
+      "sar": "SAR"
     },
     "ai": {
       "suggestedCategory": "Suggested category:",
@@ -1371,7 +1427,13 @@
     "connectInSettings": "Connect in Settings",
     "noRepos": "No public repositories found.",
     "attach": "Attach",
-    "attached": "Attached"
+    "attached": "Attached",
+    "sar": "SAR",
+    "status": "Status",
+    "linkedClient": "Linked client",
+    "couldSaveTryAgain": "Could not save. Try again.",
+    "close": "Close",
+    "edit": "Edit"
   },
   "Wizard": {
     "startProject": "Start a project",
@@ -1409,7 +1471,9 @@
     "pickerEmptyCta": "Create a new proposal",
     "pickerNoResults": "No results.",
     "setUpValue": "Set the value",
-    "setUpValueDesc": "Add the project amount to start invoicing."
+    "setUpValueDesc": "Add the project amount to start invoicing.",
+    "newProject": "New project",
+    "amountSar": "Amount (SAR)"
   },
   "Invoices": {
     "list": {
@@ -1434,7 +1498,8 @@
       "none": "none",
       "unlinkedClient": "Unlinked client",
       "due": "Due:",
-      "sar": "SAR"
+      "sar": "SAR",
+      "invoices2": "Invoices"
     },
     "form": {
       "addTitle": "New invoice",
@@ -1470,7 +1535,11 @@
       "taxAndFeesLabel": "Tax & Fees",
       "vatToggleLabel": "VAT (15%)",
       "vatToggleHint": "Applied to items and fees.",
-      "feesLabel": "Fees"
+      "feesLabel": "Fees",
+      "newInvoice": "New Invoice",
+      "sar": "SAR",
+      "removeItem": "Remove item",
+      "removeFee": "Remove fee"
     },
     "detail": {
       "markSent": "Mark as sent",
@@ -1608,7 +1677,11 @@
       "couldnTDraftMessageTry": "Couldn't draft the message. Try again.",
       "actions": "Actions",
       "rizqAi": "Rizq AI",
-      "refreshPriority": "Refresh priority"
+      "refreshPriority": "Refresh priority",
+      "days": "days",
+      "sar": "SAR",
+      "due": "Due:",
+      "overdue": "⚠ Overdue"
     },
     "form": {
       "addTitle": "Add new client",
@@ -1657,7 +1730,8 @@
         "nameRequired": "Client name is required.",
         "quotaExhausted": "Free limit reached (10 clients). Upgrade to Pro.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "newClient": "New Client"
     },
     "ai": {
       "generateInsights": "Rizq Analysis: Generate insights",
@@ -1904,7 +1978,12 @@
       },
       "cta": "Upgrade to Pro",
       "dismiss": "Not now"
-    }
+    },
+    "earlyProAccessRizq": "Early Pro access, Rizq",
+    "n0Sar": "0 SAR",
+    "somethingWentWrongTryAgain": "Something went wrong. Try again.",
+    "upgrade": "Upgrade",
+    "close": "Close"
   },
   "Hadaf": {
     "eyebrow": "Hadaf Program",
@@ -1943,7 +2022,13 @@
     "actionPlanError": "Could not generate the plan. Try again.",
     "collapse": "Collapse",
     "expand": "Expand",
-    "navLink": "Hadaf"
+    "navLink": "Hadaf",
+    "hadaf": "HADAF",
+    "hadafEligibility": "HADAF Eligibility",
+    "sarMonth": "SAR/month",
+    "sar": "SAR",
+    "days": "days",
+    "disclaimer": "Disclaimer"
   },
   "AppShell": {
     "groups": {
@@ -2199,7 +2284,8 @@
       "sub": "Free to start. No credit card. 3 queries per month on the free plan.",
       "cta": "Start free"
     },
-    "footerApps": "Tools"
+    "footerApps": "Tools",
+    "sar": "SAR"
   },
   "Settings": {
     "pageTitle": "Settings",
@@ -2240,7 +2326,9 @@
     "profileStrength": "Profile strength",
     "completeProfileStrengthen": "Complete your profile to strengthen it:",
     "profileComplete": "Your profile is complete.",
-    "optionalExtrasIfHaveThem": "Optional extras (if you have them): strengthen your pitch, never required."
+    "optionalExtrasIfHaveThem": "Optional extras (if you have them): strengthen your pitch, never required.",
+    "delete": "DELETE",
+    "completeProfile": "Complete your profile →"
   },
   "StudioProfile": {
     "testimonials": {
@@ -2262,7 +2350,8 @@
       "save": "Save testimonials",
       "saving": "Saving…",
       "savedConfirm": "Saved",
-      "errorSave": "Something went wrong. Please try again."
+      "errorSave": "Something went wrong. Please try again.",
+      "stars": "stars"
     }
   },
   "Items": {
@@ -2282,7 +2371,8 @@
         "priceRequired": "Enter a valid price greater than zero.",
         "generic": "Something went wrong. Try again."
       },
-      "saveChanges": "Save changes"
+      "saveChanges": "Save changes",
+      "sar": "SAR"
     },
     "dialog": {
       "title": "New item",
@@ -2377,6 +2467,7 @@
     "archivedToast": "Archived ({count})",
     "restoredToast": "Restored",
     "deletedToast": "Deleted ({count})",
-    "undo": "Undo"
+    "undo": "Undo",
+    "sar": "SAR"
   }
 }

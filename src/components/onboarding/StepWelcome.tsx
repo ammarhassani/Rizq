@@ -52,7 +52,7 @@ export function StepWelcome({ locale, onNext }: StepProps) {
       {/* Row 1 — preferred language */}
       <div className="space-y-3">
         <p className={`text-sm font-semibold text-rizq-ink ${font}`}>
-          {isAr ? "أولًا، اختر لغتك المفضلة" : "First, choose your preferred language"}
+          {t("firstChoosePreferredLanguage")}
         </p>
         <div className="grid grid-cols-2 gap-3">
           {langs.map((l) => {

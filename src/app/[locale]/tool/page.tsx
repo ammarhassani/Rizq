@@ -76,7 +76,7 @@ export default async function ToolPage({
   return (
     <AppShell
       locale={locale}
-      title={isAr ? "أداة التسعير" : "Pricing Tool"}
+      title={t("pricingTool")}
       maxWidth="reading"
     >
       <div dir={isAr ? "rtl" : "ltr"}>

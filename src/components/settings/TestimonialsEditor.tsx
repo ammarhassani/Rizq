@@ -191,7 +191,7 @@ export function TestimonialsEditor({ locale, initial }: Props) {
                         ? "text-rizq-gold"
                         : "text-rizq-gold/30 hover:text-rizq-gold/60"
                     }`}
-                    aria-label={`${r} ${isAr ? "نجوم" : "stars"}`}
+                    aria-label={`${r} ${t("stars")}`}
                     aria-pressed={row.rating === r}
                   >
                     ★

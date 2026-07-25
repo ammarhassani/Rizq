@@ -43,7 +43,7 @@ export function ItemPicker({ locale, items, onPick, id }: Props) {
       `${new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
-      }).format(n)} ${isAr ? "ر.س" : "SAR"}`,
+      }).format(n)} ${t("sar")}`,
     [isAr]
   );
 

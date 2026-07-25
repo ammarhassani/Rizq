@@ -196,7 +196,7 @@ export default async function GigDetailPage({
               <p className="tabular font-sans text-2xl font-bold text-rizq-green leading-none">
                 {fmtPrice(gig.amount_sar, locale as "ar" | "en")}
               </p>
-              <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+              <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
               <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}>
                 {statusLabel}
               </span>
@@ -245,7 +245,7 @@ export default async function GigDetailPage({
               </div>
               <div className="text-end">
                 <p className="tabular font-sans text-sm font-semibold text-rizq-ink">{fmtPrice(gig.deposit_sar ?? null, locale as "ar" | "en")}</p>
-                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
               </div>
             </div>
 
@@ -269,7 +269,7 @@ export default async function GigDetailPage({
               </div>
               <div className="text-end">
                 <p className="tabular font-sans text-sm font-semibold text-rizq-ink">{fmtPrice(gig.remaining_sar ?? null, locale as "ar" | "en")}</p>
-                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+                <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
               </div>
             </div>
           </div>
@@ -297,7 +297,7 @@ export default async function GigDetailPage({
               href={`/proposals/${gig.proposal_id}` as `/proposals/${string}`}
               className={`flex items-center justify-between gap-3 rounded-xl border border-rizq-gold/15 bg-[var(--raised)] px-4 py-3 hover:border-rizq-green/30 hover:bg-rizq-cream/80 transition-all ${font}`}
             >
-              <span className={`text-sm font-medium text-rizq-ink ${font}`}>{isAr ? "عرض تقديمي مرتبط" : "Linked proposal"}</span>
+              <span className={`text-sm font-medium text-rizq-ink ${font}`}>{t("linkedProposal")}</span>
               <span className="text-sm text-rizq-ink-soft/60">→</span>
             </Link>
           </section>

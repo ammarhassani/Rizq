@@ -27,8 +27,8 @@ export async function Hero({ locale }: Props) {
   const nf = new Intl.NumberFormat(isAr ? "ar-SA" : "en-US");
   const income = nf.format(24800);
   const goal = nf.format(35000);
-  const pct = isAr ? "٧٤٪" : "74%";
-  const delta = isAr ? "+٪١٨" : "+18%";
+  const pct = t("n74");
+  const delta = t("n18");
 
   return (
     <section aria-labelledby="hero-heading" className="relative overflow-hidden">
@@ -57,7 +57,7 @@ export async function Hero({ locale }: Props) {
                 id="hero-heading"
                 className={`max-w-xl font-display text-[clamp(2.2rem,4.6vw,2.75rem)] font-bold leading-[1.15] text-rizq-ink ${font}`}
               >
-                {isAr ? "نظام التشغيل الكامل لِعملك المستقلّ." : "The complete operating system for your freelance work."}
+                {t("completeOperatingSystemFreelanceWork")}
               </h1>
             </Reveal>
             <Reveal asMount delay={0.3} direction="side">
@@ -123,7 +123,7 @@ export async function Hero({ locale }: Props) {
                   <FileText size={14} strokeWidth={1.9} aria-hidden />
                 </span>
                 <span className="text-xs font-semibold text-rizq-ink">
-                  {isAr ? "عرض «شركة نون» جاهز" : "Noon Co. proposal ready"}
+                  {t("noonCoProposalReady")}
                 </span>
               </div>
 
@@ -132,14 +132,14 @@ export async function Hero({ locale }: Props) {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className={`text-sm text-[var(--content-muted)] ${font}`}>
-                      {isAr ? "دخل هذا الشهر" : "This month"}
+                      {t("month")}
                     </p>
                     <p className="mt-1 flex items-baseline gap-2">
                       <span className="tabular font-sans text-4xl sm:text-5xl font-bold aurora-text-m leading-none">
                         {income}
                       </span>
                       <span className={`text-sm text-[var(--content-muted)] ${font}`}>
-                        {isAr ? "ريال" : "SAR"}
+                        {t("sar")}
                       </span>
                     </p>
                     <span className="mt-2 inline-flex items-center gap-1 rounded-full status-positive px-2.5 py-1 text-xs font-semibold tabular">
@@ -190,10 +190,10 @@ export async function Hero({ locale }: Props) {
                 {/* Goal line */}
                 <div className={`mt-4 pt-4 border-t border-[var(--line)] flex items-center justify-between ${font}`}>
                   <span className="text-xs text-[var(--content-muted)]">
-                    {isAr ? "الهدف الشهري" : "Monthly goal"}
+                    {t("monthlyGoal")}
                   </span>
                   <span className="tabular text-xs font-semibold text-rizq-ink">
-                    {goal} {isAr ? "ريال" : "SAR"}
+                    {goal} {t("sar")}
                   </span>
                 </div>
               </div>

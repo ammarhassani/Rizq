@@ -179,7 +179,7 @@ export function UpgradeModal({ open, onClose, locale, reason }: Props) {
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-full p-1.5 text-rizq-ink-soft hover:text-rizq-ink hover:bg-rizq-ink/8 transition-colors"
-            aria-label={isAr ? "إغلاق" : "Close"}
+            aria-label={t("close")}
           >
             <X size={18} />
           </button>

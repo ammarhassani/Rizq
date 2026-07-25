@@ -136,7 +136,7 @@ export function StepProfessional({ locale, profile, onNext, onBack, onSkip, auto
               className={`text-xs ${derivedTier ? "text-rizq-green font-medium" : "text-rizq-ink-soft"} ${font}`}
             >
               {derivedTier
-                ? `${isAr ? "مستواك: " : "Level: "}${derivedTier.label}`
+                ? `${t("level")}${derivedTier.label}`
                 : isAr
                   ? "يُحدَّد مستواك تلقائيًا من سنوات خبرتك"
                   : "Your level is set automatically from your years"}

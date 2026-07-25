@@ -69,7 +69,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
   // Profile strength for the summary (same model as onboarding + the profile page).
   const { snapshot: profileSnapshot } = await loadProfileSnapshot(supabase, userData.user.id);
   const profileStrength = computeStrength(profileSnapshot);
-  const confirmPhrase = isAr ? "حذف" : "DELETE";
+  const confirmPhrase = t("delete");
 
   // Tier display
   const tierLabel =
@@ -80,7 +80,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
       : t("tierFree");
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "الإعدادات" : "Settings"} maxWidth="form">
+    <AppShell locale={locale as "ar" | "en"} title={t("pageTitle")} maxWidth="form">
       <div dir={dir}>
         {/* Back link */}
         <Link
@@ -157,7 +157,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
             <div className={`mt-5 pt-5 border-t border-rizq-gold/20 ${font}`}>
               <div className="flex items-center justify-between gap-3 mb-2">
                 <span className={`text-xs text-rizq-ink-soft/70 ${font}`}>
-                  {isAr ? "قوة الملف المهني" : "Profile strength"}
+                  {t("profileStrength")}
                 </span>
                 <span className="tabular font-sans text-sm font-bold text-rizq-green">
                   {profileStrength}%
@@ -179,7 +179,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
                 href="/settings/profile"
                 className={`text-sm text-rizq-green hover:underline ${font}`}
               >
-                {isAr ? "أكمل ملفك ←" : "Complete your profile →"}
+                {t("completeProfile")}
               </Link>
               {role === "free" && (
                 <Link

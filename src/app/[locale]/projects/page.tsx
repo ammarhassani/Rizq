@@ -63,7 +63,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
   }
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "المشاريع" : "Projects"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={t("indexEyebrow")} maxWidth="wide">
       <div dir={dir}>
         <div className="mb-6 sm:mb-8 flex items-start justify-between gap-4">
           <div>
@@ -116,7 +116,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
                         <p className="tabular font-sans text-base font-bold text-rizq-green leading-none">
                           {fmtPrice(p.amountSar, locale as "ar" | "en")}
                         </p>
-                        <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{isAr ? "ريال" : "SAR"}</p>
+                        <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
                       </div>
                     </div>
 

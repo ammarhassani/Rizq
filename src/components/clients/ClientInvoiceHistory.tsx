@@ -72,8 +72,8 @@ export function ClientInvoiceHistory({ locale, invoices }: Props) {
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
-  const heading = isAr ? "سجل الفواتير" : "Invoice history";
-  const emptyText = isAr ? "لا توجد فواتير لهذا العميل حتى الآن." : "No invoices for this client yet.";
+  const heading = tI18n("invoiceHistory");
+  const emptyText = tI18n("invoiceHistoryEmpty");
   const today = new Date();
 
   if (invoices.length === 0) {
@@ -112,12 +112,12 @@ export function ClientInvoiceHistory({ locale, invoices }: Props) {
                   </span>
                   {inv.due_date && (
                     <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>
-                      {isAr ? "الاستحقاق:" : "Due:"} {fmtDate(inv.due_date, locale)}
+                      {tI18n("due")} {fmtDate(inv.due_date, locale)}
                     </span>
                   )}
                   {overdueFlag && (
                     <span className={`text-xs font-medium text-[var(--over)] ${font}`}>
-                      {isAr ? "⚠ متأخرة" : "⚠ Overdue"}
+                      {tI18n("overdue")}
                     </span>
                   )}
                 </div>
@@ -127,7 +127,7 @@ export function ClientInvoiceHistory({ locale, invoices }: Props) {
                   {fmtPrice(inv.total_sar, locale)}
                 </p>
                 <p className={`text-xs text-rizq-ink-soft/60 mt-0.5 ${font}`}>
-                  {isAr ? "ريال" : "SAR"}
+                  {tI18n("sar")}
                 </p>
               </div>
             </Link>

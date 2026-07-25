@@ -76,7 +76,7 @@ export default async function ProposalTemplatesPage({
   const templates = templatesResult.ok ? templatesResult.templates : [];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "قوالب العروض" : "Proposal Templates"} maxWidth="reading">
+    <AppShell locale={locale as "ar" | "en"} title={t("proposalTemplates")} maxWidth="reading">
       <div dir={isAr ? "rtl" : "ltr"}>
         {/* Back link */}
         <Link

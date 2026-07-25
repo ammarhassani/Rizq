@@ -29,7 +29,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
   const handleSave = () => {
     setError(null);
     if (!flValid) {
-      setError(isAr ? "رقم الوثيقة يجب أن يكون ٥–١٢ رقمًا." : "Document number must be 5–12 digits.");
+      setError(t("documentNumberMustBe5"));
       return;
     }
     startTransition(async () => {
@@ -63,12 +63,12 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
     >
       {/* Full name — single field, direction follows what they type */}
       <div className="sm:col-span-2">
-        <label className={labelCls}>{isAr ? "الاسم الكامل" : "Full name"}</label>
+        <label className={labelCls}>{t("fullName")}</label>
         <input
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder={isAr ? "كما في هويتك" : "As on your ID"}
+          placeholder={t("asId")}
           className={inputCls}
           maxLength={120}
           dir="auto"

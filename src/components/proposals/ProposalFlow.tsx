@@ -105,7 +105,7 @@ export function ProposalFlow({ locale, specialties, templates = [], clients = []
     if (!selectedClientId) {
       setView({
         kind: "form",
-        error: isAr ? "اختر عميلاً أو أضِف عميلاً جديدًا." : "Select a client, or add a new one.",
+        error: t("selectClientAddNewOne"),
       });
       return;
     }

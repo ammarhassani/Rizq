@@ -107,7 +107,10 @@ def main() -> int:
     print(f"{path}: {len(planned)} new key(s) -> {namespace}"
           + (f" (inject {tname})" if inject else f" (reuse {tname})"))
     for k, e in planned:
-        print(f'  {k}: "{e}"')          # English only: Windows console is cp1252
+        # ASCII-safe: the Windows console is cp1252 and raises on characters like
+        # the arrow in "View all →", which previously killed the run mid-batch.
+        safe = e.encode("ascii", "replace").decode("ascii")
+        print(f'  {k}: "{safe}"')
     left = sum(1 for m in PAIR.finditer(out) if ARABIC.search(m.group(1)))
     print(f"  remaining in file: {left}")
 

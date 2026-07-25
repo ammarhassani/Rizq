@@ -73,7 +73,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
   // ── Error / no rules state ────────────────────────────────────────────────
   if (!result.ok) {
     return (
-      <AppShell locale={locale as "ar" | "en"} title={isAr ? "هدف" : "HADAF"} maxWidth="reading">
+      <AppShell locale={locale as "ar" | "en"} title={t("hadaf")} maxWidth="reading">
         <div className={font} dir={dir}>
           <p className="text-sm text-rizq-ink-soft">{t("loadError")}</p>
         </div>
@@ -84,7 +84,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
   const { status, rules, disclaimer, ai_action_plan_ar, ai_action_plan_en } = result;
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "أهلية هدف" : "HADAF Eligibility"} maxWidth="reading">
+    <AppShell locale={locale as "ar" | "en"} title={t("hadafEligibility")} maxWidth="reading">
       <div dir={dir} className={font}>
         {/* Page header */}
         <div className="mb-6 sm:mb-8">
@@ -163,7 +163,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                 <p className="tabular font-sans text-2xl font-bold text-[var(--acc)]">
                   <AnimatedNumber value={status.estimated_subsidy} locale={locale as "ar" | "en"} duration={0.9} />{" "}
                   <span className={`text-sm font-normal ${font}`}>
-                    {isAr ? "ريال/شهر" : "SAR/month"}
+                    {t("sarMonth")}
                   </span>
                 </p>
                 <p className={`text-xs text-rizq-ink-soft/50 mt-1 ${font}`}>
@@ -212,7 +212,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                   <p className="tabular font-sans text-lg font-bold text-rizq-ink">
                     {fmtSAR(status.current_month_income, locale as "ar" | "en")}
                     <span className={`text-xs font-normal ms-1 ${font}`}>
-                      {isAr ? "ريال" : "SAR"}
+                      {t("sar")}
                     </span>
                   </p>
                 </div>
@@ -221,14 +221,14 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                   <p className="tabular font-sans text-lg font-bold text-rizq-ink">
                     {fmtSAR(rules.minimum_monthly_income_sar, locale as "ar" | "en")}
                     <span className={`text-xs font-normal ms-1 ${font}`}>
-                      {isAr ? "ريال" : "SAR"}
+                      {t("sar")}
                     </span>
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("daysRemainingLabel")}</p>
                   <p className={`text-lg font-bold text-rizq-ink ${font}`}>
-                    {daysLeft} {isAr ? "يوم" : "days"}
+                    {daysLeft} {t("days")}
                   </p>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
         <div
           className={`rounded-2xl border border-[var(--warn-line)] bg-[var(--warn-soft)] p-5 sm:p-6 mb-6 ${font}`}
           role="note"
-          aria-label={isAr ? "إخلاء مسؤولية" : "Disclaimer"}
+          aria-label={t("disclaimer")}
         >
           <p className={`text-sm text-amber-800 leading-relaxed mb-3 ${font}`}>
             {disclaimer}

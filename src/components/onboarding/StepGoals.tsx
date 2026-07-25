@@ -50,9 +50,9 @@ export function StepGoals({ locale, profile, onNext, onBack, onSkip, autosave, o
   ];
 
   const platformOptions: Array<{ key: "bahr" | "mostaql" | "khamsat"; label: string; state: boolean; set: (v: boolean) => void }> = [
-    { key: "bahr", label: isAr ? "بحر" : "Bahr", state: usesBahr, set: setUsesBahr },
-    { key: "mostaql", label: isAr ? "مستقل" : "Mostaql", state: usesMostaql, set: setUsesMostaql },
-    { key: "khamsat", label: isAr ? "خمسات" : "Khamsat", state: usesKhamsat, set: setUsesKhamsat },
+    { key: "bahr", label: t("bahr"), state: usesBahr, set: setUsesBahr },
+    { key: "mostaql", label: t("mostaql"), state: usesMostaql, set: setUsesMostaql },
+    { key: "khamsat", label: t("khamsat"), state: usesKhamsat, set: setUsesKhamsat },
   ];
 
   const handleSave = () => {

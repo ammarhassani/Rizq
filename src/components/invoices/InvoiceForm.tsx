@@ -142,7 +142,7 @@ export function InvoiceForm({
     }).format(n);
   }
 
-  const currency = isAr ? "ر.س" : "SAR";
+  const currency = t("sar");
 
   // ── Item line handlers ─────────────────────────────────────────────────────
   function addItemFromCatalog(item: CreatedItem) {
@@ -283,7 +283,7 @@ export function InvoiceForm({
                         type="button"
                         onClick={() => removeItem(idx)}
                         className="shrink-0 p-1.5 text-rizq-ink-soft/50 hover:text-[var(--over)] transition-colors"
-                        aria-label={isAr ? "حذف البند" : "Remove item"}
+                        aria-label={t("removeItem")}
                       >
                         <Trash2 size={15} />
                       </button>
@@ -421,7 +421,7 @@ export function InvoiceForm({
                         type="button"
                         onClick={() => removeFee(idx)}
                         className="p-1.5 text-rizq-ink-soft/50 hover:text-[var(--over)] transition-colors"
-                        aria-label={isAr ? "حذف الرسوم" : "Remove fee"}
+                        aria-label={t("removeFee")}
                       >
                         <Trash2 size={15} />
                       </button>

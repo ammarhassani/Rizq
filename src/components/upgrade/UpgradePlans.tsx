@@ -125,7 +125,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
   // ── Coming-soon panel ────────────────────────────────────────────────────────
 
   if (checkout.status === "coming_soon") {
-    const contactHref = `mailto:${checkout.contact}?subject=${encodeURIComponent(isAr ? "وصول احترافي مبكر، رِزق" : "Early Pro access, Rizq")}`;
+    const contactHref = `mailto:${checkout.contact}?subject=${encodeURIComponent(t("earlyProAccessRizq"))}`;
     return (
       <div
         dir={dir}
@@ -205,7 +205,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
             {t("freePlanName")}
           </p>
           <p className={`text-2xl font-bold text-rizq-ink mb-0.5 ${font}`}>
-            {isAr ? "٠ ريال" : "0 SAR"}
+            {t("n0Sar")}
           </p>
           <p className={`text-xs text-rizq-ink-soft/60 mb-4 ${font}`}>{t("freePlanTagline")}</p>
           <div className="space-y-2">
@@ -284,7 +284,7 @@ export function UpgradePlans({ locale, isPro, pro_until }: Props) {
 
           {checkout.status === "error" && (
             <p className={`text-xs text-[var(--over)] text-center mt-2 ${font}`}>
-              {isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again."}
+              {t("somethingWentWrongTryAgain")}
             </p>
           )}
         </div>

@@ -82,7 +82,7 @@ export default async function ProposalsListPage({
   const rows = (proposals ?? []) as ProposalRow[];
 
   return (
-    <AppShell locale={locale as "ar" | "en"} title={isAr ? "عروضي" : "My Proposals"} maxWidth="wide">
+    <AppShell locale={locale as "ar" | "en"} title={t("myProposals")} maxWidth="wide">
       <div dir={isAr ? "rtl" : "ltr"}>
         {/* Header row */}
         <div className="mb-6 sm:mb-8 flex flex-wrap items-end justify-between gap-4">

@@ -174,7 +174,7 @@ export function StepPortfolio({ locale, profile, onNext, onBack, onSkip, autosav
           placeholder={t("notableClientsPlaceholder")}
           inputClassName={inputCls}
           dir={isAr ? "rtl" : "ltr"}
-          removeLabel={isAr ? "إزالة" : "Remove"}
+          removeLabel={t("remove")}
         />
       </div>
       </div>

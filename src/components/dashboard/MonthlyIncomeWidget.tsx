@@ -48,7 +48,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
 
   const goalFrac = goalSar && goalSar > 0 ? Math.min(1, totalSar / goalSar) : 0;
   const goalPct = goalSar && goalSar > 0 ? Math.min(100, Math.round((totalSar / goalSar) * 100)) : null;
-  const pctLabel = (n: number) => `${fmt(n, locale)}${isAr ? "٪" : "%"}`;
+  const pctLabel = (n: number) => `${fmt(n, locale)}${t("text")}`;
 
   return (
     <div
