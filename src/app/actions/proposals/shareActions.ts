@@ -73,9 +73,13 @@ export async function setProposalShare(
       update["share_token"] = token;
     }
 
-    // Bump status: final → sent, but don't touch sent/archived/draft.
+    // Bump status: draft/final → sent. The public page reads through the
+    // get_shared_proposal RPC, which filters `public_share AND status <> 'draft'`
+    // — so leaving a draft alone here hands the freelancer a link that tells their
+    // client "the owner disabled this". Publishing IS sending. Never downgrades
+    // sent/viewed/accepted/archived.
     const currentStatus = proposal.status as string | null;
-    if (currentStatus === "final") {
+    if (currentStatus === "draft" || currentStatus === "final") {
       update["status"] = "sent";
     }
   }

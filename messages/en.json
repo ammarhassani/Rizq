@@ -1,6 +1,6 @@
 {
   "Meta": {
-    "title": "Rizq: the pricing benchmark for Saudi freelancers",
+    "title": "Rizq: the Saudi freelancer operating system",
     "description": "Price with confidence. Earn your rizq. A real Saudi-market pricing benchmark, built on local data, so you know what to charge before you bid."
   },
   "Hero": {
@@ -40,7 +40,7 @@
       "price": "0",
       "period": "SAR",
       "tagline": "Start here",
-      "feature1": "3 queries per month",
+      "feature1": "5 queries per month",
       "feature2": "Full price range result",
       "feature3": "Sample size shown",
       "feature4": "Share your result",
@@ -54,7 +54,7 @@
       "feature1": "Unlimited queries",
       "feature2": "Advanced filters (project size, client type)",
       "feature3": "Save queries and history",
-      "feature4": "Clean PDF exports for proposals",
+      "feature4": "Clean Word exports, no watermark",
       "feature5": "One-click cancel, no commitment",
       "cta": "Start with Pro",
       "badge": "Most popular"
@@ -74,8 +74,8 @@
     "a4": "Yes. All contributions are anonymized before they enter the public benchmark. We don't expose any freelancer's or client's identity. Compliant with the Saudi PDPL.",
     "q5": "How is Rizq different from Mostaql or Khamsat?",
     "a5": "Those platforms match freelancers with clients. Rizq tells you the fair price before you bid, on any platform, or for a direct client.",
-    "q6": "Will there be a proposal generator?",
-    "a6": "Yes, in v0.2. Right now we're focused on getting the benchmark right first. Join the waitlist to be among the first to know.",
+    "q6": "Does Rizq write the proposal for me?",
+    "a6": "Yes, and it is live. Paste the client's message and Rizq extracts the scope, prices it, and writes the full proposal, ready to export to Word or share as a link.",
     "q7": "Does Rizq support Saudi payment methods?",
     "a7": "Yes. Mada, Visa, Mastercard, and Apple Pay through a Saudi-licensed payment processor."
   },
@@ -102,7 +102,7 @@
     "privacyNote": "We won't share your email with anyone."
   },
   "Footer": {
-    "tagline": "The pricing benchmark for Saudi freelancers",
+    "tagline": "The Saudi freelancer operating system",
     "contactLabel": "Contact",
     "contactEmail": "hello@rizq.sa",
     "termsLabel": "Terms",
@@ -213,7 +213,7 @@
       "s2Title": "2. Account and acceptable use",
       "s2Body": "You're responsible for the accuracy of your account information and for any activity that happens through it. Do not share your credentials. Automated or abusive use of Rizq is prohibited and may lead to account suspension.",
       "s3Title": "3. Subscriptions and payment",
-      "s3Body": "The free tier allows 3 queries per month. The Pro tier is a monthly subscription, cancellable at any time from your account settings. There are no hidden fees in any payment flow. Payments are processed by a Saudi-licensed processor.",
+      "s3Body": "The free tier allows 5 queries per month. The Pro tier is a monthly subscription, cancellable at any time from your account settings. There are no hidden fees in any payment flow. Payments are processed by a Saudi-licensed processor.",
       "s4Title": "4. Cancellation and refunds",
       "s4Body": "You can cancel your subscription at any time and retain access until the end of the paid period. Refunds are available within the first 7 days of a subscription, pro-rated to time used.",
       "s5Title": "5. Intellectual property",
@@ -301,7 +301,7 @@
     },
     "Signup": {
       "title": "Create your account",
-      "subtitle": "Start free. 3 queries / month, no credit card.",
+      "subtitle": "Start free. 5 queries / month, no credit card.",
       "submit": "Create account",
       "submitting": "Creating account…",
       "haveAccount": "Already have an account?",
@@ -717,7 +717,7 @@
       "min": "Low end",
       "median": "Median",
       "max": "High end",
-      "sampleSize": "Based on {n} Saudi freelancers",
+      "sampleSize": "{n, plural, one {Based on 1 Saudi freelancer} other {Based on # Saudi freelancers}}",
       "fallbackRegion": "We widened the search to your whole region.",
       "fallbackSpecialty": "We widened the search across all cities.",
       "comparison": "Higher than {percent}% of freelancers in your specialty.",
@@ -752,7 +752,7 @@
       "freeExhaustedBody": "Upgrade to Pro for unlimited queries at 49 SAR / month.",
       "freeExhaustedCta": "Upgrade now",
       "anonExhaustedTitle": "Your free query is used.",
-      "anonExhaustedBody": "Create a free account for 3 queries per month.",
+      "anonExhaustedBody": "Create a free account for 5 queries per month.",
       "anonExhaustedCta": "Create account",
       "pro": "Unlimited"
     },
@@ -905,7 +905,10 @@
     "somethingWentWrong": "Something went wrong.",
     "ref": "ref",
     "tryAgain": "Try again",
-    "home": "Home"
+    "home": "Home",
+    "useful": "Useful",
+    "notUseful": "Not useful",
+    "ratingStars": "{n} out of 5 stars"
   },
   "MySubmissions": {
     "heading": "Your contributions",
@@ -1770,7 +1773,7 @@
       "generatePersona": "Generate client persona",
       "copy": "Copy",
       "whatsapp": "WhatsApp",
-      "upgradeHint": "This is a Pro feature. Upgrade to use it.",
+      "upgradeHint": "A Pro feature. Payments aren't live yet — email hello@rizq.sa for early access.",
       "loading": "Processing…",
       "personaNeeds3Gigs": "Generating a persona requires at least 3 projects with this client."
     }
@@ -1968,9 +1971,9 @@
       "proposals": {
         "headline": "You've reached your monthly proposal limit",
         "benefit1": "30 proposals/month instead of 2",
-        "benefit2": "Clean PDF, no watermark",
+        "benefit2": "Clean Word export, no watermark",
         "benefit3": "Unlimited tone AI",
-        "benefit4": "Link proposals to clients and projects"
+        "benefit4": "AI client insights and income forecasting"
       },
       "clients": {
         "headline": "You've reached your client limit",
@@ -2024,10 +2027,11 @@
     "qualifyingSubtitle": "Keep logging your income to maintain eligibility.",
     "inProgressTitle": "On track: month {n} of 3",
     "notQualifyingTitle": "Below the target this month",
-    "monthsToQualify": "{n} more month(s) needed to qualify",
+    "monthsToQualify": "{n, plural, one {1 more month needed to qualify} other {# more months needed to qualify}}",
     "currentMonthLabel": "Your paid income this month",
     "targetLabel": "Minimum required",
     "daysRemainingLabel": "Days remaining",
+    "daysCount": "{n, plural, one {1 day} other {# days}}",
     "gapToTarget": "You need {gap} SAR more to reach the minimum this month",
     "currentMonthIncome": "Your income {income} SAR ✓ (minimum {target} SAR)",
     "estimatedSubsidyLabel": "Estimated monthly subsidy",
@@ -2049,7 +2053,7 @@
     "actionPlanGenerate": "Suggest an action plan",
     "actionPlanGenerating": "Analyzing…",
     "actionPlanRefresh": "Refresh plan",
-    "actionPlanNotApplicable": "Action plan is only available when not qualifying.",
+    "actionPlanNotApplicable": "You already qualify — no improvement plan needed.",
     "actionPlanError": "Could not generate the plan. Try again.",
     "collapse": "Collapse",
     "expand": "Expand",
@@ -2312,7 +2316,7 @@
     },
     "finalCta": {
       "heading": "Start earning your rizq today.",
-      "sub": "Free to start. No credit card. 3 queries per month on the free plan.",
+      "sub": "Free to start. No credit card. 5 queries per month on the free plan.",
       "cta": "Start free"
     },
     "footerApps": "Tools",

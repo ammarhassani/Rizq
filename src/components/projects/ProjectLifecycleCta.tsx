@@ -25,6 +25,14 @@ type Props = {
   projectId: string;
   gigId: string | null;
   invoiceId: string | null;
+  /**
+   * The agreed deposit, when the proposal defined one. The first invoice then
+   * bills the deposit rather than the whole amount — the money panel right below
+   * this button already shows the deposit/final split the client agreed to, so
+   * billing 100% up front contradicted the plan on their own proposal.
+   */
+  depositSar?: number | null;
+  depositPaid?: boolean;
 };
 
 const CTA_KEY: Record<NonNullable<LifecycleNextAction>, string> = {
@@ -35,7 +43,15 @@ const CTA_KEY: Record<NonNullable<LifecycleNextAction>, string> = {
   mark_paid: "ctaMarkPaid",
 };
 
-export function ProjectLifecycleCta({ locale, nextAction, projectId, gigId, invoiceId }: Props) {
+export function ProjectLifecycleCta({
+  locale,
+  nextAction,
+  projectId,
+  gigId,
+  invoiceId,
+  depositSar,
+  depositPaid,
+}: Props) {
   const t = useTranslations("Wizard");
   const router = useRouter();
   const font = locale === "ar" ? "font-arabic" : "font-sans";
@@ -52,7 +68,11 @@ export function ProjectLifecycleCta({ locale, nextAction, projectId, gigId, invo
     setError(null);
     startTransition(async () => {
       if (nextAction === "create_invoice" && gigId) {
-        const result = await createInvoiceFromGig({ gig_id: gigId });
+        const billDeposit = !depositPaid && typeof depositSar === "number" && depositSar > 0;
+        const result = await createInvoiceFromGig({
+          gig_id: gigId,
+          portion: billDeposit ? "deposit" : "full",
+        });
         if (!result.ok) {
           setError(t("error"));
           return;

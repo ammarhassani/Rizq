@@ -3,6 +3,8 @@ import {
   buildArtifactData,
   ARTIFACT_SECTIONS,
   RIZQ_DEFAULTS,
+  artifactTitle,
+  forClientAudience,
   type ArtifactInput,
 } from "./artifact";
 
@@ -469,12 +471,49 @@ describe("next_steps section", () => {
 // ---------------------------------------------------------------------------
 
 describe("verification section", () => {
-  it("carries proposalId, a label, and a methodologyHref", () => {
+  it("carries a human reference, a label, and a methodologyHref", () => {
     const { sections } = buildArtifactData(baseInput({ proposalId: "prop_xyz" }));
     const s = sections.find((s) => s.id === "verification")!;
-    expect(s.content["proposalId"]).toBe("prop_xyz");
+    // The client sees a short reference, never the raw 36-char UUID.
+    expect(s.content["proposalId"]).toBe("RZQ-PROP_XYZ");
     expect(typeof s.content["label"]).toBe("string");
     expect((s.content["label"] as string).length).toBeGreaterThan(0);
     expect(s.content["methodologyHref"]).toBe("/methodology");
+  });
+
+  it("shortens a real uuid to a quotable reference", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ proposalId: "089a3af8-72a6-47d5-9bcb-ceba02ccdbb9" })
+    );
+    const s = sections.find((s) => s.id === "verification")!;
+    expect(s.content["proposalId"]).toBe("RZQ-089A3AF8");
+  });
+});
+
+describe("artifactTitle", () => {
+  it("reads the cover section's projectTitle, not a top-level key", () => {
+    const data = buildArtifactData(baseInput({ projectTitle: "تصميم وتطوير موقع مؤسسة الواحة" }));
+    expect(artifactTitle(data)).toBe("تصميم وتطوير موقع مؤسسة الواحة");
+  });
+  it("returns null for junk, an empty title, or a missing cover", () => {
+    expect(artifactTitle(null)).toBeNull();
+    expect(artifactTitle({})).toBeNull();
+    expect(artifactTitle({ sections: [] })).toBeNull();
+    expect(artifactTitle({ sections: [{ id: "cover", content: { projectTitle: "  " } }] })).toBeNull();
+  });
+});
+
+describe("forClientAudience", () => {
+  it("clears ai_generated so the client copy carries no review-before-sending badge", () => {
+    const data = buildArtifactData(
+      baseInput({ proseAiGenerated: true, coverLetterBody: "نص مولّد", understandingBody: "نص مولّد" })
+    );
+    const before = data.sections.filter((s) => s.content["ai_generated"] === true);
+    expect(before.length).toBeGreaterThan(0);
+    const stripped = forClientAudience(data);
+    expect(stripped.sections.some((s) => s.content["ai_generated"] === true)).toBe(false);
+    // Content itself is untouched, and the original is not mutated.
+    expect(data.sections.some((s) => s.content["ai_generated"] === true)).toBe(true);
+    expect(stripped.sections.length).toBe(data.sections.length);
   });
 });

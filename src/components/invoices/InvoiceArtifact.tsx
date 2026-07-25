@@ -43,6 +43,7 @@ const T = {
     subtotal: "المجموع الفرعي",
     fees: "الرسوم",
     vat: "ضريبة القيمة المضافة",
+    vatNotRegistered: "غير خاضعة (غير مسجّل في ضريبة القيمة المضافة)",
     total: "الإجمالي",
     currency: "ر.س",
     payment: "معلومات الدفع",
@@ -90,6 +91,7 @@ const T = {
     subtotal: "Subtotal",
     fees: "Fees",
     vat: "VAT",
+    vatNotRegistered: "Not applicable (not VAT-registered)",
     total: "Total",
     currency: "SAR",
     payment: "Payment",
@@ -528,7 +530,14 @@ function TotalsSection({
           </div>
         ))}
 
-        {/* VAT row — only when vatPct > 0 */}
+        {/* VAT — an invoice with no VAT line reads as an oversight to a Saudi
+            client (and to an auditor). State the position either way. */}
+        {vatPct <= 0 && (
+          <div className="flex items-center justify-between gap-4">
+            <span className={`text-sm text-rizq-ink-soft ${font}`}>{t.vat}</span>
+            <span className={`text-xs text-rizq-ink-soft ${font}`}>{t.vatNotRegistered}</span>
+          </div>
+        )}
         {vatPct > 0 && (
           <div className="flex items-center justify-between gap-4">
             <span className={`text-sm text-rizq-ink-soft ${font}`}>

@@ -41,6 +41,7 @@ function cleanInsight(i: Partial<InsightItem> | undefined): InsightItem | null {
 
 export function InsightsWidget({ locale }: Props) {
   const tI18n = useTranslations("Dashboard");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -352,14 +353,14 @@ export function InsightsWidget({ locale }: Props) {
                       <button
                         onClick={() => handleVote(i, "up")}
                         className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-[var(--acc)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
-                        aria-label="useful"
+                        aria-label={tCommon("useful")}
                       >
                         <ThumbsUp className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => handleVote(i, "down")}
                         className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-[var(--over)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
-                        aria-label="not useful"
+                        aria-label={tCommon("notUseful")}
                       >
                         <ThumbsDown className="h-3 w-3" />
                       </button>

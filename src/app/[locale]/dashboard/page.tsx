@@ -8,6 +8,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayName } from "@/lib/profile/displayName";
+import { artifactTitle } from "@/lib/proposals/artifact";
 import { AppShell } from "@/components/shell/AppShell";
 import { getUpcomingInvoiceDueDates } from "@/lib/invoices/queries";
 import { resolvePrice } from "@/lib/pricing/resolve";
@@ -66,11 +68,11 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     redirect(getPathname({ href: "/onboarding", locale: locale as "ar" | "en" }));
   }
 
-  const userName =
-    (profile?.full_name_ar as string | null) ??
-    (profile?.name as string | null) ??
-    userData.user.email?.split("@")[0] ??
-    null;
+  const userName = resolveDisplayName(
+    profile?.full_name_ar as string | null,
+    profile?.name as string | null,
+    userData.user.email
+  );
 
   // --- Parallel data fetches, each wrapped in try/catch ---
   const now = new Date();
@@ -87,6 +89,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
     price_anchor: number | null;
     created_at: string | null;
     clients: { name: string } | null;
+    artifact_json: unknown;
   };
   // Per-widget error flags: a failed query must show an error+retry state, NOT a false
   // "you have nothing yet" empty state (constitution Principle V + Principle I honesty).
@@ -99,7 +102,7 @@ export default async function DashboardPage({ params }: { params: Promise<Params
   {
     const { data, error } = await supabase
       .from("proposals")
-      .select("id, client_name, status, price_anchor, created_at, clients(name)")
+      .select("id, client_name, status, price_anchor, created_at, artifact_json, clients(name)")
       .eq("user_id", userId)
       .gte("created_at", thirtyDaysAgo)
       .order("created_at", { ascending: false })
@@ -282,9 +285,11 @@ export default async function DashboardPage({ params }: { params: Promise<Params
             proposals={proposals.map((p) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const linked = ((p.clients as any)?.name as string | null) ?? null;
+              // The proposal's own title, not the client's name — two proposals for
+              // the same client were rendering as two identical rows.
               return {
                 id: p.id,
-                title: p.client_name ?? linked,
+                title: artifactTitle(p.artifact_json) ?? p.client_name ?? linked,
                 client_name: linked,
                 status: p.status,
                 final_price_sar: p.price_anchor,

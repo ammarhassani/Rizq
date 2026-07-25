@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { Link } from "@/i18n/navigation";
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
 
@@ -17,10 +18,16 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
   const [fullName, setFullName] = useState(profile.full_name_ar ?? profile.full_name_en ?? "");
   // FL number: the "FL" prefix is a fixed chip; we store only the digits the user types.
   const [flDigits, setFlDigits] = useState((profile.fl_number ?? "").replace(/\D/g, ""));
+  // VAT: the schema and the invoice builder have always read these; there was simply
+  // no input anywhere, so every invoice was silently non-VAT with no way to change it.
+  const [vatRegistered, setVatRegistered] = useState(Boolean(profile.vat_registered));
+  const [vatNumber, setVatNumber] = useState((profile.vat_number ?? "").replace(/\D/g, ""));
   const [error, setError] = useState<string | null>(null);
 
   // Optional, but if provided it must be 5–12 digits.
   const flValid = flDigits === "" || /^\d{5,12}$/.test(flDigits);
+  // A Saudi VAT number is exactly 15 digits. Only enforced once they say they're registered.
+  const vatValid = !vatRegistered || vatNumber === "" || /^\d{15}$/.test(vatNumber);
   const [isPending, startTransition] = useTransition();
 
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors ${font}`;
@@ -32,6 +39,10 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
       setError(t("documentNumberMustBe5"));
       return;
     }
+    if (!vatValid) {
+      setError(isAr ? "الرقم الضريبي ١٥ رقمًا." : "A VAT number is 15 digits.");
+      return;
+    }
     startTransition(async () => {
       const result = await saveOnboardingStep("identity", {
         // One name field — mirror to both columns so AR + EN artifacts both resolve it.
@@ -39,6 +50,8 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
         full_name_en: fullName || null,
         // Persist canonically with the FL prefix; the input only holds digits.
         fl_number: flDigits ? `FL-${flDigits}` : null,
+        vat_registered: vatRegistered,
+        vat_number: vatRegistered && vatNumber ? vatNumber : null,
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -50,7 +63,7 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
   };
 
   // Settings → Profile: save on change (debounced), no Save button.
-  useAutosave(!!autosave, handleSave, [fullName, flDigits]);
+  useAutosave(!!autosave, handleSave, [fullName, flDigits, vatRegistered, vatNumber]);
 
   return (
     <motion.div
@@ -107,9 +120,63 @@ export function StepIdentity({ locale, profile, onNext, onBack, onSkip, autosave
         </p>
       </div>
 
-      {/* FL Document upload — DEFERRED */}
+      {/* VAT — drives the 15% line on every invoice (createInvoiceFromGig). */}
+      <div className="sm:col-span-2">
+        <label className="flex items-center gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={vatRegistered}
+            onChange={(e) => setVatRegistered(e.target.checked)}
+            className="h-4 w-4 rounded border-[#8f7e48] accent-rizq-green"
+          />
+          <span className={`text-sm text-rizq-ink ${font}`}>{t("vatRegistered")}</span>
+        </label>
+        {vatRegistered && (
+          <div className="mt-3">
+            <label className={labelCls} htmlFor="vat-number">
+              {t("vatNumber")}
+            </label>
+            <input
+              id="vat-number"
+              type="text"
+              inputMode="numeric"
+              dir="ltr"
+              value={vatNumber}
+              onChange={(e) => setVatNumber(e.target.value.replace(/\D/g, "").slice(0, 15))}
+              placeholder={t("vatNumberPlaceholder")}
+              aria-invalid={!vatValid}
+              className={`${inputCls} tabular`}
+            />
+            <p className={`mt-1 text-xs ${vatValid ? "text-rizq-ink-soft" : "text-[var(--over)]"} ${font}`}>
+              {isAr
+                ? "يظهر على فواتيرك مع ضريبة ١٥٪."
+                : "Shown on your invoices alongside 15% VAT."}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Official documents live in the vault — it accepts uploads today. */}
       <div className="sm:col-span-2 rounded-xl border border-dashed border-rizq-gold/40 bg-rizq-cream/40 px-4 py-3">
-        <p className="text-sm text-rizq-ink-soft">{t("flUploadDeferred")}</p>
+        <p className={`text-sm text-rizq-ink-soft ${font}`}>
+          {isAr ? (
+            <>
+              ارفع وثيقة العمل الحر وغيرها في{" "}
+              <Link href="/documents" className="text-rizq-green underline underline-offset-2">
+                خزنة الوثائق
+              </Link>
+              .
+            </>
+          ) : (
+            <>
+              Upload your freelance permit and other papers in the{" "}
+              <Link href="/documents" className="text-rizq-green underline underline-offset-2">
+                document vault
+              </Link>
+              .
+            </>
+          )}
+        </p>
       </div>
 
       {error && (

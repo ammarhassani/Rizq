@@ -195,6 +195,8 @@ export default async function ProjectDetailPage({
               projectId={id}
               gigId={(gig?.id as string | undefined) ?? null}
               invoiceId={latestInvoiceId}
+              depositSar={gig ? Number(gig.deposit_sar ?? 0) : null}
+              depositPaid={Boolean(gig?.deposit_paid_at)}
             />
           }
         />

@@ -73,7 +73,9 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
   // Fetch gigs with optional client name join (ordered by delivery_date desc)
   const { data: gigsRaw } = await supabase
     .from("gigs")
-    .select("id, title, amount_sar, deposit_sar, remaining_sar, status, delivery_date, ai_anomaly_flag, client_id, project_id, clients(name)")
+    .select(
+      "id, title, amount_sar, deposit_sar, remaining_sar, status, delivery_date, completed_date, final_paid_at, created_at, ai_anomaly_flag, client_id, project_id, clients(name)"
+    )
     .order("delivery_date", { ascending: false });
 
   // Flatten the join
@@ -85,6 +87,10 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
     remaining_sar: g.remaining_sar ?? null,
     status: g.status,
     delivery_date: g.delivery_date ?? null,
+    // Same coalesce the monthly_income view uses — so the KPI band, the month
+    // filters and the month rollups can never disagree about when income landed.
+    income_date:
+      g.delivery_date ?? g.completed_date ?? g.final_paid_at ?? g.created_at ?? null,
     ai_anomaly_flag: g.ai_anomaly_flag ?? null,
     client_id: g.client_id ?? null,
     project_id: g.project_id ?? null,
@@ -176,7 +182,14 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
                 <AnimatedNumber value={totalSar} locale={locale as "ar" | "en"} duration={0.9} />
               </p>
               <p className={`mt-1.5 text-sm text-rizq-ink-soft ${font}`}>
-                {t("summaryLine", { total: fmtPrice(totalSar, locale as "ar" | "en"), n: String(gigCount), pending: String(pendingCount) })}
+                {/* `n` stays a number so the ICU plural can pick an Arabic category;
+                    `pending` is pre-formatted so its digits match the rest of the page
+                    (next-intl's default formatter renders Latin digits for `ar`). */}
+                {t("summaryLine", {
+                  total: fmtPrice(totalSar, locale as "ar" | "en"),
+                  n: gigCount,
+                  pending: fmtPrice(pendingCount, locale as "ar" | "en"),
+                })}
               </p>
             </div>
             {/* Month-over-month change */}

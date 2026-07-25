@@ -34,6 +34,18 @@ type ForecastState =
     }
   | { status: "error" };
 
+/**
+ * When a gig's income counts. Mirrors the monthly_income view
+ * (coalesce(delivery_date, completed_date, final_paid_at, created_at)) so the KPI
+ * band, the month filters and the server-rendered month rollups agree.
+ */
+function incomeDate(g: GigRow): Date | null {
+  const raw = g.income_date ?? g.delivery_date;
+  if (!raw) return null;
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 function getMonthRange(offset: number): { start: Date; end: Date } {
   const now = new Date();
   const year = now.getFullYear();
@@ -78,23 +90,18 @@ export function IncomeListClient({ gigs, locale }: Props) {
     } else if (filter === "this_month") {
       const { start, end } = getMonthRange(0);
       list = list.filter((g) => {
-        if (!g.delivery_date) return false;
-        const d = new Date(g.delivery_date);
-        return d >= start && d <= end;
+        const d = incomeDate(g);
+        return d != null && d >= start && d <= end;
       });
     } else if (filter === "last_month") {
       const { start, end } = getMonthRange(-1);
       list = list.filter((g) => {
-        if (!g.delivery_date) return false;
-        const d = new Date(g.delivery_date);
-        return d >= start && d <= end;
+        const d = incomeDate(g);
+        return d != null && d >= start && d <= end;
       });
     } else if (filter === "this_year") {
       const year = new Date().getFullYear();
-      list = list.filter((g) => {
-        if (!g.delivery_date) return false;
-        return new Date(g.delivery_date).getFullYear() === year;
-      });
+      list = list.filter((g) => incomeDate(g)?.getFullYear() === year);
     }
 
     if (sort === "delivery_date") {
@@ -125,8 +132,11 @@ export function IncomeListClient({ gigs, locale }: Props) {
     let thisMonth = 0, lastMonth = 0, thisYear = 0, yearCount = 0;
     const monthly = Array(6).fill(0) as number[];
     for (const g of gigs) {
-      if (!g.delivery_date) continue;
-      const d = new Date(g.delivery_date);
+      const d = incomeDate(g);
+      // A paid gig with no delivery date still earned money. Skipping it here was
+      // why this band read 0 while the month rollup directly above it read the
+      // full amount.
+      if (!d) continue;
       const amt = g.amount_sar || 0;
       if (sameMonth(d, 0)) thisMonth += amt;
       if (sameMonth(d, -1)) lastMonth += amt;

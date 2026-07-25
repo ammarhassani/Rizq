@@ -33,8 +33,22 @@ import { assertNoProtectedSections } from "@/lib/proposals/sections";
 import { loadUserBrandDefaults } from "@/lib/proposals/brand";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
+import { PROPOSAL_STRINGS } from "@/lib/proposals/proposalStrings";
 
 const EDITABLE_STATUSES = new Set(["draft", "final", "sent"]);
+
+/**
+ * Version-history label for an AI chat edit. This string is rendered verbatim in
+ * the freelancer's version list, so it has to read like a sentence in their
+ * language — not the internal `Chat edit: scope_of_work` snake_case.
+ */
+function describeChatEdit(targets: string[], locale: "ar" | "en"): string {
+  const labels = PROPOSAL_STRINGS[locale].sections as Record<string, string>;
+  const named = targets.map((id) => labels[id] ?? id);
+  const list = named.join(locale === "ar" ? "، " : ", ");
+  if (!list) return locale === "ar" ? "تعديل عبر رِزق AI" : "Edited with Rizq AI";
+  return locale === "ar" ? `تعديل عبر رِزق AI: ${list}` : `Edited with Rizq AI: ${list}`;
+}
 
 const InputSchema = z.object({
   proposal_id: z.string().uuid(),
@@ -167,7 +181,10 @@ export async function proposalChat(rawInput: unknown): Promise<ProposalChatResul
       price_anchor: Number(proposal["price_anchor"]),
       price_max: Number(proposal["price_max"]),
       changed_by: userId,
-      change_summary: `Chat edit: ${targets.join(", ")}`,
+      change_summary: describeChatEdit(
+        targets,
+        (proposal["brief_language"] as string | null) === "en" ? "en" : "ar"
+      ),
     });
     if (versionErr) {
       console.error("[proposalChat] version insert failed", versionErr.code);

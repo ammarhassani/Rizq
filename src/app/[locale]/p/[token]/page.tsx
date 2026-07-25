@@ -247,7 +247,7 @@ export default async function ProposalSharePage({
 
         {/* Artifact */}
         <main className="relative z-10 flex-1 mx-auto w-full max-w-3xl px-4 sm:px-8 py-10 sm:py-14">
-          <ProposalArtifact data={artifact} locale={artifactLocale} />
+          <ProposalArtifact data={artifact} locale={artifactLocale} audience="client" />
 
           {/* Action row */}
           <div

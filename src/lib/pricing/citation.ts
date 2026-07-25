@@ -26,9 +26,43 @@ export function buildCitation(input: CitationInput): { ar: string; en: string } 
         ? " Widened across all cities."
         : "";
 
-  // TODO(i18n): Arabic counted-noun grammar varies by n (سجل واحد / N سجلات / N سجلاً).
-  // Current form reads correctly for n≥11; refine pluralization in a later polish pass.
-  const ar = `تقدير رِزق بناءً على ${n} سجلاً (${label.ar}) حتى عام ${year}.${widenAr}`;
-  const en = `Rizq estimate based on ${n} record(s) (${label.en}) through ${year}.${widenEn}`;
+  const ar = `تقدير رِزق بناءً على ${arabicRecordCount(n)} (${label.ar}) حتى عام ${arDigits(year)}.${widenAr}`;
+  const en = `Rizq estimate based on ${n} ${n === 1 ? "record" : "records"} (${label.en}) through ${year}.${widenEn}`;
   return { ar, en };
+}
+
+/** Arabic-Indic digits, matching every other number the app renders in Arabic. */
+export function arDigits(n: number): string {
+  return new Intl.NumberFormat("ar-SA", { useGrouping: false }).format(n);
+}
+
+/**
+ * Arabic counted-noun agreement for "سجل" — singular / dual / plural-of-paucity
+ * (3–10) / tamyīz (11+). "5 سجلاً" is simply wrong; a Saudi reader notices.
+ */
+export function arabicRecordCount(n: number): string {
+  if (n === 1) return "سجل واحد";
+  if (n === 2) return "سجلين";
+  if (n >= 3 && n <= 10) return `${arDigits(n)} سجلات`;
+  return `${arDigits(n)} سجلاً`;
+}
+
+/**
+ * Wraps the benchmark citation for the figure actually quoted. Only a "market"
+ * quote may present the benchmark as its source (Constitution Principle I).
+ */
+export function quoteBasisCitation(
+  basis: "market" | "scope" | "client_budget",
+  marketCitation: string,
+  locale: "ar" | "en"
+): string {
+  if (basis === "market") return marketCitation;
+  if (basis === "scope") {
+    return locale === "ar"
+      ? `السعر مُعدَّل لحجم النطاق المطلوب، وليس رقمًا من المعيار. مرجع السوق للمشروع الواحد: ${marketCitation}`
+      : `Adjusted for the size of this scope — not a benchmark figure. Market reference for a single project: ${marketCitation}`;
+  }
+  return locale === "ar"
+    ? `السعر مبني على الميزانية التي ذكرها العميل. مرجع السوق للمشروع الواحد: ${marketCitation}`
+    : `Based on the budget the client stated. Market reference for a single project: ${marketCitation}`;
 }

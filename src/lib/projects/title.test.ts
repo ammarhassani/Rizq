@@ -31,3 +31,19 @@ describe("deriveProjectTitle", () => {
     expect(deriveProjectTitle({ deliverables: [long] }, null).length).toBe(255);
   });
 });
+
+describe("deriveProjectTitle — proposal title wins", () => {
+  it("uses the proposal's own title over the first deliverable", () => {
+    expect(
+      deriveProjectTitle(
+        { deliverables: ["إعادة تصميم 18 شاشة"] },
+        "تصميم واجهات",
+        "إعادة تصميم تطبيق نون للتقنية"
+      )
+    ).toBe("إعادة تصميم تطبيق نون للتقنية");
+  });
+  it("falls back to the first deliverable when there is no proposal title", () => {
+    expect(deriveProjectTitle({ deliverables: ["شعار"] }, "تصميم شعار", null)).toBe("شعار");
+    expect(deriveProjectTitle({ deliverables: ["شعار"] }, "تصميم شعار", "   ")).toBe("شعار");
+  });
+});

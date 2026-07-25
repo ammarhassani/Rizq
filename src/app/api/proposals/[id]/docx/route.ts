@@ -16,6 +16,8 @@ import type { ArtifactData } from "@/lib/proposals/artifact";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+import { proposalReference } from "@/lib/proposals/artifact";
+
 type Params = { id: string };
 
 /** ASCII-safe filename fragment; non-Latin / unsafe chars → '-'. */
@@ -47,7 +49,7 @@ export async function GET(
 
     const { data: proposal, error } = await supabase
       .from("proposals")
-      .select("artifact_json, client_name, brief_language, created_at")
+      .select("id, artifact_json, client_name, brief_language, created_at")
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
@@ -98,7 +100,18 @@ export async function GET(
     const niceBase = parts.join(" ") || "Rizq Proposal";
 
     const niceName = `${niceBase}.docx`;
-    const asciiName = `${asciiSlug(niceBase) || "Rizq-Proposal"}.docx`;
+    // An all-Arabic title transliterates to nothing, so slugging the joined string
+    // left connectives behind and produced files literally called
+    // "TO-Proposal-2026-07-25.docx". Slug each part, drop the ones that vanished,
+    // and fall back to the proposal's own reference so the file is still
+    // identifiable on a system that uses the ASCII name.
+    const asciiParts = parts
+      .map((part) => asciiSlug(part))
+      .filter((part) => part && part !== "proposal" && part !== "TO");
+    const asciiBase = asciiParts.length > 1
+      ? asciiParts.join("-")
+      : `Rizq-Proposal-${proposalReference(proposal.id as string)}${dateStr ? `-${dateStr}` : ""}`;
+    const asciiName = `${asciiBase}.docx`;
 
     return new Response(new Uint8Array(buffer), {
       status: 200,

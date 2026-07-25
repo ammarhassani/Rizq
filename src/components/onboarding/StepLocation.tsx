@@ -25,12 +25,10 @@ export function StepLocation({ locale, profile, onNext, onBack, onSkip, autosave
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      // For now we don't have the uuid lookup at the client layer —
-      // we pass city text slug as the legacy `city` field.
-      // city_id lookup would require a DB fetch; deferred to a future refactor.
+      // We send the slug; saveOnboardingStep resolves it to `city_id` server-side
+      // (the FK the pricing engine actually reads).
       const result = await saveOnboardingStep("location", {
         city: citySlug || null,
-        city_id: null, // set from DB side via trigger or future step
       });
       if (result.ok) {
         onNext(result.completeness);

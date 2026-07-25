@@ -17,6 +17,11 @@ export function ProposalPrintStyles() {
       @media print {
         nav, header, .print-hidden { display: none !important; }
         body { background: #ffffff !important; }
+        /* The printed/PDF document is always the light paper version, whatever
+           theme the viewer's browser is in — a dark-themed client must not print
+           an unreadable (or ink-flooding) proposal. */
+        #proposal-artifact, #proposal-artifact * { color: #1A1A1A !important; }
+        #proposal-artifact section { background: #ffffff !important; }
         #proposal-artifact { max-width: 100% !important; margin: 0 auto !important; }
         #proposal-artifact section { break-inside: avoid; page-break-inside: avoid; }
         #proposal-artifact .proposal-cover-page { break-after: page; page-break-after: always; }

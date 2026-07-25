@@ -358,7 +358,9 @@ export async function updateProposalPrice(rawInput: unknown): Promise<UpdateSect
 
   const { data: rawProposal, error: fetchErr } = await supabase
     .from("proposals")
-    .select("id, status, version, scope_json, price_min, price_anchor, price_max, artifact_json")
+    .select(
+      "id, status, version, brief_language, scope_json, price_min, price_anchor, price_max, artifact_json"
+    )
     .eq("id", proposal_id)
     .eq("user_id", userId)
     .single();
@@ -376,12 +378,31 @@ export async function updateProposalPrice(rawInput: unknown): Promise<UpdateSect
   }
 
   const rounded = Math.round(anchor);
+  const isAr = (proposal["brief_language"] as string | null) !== "en";
 
   let found = false;
   const sections: ArtifactSection[] = artifact.sections.map((section) => {
     if (section.id !== "pricing") return section;
     found = true;
-    return { ...section, content: { ...section.content, anchor: rounded } };
+    // Honesty (Principle I): once the freelancer sets the number by hand, the
+    // benchmark no longer vouches for it. Keep the band + its citation on show as
+    // context, but say plainly where the quoted figure came from.
+    const marketCitation = typeof section.content["citation"] === "string"
+      ? (section.content["citation"] as string)
+      : "";
+    const manualCitation = isAr
+      ? `سعر حدّدته بنفسك.${marketCitation ? ` مرجع السوق: ${marketCitation}` : ""}`
+      : `Price you set yourself.${marketCitation ? ` Market reference: ${marketCitation}` : ""}`;
+    return {
+      ...section,
+      content: {
+        ...section.content,
+        anchor: rounded,
+        citation: manualCitation,
+        // Preserve the original so a later re-generate can restore it verbatim.
+        marketCitation: section.content["marketCitation"] ?? marketCitation,
+      },
+    };
   });
   if (!found) return { ok: false, code: "not_found" };
 

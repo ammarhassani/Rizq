@@ -142,6 +142,16 @@ export async function sendInvoiceEmail(rawInput: unknown): Promise<SendInvoiceEm
     replyTo: (profile?.contact_email as string | null) ?? undefined,
   });
   if (!result.ok) {
+    // Delivery failed, so the invoice was NOT sent — undo the draft → sent bump we
+    // made to mint the link. Leaving it as "sent" fakes a delivery that never
+    // happened and silently starts the overdue clock.
+    if (shared.statusBumped) {
+      await supabase
+        .from("invoices")
+        .update({ status: "draft", sent_at: null, public_share: false, updated_at: new Date().toISOString() })
+        .eq("id", invoice_id)
+        .eq("user_id", userId);
+    }
     return { ok: false, code: result.code === "not_configured" ? "not_configured" : "error" };
   }
 

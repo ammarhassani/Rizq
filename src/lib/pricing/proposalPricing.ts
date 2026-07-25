@@ -5,10 +5,18 @@ export type PricingModifierInput = {
   ip_transfer: "full_transfer" | "license" | "unclear" | null;
   /** How many deliverables the scope covers — scales the band (more work → higher). */
   deliverable_count?: number | null;
+  /** A budget the CLIENT stated in the brief, in SAR. Only ever lifts the quote. */
+  budget_mentioned?: number | null;
 };
 
 /** The market band from resolvePrice (already rounded). */
 export type MarketBand = { min: number; anchor: number; max: number };
+
+/**
+ * Where the quoted number comes from. Drives the provenance line: only "market"
+ * may claim the benchmark citation backs the figure.
+ */
+export type QuoteBasis = "market" | "scope" | "client_budget";
 
 export type ProposalPrice = {
   min: number;
@@ -16,6 +24,14 @@ export type ProposalPrice = {
   max: number;
   modifiers: { urgency: number; client_type: number; ip: number; complexity: number };
   personal_weight: number;
+  /**
+   * The number to actually quote. Equals `anchor` for an ordinary single-scope job.
+   * Rises above the cited band when the scope is bigger than one benchmark "project"
+   * or the client already named a larger budget — those figures are NOT benchmark
+   * claims, which is what `quote_basis` records.
+   */
+  quote: number;
+  quote_basis: QuoteBasis;
 };
 
 const round10 = (n: number) => Math.round(n / 10) * 10;
@@ -92,7 +108,8 @@ export function computeProposalPrice(
   const min = round10(market.min);
   const max = round10(market.max);
   const combined = m.urgency * m.client_type * m.ip * m.complexity;
-  const modifiedAnchor = clamp(market.anchor * combined, min, max);
+  const rawModified = market.anchor * combined; // scope-true, band-free
+  const modifiedAnchor = clamp(rawModified, min, max);
 
   // The freelancer's stated rate joins their personal history as one anchor point,
   // so a profiled freelancer is reflected even with no past proposals.
@@ -100,9 +117,37 @@ export function computeProposalPrice(
     typeof statedAnchor === "number" && statedAnchor > 0 ? [...pastAnchors, statedAnchor] : pastAnchors;
   const w = personalWeight(personalPoints.length);
   const personalAnchor = median(personalPoints);
-  const blended = w > 0 ? modifiedAnchor * (1 - w) + personalAnchor * w : modifiedAnchor;
+  const blend = (base: number) => (w > 0 ? base * (1 - w) + personalAnchor * w : base);
+  const blended = blend(modifiedAnchor);
 
   const anchor = clamp(round50(blended), min, max);
 
-  return { min, anchor, max, modifiers: m, personal_weight: w };
+  // ── What to actually quote ────────────────────────────────────────────────
+  // The band above is the CITED per-project market reference and stays untouched.
+  // The quote may exceed it, because two things the benchmark can't see legitimately
+  // move the real number:
+  //
+  //   1. Scope. A 5-deliverable job is not one benchmark "project". With a narrow
+  //      band (small sample) the modified anchor otherwise pins to `max` and every
+  //      proposal comes out identical — the saturation bug.
+  //   2. The client's own stated budget. If they already named a bigger number,
+  //      quoting under it leaves the freelancer's money on the table.
+  //
+  // Neither figure is presented as benchmark-backed — `quote_basis` says which it is.
+  const scopeAdjusted = round50(Math.max(blend(rawModified), min));
+  let quote = anchor;
+  let quote_basis: QuoteBasis = "market";
+  if (scopeAdjusted > anchor) {
+    quote = scopeAdjusted;
+    quote_basis = "scope";
+  }
+  // ponytail: a stated budget only ever lifts. Quoting DOWN to a lowball number is the
+  // freelancer's call to make by hand, not ours to make for them.
+  const budget = mods.budget_mentioned;
+  if (typeof budget === "number" && Number.isFinite(budget) && budget > quote) {
+    quote = round50(budget);
+    quote_basis = "client_budget";
+  }
+
+  return { min, anchor, max, modifiers: m, personal_weight: w, quote, quote_basis };
 }
