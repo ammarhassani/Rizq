@@ -19,14 +19,18 @@ export const deepseek = createDeepSeek({
  * once (scope extraction, proposals, insights, tone, forecasts) with a generic
  * "we couldn't analyze that" rather than anything pointing at the model id.
  *
- * `-pro` over `-flash`: this constant backs pricing priors and scope extraction,
- * where correctness is the product's moat (Principle I); measured latency is
- * ~1.8s vs ~1.2s, well inside the 20s extraction abort, so quality wins.
+ * `-flash` over `-pro`, measured on a REALISTIC extraction (long brief + the full
+ * scope schema), not a toy prompt: flash ~7s, pro ~24s. Pro blows the 20s
+ * extraction abort every time — and the 15s positioning and 12s trend aborts too
+ * — so it would reintroduce the exact "we couldn't analyze that" failure this
+ * constant caused when it went stale. Quality is not the trade it looks like:
+ * prices come from the deterministic resolver, and the model only extracts scope
+ * and narrates figures it is given.
  *
  * If AI features start failing wholesale, check this against the live list first:
  *   curl https://api.deepseek.com/models -H "Authorization: Bearer $DEEPSEEK_API_KEY"
  */
-export const REASONING_MODEL = "deepseek-v4-pro";
+export const REASONING_MODEL = "deepseek-v4-flash";
 
 /**
  * Whether the DeepSeek API key is present in this runtime. AI-backed features
