@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
   getDocumentSignedUrl,
@@ -33,6 +34,7 @@ type Props = {
 };
 
 export function DocumentDetailClient({ doc, locale, categories }: Props) {
+  const tI18n = useTranslations("Documents.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -54,7 +56,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
       if (res.ok) {
         window.open(res.url, "_blank", "noopener,noreferrer");
       } else {
-        setError(isAr ? "تعذّر تحميل الملف" : "Could not load file");
+        setError(tI18n("couldLoadFile"));
       }
     });
   }
@@ -67,7 +69,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
         router.push("/documents");
         router.refresh();
       } else {
-        setError(isAr ? "تعذّر الحذف" : "Could not delete");
+        setError(tI18n("couldDelete"));
         setConfirmDelete(false);
       }
     });
@@ -108,7 +110,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
           className={`inline-flex items-center gap-2 rounded-full bg-rizq-green text-rizq-cream px-5 py-2.5 text-sm font-medium hover:bg-rizq-green-dark disabled:opacity-50 transition-all ${font}`}
         >
           <ExternalLink size={15} />
-          {isAr ? "عرض / تحميل" : "View / Download"}
+          {tI18n("viewDownload")}
         </button>
 
         <button
@@ -118,8 +120,8 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
         >
           <Trash2 size={15} />
           {confirmDelete
-            ? (isAr ? "تأكيد الحذف" : "Confirm delete")
-            : (isAr ? "حذف" : "Delete")}
+            ? (tI18n("confirmDelete"))
+            : (tI18n("delete"))}
         </button>
         {confirmDelete && (
           <button
@@ -127,7 +129,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
             onClick={() => setConfirmDelete(false)}
             className={`text-sm text-rizq-ink-soft hover:text-rizq-ink transition-colors ${font}`}
           >
-            {isAr ? "إلغاء" : "Cancel"}
+            {tI18n("cancel")}
           </button>
         )}
       </div>
@@ -142,7 +144,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
           <div className="flex items-center gap-2">
             <Share2 size={16} className="text-rizq-ink-soft" />
             <span className={`text-sm font-medium text-rizq-ink ${font}`}>
-              {isAr ? "مشاركة الوثيقة" : "Share document"}
+              {tI18n("shareDocument")}
             </span>
           </div>
           <button
@@ -160,17 +162,17 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
         {!shareEnabled && (
           <div className="flex items-center gap-2">
             <label className={`text-xs text-rizq-ink-soft ${font}`}>
-              {isAr ? "صلاحية:" : "Expires after:"}
+              {tI18n("expiresAfter")}
             </label>
             <select
               value={shareHours}
               onChange={(e) => setShareHours(Number(e.target.value))}
               className={`rounded-lg border border-rizq-gold/30 bg-[var(--raised)] px-2 py-1 text-xs ${font}`}
             >
-              <option value={24}>{isAr ? "٢٤ ساعة" : "24 hours"}</option>
-              <option value={72}>{isAr ? "٣ أيام" : "3 days"}</option>
-              <option value={168}>{isAr ? "أسبوع" : "1 week"}</option>
-              <option value={720}>{isAr ? "شهر" : "1 month"}</option>
+              <option value={24}>{tI18n("n24Hours")}</option>
+              <option value={72}>{tI18n("n3Days")}</option>
+              <option value={168}>{tI18n("n1Week")}</option>
+              <option value={720}>{tI18n("n1Month")}</option>
             </select>
           </div>
         )}
@@ -188,7 +190,7 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
               className={`inline-flex items-center gap-1 rounded-full bg-rizq-green/10 text-rizq-green px-3 py-1.5 text-xs hover:bg-rizq-green/20 transition-colors ${font}`}
             >
               {copied ? <CheckCircle size={12} /> : <Copy size={12} />}
-              {copied ? (isAr ? "تم النسخ" : "Copied!") : (isAr ? "نسخ" : "Copy")}
+              {copied ? (tI18n("copied")) : (tI18n("copy"))}
             </button>
           </div>
         )}
@@ -197,15 +199,15 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
       {/* Metadata */}
       <div className="rounded-2xl border border-rizq-gold/20 bg-[var(--raised)] p-5 space-y-3">
         <h3 className={`text-sm font-semibold text-rizq-ink ${font}`}>
-          {isAr ? "بيانات الوثيقة" : "Document info"}
+          {tI18n("documentInfo")}
         </h3>
         <dl className="space-y-2 text-sm">
           <div className="flex items-start gap-2">
-            <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{isAr ? "الاسم" : "Filename"}</dt>
+            <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{tI18n("filename")}</dt>
             <dd className={`text-rizq-ink truncate ${font}`}>{doc.file_name}</dd>
           </div>
           <div className="flex items-start gap-2">
-            <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{isAr ? "الحجم" : "Size"}</dt>
+            <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{tI18n("size")}</dt>
             <dd className="tabular text-rizq-ink">
               {doc.file_size > 1024 * 1024
                 ? `${(doc.file_size / (1024 * 1024)).toFixed(1)} MB`
@@ -214,13 +216,13 @@ export function DocumentDetailClient({ doc, locale, categories }: Props) {
           </div>
           {doc.expiry_date && (
             <div className="flex items-start gap-2">
-              <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{isAr ? "تاريخ الانتهاء" : "Expiry"}</dt>
+              <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{tI18n("expiry")}</dt>
               <dd className="tabular text-rizq-ink">{new Date(doc.expiry_date).toLocaleDateString(isAr ? "ar-SA" : "en-US")}</dd>
             </div>
           )}
           {doc.tags.length > 0 && (
             <div className="flex items-start gap-2">
-              <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{isAr ? "الوسوم" : "Tags"}</dt>
+              <dt className={`text-rizq-ink-soft/60 shrink-0 w-24 ${font}`}>{tI18n("tags")}</dt>
               <dd className="flex flex-wrap gap-1">
                 {doc.tags.map((tag) => (
                   <span key={tag} className={`rounded-full bg-rizq-gold/10 text-rizq-ink-soft px-2 py-0.5 text-xs ${font}`}>{tag}</span>

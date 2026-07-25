@@ -1,4 +1,5 @@
 import { type StrengthItem } from "@/lib/profile/strength";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, Circle } from "lucide-react";
 
 /**
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function ProfileStrengthPanel({ locale, strength, items }: Props) {
+  const tI18n = useTranslations("Settings");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -27,7 +29,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
     >
       <div className="flex items-center justify-between gap-3">
         <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-          {isAr ? "قوة ملفك" : "Profile strength"}
+          {tI18n("profileStrength")}
         </span>
         <span className="tabular font-sans text-lg font-bold text-rizq-green">{strength}%</span>
       </div>
@@ -42,7 +44,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
       {requiredMissing.length > 0 ? (
         <div className="mt-5">
           <p className={`text-xs font-medium text-rizq-ink-soft mb-2 ${font}`}>
-            {isAr ? "أكمل ملفك لتقويته:" : "Complete your profile to strengthen it:"}
+            {tI18n("completeProfileStrengthen")}
           </p>
           <ul className="space-y-1.5">
             {requiredMissing.map((m) => (
@@ -59,7 +61,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
       ) : (
         <p className={`mt-4 inline-flex items-center gap-2 text-sm text-rizq-green ${font}`}>
           <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-          {isAr ? "ملفك مكتمل بالكامل." : "Your profile is complete."}
+          {tI18n("profileComplete")}
         </p>
       )}
 
@@ -68,7 +70,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
       {optionalMissing.length > 0 && (
         <div className="mt-5 border-t border-rizq-gold/20 pt-4">
           <p className={`text-xs font-medium text-rizq-ink-soft mb-2 ${font}`}>
-            {isAr ? "إضافات اختيارية (لمن لديه): تقوّي عرضك، وليست مطلوبة." : "Optional extras (if you have them): strengthen your pitch, never required."}
+            {tI18n("optionalExtrasIfHaveThem")}
           </p>
           <ul className="flex flex-wrap gap-2">
             {optionalMissing.map((m) => (

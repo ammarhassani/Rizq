@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { uploadDocument, suggestCategoryAction, suggestExpiryAction } from "@/app/actions/documents/documentActions";
 import { Loader2, Sparkles, CheckCircle } from "lucide-react";
@@ -17,6 +18,7 @@ type Props = {
 type AISuggest<T> = { value: T; confidence: number; accepted: boolean } | null;
 
 export function DocumentUploadForm({ locale, categories }: Props) {
+  const tI18n = useTranslations("Documents.upload");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -87,7 +89,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file) { setError(isAr ? "اختر ملفًا" : "Choose a file"); return; }
+    if (!file) { setError(tI18n("chooseFile")); return; }
     setError(null);
 
     startTransition(async () => {
@@ -104,7 +106,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
         if (res.code === "quota_exhausted") {
           setShowUpgradeModal(true);
         } else {
-          setError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
+          setError(tI18n("somethingWentWrongTryAgain"));
         }
         return;
       }
@@ -129,7 +131,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* File picker */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "الملف" : "File"} <span className="text-[var(--over)]">*</span>
+          {tI18n("file")} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           ref={fileRef}
@@ -147,14 +149,14 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* Title */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "العنوان" : "Title"} <span className="text-[var(--over)]">*</span>
+          {tI18n("title")} <span className="text-[var(--over)]">*</span>
         </label>
         <input
           type="text"
           value={titleAr}
           onChange={(e) => setTitleAr(e.target.value)}
           required
-          placeholder={isAr ? "مثال: شهادة ضريبة القيمة المضافة 2026" : "e.g. VAT Certificate 2026"}
+          placeholder={tI18n("eGVatCertificate2026")}
           className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
         />
       </div>
@@ -162,10 +164,10 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* Category */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "التصنيف" : "Category"}
+          {tI18n("category")}
         </label>
         <Combobox
-          aria-label={isAr ? "التصنيف" : "Category"}
+          aria-label={tI18n("category")}
           locale={locale}
           value={category || null}
           onChange={(v) => setCategory(v ?? "")}
@@ -173,9 +175,9 @@ export function DocumentUploadForm({ locale, categories }: Props) {
             value: c.id,
             label: isAr ? c.name_ar : c.name_en,
           }))}
-          placeholder={isAr ? "اختر…" : "Select…"}
-          searchPlaceholder={isAr ? "ابحث…" : "Search…"}
-          emptyText={isAr ? "لا توجد نتائج" : "No results"}
+          placeholder={tI18n("select")}
+          searchPlaceholder={tI18n("search")}
+          emptyText={tI18n("results")}
           allowClear
         />
         {/* AI category suggestion chip */}
@@ -183,7 +185,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           <div className={`mt-2 flex items-center gap-2 ${font}`}>
             <span className="flex items-center gap-1 text-xs text-rizq-ink-soft">
               <Sparkles size={12} className="text-rizq-gold" />
-              {isAr ? "تصنيف مقترح بالذكاء الاصطناعي:" : "AI suggested:"}
+              {tI18n("aiSuggested")}
               <strong>{catName(categoryAI.value)}</strong>
               <span className="opacity-60">({Math.round(categoryAI.confidence * 100)}%)</span>
             </span>
@@ -193,20 +195,20 @@ export function DocumentUploadForm({ locale, categories }: Props) {
               className={`inline-flex items-center gap-1 rounded-full bg-rizq-green/10 text-rizq-green px-2.5 py-0.5 text-xs hover:bg-rizq-green/20 transition-colors ${font}`}
             >
               <CheckCircle size={11} />
-              {isAr ? "قبول" : "Accept"}
+              {tI18n("accept")}
             </button>
           </div>
         )}
         {categoryAI?.accepted && (
           <p className={`mt-1 text-xs text-[var(--acc)] flex items-center gap-1 ${font}`}>
             <CheckCircle size={11} />
-            {isAr ? "تم قبول التصنيف المقترح" : "AI suggestion accepted"}
+            {tI18n("aiSuggestionAccepted")}
           </p>
         )}
         {aiLoading && (
           <p className={`mt-1 text-xs text-rizq-ink-soft/60 flex items-center gap-1 ${font}`}>
             <Loader2 size={11} className="animate-spin" />
-            {isAr ? "يحلل الملف..." : "Analyzing..."}
+            {tI18n("analyzing")}
           </p>
         )}
       </div>
@@ -214,7 +216,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "وصف (اختياري)" : "Description (optional)"}
+          {tI18n("descriptionOptional")}
         </label>
         <textarea
           value={description}
@@ -228,7 +230,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <label className="text-sm font-medium text-rizq-ink">
-            {isAr ? "تاريخ الانتهاء (اختياري)" : "Expiry date (optional)"}
+            {tI18n("expiryDateOptional")}
           </label>
           <button
             type="button"
@@ -237,7 +239,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
             className={`inline-flex items-center gap-1 text-xs text-rizq-gold hover:text-rizq-green transition-colors disabled:opacity-40 ${font}`}
           >
             <Sparkles size={11} />
-            {isAr ? "اقتراح ذكاء اصطناعي" : "AI suggest"}
+            {tI18n("aiSuggest")}
           </button>
         </div>
         <input
@@ -251,7 +253,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
           <div className={`mt-2 flex items-center gap-2 ${font}`}>
             <span className="flex items-center gap-1 text-xs text-rizq-ink-soft">
               <Sparkles size={12} className="text-rizq-gold" />
-              {isAr ? "تاريخ انتهاء مقترح:" : "AI suggested expiry:"}
+              {tI18n("aiSuggestedExpiry")}
               <strong>{expiryAI.value}</strong>
               <span className="opacity-60">({Math.round(expiryAI.confidence * 100)}%)</span>
             </span>
@@ -261,13 +263,13 @@ export function DocumentUploadForm({ locale, categories }: Props) {
               className={`inline-flex items-center gap-1 rounded-full bg-rizq-green/10 text-rizq-green px-2.5 py-0.5 text-xs hover:bg-rizq-green/20 transition-colors ${font}`}
             >
               <CheckCircle size={11} />
-              {isAr ? "قبول" : "Accept"}
+              {tI18n("accept")}
             </button>
           </div>
         )}
         {expiryAI && !expiryAI.value && !aiLoading && (
           <p className={`mt-1 text-xs text-rizq-ink-soft/60 ${font}`}>
-            {isAr ? "لم يُرصَد تاريخ انتهاء واضح" : "No clear expiry detected"}
+            {tI18n("clearExpiryDetected")}
           </p>
         )}
       </div>
@@ -275,13 +277,13 @@ export function DocumentUploadForm({ locale, categories }: Props) {
       {/* Tags */}
       <div>
         <label className="block text-sm font-medium text-rizq-ink mb-1.5">
-          {isAr ? "وسوم (افصل بفاصلة)" : "Tags (comma-separated)"}
+          {tI18n("tagsCommaSeparated")}
         </label>
         <input
           type="text"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          placeholder={isAr ? "مثال: 2026، رسمي" : "e.g. 2026, official"}
+          placeholder={tI18n("eG2026Official")}
           className={`w-full rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus:ring-2 focus:ring-rizq-green/30 ${font}`}
         />
       </div>
@@ -296,7 +298,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
         className={`w-full rounded-full bg-rizq-green text-rizq-cream py-3 text-sm font-medium hover:bg-rizq-green-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 ${font}`}
       >
         {isPending && <Loader2 size={15} className="animate-spin" />}
-        {isAr ? "رفع الوثيقة" : "Upload document"}
+        {tI18n("uploadDocument")}
       </button>
     </form>
     </>

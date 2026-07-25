@@ -5,6 +5,7 @@
  */
 
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { isOverdue } from "@/lib/invoices/overdue";
 
 type Invoice = {
@@ -67,6 +68,7 @@ function fmtDate(iso: string | null, locale: "ar" | "en"): string {
 }
 
 export function ClientInvoiceHistory({ locale, invoices }: Props) {
+  const tI18n = useTranslations("Clients.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";

@@ -148,7 +148,51 @@
     "shareNotice": "تمت مشاركة هذه الوثيقة معك عبر رِزق. الرابط مؤقت وسينتهي قريبًا.",
     "downloadFile": "تحميل الملف",
     "downloadError": "تعذّر تحضير رابط التحميل.",
-    "attribution": "مُنشأ بواسطة رِزق. سعّر بثقة، اقبض رزقك"
+    "attribution": "مُنشأ بواسطة رِزق. سعّر بثقة، اقبض رزقك",
+    "upload": {
+      "chooseFile": "اختر ملفًا",
+      "somethingWentWrongTryAgain": "حدث خطأ. حاول مرة أخرى.",
+      "file": "الملف",
+      "title": "العنوان",
+      "eGVatCertificate2026": "مثال: شهادة ضريبة القيمة المضافة 2026",
+      "category": "التصنيف",
+      "select": "اختر…",
+      "search": "ابحث…",
+      "results": "لا توجد نتائج",
+      "aiSuggested": "تصنيف مقترح بالذكاء الاصطناعي:",
+      "accept": "قبول",
+      "aiSuggestionAccepted": "تم قبول التصنيف المقترح",
+      "analyzing": "يحلل الملف...",
+      "descriptionOptional": "وصف (اختياري)",
+      "expiryDateOptional": "تاريخ الانتهاء (اختياري)",
+      "aiSuggest": "اقتراح ذكاء اصطناعي",
+      "aiSuggestedExpiry": "تاريخ انتهاء مقترح:",
+      "clearExpiryDetected": "لم يُرصَد تاريخ انتهاء واضح",
+      "tagsCommaSeparated": "وسوم (افصل بفاصلة)",
+      "eG2026Official": "مثال: 2026، رسمي",
+      "uploadDocument": "رفع الوثيقة"
+    },
+    "detail": {
+      "couldLoadFile": "تعذّر تحميل الملف",
+      "couldDelete": "تعذّر الحذف",
+      "viewDownload": "عرض / تحميل",
+      "confirmDelete": "تأكيد الحذف",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "shareDocument": "مشاركة الوثيقة",
+      "expiresAfter": "صلاحية:",
+      "n24Hours": "٢٤ ساعة",
+      "n3Days": "٣ أيام",
+      "n1Week": "أسبوع",
+      "n1Month": "شهر",
+      "copied": "تم النسخ",
+      "copy": "نسخ",
+      "documentInfo": "بيانات الوثيقة",
+      "filename": "الاسم",
+      "size": "الحجم",
+      "expiry": "تاريخ الانتهاء",
+      "tags": "الوسوم"
+    }
   },
   "Legal": {
     "lastUpdated": "آخر تحديث: مايو 2026",
@@ -589,7 +633,9 @@
     "upcomingDeadlines": "المواعيد القادمة",
     "noUpcomingDeadlines": "لا توجد مواعيد قادمة.",
     "createInvoice": "أنشئ فاتورة",
-    "currencySarShort": "ر.س"
+    "currencySarShort": "ر.س",
+    "showLess": "عرض أقل",
+    "untitledProposal": "عرض بدون عنوان"
   },
   "Tool": {
     "eyebrow": "أداة التسعير",
@@ -638,7 +684,11 @@
       "contributeYourPrice": "هل حصلت على سعر مختلف؟ ساهم في تحسين المعيار",
       "methodologyLink": "كيف نحسب هذا الرقم؟",
       "confidenceLabel": "درجة الثقة",
-      "createProposal": "أنشئ عرضًا سعريًا كاملاً"
+      "createProposal": "أنشئ عرضًا سعريًا كاملاً",
+      "min2": "الأدنى",
+      "max2": "الأعلى",
+      "marketAnchor": "وسيط السوق",
+      "rate": "سعرك"
     },
     "insufficient": {
       "title": "بيانات غير كافية بعد.",
@@ -762,7 +812,9 @@
     },
     "combobox": {
       "searchPlaceholder": "ابحث…",
-      "noResults": "لا توجد نتائج"
+      "noResults": "لا توجد نتائج",
+      "clearSelection": "مسح الاختيار",
+      "search": "بحث"
     },
     "quickAddClient": {
       "footerAdd": "إضافة عميل",
@@ -792,7 +844,12 @@
     "addClient": {
       "title": "عميل جديد",
       "subtitle": "أدخل بيانات العميل كاملة."
-    }
+    },
+    "error": "خطأ",
+    "somethingWentWrong": "حدث خطأ غير متوقع.",
+    "ref": "رمز",
+    "tryAgain": "حاول مرة أخرى",
+    "home": "الرئيسية"
   },
   "MySubmissions": {
     "heading": "مساهماتك",
@@ -1034,7 +1091,16 @@
       "freeInvoiceLimitReachedUpgrade": "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي.",
       "invoiceCanOnlyBeCreated": "يمكن إصدار الفاتورة فقط للعروض المقبولة.",
       "couldCreateInvoiceTryAgain": "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى.",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "priceUpdated": "تم تحديث السعر",
+      "couldnTUpdatePrice": "تعذّر تحديث السعر.",
+      "sar": "ر.س",
+      "adjustPriceManually": "اضبط السعر يدويًا",
+      "save": "حفظ",
+      "projectTitleSaved": "تم حفظ عنوان المشروع",
+      "couldnTSaveTitle": "تعذّر حفظ العنوان.",
+      "projectTitle": "عنوان المشروع",
+      "eGBrandIdentityCoffee": "مثال: هوية بصرية لمحمصة قهوة"
     },
     "refine": {
       "edit": "تعديل",
@@ -1086,6 +1152,15 @@
       "setAsDefault": "تعيين كافتراضي",
       "startFromTemplate": "ابدأ من قالب / Start from a template",
       "noTemplate": "بدون قالب"
+    },
+    "followUps": {
+      "doneGenerateProposal": "تم. أنشئ العرض",
+      "skipAll": "تخطّي الكل",
+      "skip": "تخطّي",
+      "quickQuestionsRefineProposal": "أسئلة سريعة لتحسين العرض",
+      "rizqAnalysis": "تحليل رِزق",
+      "typeAnswer": "اكتب إجابتك…",
+      "generating": "جارٍ الإنشاء…"
     }
   },
   "Income": {
@@ -1356,7 +1431,10 @@
       "emptyBody": "أنشئ أول فاتورة وابدأ في تتبع مدفوعاتك.",
       "emptyCta": "أنشئ أول فاتورة",
       "invoices": "فاتورة",
-      "none": "لا شيء"
+      "none": "لا شيء",
+      "unlinkedClient": "عميل غير محدد",
+      "due": "الاستحقاق:",
+      "sar": "ر.س"
     },
     "form": {
       "addTitle": "فاتورة جديدة",
@@ -2158,7 +2236,11 @@
     "deleteConfirmMismatch": "العبارة غير صحيحة. اكتب «حذف» أو «DELETE» بالضبط.",
     "deleteErrorGeneric": "حدث خطأ. حاول مرة أخرى.",
     "dialogClose": "إغلاق",
-    "dialogCancel": "إلغاء"
+    "dialogCancel": "إلغاء",
+    "profileStrength": "قوة ملفك",
+    "completeProfileStrengthen": "أكمل ملفك لتقويته:",
+    "profileComplete": "ملفك مكتمل بالكامل.",
+    "optionalExtrasIfHaveThem": "إضافات اختيارية (لمن لديه): تقوّي عرضك، وليست مطلوبة."
   },
   "StudioProfile": {
     "testimonials": {

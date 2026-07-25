@@ -10,6 +10,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
@@ -22,6 +23,7 @@ type Props = {
 };
 
 export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
+  const tI18n = useTranslations("Proposals.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -40,10 +42,10 @@ export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
       const result = await updateProjectTitle({ proposal_id: proposalId, title: next });
       if (result.ok) {
         setSaved(next);
-        toast.success(isAr ? "تم حفظ عنوان المشروع" : "Project title saved");
+        toast.success(tI18n("projectTitleSaved"));
         router.refresh();
       } else {
-        toast.error(isAr ? "تعذّر حفظ العنوان." : "Couldn't save the title.");
+        toast.error(tI18n("couldnTSaveTitle"));
       }
     });
   }
@@ -54,7 +56,7 @@ export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
       className={`print:hidden mb-4 rounded-2xl border border-rizq-gold/25 bg-rizq-cream/70 p-4 ${font}`}
     >
       <label className={`block text-xs font-medium text-rizq-ink-soft/70 uppercase tracking-wide mb-2 ${font}`}>
-        {isAr ? "عنوان المشروع" : "Project title"}
+        {tI18n("projectTitle")}
       </label>
       <div className="flex items-center gap-2">
         <input
@@ -68,7 +70,7 @@ export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
             }
           }}
           maxLength={140}
-          placeholder={isAr ? "مثال: هوية بصرية لمحمصة قهوة" : "e.g. Brand identity for a coffee roastery"}
+          placeholder={tI18n("eGBrandIdentityCoffee")}
           className={`flex-1 rounded-xl border border-rizq-gold/30 bg-[var(--raised)] px-3.5 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors placeholder:text-rizq-ink-soft/50 ${font}`}
         />
         <button
@@ -78,7 +80,7 @@ export function CoverTitleEditor({ proposalId, initialTitle, locale }: Props) {
           className={`inline-flex items-center gap-1.5 rounded-full bg-rizq-green text-rizq-cream px-4 py-2.5 text-sm font-medium hover:bg-rizq-green-dark transition-all disabled:opacity-50 ${font}`}
         >
           {isPending ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-          {isAr ? "حفظ" : "Save"}
+          {tI18n("save")}
         </button>
       </div>
     </div>

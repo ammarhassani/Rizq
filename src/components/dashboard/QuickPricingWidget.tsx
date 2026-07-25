@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Tag } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function QuickPricingWidget({ anchor, specialty, citation, locale }: Props) {
+  const tI18n = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";

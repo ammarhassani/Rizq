@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown, RefreshCw, Sparkles, ChevronDown } from "lucide-react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { getBusinessInsightsAction, submitInsightFeedbackAction } from "@/app/actions/dashboard/insights";
@@ -39,6 +40,7 @@ function cleanInsight(i: Partial<InsightItem> | undefined): InsightItem | null {
 }
 
 export function InsightsWidget({ locale }: Props) {
+  const tI18n = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -256,7 +258,7 @@ export function InsightsWidget({ locale }: Props) {
       <div dir={dir} className={`card-wahaj p-6 sm:p-8 text-center ${font}`}>
         <Sparkles className="h-8 w-8 text-rizq-gold mx-auto mb-3 opacity-50" />
         <p className={`text-sm text-rizq-ink-soft ${font}`}>
-          {isAr ? "أنشئ أول عرض لتفعيل التحليلات" : "Create your first proposal to activate insights"}
+          {tI18n("insightsEmptyTitle")}
         </p>
       </div>
     );
@@ -266,13 +268,13 @@ export function InsightsWidget({ locale }: Props) {
     return (
       <div dir={dir} className={`rounded-3xl border border-[var(--over-line)] bg-[var(--over-soft)] p-6 sm:p-8 ${font}`}>
         <p className={`text-sm text-[var(--over)] ${font}`}>
-          {isAr ? "تعذّر تحميل التحليلات. حاول مجددًا." : "Could not load insights. Try again."}
+          {tI18n("insightsErrorMsg")}
         </p>
         <button
           onClick={() => void loadFromAction()}
           className={`mt-3 text-xs text-rizq-green hover:underline ${font}`}
         >
-          {isAr ? "إعادة المحاولة" : "Retry"}
+          {tI18n("insightsRetry")}
         </button>
       </div>
     );
@@ -298,7 +300,7 @@ export function InsightsWidget({ locale }: Props) {
         >
           <Sparkles className={`h-4 w-4 text-rizq-gold ${isStreaming ? "animate-pulse" : ""}`} />
           <span className={`text-xs font-semibold text-rizq-ink-soft/70 uppercase tracking-wide ${font}`}>
-            {isAr ? "تحليل رِزق" : "Rizq Insights"}
+            {tI18n("insightsTitle")}
           </span>
           {collapsed && displayInsights.length > 0 && (
             <span className="tabular font-sans inline-flex min-w-4 items-center justify-center rounded-full bg-rizq-gold/15 px-1.5 text-[11px] text-rizq-gold-deep">
@@ -314,17 +316,17 @@ export function InsightsWidget({ locale }: Props) {
           <div className="flex items-center gap-2">
             {cached && !isStreaming && (
               <span className={`text-xs text-rizq-ink-soft/50 ${font}`}>
-                {isAr ? "محفوظ مؤقتًا" : "Cached"}
+                {tI18n("insightsCached")}
               </span>
             )}
             <button
               onClick={handleRefresh}
               disabled={refreshing || isStreaming}
               className="flex items-center gap-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
-              aria-label={isAr ? "تحديث" : "Refresh"}
+              aria-label={tI18n("insightsRefresh")}
             >
               <RefreshCw className={`h-3 w-3 ${refreshing || isStreaming ? "animate-spin" : ""}`} />
-              <span className={font}>{isAr ? "تحديث" : "Refresh"}</span>
+              <span className={font}>{tI18n("insightsRefresh")}</span>
             </button>
           </div>
         )}
@@ -385,7 +387,7 @@ export function InsightsWidget({ locale }: Props) {
               className={`mt-3 inline-flex items-center gap-1 text-xs font-medium text-rizq-green hover:text-rizq-green-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 rounded ${font}`}
             >
               {showAll
-                ? isAr ? "عرض أقل" : "Show less"
+                ? tI18n("showLess")
                 : isAr ? `عرض الكل (${displayInsights.length})` : `Show all (${displayInsights.length})`}
               <ChevronDown size={13} className={`transition-transform ${showAll ? "rotate-180" : ""}`} aria-hidden />
             </button>

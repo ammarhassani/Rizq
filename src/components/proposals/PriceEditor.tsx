@@ -11,6 +11,7 @@
  */
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
@@ -26,6 +27,7 @@ type Props = {
 };
 
 export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Props) {
+  const tI18n = useTranslations("Proposals.detail");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -50,15 +52,15 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
       const result = await updateProposalPrice({ proposal_id: proposalId, anchor: next });
       if (result.ok) {
         setSaved(next);
-        toast.success(isAr ? "تم تحديث السعر" : "Price updated");
+        toast.success(tI18n("priceUpdated"));
         router.refresh();
       } else {
-        toast.error(isAr ? "تعذّر تحديث السعر." : "Couldn't update the price.");
+        toast.error(tI18n("couldnTUpdatePrice"));
       }
     });
   }
 
-  const currencyLabel = isAr ? "ر.س" : "SAR";
+  const currencyLabel = tI18n("sar");
   const hasRange = typeof min === "number" && typeof max === "number" && max > 0;
 
   return (
@@ -67,7 +69,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
       className={`print:hidden mt-3 rounded-2xl border border-rizq-green/20 bg-[var(--raised)] p-4 ${font}`}
     >
       <label className={`block text-xs font-medium text-rizq-ink-soft/70 uppercase tracking-wide mb-2 ${font}`}>
-        {isAr ? "اضبط السعر يدويًا" : "Adjust price manually"}
+        {tI18n("adjustPriceManually")}
       </label>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -98,7 +100,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
           className={`inline-flex items-center gap-1.5 rounded-full bg-rizq-green text-rizq-cream px-4 py-2.5 text-sm font-medium hover:bg-rizq-green-dark transition-all disabled:opacity-50 ${font}`}
         >
           {isPending ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-          {isAr ? "حفظ" : "Save"}
+          {tI18n("save")}
         </button>
       </div>
       <p className={`mt-1.5 text-xs text-rizq-ink-soft/60 ${font}`}>

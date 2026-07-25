@@ -13,6 +13,7 @@
  */
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, Check, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +78,7 @@ export function Combobox({
   footer,
   "aria-label": ariaLabel,
 }: Props) {
+  const tI18n = useTranslations("Common.combobox");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
@@ -243,7 +245,7 @@ export function Combobox({
             <span
               role="button"
               tabIndex={-1}
-              aria-label={isAr ? "مسح الاختيار" : "Clear selection"}
+              aria-label={tI18n("clearSelection")}
               onClick={clear}
               className="rounded-full p-0.5 text-rizq-ink-soft/60 hover:bg-rizq-ink/8 hover:text-rizq-ink transition-colors"
             >
@@ -291,8 +293,8 @@ export function Combobox({
                   setActiveIndex(0);
                 }}
                 onKeyDown={onSearchKeyDown}
-                placeholder={searchPlaceholder ?? (isAr ? "ابحث…" : "Search…")}
-                aria-label={searchPlaceholder ?? (isAr ? "بحث" : "Search")}
+                placeholder={searchPlaceholder ?? (tI18n("searchPlaceholder"))}
+                aria-label={searchPlaceholder ?? (tI18n("search"))}
                 aria-controls={listboxId}
                 aria-autocomplete="list"
                 aria-activedescendant={
@@ -322,7 +324,7 @@ export function Combobox({
                 role="presentation"
                 className="px-3 py-3 text-center text-sm text-rizq-ink-soft/60"
               >
-                {emptyText ?? (isAr ? "لا توجد نتائج" : "No results")}
+                {emptyText ?? (tI18n("noResults"))}
               </li>
             ) : (
               filtered.map((option, idx) => {

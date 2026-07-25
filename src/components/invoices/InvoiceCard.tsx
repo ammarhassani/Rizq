@@ -3,6 +3,7 @@
  * Mirrors GigCard in structure, status colors, and RTL handling.
  */
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { isOverdue } from "@/lib/invoices/overdue";
 
 export type InvoiceRow = {
@@ -70,6 +71,7 @@ function fmtMoney(n: number, locale: "ar" | "en"): string {
 }
 
 export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
+  const tI18n = useTranslations("Invoices.list");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -82,7 +84,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
     : STATUS_LABELS_EN[invoice.status] ?? invoice.status;
   const statusStyle = STATUS_STYLES[invoice.status] ?? STATUS_STYLES.draft;
 
-  const clientDisplay = invoice.client_name ?? (isAr ? "عميل غير محدد" : "Unlinked client");
+  const clientDisplay = invoice.client_name ?? (tI18n("unlinkedClient"));
 
   return (
     <Link
@@ -99,7 +101,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
             {/* Overdue badge */}
             {overdueFlag && (
               <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium status-overdue ${font}`}>
-                {isAr ? "متأخرة" : "Overdue"}
+                {tI18n("filterOverdue")}
               </span>
             )}
           </div>
@@ -110,7 +112,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
           {/* Due date */}
           {invoice.due_date && (
             <p className="mt-1 text-xs text-rizq-ink-soft/60">
-              {isAr ? "الاستحقاق:" : "Due:"}{" "}
+              {tI18n("due")}{" "}
               {fmtDate(invoice.due_date, locale)}
             </p>
           )}
@@ -120,7 +122,7 @@ export function InvoiceCard({ invoice, locale, statusSlot }: Props) {
             {fmtMoney(invoice.total_sar, locale)}
           </p>
           <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>
-            {isAr ? "ر.س" : "SAR"}
+            {tI18n("sar")}
           </p>
           {statusSlot ?? (
             <span

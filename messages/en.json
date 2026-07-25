@@ -148,7 +148,51 @@
     "shareNotice": "This document was shared with you via Rizq. The link is temporary and will expire soon.",
     "downloadFile": "Download file",
     "downloadError": "Could not prepare download link.",
-    "attribution": "Shared via Rizq. Price with confidence, earn your rizq"
+    "attribution": "Shared via Rizq. Price with confidence, earn your rizq",
+    "upload": {
+      "chooseFile": "Choose a file",
+      "somethingWentWrongTryAgain": "Something went wrong. Try again.",
+      "file": "File",
+      "title": "Title",
+      "eGVatCertificate2026": "e.g. VAT Certificate 2026",
+      "category": "Category",
+      "select": "Select…",
+      "search": "Search…",
+      "results": "No results",
+      "aiSuggested": "AI suggested:",
+      "accept": "Accept",
+      "aiSuggestionAccepted": "AI suggestion accepted",
+      "analyzing": "Analyzing...",
+      "descriptionOptional": "Description (optional)",
+      "expiryDateOptional": "Expiry date (optional)",
+      "aiSuggest": "AI suggest",
+      "aiSuggestedExpiry": "AI suggested expiry:",
+      "clearExpiryDetected": "No clear expiry detected",
+      "tagsCommaSeparated": "Tags (comma-separated)",
+      "eG2026Official": "e.g. 2026, official",
+      "uploadDocument": "Upload document"
+    },
+    "detail": {
+      "couldLoadFile": "Could not load file",
+      "couldDelete": "Could not delete",
+      "viewDownload": "View / Download",
+      "confirmDelete": "Confirm delete",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "shareDocument": "Share document",
+      "expiresAfter": "Expires after:",
+      "n24Hours": "24 hours",
+      "n3Days": "3 days",
+      "n1Week": "1 week",
+      "n1Month": "1 month",
+      "copied": "Copied!",
+      "copy": "Copy",
+      "documentInfo": "Document info",
+      "filename": "Filename",
+      "size": "Size",
+      "expiry": "Expiry",
+      "tags": "Tags"
+    }
   },
   "Legal": {
     "lastUpdated": "Last updated: May 2026",
@@ -589,7 +633,9 @@
     "upcomingDeadlines": "Upcoming Deadlines",
     "noUpcomingDeadlines": "No upcoming deadlines.",
     "createInvoice": "Create an invoice",
-    "currencySarShort": "SAR"
+    "currencySarShort": "SAR",
+    "showLess": "Show less",
+    "untitledProposal": "Untitled proposal"
   },
   "Tool": {
     "eyebrow": "Pricing tool",
@@ -638,7 +684,11 @@
       "contributeYourPrice": "Paid a different price? Help improve the benchmark",
       "methodologyLink": "How did we calculate this?",
       "confidenceLabel": "Confidence",
-      "createProposal": "Create a full proposal"
+      "createProposal": "Create a full proposal",
+      "min2": "Min",
+      "max2": "Max",
+      "marketAnchor": "Market anchor",
+      "rate": "Your rate"
     },
     "insufficient": {
       "title": "Not enough data yet.",
@@ -762,7 +812,9 @@
     },
     "combobox": {
       "searchPlaceholder": "Search…",
-      "noResults": "No results"
+      "noResults": "No results",
+      "clearSelection": "Clear selection",
+      "search": "Search"
     },
     "quickAddClient": {
       "footerAdd": "Add client",
@@ -792,7 +844,12 @@
     "addClient": {
       "title": "New client",
       "subtitle": "Enter the client's full details."
-    }
+    },
+    "error": "Error",
+    "somethingWentWrong": "Something went wrong.",
+    "ref": "ref",
+    "tryAgain": "Try again",
+    "home": "Home"
   },
   "MySubmissions": {
     "heading": "Your contributions",
@@ -1034,7 +1091,16 @@
       "freeInvoiceLimitReachedUpgrade": "Free invoice limit reached. Upgrade to Pro.",
       "invoiceCanOnlyBeCreated": "Invoice can only be created for accepted proposals.",
       "couldCreateInvoiceTryAgain": "Could not create invoice. Try again.",
-      "actions": "Actions"
+      "actions": "Actions",
+      "priceUpdated": "Price updated",
+      "couldnTUpdatePrice": "Couldn't update the price.",
+      "sar": "SAR",
+      "adjustPriceManually": "Adjust price manually",
+      "save": "Save",
+      "projectTitleSaved": "Project title saved",
+      "couldnTSaveTitle": "Couldn't save the title.",
+      "projectTitle": "Project title",
+      "eGBrandIdentityCoffee": "e.g. Brand identity for a coffee roastery"
     },
     "refine": {
       "edit": "Edit",
@@ -1086,6 +1152,15 @@
       "setAsDefault": "Set as default",
       "startFromTemplate": "Start from a template",
       "noTemplate": "No template"
+    },
+    "followUps": {
+      "doneGenerateProposal": "Done. Generate proposal",
+      "skipAll": "Skip all",
+      "skip": "Skip",
+      "quickQuestionsRefineProposal": "Quick questions to refine your proposal",
+      "rizqAnalysis": "Rizq Analysis",
+      "typeAnswer": "Type your answer…",
+      "generating": "Generating…"
     }
   },
   "Income": {
@@ -1356,7 +1431,10 @@
       "emptyBody": "Create your first invoice and start tracking payments.",
       "emptyCta": "Create first invoice",
       "invoices": "invoices",
-      "none": "none"
+      "none": "none",
+      "unlinkedClient": "Unlinked client",
+      "due": "Due:",
+      "sar": "SAR"
     },
     "form": {
       "addTitle": "New invoice",
@@ -2158,7 +2236,11 @@
     "deleteConfirmMismatch": "Phrase doesn't match. Type exactly «حذف» or «DELETE».",
     "deleteErrorGeneric": "Something went wrong. Please try again.",
     "dialogClose": "Close",
-    "dialogCancel": "Cancel"
+    "dialogCancel": "Cancel",
+    "profileStrength": "Profile strength",
+    "completeProfileStrengthen": "Complete your profile to strengthen it:",
+    "profileComplete": "Your profile is complete.",
+    "optionalExtrasIfHaveThem": "Optional extras (if you have them): strengthen your pitch, never required."
   },
   "StudioProfile": {
     "testimonials": {

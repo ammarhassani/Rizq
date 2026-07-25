@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { FileText, Plus } from "lucide-react";
 import { WidgetError } from "./WidgetError";
 
@@ -55,6 +56,7 @@ const statusLabelsEn: Record<string, string> = {
 const humanizeStatus = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 export function RecentProposalsWidget({ proposals, error, locale }: Props) {
+  const tI18n = useTranslations("Dashboard");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -65,11 +67,11 @@ export function RecentProposalsWidget({ proposals, error, locale }: Props) {
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4 text-rizq-green opacity-70" />
           <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
-            {isAr ? "أحدث العروض" : "Recent Proposals"}
+            {tI18n("proposalsTitle")}
           </span>
         </div>
         <Link href="/proposals" className={`text-xs text-rizq-green hover:underline ${font}`}>
-          {isAr ? "عرض الكل ←" : "View all →"}
+          {tI18n("viewAll")}
         </Link>
       </div>
 
@@ -78,14 +80,14 @@ export function RecentProposalsWidget({ proposals, error, locale }: Props) {
       ) : proposals.length === 0 ? (
         <div className={`text-center py-4 ${font}`}>
           <p className={`text-sm text-rizq-ink-soft mb-3 ${font}`}>
-            {isAr ? "ما عندك عروض حتى الآن." : "No proposals yet."}
+            {tI18n("proposalsEmpty")}
           </p>
           <Link
             href="/proposals/new"
             className={`inline-flex items-center gap-1 text-sm text-rizq-green hover:underline ${font}`}
           >
             <Plus className="h-3 w-3" />
-            {isAr ? "أنشئ أول عرض" : "Create your first proposal"}
+            {tI18n("proposalsEmptyCta")}
           </Link>
         </div>
       ) : (
@@ -98,7 +100,7 @@ export function RecentProposalsWidget({ proposals, error, locale }: Props) {
             >
               <div className="min-w-0">
                 <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>
-                  {p.title ?? (isAr ? "عرض بدون عنوان" : "Untitled proposal")}
+                  {p.title ?? (tI18n("untitledProposal"))}
                 </p>
                 {p.client_name && (
                   <p className={`text-xs text-rizq-ink-soft truncate ${font}`}>{p.client_name}</p>

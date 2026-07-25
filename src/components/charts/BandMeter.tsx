@@ -17,6 +17,8 @@
  * geometry itself is decorative.
  */
 
+import { useTranslations } from "next-intl";
+
 type Props = {
   min: number;
   anchor: number;
@@ -54,6 +56,7 @@ export function BandMeter({
   maxLabel,
   anchorLabel,
 }: Props) {
+  const tI18n = useTranslations("Tool.result");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const curr = isAr && currency === "SAR" ? "ريال" : currency;
@@ -65,9 +68,9 @@ export function BandMeter({
   // RTL: low on the right → mirror the offset.
   const place = (pct: number) => (isAr ? 100 - pct : pct);
 
-  const lowLbl = minLabel ?? (isAr ? "الأدنى" : "Min");
-  const highLbl = maxLabel ?? (isAr ? "الأعلى" : "Max");
-  const anchorLbl = anchorLabel ?? (isAr ? "وسيط السوق" : "Market anchor");
+  const lowLbl = minLabel ?? (tI18n("min2"));
+  const highLbl = maxLabel ?? (tI18n("max2"));
+  const anchorLbl = anchorLabel ?? (tI18n("marketAnchor"));
 
   const ariaLabel = (() => {
     const base = isAr
@@ -142,7 +145,7 @@ export function BandMeter({
               aria-hidden
               className="inline-block h-2.5 w-2.5 rounded-full border-2 border-rizq-gold-deep bg-rizq-cream"
             />
-            {isAr ? "سعرك" : "Your rate"}:{" "}
+            {tI18n("rate")}:{" "}
             <span className="tabular font-sans font-semibold text-rizq-ink">
               {fmtNumber(value as number, locale)}
             </span>

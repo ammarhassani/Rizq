@@ -11,6 +11,7 @@
  */
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import type { FollowUpTemplate } from "@/lib/proposals/followUp";
 
@@ -27,13 +28,14 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
   const font = locale === "ar" ? "font-arabic" : "font-sans";
   const dir = locale === "ar" ? "rtl" : "ltr";
 
+  const tI18n = useTranslations("Proposals.followUps");
   const isAr = locale === "ar";
 
   const labels = {
-    done: isAr ? "تم. أنشئ العرض" : "Done. Generate proposal",
-    skipAll: isAr ? "تخطّي الكل" : "Skip all",
-    skip: isAr ? "تخطّي" : "Skip",
-    heading: isAr ? "أسئلة سريعة لتحسين العرض" : "Quick questions to refine your proposal",
+    done: tI18n("doneGenerateProposal"),
+    skipAll: tI18n("skipAll"),
+    skip: tI18n("skip"),
+    heading: tI18n("quickQuestionsRefineProposal"),
     subheading: isAr
       ? "اختياري. إجاباتك تجعل السعر والنطاق أدق."
       : "Optional. Your answers make the price and scope more accurate.",
@@ -67,7 +69,7 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
       {/* Header */}
       <div>
         <p className="eyebrow mb-2 text-rizq-green">
-          {isAr ? "تحليل رِزق" : "Rizq Analysis"}
+          {tI18n("rizqAnalysis")}
         </p>
         <h2 className="text-xl font-semibold text-rizq-ink">{labels.heading}</h2>
         <p className="mt-1 text-sm text-rizq-ink-soft">{labels.subheading}</p>
@@ -124,7 +126,7 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
                       return next;
                     });
                   }}
-                  placeholder={isAr ? "اكتب إجابتك…" : "Type your answer…"}
+                  placeholder={tI18n("typeAnswer")}
                   disabled={pending}
                   dir={dir}
                   className="w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2.5 text-sm text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors disabled:opacity-50"
@@ -157,7 +159,7 @@ export function FollowUpCards({ locale, questions, onSubmit, onSkip, pending }: 
           {pending ? (
             <>
               <Loader2 size={15} className="animate-spin" />
-              <span>{isAr ? "جارٍ الإنشاء…" : "Generating…"}</span>
+              <span>{tI18n("generating")}</span>
             </>
           ) : (
             <span>{labels.done}</span>
