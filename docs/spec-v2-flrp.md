@@ -534,14 +534,33 @@ M1 delegates to M4's `resolvePrice`. Then applies:
    - Urgency: rush → +15%, long-term → -10%
    - Client type: corporate → +10%, individual → -5%
    - IP transfer: full_transfer → +20%, license → -5%
+   - Scope size: +10% per extra deliverable, capped at +60%
 
 2. **Personal weighting:** Blend the freelancer's own prior proposal anchors with the market anchor:
    - N < 3 proposals: weight = 0.1 (mostly market)
    - N 3-10: weight = 0.3
    - N > 10: weight = 0.5 (market + personal equally weighted)
    - Never exceeds 0.5 — market always has a voice.
+   - The freelancer's own stated project rate counts as one personal anchor point, so a
+     profiled freelancer is reflected from proposal #1.
 
 3. **Rounding:** Anchor rounded to nearest 50 SAR. Min/Max rounded to nearest 10 SAR.
+
+4. **The quote vs the band** (revised 2026-07-26 — see
+   `docs/validation/power-user-pass-2026-07-26.md` P0-2). The cited band is a *per-project market
+   reference* and is **never widened**; `anchor` stays inside it. But the number we quote is
+   `quote`, which may exceed the band, because two things the benchmark cannot see legitimately
+   move the real price:
+   - **Scope.** A five-deliverable job is not one benchmark "project". Clamping the modified
+     anchor to the band max meant that with a narrow band (small sample — the normal case at
+     n=5) every mid-size proposal returned the identical ceiling figure.
+   - **A budget the client stated.** `budget_mentioned` is already extracted from the brief;
+     quoting under it leaves the freelancer's money on the table. It only ever **lifts** the
+     quote — pricing *down* to a lowball is the freelancer's call to make by hand.
+
+   `quote_basis` (`market` | `scope` | `client_budget`) records which applied, and the
+   provenance line changes with it: only a `market` quote may present the benchmark citation as
+   its source (Constitution Principle I). A manual override likewise re-labels its own source.
 
 #### M1.8 UX specification
 
