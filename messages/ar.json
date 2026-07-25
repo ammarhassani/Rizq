@@ -1028,7 +1028,13 @@
         "downloadPdfNote": "افتح رابط المشاركة ثم اطبع من المتصفح.",
         "whatsapp": "واتساب",
         "close": "إغلاق"
-      }
+      },
+      "freeProjectLimitReachedUpgrade": "وصلت للحد المجاني للمشاريع. ترقَّ للاحترافي.",
+      "somethingWentWrongTryAgain": "حدث خطأ. حاول مرة أخرى.",
+      "freeInvoiceLimitReachedUpgrade": "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي.",
+      "invoiceCanOnlyBeCreated": "يمكن إصدار الفاتورة فقط للعروض المقبولة.",
+      "couldCreateInvoiceTryAgain": "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى.",
+      "actions": "الإجراءات"
     },
     "refine": {
       "edit": "تعديل",
@@ -1109,7 +1115,20 @@
       "markPaid": "اقبض",
       "emptyTitle": "ما عندك دخل مسجّل بعد.",
       "emptyBody": "سجّل أول دفعة وابدأ بتتبع دخلك.",
-      "emptyCta": "سجّل دخلاً"
+      "emptyCta": "سجّل دخلاً",
+      "sar": "ريال",
+      "gigs": "عملًا",
+      "monthlyAverage": "المتوسّط الشهريّ",
+      "year": "هذا العام",
+      "monthlyIncome": "الدخل الشهريّ",
+      "exporting": "جارٍ التصدير…",
+      "exportCsvPro": "تصدير CSV (احترافي)",
+      "somethingWentWrongTryAgain": "حدث خطأ. حاول مرة أخرى.",
+      "tryAgain": "أعد المحاولة",
+      "generatingForecast": "جارٍ توليد الإسقاط…",
+      "monthProjected": "هذا الشهر (متوقع)",
+      "nextMonthProjected": "الشهر القادم (متوقع)",
+      "refresh": "تحديث"
     },
     "form": {
       "addTitle": "سجّل مشروع جديد",
@@ -1160,7 +1179,18 @@
       "deleteConfirm": "هل تريد حذف هذا المشروع نهائيًا؟ لا يمكن التراجع.",
       "deleteConfirmBtn": "تأكيد الحذف",
       "deleting": "جارٍ الحذف…",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "freeInvoiceLimitReachedUpgrade": "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي.",
+      "couldCreateInvoiceTryAgain": "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى.",
+      "couldnTUndo": "تعذّر التراجع.",
+      "statusPaidUndo": "الحالة: مدفوع · يمكنك التراجع",
+      "undo": "تراجع",
+      "couldnTUpdateStatus": "تعذّر تحديث الحالة.",
+      "statusOverdueUndo": "الحالة: متأخر · يمكنك التراجع",
+      "deleted": "تم الحذف",
+      "couldnTDelete": "تعذّر الحذف.",
+      "linkedInvoice": "الفاتورة المرتبطة",
+      "actions": "الإجراءات"
     },
     "ai": {
       "suggestedCategory": "تصنيف مقترح:",
@@ -1324,7 +1354,9 @@
       "markPaid": "اقبض",
       "emptyTitle": "ما عندك فواتير حتى الآن.",
       "emptyBody": "أنشئ أول فاتورة وابدأ في تتبع مدفوعاتك.",
-      "emptyCta": "أنشئ أول فاتورة"
+      "emptyCta": "أنشئ أول فاتورة",
+      "invoices": "فاتورة",
+      "none": "لا شيء"
     },
     "form": {
       "addTitle": "فاتورة جديدة",
@@ -1374,7 +1406,14 @@
       "deleting": "جارٍ الحذف…",
       "cancel": "إلغاء",
       "share": "مشاركة الفاتورة",
-      "print": "طباعة PDF"
+      "print": "طباعة PDF",
+      "couldnTUndo": "تعذّر التراجع.",
+      "undo": "تراجع",
+      "couldnTUpdateStatus": "تعذّر تحديث الحالة.",
+      "deleted": "تم الحذف",
+      "couldnTDelete": "تعذّر الحذف.",
+      "actions": "الإجراءات",
+      "emailClient": "إرسال بالبريد"
     },
     "share": {
       "title": "مشاركة الفاتورة",
@@ -1482,7 +1521,16 @@
       "archiveConfirmBtn": "تأكيد الأرشفة",
       "archiving": "جارٍ الأرشفة…",
       "cancel": "إلغاء",
-      "saving": "جارٍ الحفظ…"
+      "saving": "جارٍ الحفظ…",
+      "couldnTUndo": "تعذّر التراجع.",
+      "archivedUndo": "تمت الأرشفة · يمكنك التراجع",
+      "undo": "تراجع",
+      "couldnTArchive": "تعذّرت الأرشفة.",
+      "somethingWentWrongTryAgain": "حدث خطأ. حاول مرة أخرى.",
+      "couldnTDraftMessageTry": "حدث خطأ في صياغة الرسالة. حاول مرة أخرى.",
+      "actions": "الإجراءات",
+      "rizqAi": "ميزات رِزق AI",
+      "refreshPriority": "تحديث الأولوية"
     },
     "form": {
       "addTitle": "إضافة عميل جديد",
@@ -2176,7 +2224,12 @@
         "amountRequired": "أدخل مبلغًا صحيحًا أكبر من صفر.",
         "generic": "حدث خطأ. حاول مرة أخرى."
       },
-      "saveChanges": "حفظ التغييرات"
+      "saveChanges": "حفظ التغييرات",
+      "enterPercentageBetween0100": "أدخل نسبة بين 0 و100.",
+      "feeType": "نوع الرسوم",
+      "fixedValue": "قيمة ثابتة",
+      "percentage": "نسبة مئوية",
+      "sar": "ر.س"
     },
     "dialog": {
       "title": "رسوم جديدة",

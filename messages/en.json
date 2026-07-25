@@ -1028,7 +1028,13 @@
         "downloadPdfNote": "Open the share link, then print from your browser.",
         "whatsapp": "WhatsApp",
         "close": "Close"
-      }
+      },
+      "freeProjectLimitReachedUpgrade": "Free project limit reached. Upgrade to Pro.",
+      "somethingWentWrongTryAgain": "Something went wrong. Try again.",
+      "freeInvoiceLimitReachedUpgrade": "Free invoice limit reached. Upgrade to Pro.",
+      "invoiceCanOnlyBeCreated": "Invoice can only be created for accepted proposals.",
+      "couldCreateInvoiceTryAgain": "Could not create invoice. Try again.",
+      "actions": "Actions"
     },
     "refine": {
       "edit": "Edit",
@@ -1109,7 +1115,20 @@
       "markPaid": "Mark paid",
       "emptyTitle": "No income logged yet.",
       "emptyBody": "Log your first payment and start tracking your income.",
-      "emptyCta": "Log income"
+      "emptyCta": "Log income",
+      "sar": "SAR",
+      "gigs": "gigs",
+      "monthlyAverage": "Monthly average",
+      "year": "this year",
+      "monthlyIncome": "Monthly income",
+      "exporting": "Exporting…",
+      "exportCsvPro": "Export CSV (Pro)",
+      "somethingWentWrongTryAgain": "Something went wrong. Try again.",
+      "tryAgain": "Try again",
+      "generatingForecast": "Generating forecast…",
+      "monthProjected": "This month (projected)",
+      "nextMonthProjected": "Next month (projected)",
+      "refresh": "Refresh"
     },
     "form": {
       "addTitle": "Log a new project",
@@ -1160,7 +1179,18 @@
       "deleteConfirm": "Permanently delete this project? This cannot be undone.",
       "deleteConfirmBtn": "Confirm delete",
       "deleting": "Deleting…",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "freeInvoiceLimitReachedUpgrade": "Free invoice limit reached. Upgrade to Pro.",
+      "couldCreateInvoiceTryAgain": "Could not create invoice. Try again.",
+      "couldnTUndo": "Couldn't undo.",
+      "statusPaidUndo": "Status: Paid · Undo",
+      "undo": "Undo",
+      "couldnTUpdateStatus": "Couldn't update status.",
+      "statusOverdueUndo": "Status: Overdue · Undo",
+      "deleted": "Deleted",
+      "couldnTDelete": "Couldn't delete.",
+      "linkedInvoice": "Linked invoice",
+      "actions": "Actions"
     },
     "ai": {
       "suggestedCategory": "Suggested category:",
@@ -1324,7 +1354,9 @@
       "markPaid": "Mark paid",
       "emptyTitle": "No invoices yet.",
       "emptyBody": "Create your first invoice and start tracking payments.",
-      "emptyCta": "Create first invoice"
+      "emptyCta": "Create first invoice",
+      "invoices": "invoices",
+      "none": "none"
     },
     "form": {
       "addTitle": "New invoice",
@@ -1374,7 +1406,14 @@
       "deleting": "Deleting…",
       "cancel": "Cancel",
       "share": "Share invoice",
-      "print": "Print PDF"
+      "print": "Print PDF",
+      "couldnTUndo": "Couldn't undo.",
+      "undo": "Undo",
+      "couldnTUpdateStatus": "Couldn't update status.",
+      "deleted": "Deleted",
+      "couldnTDelete": "Couldn't delete.",
+      "actions": "Actions",
+      "emailClient": "Email to client"
     },
     "share": {
       "title": "Share invoice",
@@ -1482,7 +1521,16 @@
       "archiveConfirmBtn": "Confirm archive",
       "archiving": "Archiving…",
       "cancel": "Cancel",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "couldnTUndo": "Couldn't undo.",
+      "archivedUndo": "Archived · Undo",
+      "undo": "Undo",
+      "couldnTArchive": "Couldn't archive.",
+      "somethingWentWrongTryAgain": "Something went wrong. Try again.",
+      "couldnTDraftMessageTry": "Couldn't draft the message. Try again.",
+      "actions": "Actions",
+      "rizqAi": "Rizq AI",
+      "refreshPriority": "Refresh priority"
     },
     "form": {
       "addTitle": "Add new client",
@@ -2176,7 +2224,12 @@
         "amountRequired": "Enter a valid amount greater than zero.",
         "generic": "Something went wrong. Try again."
       },
-      "saveChanges": "Save changes"
+      "saveChanges": "Save changes",
+      "enterPercentageBetween0100": "Enter a percentage between 0 and 100.",
+      "feeType": "Fee type",
+      "fixedValue": "Fixed value",
+      "percentage": "Percentage",
+      "sar": "SAR"
     },
     "dialog": {
       "title": "New fee",

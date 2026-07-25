@@ -233,43 +233,43 @@ export function IncomeListClient({ gigs, locale }: Props) {
       <section dir={dir} className="space-y-[18px]">
         <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-3">
           <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
-            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "دخل هذا الشهر" : "This month"}</div>
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{t("filterThisMonth")}</div>
             <div className="flex items-baseline gap-1.5">
               <span className="aurora-text tabular font-sans text-[34px] font-bold leading-none">
                 <AnimatedNumber value={stats.thisMonth} locale={locale} duration={1.1} />
               </span>
-              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{t("sar")}</span>
             </div>
             {stats.changePct !== null && (
               <div className={`mt-1 text-[10px] text-[var(--acc)] ${font}`}>
-                {stats.changePct >= 0 ? "+" : ""}{stats.changePct}% {isAr ? "عن الشهر الماضي" : "vs last month"}
+                {stats.changePct >= 0 ? "+" : ""}{stats.changePct}% {t("vsLastMonth")}
               </div>
             )}
           </div>
           <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
-            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "دخل هذا العام" : "This year"}</div>
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{t("filterThisYear")}</div>
             <div className="flex items-baseline gap-1.5">
               <span className="tabular font-sans text-[34px] font-bold leading-none text-[var(--content)]">
                 <AnimatedNumber value={stats.thisYear} locale={locale} duration={1.1} />
               </span>
-              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{t("sar")}</span>
             </div>
-            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{fmtPrice(stats.yearCount, locale)} {isAr ? "عملًا" : "gigs"}</div>
+            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{fmtPrice(stats.yearCount, locale)} {t("gigs")}</div>
           </div>
           <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
-            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{isAr ? "المتوسّط الشهريّ" : "Monthly average"}</div>
+            <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{t("monthlyAverage")}</div>
             <div className="flex items-baseline gap-1.5">
               <span className="tabular font-sans text-[34px] font-bold leading-none text-[var(--content)]">
                 <AnimatedNumber value={stats.avg} locale={locale} duration={1.1} />
               </span>
-              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{isAr ? "ريال" : "SAR"}</span>
+              <span className={`text-xs text-[var(--content-muted)] ${font}`}>{t("sar")}</span>
             </div>
-            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{isAr ? "هذا العام" : "this year"}</div>
+            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{t("year")}</div>
           </div>
         </div>
         <div className="nm-raised rounded-[20px] bg-[var(--raised)] px-[22px] py-5">
           <div className={`mb-4 text-xs font-semibold text-[var(--content)] ${font}`}>
-            {isAr ? "الدخل الشهريّ" : "Monthly income"} · {stats.year}
+            {t("monthlyIncome")} · {stats.year}
           </div>
           <div className="flex h-[150px] items-end gap-3.5">
             {stats.monthly.map((v, i) => {
@@ -338,9 +338,9 @@ export function IncomeListClient({ gigs, locale }: Props) {
           className={`inline-flex items-center gap-2 rounded-full border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-2 text-sm font-medium text-rizq-ink-soft hover:border-rizq-green/40 hover:text-rizq-green transition-all disabled:opacity-60 ${font}`}
         >
           {csvState === "loading" ? (
-            <><Loader2 size={14} className="animate-spin" /> {isAr ? "جارٍ التصدير…" : "Exporting…"}</>
+            <><Loader2 size={14} className="animate-spin" /> {t("exporting")}</>
           ) : (
-            <><Download size={14} /> {isAr ? "تصدير CSV (احترافي)" : "Export CSV (Pro)"}</>
+            <><Download size={14} /> {t("exportCsvPro")}</>
           )}
         </button>
         {csvState === "upgrade" && (
@@ -350,7 +350,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
         )}
         {csvState === "error" && (
           <p className={`text-sm text-[var(--over)] ${font}`}>
-            {isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again."}
+            {t("somethingWentWrongTryAgain")}
           </p>
         )}
       </div>
@@ -365,7 +365,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
             className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 bg-rizq-green/8 px-4 py-2 text-sm font-medium text-rizq-green hover:bg-rizq-green/15 transition-colors ${font}`}
           >
             {forecast.status === "error"
-              ? (isAr ? "أعد المحاولة" : "Try again")
+              ? (t("tryAgain"))
               : (isAr ? tAi("generateForecast") : tAi("generateForecast"))}
           </button>
         )}
@@ -374,7 +374,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
         {forecast.status === "loading" && (
           <div className={`flex items-center gap-2 text-sm text-rizq-ink-soft ${font}`}>
             <Loader2 size={14} className="animate-spin text-rizq-green" />
-            <span>{isAr ? "جارٍ توليد الإسقاط…" : "Generating forecast…"}</span>
+            <span>{t("generatingForecast")}</span>
           </div>
         )}
 
@@ -392,12 +392,12 @@ export function IncomeListClient({ gigs, locale }: Props) {
             <div dir={dir} className="flex flex-wrap gap-4">
               <div>
                 <p className="text-xs text-rizq-ink-soft/60 mb-0.5">
-                  {isAr ? "هذا الشهر (متوقع)" : "This month (projected)"}
+                  {t("monthProjected")}
                 </p>
                 <p className="tabular font-sans text-base font-semibold text-rizq-green">
                   {fmtPrice(forecast.current_month_projection, locale)}{" "}
                   <span className={`text-xs text-rizq-ink-soft/60 font-normal ${font}`}>
-                    {isAr ? "ريال" : "SAR"}
+                    {t("sar")}
                   </span>
                 </p>
                 <p className="text-xs text-rizq-ink-soft/50">
@@ -406,12 +406,12 @@ export function IncomeListClient({ gigs, locale }: Props) {
               </div>
               <div>
                 <p className="text-xs text-rizq-ink-soft/60 mb-0.5">
-                  {isAr ? "الشهر القادم (متوقع)" : "Next month (projected)"}
+                  {t("nextMonthProjected")}
                 </p>
                 <p className="tabular font-sans text-base font-semibold text-rizq-ink">
                   {fmtPrice(forecast.next_month_projection, locale)}{" "}
                   <span className={`text-xs text-rizq-ink-soft/60 font-normal ${font}`}>
-                    {isAr ? "ريال" : "SAR"}
+                    {t("sar")}
                   </span>
                 </p>
               </div>
@@ -444,7 +444,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
               onClick={handleGenerateForecast}
               className={`text-xs text-rizq-ink-soft/50 hover:text-rizq-green transition-colors ${font}`}
             >
-              {isAr ? "تحديث" : "Refresh"}
+              {t("refresh")}
             </button>
           </div>
         )}

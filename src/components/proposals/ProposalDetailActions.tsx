@@ -151,9 +151,9 @@ export function ProposalDetailActions({
       const result = await createProjectFromProposal({ proposal_id: proposalId });
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
-          setCreateGigError(isAr ? "وصلت للحد المجاني للمشاريع. ترقَّ للاحترافي." : "Free project limit reached. Upgrade to Pro.");
+          setCreateGigError(t("freeProjectLimitReachedUpgrade"));
         } else {
-          setCreateGigError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
+          setCreateGigError(t("somethingWentWrongTryAgain"));
         }
         return;
       }
@@ -175,11 +175,11 @@ export function ProposalDetailActions({
       const result = await createInvoiceFromProposal({ proposal_id: proposalId });
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
-          setCreateInvoiceError(isAr ? "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي." : "Free invoice limit reached. Upgrade to Pro.");
+          setCreateInvoiceError(t("freeInvoiceLimitReachedUpgrade"));
         } else if (result.code === "not_accepted") {
-          setCreateInvoiceError(isAr ? "يمكن إصدار الفاتورة فقط للعروض المقبولة." : "Invoice can only be created for accepted proposals.");
+          setCreateInvoiceError(t("invoiceCanOnlyBeCreated"));
         } else {
-          setCreateInvoiceError(isAr ? "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى." : "Could not create invoice. Try again.");
+          setCreateInvoiceError(t("couldCreateInvoiceTryAgain"));
         }
         return;
       }
@@ -209,7 +209,7 @@ export function ProposalDetailActions({
       >
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase">
           {/* Section label reuse from ProposalFlow */}
-          {isAr ? "الإجراءات" : "Actions"}
+          {t("actions")}
         </p>
 
         <div className="flex flex-wrap gap-3">

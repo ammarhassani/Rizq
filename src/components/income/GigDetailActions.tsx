@@ -75,9 +75,9 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       const result = await createInvoiceFromGig({ gig_id: gig.id });
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
-          setInvoiceError(isAr ? "وصلت للحد المجاني للفواتير. ترقَّ للاحترافي." : "Free invoice limit reached. Upgrade to Pro.");
+          setInvoiceError(t("freeInvoiceLimitReachedUpgrade"));
         } else {
-          setInvoiceError(isAr ? "حدث خطأ أثناء إنشاء الفاتورة. حاول مرة أخرى." : "Could not create invoice. Try again.");
+          setInvoiceError(t("couldCreateInvoiceTryAgain"));
         }
         return;
       }
@@ -91,7 +91,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
     startMarkPaidTransition(async () => {
       const result = await markGigStatus({ id: gig.id, status: prevStatus });
       if (result.ok) router.refresh();
-      else toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
+      else toast.error(t("couldnTUndo"));
     });
   }
 
@@ -102,12 +102,12 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       if (result.ok) {
         track("gig_marked_paid", { locale });
         router.refresh();
-        toast.success(isAr ? "الحالة: مدفوع · يمكنك التراجع" : "Status: Paid · Undo", {
+        toast.success(t("statusPaidUndo"), {
           duration: 7000,
-          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev) },
+          action: { label: t("undo"), onClick: () => revertStatus(prev) },
         });
       } else {
-        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+        toast.error(t("couldnTUpdateStatus"));
       }
     });
   }
@@ -119,12 +119,12 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       if (result.ok) {
         track("gig_marked_overdue", { locale });
         router.refresh();
-        toast.success(isAr ? "الحالة: متأخر · يمكنك التراجع" : "Status: Overdue · Undo", {
+        toast.success(t("statusOverdueUndo"), {
           duration: 7000,
-          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev) },
+          action: { label: t("undo"), onClick: () => revertStatus(prev) },
         });
       } else {
-        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+        toast.error(t("couldnTUpdateStatus"));
       }
     });
   }
@@ -135,11 +135,11 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       if (result.ok) {
         track("gig_deleted", { locale });
         // Hard delete — irreversible, so a plain confirmation toast (no Undo).
-        toast.success(isAr ? "تم الحذف" : "Deleted");
+        toast.success(t("deleted"));
         router.push("/income" as "/income");
         router.refresh();
       } else {
-        toast.error(isAr ? "تعذّر الحذف." : "Couldn't delete.");
+        toast.error(t("couldnTDelete"));
       }
     });
   }
@@ -172,7 +172,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
       {linkedInvoice && (
         <div dir={dir} className={`rounded-2xl border border-rizq-green/20 bg-rizq-green/5 p-4 ${font}`}>
           <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-2">
-            {isAr ? "الفاتورة المرتبطة" : "Linked invoice"}
+            {t("linkedInvoice")}
           </p>
           <Link
             href={`/invoices/${linkedInvoice.id}` as `/invoices/${string}`}
@@ -192,7 +192,7 @@ export function GigDetailActions({ locale, gig, clients = [], linkedInvoice = nu
 
       <div dir={dir} className={`card-wahaj-sm p-5 ${font}`}>
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-4">
-          {isAr ? "الإجراءات" : "Actions"}
+          {t("actions")}
         </p>
         <div className="flex flex-wrap gap-3">
           {/* Edit */}

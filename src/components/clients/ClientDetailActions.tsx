@@ -86,7 +86,7 @@ export function ClientDetailActions({
     startArchiveTransition(async () => {
       const result = await restoreClient({ id: clientId });
       if (!result.ok) {
-        toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
+        toast.error(t("couldnTUndo"));
       }
     });
   }
@@ -99,17 +99,17 @@ export function ClientDetailActions({
         // Act-now-then-undo: archive runs instantly, leave the page, and offer
         // a single Undo that restores the client (sonner is globally mounted so
         // the toast survives the navigation).
-        toast(isAr ? "تمت الأرشفة · يمكنك التراجع" : "Archived · Undo", {
+        toast(t("archivedUndo"), {
           duration: 7000,
           action: {
-            label: isAr ? "تراجع" : "Undo",
+            label: t("undo"),
             onClick: () => handleRestore(),
           },
         });
         router.push("/clients" as "/clients");
         router.refresh();
       } else {
-        toast.error(isAr ? "تعذّرت الأرشفة." : "Couldn't archive.");
+        toast.error(t("couldnTArchive"));
       }
     });
   }
@@ -149,7 +149,7 @@ export function ClientDetailActions({
       } else if (result.code === "upgrade") {
         setInsightError(tAi("upgradeHint"));
       } else {
-        setInsightError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
+        setInsightError(t("somethingWentWrongTryAgain"));
       }
     });
   }
@@ -164,7 +164,7 @@ export function ClientDetailActions({
         setFollowupDraft(result.draft);
         track("client_followup_drafted", { locale });
       } else {
-        setFollowupError(isAr ? "حدث خطأ في صياغة الرسالة. حاول مرة أخرى." : "Couldn't draft the message. Try again.");
+        setFollowupError(t("couldnTDraftMessageTry"));
       }
     });
   }
@@ -189,7 +189,7 @@ export function ClientDetailActions({
       } else if (result.code === "insufficient_gigs") {
         setPersonaError(tAi("personaNeeds3Gigs"));
       } else {
-        setPersonaError(isAr ? "حدث خطأ. حاول مرة أخرى." : "Something went wrong. Try again.");
+        setPersonaError(t("somethingWentWrongTryAgain"));
       }
     });
   }
@@ -230,7 +230,7 @@ export function ClientDetailActions({
         className={`card-wahaj-sm p-5 ${font}`}
       >
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-4">
-          {isAr ? "الإجراءات" : "Actions"}
+          {t("actions")}
         </p>
         <div className="flex flex-wrap gap-3">
           {/* Edit */}
@@ -312,7 +312,7 @@ export function ClientDetailActions({
         className={`rounded-2xl border border-rizq-gold/30 bg-rizq-gold/5 p-5 ${font}`}
       >
         <p className="text-xs font-semibold text-rizq-gold-dark tracking-wide uppercase mb-4">
-          {isAr ? "ميزات رِزق AI" : "Rizq AI"}
+          {t("rizqAi")}
         </p>
         <div className="flex flex-wrap gap-3">
           {/* Generate Insights — Pro */}
@@ -374,7 +374,7 @@ export function ClientDetailActions({
             ) : (
               <RefreshCw size={14} />
             )}
-            {isAr ? "تحديث الأولوية" : "Refresh priority"}
+            {t("refreshPriority")}
           </button>
         </div>
 

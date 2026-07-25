@@ -78,7 +78,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
     const pct = parseNum(percentage);
     if (isPct) {
       if (!percentage.trim() || pct <= 0 || pct > 100) {
-        setError(isAr ? "أدخل نسبة بين 0 و100." : "Enter a percentage between 0 and 100.");
+        setError(t("enterPercentageBetween0100"));
         return;
       }
     } else if (!amount.trim() || amt <= 0) {
@@ -155,11 +155,11 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
 
       {/* Fee type — fixed amount or a percentage of the items subtotal */}
       <div>
-        <label className={labelClass}>{isAr ? "نوع الرسوم" : "Fee type"}</label>
+        <label className={labelClass}>{t("feeType")}</label>
         <div dir={dir} className="inline-flex rounded-full border border-rizq-gold/30 bg-rizq-cream/60 p-1">
           {([
-            { key: "fixed", label: isAr ? "قيمة ثابتة" : "Fixed value" },
-            { key: "percentage", label: isAr ? "نسبة مئوية" : "Percentage" },
+            { key: "fixed", label: t("fixedValue") },
+            { key: "percentage", label: t("percentage") },
           ] as const).map((opt) => (
             <button
               key={opt.key}
@@ -186,7 +186,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
           {feeType === "percentage" ? (
             <>
               <label className={labelClass}>
-                {isAr ? "النسبة" : "Percentage"} <span className="text-[var(--over)]">*</span>
+                {t("percentage")} <span className="text-[var(--over)]">*</span>
               </label>
               <div className="relative">
                 <input
@@ -229,7 +229,7 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
                   dir="ltr"
                 />
                 <span className={`pointer-events-none absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-xs text-rizq-ink-soft/60 ${font}`}>
-                  {isAr ? "ر.س" : "SAR"}
+                  {t("sar")}
                 </span>
               </div>
             </>

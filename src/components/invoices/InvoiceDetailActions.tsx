@@ -138,7 +138,7 @@ export function InvoiceDetailActions({
     start(async () => {
       const result = await markInvoiceStatus({ invoice_id: invoiceId, status: prevStatus, allow_reverse: true });
       if (result.ok) router.refresh();
-      else toast.error(isAr ? "تعذّر التراجع." : "Couldn't undo.");
+      else toast.error(t("couldnTUndo"));
     });
   }
 
@@ -154,10 +154,10 @@ export function InvoiceDetailActions({
         const label = isAr ? STATUS_LABEL_AR[next] : STATUS_LABEL_EN[next];
         toast.success(isAr ? `الحالة: ${label} · يمكنك التراجع` : `Marked ${label} · Undo`, {
           duration: 7000,
-          action: { label: isAr ? "تراجع" : "Undo", onClick: () => revertStatus(prev, start) },
+          action: { label: t("undo"), onClick: () => revertStatus(prev, start) },
         });
       } else {
-        toast.error(isAr ? "تعذّر تحديث الحالة." : "Couldn't update status.");
+        toast.error(t("couldnTUpdateStatus"));
       }
     });
   }
@@ -173,11 +173,11 @@ export function InvoiceDetailActions({
       const result = await deleteInvoice({ invoice_id: invoiceId });
       if (result.ok) {
         // Hard delete — irreversible, so a plain confirmation toast (no Undo).
-        toast.success(isAr ? "تم الحذف" : "Deleted");
+        toast.success(t("deleted"));
         router.push("/invoices" as "/invoices");
         router.refresh();
       } else {
-        toast.error(isAr ? "تعذّر الحذف." : "Couldn't delete.");
+        toast.error(t("couldnTDelete"));
       }
     });
   }
@@ -226,7 +226,7 @@ export function InvoiceDetailActions({
     <div className="space-y-4">
       <div dir={dir} className={`card-wahaj-sm p-5 ${font}`}>
         <p className="text-xs font-medium text-rizq-ink-soft/70 tracking-wide uppercase mb-4">
-          {isAr ? "الإجراءات" : "Actions"}
+          {t("actions")}
         </p>
         <div className="flex flex-wrap gap-3">
           {/* Mark Sent */}
@@ -349,7 +349,7 @@ export function InvoiceDetailActions({
               className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-5 py-2.5 text-sm font-medium hover:bg-rizq-green/10 transition-all disabled:opacity-70 ${font}`}
             >
               {isEmailing ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
-              {isAr ? "إرسال بالبريد" : "Email to client"}
+              {t("emailClient")}
             </button>
           )}
 

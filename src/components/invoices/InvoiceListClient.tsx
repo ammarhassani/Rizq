@@ -93,7 +93,7 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
             <AnimatedNumber value={summary.paidTotal} locale={locale} duration={0.9} />
           </div>
           <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
-            {fmtMoney(counts.paid, locale)} {isAr ? "فاتورة" : "invoices"}
+            {fmtMoney(counts.paid, locale)} {t("invoices")}
           </div>
         </div>
         <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-[18px]">
@@ -105,7 +105,7 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
             <AnimatedNumber value={outstanding} locale={locale} duration={0.9} />
           </div>
           <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
-            {fmtMoney(counts.sent, locale)} {isAr ? "فاتورة" : "invoices"}
+            {fmtMoney(counts.sent, locale)} {t("invoices")}
           </div>
         </div>
         <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-[18px]">
@@ -118,8 +118,8 @@ export function InvoiceListClient({ invoices, summary, locale }: Props) {
           </div>
           <div className={`mt-0.5 text-[10px] text-[var(--content-faint)] ${font}`}>
             {summary.overdueCount > 0
-              ? `${fmtMoney(summary.overdueCount, locale)} ${isAr ? "فاتورة" : "invoices"}`
-              : isAr ? "لا شيء" : "none"}
+              ? `${fmtMoney(summary.overdueCount, locale)} ${t("invoices")}`
+              : t("none")}
           </div>
         </div>
       </div>
