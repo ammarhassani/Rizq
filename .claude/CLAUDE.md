@@ -25,10 +25,10 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
 - Animation: Framer Motion
 - i18n: next-intl (Arabic primary, English secondary, full RTL)
 - AI: DeepSeek via the Vercel AI SDK (`ai`, `@ai-sdk/deepseek`, `@ai-sdk/react`)
-- Backend: Vercel serverless + Supabase (Postgres + Auth + Storage)
+- Backend: Node server (self-hosted) + Supabase (Postgres + Auth + Storage)
 - Database: Supabase Postgres with Row Level Security on every table
 - Auth: Supabase Auth (email + Google + LinkedIn OAuth)
-- Analytics: PostHog + Vercel Analytics · Errors: Sentry
+- Analytics: PostHog · Errors: Sentry
 - Planned/deferred: Tap Payments (payments), Resend (email)
 
 ## Design Principles

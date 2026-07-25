@@ -40,7 +40,7 @@ an honesty-first data architecture, not a data monopoly.
 - **next-intl** — Arabic-primary, full RTL, English toggle
 - **Supabase** — Postgres + Auth + Storage, Row Level Security on every table
 - **DeepSeek** via the **Vercel AI SDK** for all AI features
-- **Vercel** hosting/serverless · **Sentry** (errors) · **PostHog** + Vercel Analytics
+- **Self-hosted Node server** · **Sentry** (errors) · **PostHog**
 - _Planned/deferred:_ Tap Payments, Resend (email)
 
 ## Getting started

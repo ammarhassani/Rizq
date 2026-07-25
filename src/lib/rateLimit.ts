@@ -1,13 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Rate limiting, shared across serverless instances.
+ * Rate limiting, shared across app processes.
  *
  * The counter lives in Postgres (private.rate_limits, via the
- * public.check_rate_limit RPC), because the previous in-process Map was
- * ineffective on Vercel: every lambda instance kept its own buckets and cold
- * starts reset them, so the auth brute-force guards were effectively unenforced
- * in production.
+ * public.check_rate_limit RPC), because an in-process Map does not survive what
+ * production actually does: a restart/redeploy wipes it, and any second worker
+ * (PM2 cluster, container replica, or a serverless instance) keeps its own copy,
+ * so the auth brute-force guards were effectively unenforced.
  *
  * The DB path needs SUPABASE_SERVICE_ROLE_KEY: EXECUTE on the RPCs is granted to
  * service_role only and revoked from anon/authenticated, since keys are
@@ -32,8 +32,8 @@ function bypassInDev(): boolean {
 }
 
 /**
- * Per-instance limiter. Correct within one process, which makes it fine for
- * tests and a single-instance deploy — but NOT across lambdas. Exported so the
+ * Per-process limiter. Correct within one process, which makes it fine for
+ * tests — but it resets on restart and is not shared with other workers. Exported so the
  * unit tests can exercise the window/counting logic directly.
  */
 export function checkRateLimitInMemory(
@@ -73,7 +73,7 @@ function getAdminClient(): SupabaseClient | null {
       warnedNoServiceKey = true;
       console.warn(
         "[rateLimit] SUPABASE_SERVICE_ROLE_KEY not set — falling back to the in-memory limiter. " +
-          "On serverless this is per-instance and does NOT enforce the limit across lambdas."
+          "That is per-process and resets on restart, so it does NOT enforce the limit reliably."
       );
     }
     return null;

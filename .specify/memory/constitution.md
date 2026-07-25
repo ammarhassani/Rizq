@@ -65,7 +65,8 @@ when the model is slow or unavailable.
 - `next-intl` (Arabic primary, English secondary, full RTL)
 - Supabase Postgres + Auth + Storage, **Row Level Security on every table**
 - DeepSeek + Vercel AI SDK (`ai`, `@ai-sdk/*`) for all AI features
-- Vercel hosting/serverless; Sentry (errors) + PostHog + Vercel Analytics
+- Self-hosted Node server (founder decision, 2026-07-25 — replaces Vercel);
+  Sentry (errors) + PostHog
 - Payments (Tap) and transactional email (Resend) are **planned/deferred** to the
   monetization phase — not yet integrated.
 
@@ -101,4 +102,4 @@ Amendments are versioned with semantic versioning and dated:
 Every review verifies compliance with these principles. Added complexity must be
 justified against Principle V (stands on its own feet) and YAGNI.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-24 | **Last Amended**: 2026-06-24
+**Version**: 1.1.0 | **Ratified**: 2026-06-24 | **Last Amended**: 2026-07-25
