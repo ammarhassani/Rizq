@@ -5,23 +5,24 @@ import { provisionUser, type DisposableUser } from "../fixtures/users";
 import { signedInClient } from "../fixtures/supabaseClient";
 
 /**
- * Clears the reused main user's clients (and the gigs that FK-depend on them) so
- * a repeated run starts under the free-tier client cap. Without this, every full
- * run leaves ~1 more client behind; after ~10 runs the reused user hits the cap
- * and client-creation specs fail against a paywall the app is CORRECT to show —
- * a data-exhaustion false negative, not a bug. Best-effort: logs and continues.
+ * Clears the reused main user's quota-bearing rows so a repeated run starts with
+ * a clean budget. Without this, every run leaves clients and proposals behind and
+ * the reused user eventually trips the free-tier caps — then client- and
+ * proposal-creating specs fail against a paywall the app is CORRECT to show. That
+ * reads like an app bug but is pure test-data exhaustion, and it cost real
+ * debugging time twice. Best-effort: logs and continues.
+ *
+ * Deleted child-first so foreign keys don't block: invoices → gigs → projects →
+ * proposals → clients.
  */
-async function resetMainUserClients(): Promise<void> {
+async function resetMainUserData(): Promise<void> {
   try {
     const { client, userId } = await signedInClient("main");
-    // gigs first — they reference clients; delete only this user's rows (RLS also scopes).
-    await client.from("gigs").delete().eq("user_id", userId);
-    const { error } = await client.from("clients").delete().eq("user_id", userId);
-    if (error) {
-      console.log(`[global-setup] client reset skipped: ${error.message}`);
-    } else {
-      console.log("[global-setup] reset reused main user's clients (repeatable run)");
+    for (const table of ["invoices", "gigs", "projects", "proposals", "clients"]) {
+      const { error } = await client.from(table).delete().eq("user_id", userId);
+      if (error) console.log(`[global-setup] reset ${table} skipped: ${error.message}`);
     }
+    console.log("[global-setup] reset reused main user's clients/proposals (repeatable run)");
     // NOTE: deliberately no signOut(). supabase-js signs out GLOBALLY by default,
     // which revokes every refresh token for the user — including the browser
     // cookies in main.json that the specs are about to use, so the whole suite
@@ -82,7 +83,7 @@ export default async function globalSetup(config: FullConfig) {
       console.log("[global-setup] reusing existing e2e/.auth sessions (set FORCE_PROVISION=1 to refresh)");
       // Freshly-provisioned users start empty; a REUSED main user accumulates
       // clients across runs and eventually trips the free-tier cap, so reset it.
-      await resetMainUserClients();
+      await resetMainUserData();
       return;
     }
     // eslint-disable-next-line no-console
