@@ -9,7 +9,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2, Sparkles, Copy } from "lucide-react";
+import { Loader2, Trash2, CheckCircle, AlertCircle, Send, Eye, Share2, Sparkles, Copy, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { markInvoiceStatus } from "@/app/actions/invoices/markInvoiceStatus";
@@ -17,6 +17,7 @@ import { deleteInvoice } from "@/app/actions/invoices/deleteInvoice";
 import { generateInvoiceDescriptionAction } from "@/app/actions/invoices/aiActions";
 import { generatePaymentReminderAction } from "@/app/actions/invoices/aiActions";
 import { ShareInvoiceModal } from "@/components/invoices/ShareInvoiceModal";
+import { sendInvoiceEmail } from "@/app/actions/invoices/sendInvoiceEmail";
 import { PrintButton } from "@/components/proposals/PrintButton";
 
 type Props = {
@@ -32,6 +33,10 @@ type Props = {
   /** When opened in a guided project context, a successful status change returns
    *  here (the project pane) instead of refreshing in place (feature 005, US2). */
   returnTo?: string;
+  /** Whether transactional email is wired up in this runtime (RESEND_* set). */
+  emailConfigured?: boolean;
+  /** Whether the attached client actually has an email address to send to. */
+  clientHasEmail?: boolean;
 };
 
 // Allowed transitions (mirrors markInvoiceStatus server action)
@@ -52,6 +57,8 @@ export function InvoiceDetailActions({
   shareToken,
   looksOverdue = false,
   returnTo,
+  emailConfigured = false,
+  clientHasEmail = false,
 }: Props) {
   const t = useTranslations("Invoices.detail");
   const tAi = useTranslations("Invoices.ai");
@@ -63,6 +70,37 @@ export function InvoiceDetailActions({
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  // Email delivery state
+  const [isEmailing, startEmailTransition] = useTransition();
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const handleSendEmail = () => {
+    setEmailError(null);
+    setEmailSentTo(null);
+    startEmailTransition(async () => {
+      const res = await sendInvoiceEmail({ invoice_id: invoiceId, locale });
+      if (res.ok) {
+        setEmailSentTo(res.sent_to);
+        router.refresh(); // status may have moved draft → sent
+        return;
+      }
+      setEmailError(
+        res.code === "no_client_email"
+          ? isAr
+            ? "لا يوجد بريد إلكتروني لهذا العميل."
+            : "This client has no email address."
+          : res.code === "not_configured"
+            ? isAr
+              ? "إرسال البريد غير مُفعّل."
+              : "Email sending isn't configured."
+            : isAr
+              ? "تعذّر إرسال الفاتورة. حاول مرة أخرى."
+              : "Couldn't send the invoice. Please try again.",
+      );
+    });
+  };
 
   // AI description state
   const [isGeneratingDescription, startGenerateDescTransition] = useTransition();
@@ -299,9 +337,34 @@ export function InvoiceDetailActions({
             {t("share")}
           </button>
 
+          {/* Email to client — only offered when it can actually work: email must
+              be configured in this runtime AND the client must have an address.
+              Offering a button that silently does nothing would be a false
+              affordance (Principle I). */}
+          {emailConfigured && clientHasEmail && (
+            <button
+              type="button"
+              onClick={handleSendEmail}
+              disabled={isEmailing}
+              className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 text-rizq-green px-5 py-2.5 text-sm font-medium hover:bg-rizq-green/10 transition-all disabled:opacity-70 ${font}`}
+            >
+              {isEmailing ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+              {isAr ? "إرسال بالبريد" : "Email to client"}
+            </button>
+          )}
+
           {/* Print to PDF */}
           <PrintButton label={t("print")} locale={locale} />
         </div>
+
+        {(emailSentTo || emailError) && (
+          <p
+            role={emailError ? "alert" : "status"}
+            className={`mt-2 text-xs ${emailError ? "text-[var(--over)]" : "text-[var(--acc)]"} ${font}`}
+          >
+            {emailError ?? (isAr ? `أُرسلت إلى ${emailSentTo}` : `Sent to ${emailSentTo}`)}
+          </p>
+        )}
 
         {/* ── P4.6: AI Tools ── */}
         <div className="mt-4 pt-4 border-t border-rizq-gold/15">

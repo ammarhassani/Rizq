@@ -20,6 +20,7 @@ import { InvoiceDetailActions } from "@/components/invoices/InvoiceDetailActions
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import type { InvoiceArtifactData } from "@/lib/invoices/artifact";
 import { daysOverdue } from "@/lib/invoices/overdue";
+import { isEmailConfigured } from "@/lib/email/send";
 
 type Params = { locale: string; id: string };
 
@@ -79,7 +80,7 @@ export default async function InvoiceDetailPage({
   const { data: invoice, error: invoiceErr } = await supabase
     .from("invoices")
     .select(
-      "id, invoice_number, status, total_sar, due_date, created_at, artifact_json, client_id, public_share, share_token, clients(name)"
+      "id, invoice_number, status, total_sar, due_date, created_at, artifact_json, client_id, public_share, share_token, clients(name, email)"
     )
     .eq("id", id)
     .eq("user_id", userData.user.id)
@@ -117,6 +118,8 @@ export default async function InvoiceDetailPage({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const clientName = (invoice.clients as any)?.name ?? null;
+  // Only offer email delivery when there is actually an address to send to.
+  const clientHasEmail = Boolean(((invoice.clients as any)?.email ?? "").trim());
 
   // Show the AI payment-reminder button only when the reminder action will
   // actually fire: status is sent/viewed/overdue AND ≥7 days past due
@@ -208,6 +211,8 @@ export default async function InvoiceDetailPage({
             shareToken={(invoice.share_token as string | null) ?? null}
             looksOverdue={looksOverdue}
             returnTo={origin ? `/projects/${origin.id}?guided=1` : undefined}
+            emailConfigured={isEmailConfigured()}
+            clientHasEmail={clientHasEmail}
           />
         </div>
       </div>
