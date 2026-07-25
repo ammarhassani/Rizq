@@ -30,7 +30,7 @@ export async function signUp(input: unknown): Promise<SignupResult> {
 
   const ip = await getClientIp();
   const rlKey = `signup:${ip}`;
-  const rl = checkRateLimit(rlKey, 5, 5 * 60 * 1000);
+  const rl = await checkRateLimit(rlKey, 5, 5 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();
@@ -54,11 +54,11 @@ export async function signUp(input: unknown): Promise<SignupResult> {
   if (error) {
     const msg = error.message.toLowerCase();
     if (msg.includes("already registered") || msg.includes("already been registered")) {
-      refundRateLimit(rlKey); // benign — created nothing, don't count it
+      await refundRateLimit(rlKey); // benign — created nothing, don't count it
       return { ok: false, code: "email_taken" };
     }
     if (msg.includes("weak") || msg.includes("password should")) {
-      refundRateLimit(rlKey);
+      await refundRateLimit(rlKey);
       return { ok: false, code: "weak_password" };
     }
     if (msg.includes("rate limit") || msg.includes("too many")) {
@@ -67,7 +67,7 @@ export async function signUp(input: unknown): Promise<SignupResult> {
     // GoTrue rejects addresses it can't deliver to (e.g. @test.com / @example.com).
     // Surface it on the email field instead of a generic "something went wrong".
     if (error.code === "email_address_invalid" || (msg.includes("invalid") && msg.includes("email"))) {
-      refundRateLimit(rlKey); // typo'd / undeliverable email isn't abuse
+      await refundRateLimit(rlKey); // typo'd / undeliverable email isn't abuse
       return { ok: false, code: "invalid_email" };
     }
     console.error("[signup] error", { code: error.code });

@@ -36,7 +36,7 @@ export async function reviewSubmission(input: unknown): Promise<ReviewResult> {
 
   // 120 reviews per hour per admin. High ceiling — admin shouldn't be
   // throttled in normal use — but caps a compromised account.
-  const rl = checkRateLimit(
+  const rl = await checkRateLimit(
     `review:${userData.user.id}`,
     120,
     60 * 60 * 1000

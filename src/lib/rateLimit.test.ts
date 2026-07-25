@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { checkRateLimit } from "./rateLimit";
+import { checkRateLimitInMemory as checkRateLimit } from "./rateLimit";
 
-describe("checkRateLimit", () => {
+// Targets the in-memory implementation directly: it owns the window/counting
+// logic, and the exported checkRateLimit() is an async wrapper that delegates to
+// it whenever SUPABASE_SERVICE_ROLE_KEY is absent (the DB path is covered by the
+// migration's own SQL-level verification).
+describe("checkRateLimitInMemory", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-13T12:00:00Z"));

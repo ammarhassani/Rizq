@@ -55,7 +55,7 @@ export async function calculate(input: unknown): Promise<ToolActionResult> {
   // Rate-limit independent of quota — protects against scripted abuse on the
   // 1-free-anon-query path even before quota counts kick in.
   const ip = await getClientIp();
-  const rl = checkRateLimit(`tool:${ip}`, 20, 60 * 1000);
+  const rl = await checkRateLimit(`tool:${ip}`, 20, 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   // Quota gate

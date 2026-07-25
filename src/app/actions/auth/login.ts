@@ -30,7 +30,7 @@ export async function logIn(input: unknown): Promise<LoginResult> {
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const ip = await getClientIp();
-  const rl = checkRateLimit(`login:${ip}`, 10, 5 * 60 * 1000);
+  const rl = await checkRateLimit(`login:${ip}`, 10, 5 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();

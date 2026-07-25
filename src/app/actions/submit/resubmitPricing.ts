@@ -48,7 +48,7 @@ export async function resubmitPricing(input: unknown): Promise<ResubmitResult> {
 
   // 10 resubmits per hour per user — generous for legitimate iteration on
   // a needs_info request, tight enough to discourage hammering.
-  const rl = checkRateLimit(`resubmit:${userData.user.id}`, 10, 60 * 60 * 1000);
+  const rl = await checkRateLimit(`resubmit:${userData.user.id}`, 10, 60 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const [specRes, cityRes, tierRes] = await Promise.all([

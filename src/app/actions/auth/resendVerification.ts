@@ -29,7 +29,7 @@ export async function resendVerificationEmail(
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const ip = await getClientIp();
-  const rl = checkRateLimit(`resend:${ip}`, 3, 10 * 60 * 1000);
+  const rl = await checkRateLimit(`resend:${ip}`, 3, 10 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();

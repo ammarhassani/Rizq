@@ -30,7 +30,7 @@ export async function requestPasswordReset(
 
   const ip = await getClientIp();
   // Tighter limit on password reset to discourage email enumeration / spam.
-  const rl = checkRateLimit(`forgot:${ip}`, 3, 10 * 60 * 1000);
+  const rl = await checkRateLimit(`forgot:${ip}`, 3, 10 * 60 * 1000);
   if (!rl.allowed) return { ok: false, code: "rate_limited" };
 
   const supabase = await createClient();

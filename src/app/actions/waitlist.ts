@@ -42,7 +42,7 @@ export async function joinWaitlist(
   if (!parsed.success) return { ok: false, code: "invalid" };
 
   const ip = await getClientIp();
-  const rl = checkRateLimit(
+  const rl = await checkRateLimit(
     `waitlist:${ip}`,
     RATE_LIMIT_MAX,
     RATE_LIMIT_WINDOW_MS
