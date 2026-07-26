@@ -101,6 +101,101 @@ default. A loading cost, not a behaviour change.
 
 ---
 
+## Pass 4 — the harder re-drive (same day, fresh account)
+
+Everything above was re-checked on a **brand-new account** driven end to end, plus the paths
+the first pass could not reach. That found **six more defects, five of them introduced by this
+feature.** All are fixed and re-verified below.
+
+### P4-1 — The welcome step was skipped for every new account *(regression, mine)*
+
+`onboarding/page.tsx` normalised a stored `onboarding_step` of 0 up to 1 before handing it to
+the wizard, which then resolved it as "step 1 already saved" and opened on identity. The old
+`initialStep - 1` arithmetic had cancelled that out; `resumeStepIndex` does not.
+
+Fixed by passing the stored value untouched. `resume.test.ts` now pins a fresh account to
+`welcome` and `onboarding_step = 2` to `location`, using the real `STEP_KEYS` order.
+
+### P4-2 — A valid link was silently discarded with an invalid one *(regression, mine)*
+
+Typing one malformed URL alongside good ones flagged the bad field correctly **and threw away
+the valid links**, saving nothing and leaving `onboarding_step` unchanged, with nothing on
+screen saying so.
+
+Root cause: the form and the action disagreed about what a URL is. `new URL()` in a **browser**
+percent-encodes whitespace into the hostname, so `https://not a url at all` becomes
+`https://not%20a%20url%20at%20all/` and passes Zod's `.url()`; the same input is rejected under
+Node. The form vouched for the value, submitted it, and the action rejected the entire step.
+
+Fixed by deleting both ad-hoc checks and defining one rule over the *parsed* URL parts
+(`urlShape` → `PROFILE_URL` → `urlProblem`), used by the Zod schema and the form alike.
+`fieldErrors.test.ts` asserts the two can never disagree, over the accepted and rejected sets.
+
+Re-verified: `linkedin.com/in/sara` and `https://mostaql.com/u/sara` saved, the malformed and
+`javascript:` fields flagged with their own reasons, other typed values intact, step advanced.
+
+### P4-3 — VAT percentage printed Latin digits on an Arabic tax invoice *(mine)*
+
+`{vatPct}%` was interpolated raw, so an otherwise fully Arabic-Indic invoice read
+`ضريبة القيمة المضافة (15%)`. Same class in the proposal milestone split (`{pct}%`) and the
+invoice fee rows (`{f.rate}%`). All three now go through the locale formatter. The issued
+invoice now reads `(١٥%)` and carries **zero** Latin digits outside identifiers.
+
+### P4-4 — A catalog price with three decimals reached the money field *(mine)*
+
+Entry was constrained, but a price already stored with three decimals seeded the input as
+`10450.555` while the totals used `10450.56`. Seeds from the catalog and from a gig prefill are
+now clamped too. Verified: field `10450.55`, line total `٣١٬٣٥١٫٦٥` — the client can reproduce
+it from what is printed.
+
+### P4-5 — The dashboard's client count printed a Latin digit
+
+`{clients.length}` rendered `1` beside Arabic-Indic figures. Extracted `fmtCount` to
+`lib/format/number.ts` (replacing a local copy in `HadafStreakBar`) and applied it.
+
+### P4-6 — `rate_confidence` is stamped by the database, not by the freelancer
+
+`users.rate_confidence` is `NOT NULL DEFAULT 'approximate'`, so **every account carries that
+value from creation**. The client no longer sends it unless chosen, but the row still records a
+confidence nobody picked — FR-015's "the stored row MUST match" is **not** met.
+
+Half-fixed without a migration: `exact` and `estimate` can only have been chosen, so they still
+show as selected; `approximate` is indistinguishable from the column default and is therefore
+not shown as a selection. Verified on a fresh account — all three pills unpressed, and the row
+still reads `approximate`.
+
+**The durable fix needs a migration** (`DROP DEFAULT`, `DROP NOT NULL`) that this feature
+deliberately does not carry. Founder call.
+
+### Verified on the fresh account and the new artifacts
+
+| Check | Result |
+|---|---|
+| Brand-new account opens onboarding | `مرحباً في رِزق` (welcome) |
+| Rates step, untouched controls | no confidence pill pressed, no goal band selected |
+| Hourly 1,000,000 with no minimum project | `أضف أقل سعر مشروع تقبله … سعرك بالساعة لم تتم مقارنته.` |
+| Minimum project 6,000 entered | `أقل سعر مشروع تقبله (٦٬٠٠٠ ريال) يقع ضمن نطاق مشاريع السوق.` |
+| Row after saving rates untouched | `income_goal_monthly_sar` null, `onboarding_step = 5` |
+| Leave and return | lands on `الحضور على المنصات` (platforms), the next unfinished step |
+| Issued VAT invoice | VAT no. `399999999900003` printed; `٣  ١٠٬٤٠٥٫٥٥  ٣١٬٣٥١٫٦٥`; `(١٥%)`; no Latin digits |
+| Proposal from a brief stating `المدة المطلوبة ٣ أشهر` | scope extracted `stated_duration: "٣ أشهر"`, `budget_mentioned: 3000` |
+| …cover letter | `نشكر مؤسسة الرمال على إتاحة الفرصة…` — no `عميل محترم` |
+| …timeline | dates `يُتفق عليه`, plus `المدة كما ذكرها العميل: ٣ أشهر` |
+| …quote vs the client's lowball 3,000 | quoted 5,400 — the budget lifts, never drags |
+| Share dialog, no contact set | nudge shown, link still copyable (never blocks) |
+| Anonymous share page | quote, client, duration, citation, Rizq attribution, `RZQ-` reference present; band, methodology link, tagline, auth email, mailto, AI badge **all absent** |
+| DOCX export | same verdict, including no `النطاق السعري` line |
+| Every page with a rewritten plural, `ar` + `en` | 200, no ICU failure, no literal `{count}` |
+| 390px: dashboard, invoice, proposal, share, invoice form, onboarding | no horizontal scroll |
+| Cross-user proposal URL | 404 inside the app shell, no other account's data |
+
+### Still not fixed
+
+- **P4-6** above: the `rate_confidence` column default. Needs a migration.
+- AI-written dashboard insights composed Arabic prose with Latin digits. The prompt now asks
+  for Arabic-Indic digits in Arabic output; a model is not a guarantee, and this was **not**
+  re-verified against a fresh DeepSeek generation.
+
 ## Pass-2 regressions re-checked
 
 - Onboarding writes `primary_specialty_id` / `city_id` / `experience_tier_id` — confirmed in

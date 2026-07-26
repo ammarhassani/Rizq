@@ -9,6 +9,7 @@
  * PURE. Contract: specs/011-power-user-pass-3/contracts/validation-errors.md
  */
 
+import { z } from "zod";
 import type { ZodError } from "zod";
 
 export type FieldErrorReason =
@@ -38,6 +39,57 @@ export function isSupportedUrl(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * What is wrong with a link the freelancer wants on their profile, or null when nothing is.
+ *
+ * Deliberately NOT Zod's `.url()`. Browsers percent-encode whitespace into the hostname, so
+ * `new URL("https://not a url at all")` yields `https://not%20a%20url%20at%20all/`, which
+ * that check then accepts — while the same input is rejected under Node. The form vouched
+ * for the value, submitted it, and the action threw out the whole step, silently discarding
+ * the valid links typed beside it.
+ *
+ * This rule reads the PARSED parts, so it returns the same verdict in every runtime.
+ */
+function urlShape(value: string): FieldErrorReason | null {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return "invalid_url";
+  }
+
+  if (!(SUPPORTED_URL_SCHEMES as readonly string[]).includes(url.protocol)) {
+    return "unsupported_scheme";
+  }
+
+  // A real host: no encoded whitespace, and at least two non-empty labels.
+  const host = url.hostname;
+  if (!host || host.includes("%")) return "invalid_url";
+  const labels = host.split(".");
+  if (labels.length < 2 || labels.some((label) => label.length === 0)) return "invalid_url";
+
+  return null;
+}
+
+/**
+ * THE link validator. The server schema and the form run this same rule, because a form that
+ * vouches for a value the action rejects costs the freelancer everything they typed with it.
+ */
+export const PROFILE_URL = z
+  .string()
+  .max(500)
+  .superRefine((value, ctx) => {
+    const problem = urlShape(value);
+    if (problem) ctx.addIssue({ code: "custom", message: problem });
+  });
+
+/** Why this link cannot be saved, or null when it can. Same verdict on both sides. */
+export function urlProblem(value: string): FieldErrorReason | null {
+  const parsed = PROFILE_URL.safeParse(value);
+  if (parsed.success) return null;
+  return reasonFromIssue(parsed.error.issues[0]);
 }
 
 const KNOWN_REASONS = new Set<string>([

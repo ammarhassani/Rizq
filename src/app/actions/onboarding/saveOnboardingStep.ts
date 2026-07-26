@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 import { computeStrength } from "@/lib/profile/strength";
 import { getCities, getSpecialties, getExperienceTiers } from "@/lib/pricing/refDataDb";
 import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
-import { fieldErrorsFromZod, isSupportedUrl } from "@/lib/validation/fieldErrors";
+import { fieldErrorsFromZod, PROFILE_URL } from "@/lib/validation/fieldErrors";
 import type { FieldError } from "@/lib/validation/fieldErrors";
 
 // ── Per-step Zod schemas ─────────────────────────────────────────────────────
@@ -60,14 +60,7 @@ const StepRatesSchema = z.object({
  * scheme allow-list is enforced HERE, on the trust boundary, and reports the rejection with
  * its own reason code instead of quietly storing nothing (FR-011).
  */
-const urlOrEmpty = z
-  .string()
-  .url()
-  .max(500)
-  .refine(isSupportedUrl, { error: "unsupported_scheme" })
-  .optional()
-  .nullable()
-  .or(z.literal(""));
+const urlOrEmpty = PROFILE_URL.optional().nullable().or(z.literal(""));
 
 const StepPlatformsSchema = z.object({
   bahr_profile_url: urlOrEmpty,

@@ -7,10 +7,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-
-function fmtCount(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format(n);
-}
+import { fmtCount } from "@/lib/format/number";
 
 type Props = {
   streak: number;

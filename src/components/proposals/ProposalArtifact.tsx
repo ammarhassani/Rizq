@@ -709,7 +709,8 @@ function MilestonesSection({
             >
               <p className={`text-sm text-rizq-ink ${font}`}>{triggerLabel(m.trigger)}</p>
               <span className="tabular font-sans text-xl font-semibold text-rizq-green">
-                {pct}%
+                {/* Locale-formatted: a raw 50 printed Latin digits on an Arabic proposal. */}
+                {fmtPrice(pct, locale)}%
                 <span className={`ms-1 text-xs font-normal text-rizq-ink-soft ${font}`}>
                   {t.ofTotal}
                 </span>

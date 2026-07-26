@@ -70,7 +70,10 @@ export default async function OnboardingPage({
 
   const t = await getTranslations({ locale, namespace: "Onboarding" });
   const localeTyped = locale as "ar" | "en";
-  const initialStep = snapshot.onboarding_step > 0 ? snapshot.onboarding_step : 1;
+  // Pass the STORED step (the last one saved, 1-based; 0 = nothing yet) untouched. The
+  // wizard resolves the next unfinished step from it via resumeStepIndex — lifting a fresh
+  // 0 to 1 here skipped the welcome screen for every new account.
+  const initialStep = snapshot.onboarding_step;
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-6 py-10 sm:py-14 overflow-hidden">

@@ -529,7 +529,9 @@ function TotalsSection({
             <span className={`text-sm text-rizq-ink-soft ${font}`}>
               {f.name}
               {f.isPct && f.rate != null && (
-                <span className="text-xs text-rizq-ink-soft/50"> ({f.rate}%)</span>
+                <span className="text-xs text-rizq-ink-soft/50">
+                  {" "}({fmtMoney(f.rate, locale)}%)
+                </span>
               )}
             </span>
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
@@ -554,7 +556,9 @@ function TotalsSection({
         {vatPct > 0 && (
           <div className="flex items-center justify-between gap-4">
             <span className={`text-sm text-rizq-ink-soft ${font}`}>
-              {t.vat} ({vatPct}%)
+              {/* Through the locale formatter like every other number here — a raw 15
+                  printed Latin digits in the middle of an Arabic tax invoice. */}
+              {t.vat} ({fmtMoney(vatPct, locale)}%)
             </span>
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
               {fmtMoney(vatSar, locale)}{" "}

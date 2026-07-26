@@ -113,7 +113,7 @@ export function InvoiceForm({
           item_id: null,
           description: initial.title,
           quantity: "1",
-          unit_price_sar: String(initial.amount_sar),
+          unit_price_sar: clampMoneyInput(String(initial.amount_sar)),
         },
       ];
     }
@@ -162,8 +162,11 @@ export function InvoiceForm({
       {
         item_id: item.id,
         description: item.name,
+        // Clamp on the way in too: a catalog row saved before money entry was constrained
+        // can still hold three decimals, and the field must not show a precision the
+        // totals will not use.
         quantity: "1",
-        unit_price_sar: String(item.unit_price_sar),
+        unit_price_sar: clampMoneyInput(String(item.unit_price_sar)),
       },
     ]);
   }

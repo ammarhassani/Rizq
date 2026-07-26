@@ -24,11 +24,18 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
   const [monthlyGoal, setMonthlyGoal] = useState(
     profile.income_goal_monthly_sar?.toString() ?? ""
   );
-  // null until the freelancer picks one. Defaulting to "approximate" both highlighted a
-  // choice nobody made and wrote it to the row as if they had.
+  /**
+   * null until the freelancer picks one — nothing may appear chosen that they did not choose.
+   *
+   * `users.rate_confidence` is NOT NULL DEFAULT 'approximate', so every account carries that
+   * value from the moment it is created. "exact" and "estimate" can only have been chosen;
+   * "approximate" is indistinguishable from the column default, so it is not shown as a
+   * selection. The durable fix is dropping the default and letting the column be null, which
+   * needs a migration this feature deliberately does not carry.
+   */
   const [rateConfidence, setRateConfidence] = useState<
     "exact" | "approximate" | "estimate" | null
-  >(profile.rate_confidence ?? null);
+  >(profile.rate_confidence === "approximate" ? null : profile.rate_confidence ?? null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 

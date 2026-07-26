@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Users, AlertCircle, Plus } from "lucide-react";
 import { WidgetError } from "./WidgetError";
+import { fmtCount } from "@/lib/format/number";
 
 type Client = {
   id: string;
@@ -66,14 +67,16 @@ export function ActiveClientsWidget({ clients, error, locale }: Props) {
         <div className="space-y-2">
           <div className="flex items-center gap-4 px-1">
             <div>
-              <p className="tabular text-2xl font-bold text-rizq-green leading-none">{clients.length}</p>
+              <p className="tabular text-2xl font-bold text-rizq-green leading-none">
+                {fmtCount(clients.length, locale)}
+              </p>
               <p className={`text-xs text-rizq-ink-soft mt-0.5 ${font}`}>{t("totalClients")}</p>
             </div>
             {needsFollowup.length > 0 && (
               <div className="flex items-center gap-1.5 rounded-xl bg-[var(--warn-soft)] border border-[var(--warn-line)] px-3 py-1.5">
                 <AlertCircle className="h-3 w-3 text-[var(--warn)] shrink-0" />
                 <p className={`text-xs text-[var(--warn)] ${font}`}>
-                  {needsFollowup.length} {t("needFollowUp")}
+                  {fmtCount(needsFollowup.length, locale)} {t("needFollowUp")}
                 </p>
               </div>
             )}

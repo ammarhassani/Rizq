@@ -183,7 +183,16 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   number for the category **and** a pre-formatted `{count}` for the digits; bare `#` is banned
   and `src/lib/format/count.test.ts` enforces all of it statically across both catalogues and
   every call site.
-Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in Arabic.
+  **Pass 4 (harder re-drive, fresh account, same day) found 6 more, 5 of them introduced by
+  this feature** — all fixed: the welcome step was skipped for new accounts; a valid platform
+  link was discarded alongside an invalid one (browser `new URL()` percent-encodes spaces into
+  the hostname, so the form and Zod disagreed — now ONE rule over the parsed parts, shared by
+  both); VAT `%`, milestone `%` and fee `%` printed Latin digits on Arabic documents; a catalog
+  price with 3 decimals reached the money field; the dashboard client count printed `1`.
+  **Open, needs a migration:** `users.rate_confidence` is `NOT NULL DEFAULT 'approximate'`, so
+  the row records a confidence nobody chose (the UI no longer shows it as chosen). Founder call.
+Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in
+Arabic twice (pass 3 + the pass-4 re-drive on a fresh account).
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.
 <!-- SPECKIT END -->
 ## Validation history (read before trusting a "SHIPPED" tag)

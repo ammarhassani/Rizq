@@ -7,7 +7,9 @@ import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
-import { isSupportedUrl } from "@/lib/validation/fieldErrors";
+// The SAME validator the server action runs — a form that vouches for a value the action
+// then rejects throws away the whole step, including the valid links typed beside it.
+import { urlProblem } from "@/lib/validation/fieldErrors";
 import type { FieldErrorReason } from "@/lib/validation/fieldErrors";
 
 // Freelancer platform-presence links. Columns + write-grants already exist
@@ -23,20 +25,6 @@ const FIELDS = [
 ] as const;
 
 type FieldKey = (typeof FIELDS)[number]["key"];
-
-/**
- * Why this link cannot be saved, or null when it can. Mirrors the server allow-list so the
- * freelancer sees the reason before a round trip; the server still enforces it.
- */
-function urlProblem(raw: string): FieldErrorReason | null {
-  let parsed: URL;
-  try {
-    parsed = new URL(raw);
-  } catch {
-    return "invalid_url";
-  }
-  return isSupportedUrl(parsed.href) ? null : "unsupported_scheme";
-}
 
 export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const tv2 = useTranslations("Onboarding.v2");
