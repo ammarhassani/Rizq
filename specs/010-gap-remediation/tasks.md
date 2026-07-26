@@ -60,7 +60,7 @@ zero-row success still shows the empty-state CTA.
 
 ### Tests for User Story 1
 
-- [ ] T003 [P] [US1] Playwright forced-failure spec in `e2e/modules/error-states.spec.ts` — for methodology, calendar, documents, projects: read fails → error+retry visible, empty CTA absent; zero-row success → empty CTA visible.
+- [X] T003 [P] [US1] Forced-failure spec — for methodology, calendar, documents, projects: read fails → error+retry present, empty CTA absent; zero-row success → empty CTA present. **Landed as `src/app/__tests__/error-states.test.ts`, not Playwright**: all four reads happen in server components, so a browser-side `page.route()` can't fail them, and the alternatives (a test-only failure flag in product code, or a second dev server behind a failing Supabase proxy) both cost more than they prove. The unit test injects the failure at `createClient()` and walks the returned React element tree — no DOM, no product-source change. Mutation-checked: forcing `loadError = false` in the documents page fails it.
 
 ### Implementation for User Story 1
 
@@ -68,7 +68,7 @@ zero-row success still shows the empty-state CTA.
 - [X] T005 [P] [US1] `src/app/[locale]/calendar/page.tsx` — same error-vs-empty split on the events read.
 - [X] T006 [P] [US1] `src/app/[locale]/documents/page.tsx` — same on the vault list read.
 - [X] T007 [P] [US1] `src/app/[locale]/projects/page.tsx` — same on the projects list read.
-- [ ] T008 [US1] Add `WidgetError` retry copy keys (ar/en) if the reused component needs page-specific labels; otherwise reuse existing keys.
+- [X] T008 [US1] No new keys needed — `WidgetError` reuses `Dashboard.couldnTLoad` / `Dashboard.tapRetry`, present in both `messages/ar.json` and `messages/en.json`.
 
 **Checkpoint**: US1 shippable. No raw empty-on-error on the four surfaces.
 
@@ -83,7 +83,7 @@ unchanged.
 
 ### Tests for User Story 2
 
-- [ ] T009 [P] [US2] Unit `src/components/dashboard/RecentProposalsWidget.test.tsx` (or existing test file) — assert every status enum resolves to a non-enum label for `en`; unknown enum humanizes, never leaks raw.
+- [X] T009 [P] [US2] Unit `src/components/dashboard/proposalStatus.test.ts` — every status resolves to a non-enum label in `en` (and a Latin-free one in `ar`); unknown enum humanizes, never leaks raw. Maps extracted to `src/components/dashboard/proposalStatus.ts` so the mapping is testable without rendering React.
 
 ### Implementation for User Story 2
 
@@ -105,7 +105,7 @@ pricing lookup refused (not 4th).
 
 - [X] T011 [P] [US3] Unit `src/app/actions/billing/upgrade.test.ts` — `isPro`: past `pro_until`→free, future→pro, null→free, `role='admin'`→pro regardless, `pro_until <= now` (equal)→free.
 - [X] T012 [P] [US3] Unit for tone-AI quota — free user at limit → quota-exhausted/upgrade response; under limit → allowed.
-- [ ] T013 [P] [US3] Unit `src/lib/pricing/quota.test.ts` — regression: `FREE_MONTHLY_QUERIES === 5`.
+- [X] T013 [P] [US3] Unit `src/lib/pricing/quota.test.ts` — regression: `FREE_MONTHLY_QUERIES === 5` (constant exported for the guard).
 
 ### Implementation for User Story 3
 
@@ -160,9 +160,9 @@ not double-grant; direct client write to `payments`/`users.pro_until` denied by 
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [ ] T027 Run `specs/010-gap-remediation/quickstart.md` validation for every shipped slice.
-- [ ] T028 Merge gate — `pnpm typecheck` clean and `pnpm test` green (incl. all new regression tests).
-- [ ] T029 [P] Track the 735-ternary → `next-intl` catalog migration as a follow-up (out of scope here per spec assumptions); do not attempt in this feature.
+- [~] T027 Quickstart validation — US1, US2 and US3 are covered by automated regressions (error-vs-empty tree test, status-label unit, `isPro` expiry + tone quota + `FREE_MONTHLY_QUERIES` units). **US5 steps remain manual** (a live DeepSeek trend line + a real FL document upload); not yet run.
+- [X] T028 Merge gate — 2026-07-26: `tsc --noEmit` clean; `pnpm test` 768 tests / 64 files green.
+- [X] T029 [P] Follow-up recorded (not attempted here): the remaining inline-ternary copy → `next-intl` catalog migration, tracked in `.claude/CLAUDE.md` under feature 010.
 
 ---
 

@@ -149,7 +149,13 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   **FOUNDER-GATED**: Tap payments (migration + external dep; contract authored, DO NOT BUILD until
   greenlit). No migration except the gated Tap slice. Plan:
   [specs/010-gap-remediation/plan.md](specs/010-gap-remediation/plan.md).
-Active (`.specify/feature.json`): **010** — spec+plan done → **/speckit-tasks next**. US4 (Tap) blocked on founder approval.
+  ✅ **US1/US2/US3/US5 SHIPPED** (2026-07-26) incl. regressions: error-vs-empty server-component
+  test (`src/app/__tests__/error-states.test.ts` — failure injected at `createClient`, element tree
+  walked; Playwright can't fail a server-side read), proposal status labels extracted to
+  `src/components/dashboard/proposalStatus.ts` + unit, `FREE_MONTHLY_QUERIES = 5` guard.
+  Still open: quickstart US5 manual steps (live DeepSeek trend + FL upload); the remaining
+  inline-ternary copy → `next-intl` catalog migration (deliberate follow-up, out of scope).
+Active (`.specify/feature.json`): **010** — P1–P3 implemented, merge gate green. US4 (Tap) blocked on founder approval.
 <!-- SPECKIT END -->
 ## Validation history (read before trusting a "SHIPPED" tag)
 - `docs/validation/business-logic-audit.md` — static spec-vs-code audit (2026-07-22).

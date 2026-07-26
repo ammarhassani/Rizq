@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { FileText, Plus } from "lucide-react";
 import { WidgetError } from "./WidgetError";
+import { proposalStatusClass, proposalStatusLabel } from "./proposalStatus";
 
 type Proposal = {
   id: string;
@@ -17,43 +18,6 @@ type Props = {
   error?: boolean;
   locale: "ar" | "en";
 };
-
-// Reuse the theme-aware, contrast-paired status pills from globals.css
-// (12% accent fill + full-accent text) — never hardcode bg-*-100 + a
-// theme-aware text var, which goes light-on-light in dark theme.
-const statusColors: Record<string, string> = {
-  draft: "status-neutral",
-  final: "status-info",
-  sent: "status-pending",
-  viewed: "status-info",
-  accepted: "status-positive",
-  declined: "status-overdue",
-  expired: "status-neutral",
-};
-
-const statusLabelsAr: Record<string, string> = {
-  draft: "مسودة",
-  final: "معتمد",
-  sent: "مُرسَل",
-  viewed: "مُطَّلَع عليه",
-  accepted: "مقبول",
-  declined: "مرفوض",
-  expired: "منتهٍ",
-};
-
-// English labels — mirror statusLabelsAr so English users never see the raw DB enum.
-const statusLabelsEn: Record<string, string> = {
-  draft: "Draft",
-  final: "Final",
-  sent: "Sent",
-  viewed: "Viewed",
-  accepted: "Accepted",
-  declined: "Declined",
-  expired: "Expired",
-};
-
-// Fallback for an unknown/new enum: humanize, never leak the raw value.
-const humanizeStatus = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 export function RecentProposalsWidget({ proposals, error, locale }: Props) {
   const tI18n = useTranslations("Dashboard");
@@ -112,8 +76,8 @@ export function RecentProposalsWidget({ proposals, error, locale }: Props) {
                     {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(p.final_price_sar)}
                   </span>
                 )}
-                <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[p.status] ?? "status-neutral"}`}>
-                  {(isAr ? statusLabelsAr : statusLabelsEn)[p.status] ?? humanizeStatus(p.status)}
+                <span className={`text-xs px-2 py-0.5 rounded-full ${proposalStatusClass(p.status)}`}>
+                  {proposalStatusLabel(p.status, locale)}
                 </span>
               </div>
             </Link>
