@@ -155,7 +155,20 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   `src/components/dashboard/proposalStatus.ts` + unit, `FREE_MONTHLY_QUERIES = 5` guard.
   Still open: quickstart US5 manual steps (live DeepSeek trend + FL upload); the remaining
   inline-ternary copy → `next-intl` catalog migration (deliberate follow-up, out of scope).
-Active (`.specify/feature.json`): **010** — P1–P3 implemented, merge gate green. US4 (Tap) blocked on founder approval.
+- `specs/011-power-user-pass-3/` — **Power-User Pass 3 Remediation**: the 18 defects found driving
+  the app in Arabic as a freelancer (pass 3, 2026-07-26). 8 independent slices, **no migration**,
+  no new dependency. P1 (MVP): Arabic ICU counts render `NaN` on the pricing result + public
+  result page (pre-formatted number passed to a plural arg) and the sentence misstates provenance;
+  VAT can be charged with `vat_registered=false` and no VAT number on the document; client-facing
+  proposal/invoice leak the price floor + band, the freelancer's **auth email** (`brand.ts` contact
+  fallback) and Rizq's own tagline as theirs; validation failures render as generic "try again"
+  with no field. P2: onboarding rate verdict ignores the hourly rate, resume lands on the completed
+  step, unchosen values shown/stored; pricing tool ignores the profile and the quota badge goes
+  stale. P3: cover letter doesn't name the client + stated duration never reaches the timeline;
+  money input accepts 3 decimals, mixed numerals, 404 outside the app shell. Plan:
+  [specs/011-power-user-pass-3/plan.md](specs/011-power-user-pass-3/plan.md).
+Active (`.specify/feature.json`): **011** — spec + plan done → **/speckit-tasks next**.
+Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.
 <!-- SPECKIT END -->
 ## Validation history (read before trusting a "SHIPPED" tag)
 - `docs/validation/business-logic-audit.md` — static spec-vs-code audit (2026-07-22).
