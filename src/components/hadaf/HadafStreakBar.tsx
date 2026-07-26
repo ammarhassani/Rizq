@@ -8,6 +8,10 @@
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
+function fmtCount(n: number, locale: "ar" | "en"): string {
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US").format(n);
+}
+
 type Props = {
   streak: number;
   required: number;
@@ -41,7 +45,13 @@ export function HadafStreakBar({ streak, required, locale }: Props) {
       </div>
       {/* Label */}
       <p className={`text-xs text-rizq-ink-soft ${font}`}>
-        {t("streakLabel", { current: streak, required })}
+        {t("streakLabel", {
+          current: streak,
+          // `current` selects the plural category; `count`/`required` carry the digits in
+          // this view's numbering system, which ICU's `#` would not match for "ar".
+          count: fmtCount(streak, locale),
+          required: fmtCount(required, locale),
+        })}
       </p>
     </div>
   );

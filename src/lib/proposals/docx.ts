@@ -25,6 +25,7 @@ import {
   type ISpacingProperties,
 } from "docx";
 import type { ArtifactData } from "./artifact";
+import { ownTagline } from "./artifact";
 import { PROPOSAL_STRINGS as T } from "./proposalStrings";
 
 type Locale = "ar" | "en";
@@ -150,7 +151,7 @@ export async function buildProposalDocxBuffer(
   {
     const c = get("cover");
     const brandName = s(c["brandName"]);
-    const tagline = s(c["tagline"]);
+    const tagline = ownTagline(s(c["tagline"])) ?? "";
     const projectTitle = s(c["projectTitle"], t.coverDocLabel);
     const clientName = s(c["clientName"], t.noClient);
     const issueDate = fmtDate(s(c["issueDate"]) || null);
@@ -265,9 +266,12 @@ export async function buildProposalDocxBuffer(
     const c = get("timeline");
     const start = fmtDate(s(c["startDate"]) || null);
     const delivery = fmtDate(s(c["deliveryDate"]) || null);
+    const statedDuration = s(c["statedDuration"]);
     children.push(sectionHeading(t.sections.timeline));
     children.push(labelLine(t.startDate, start || t.noDates));
     children.push(labelLine(t.deliveryDate, delivery || t.noDates));
+    // The client's own words about timing — the preview and the deliverable must match.
+    if (statedDuration) children.push(labelLine(t.statedDurationLabel, statedDuration));
   }
 
   // ── Pricing (Investment) ───────────────────────────────────────────────────────

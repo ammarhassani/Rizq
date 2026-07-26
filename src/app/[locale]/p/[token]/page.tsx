@@ -19,6 +19,7 @@ import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles"
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogProposalView } from "@/components/proposals/LogProposalView";
 import type { ArtifactData } from "@/lib/proposals/artifact";
+import { forClientAudience } from "@/lib/proposals/artifact";
 import { isValidShareToken } from "@/lib/proposals/shareToken";
 
 // ---------------------------------------------------------------------------
@@ -87,8 +88,17 @@ function parseArtifactData(raw: unknown): ArtifactData | null {
   return raw as ArtifactData;
 }
 
+/**
+ * Contact details as the CLIENT may see them.
+ *
+ * Reads the redacted copy, not the stored artifact: `contact.email` used to fall back to
+ * the freelancer's sign-in address, so an artifact built before that fix can still be
+ * carrying a login email. When there is no publishable address the affordance is simply
+ * absent — better than mailto-ing an address the freelancer never chose to publish.
+ */
 function buildContactLinks(artifact: ArtifactData | null) {
   if (!artifact) return { email: null, whatsapp: null };
+  artifact = forClientAudience(artifact);
   // New document model carries contact on `cover`; legacy on `branding`.
   const section =
     artifact.sections.find((s) => s.id === "cover") ??

@@ -97,10 +97,32 @@ export const ARTIFACT_SECTIONS: ArtifactSectionMeta[] = [
 // Rizq brand defaults (used when M8 brand fields are null)
 // ---------------------------------------------------------------------------
 
+/**
+ * Colours only. Rizq's own tagline is not the freelancer's — a document the client reads may
+ * not present it as theirs, so an absent tagline renders as absent
+ * (contracts/client-facing-artifact.md).
+ */
 export const RIZQ_DEFAULTS = {
-  taglineAr: "سعّر بثقة. اقبض رزقك.",
   colors: { primary: "#1A5F3F", secondary: "#C8A951" },
 } as const;
+
+/**
+ * Rizq's own tagline, substituted into every artifact built before this was recognised as a
+ * leak. Documents stored back then carry it as if the freelancer had written it.
+ */
+const RIZQ_MARKETING_TAGLINE_AR = "سعّر بثقة. اقبض رزقك.";
+
+/**
+ * A tagline the freelancer actually wrote, or null.
+ *
+ * Applied at render so stored artifacts stop presenting Rizq's marketing line as theirs
+ * without a rewrite. An absent value renders as absent — nothing is substituted.
+ */
+export function ownTagline(tagline: string | null | undefined): string | null {
+  const trimmed = (tagline ?? "").trim();
+  if (!trimmed || trimmed === RIZQ_MARKETING_TAGLINE_AR) return null;
+  return trimmed;
+}
 
 // ---------------------------------------------------------------------------
 // Input / output types
@@ -173,6 +195,11 @@ export type ArtifactInput = {
   ipTerms: "full_transfer" | "license" | "per_project";
   startDate: string | null;
   deliveryDate: string | null;
+  /**
+   * The duration the client stated in their brief, in their own words. Rendered as-is;
+   * never converted into calendar dates. Null when the brief said nothing.
+   */
+  statedDuration: string | null;
   validityDays: number;         // e.g. 30
   // profile / about (from extended loadUserBrandDefaults)
   bioAr: string | null;
@@ -206,14 +233,22 @@ function buildCover(input: ArtifactInput): Record<string, unknown> {
     brandName: input.brandNameAr ?? input.freelancerName,
     logoUrl: input.logoUrl,
     colors: input.brandColors ?? RIZQ_DEFAULTS.colors,
-    tagline: input.taglineAr ?? RIZQ_DEFAULTS.taglineAr,
+    tagline: input.taglineAr,
     contact: input.contact,
+    /**
+     * Marks the contact block as built after `contact.email` stopped falling back to the
+     * freelancer's sign-in address. Artifacts without it predate that fix and may be
+     * carrying a login email, so the client copy withholds it.
+     */
+    contactEmailIsPublic: true,
   };
 }
 
 function buildCoverLetter(input: ArtifactInput): Record<string, unknown> {
   return {
     body: input.coverLetterBody,
+    // The renderer greets by name; without this it falls back to "عميل محترم".
+    clientName: input.clientName,
     ai_generated: input.proseAiGenerated && input.coverLetterBody != null,
   };
 }
@@ -257,6 +292,8 @@ function buildTimeline(input: ArtifactInput): Record<string, unknown> {
   return {
     startDate: input.startDate,
     deliveryDate: input.deliveryDate,
+    // Echoed back to the client because they wrote it; dates stay "to be agreed".
+    statedDuration: input.statedDuration,
     revisions: input.revisions,
   };
 }
@@ -271,6 +308,9 @@ function buildPricing(input: ArtifactInput): Record<string, unknown> {
     citation: input.provenanceCitation,
     included: input.included,
     depositPct: input.depositPct,
+    // Decision support for the owner. Withheld from the client copy — an invitation to
+    // negotiate the tool rather than the work.
+    methodologyHref: "/methodology",
   };
 }
 
@@ -335,20 +375,70 @@ export function artifactTitle(artifactJson: unknown): string | null {
 }
 
 /**
+ * Keys a client may see, per section. Allow-list, not deny-list: a field added to one of
+ * these sections later is withheld until someone decides it may be shown
+ * (contracts/client-facing-artifact.md, rule 2).
+ *
+ * Sections absent from this map pass through unchanged — only their AI badges are cleared.
+ */
+const CLIENT_ALLOWED_KEYS: Partial<Record<ArtifactSectionId, readonly string[]>> = {
+  // The quote and what justifies it stay; the band the freelancer priced inside does not.
+  pricing: ["anchor", "citation", "included", "depositPct", "ai_generated"],
+  // The Rizq seal and the reference the client quotes back; not the methodology link.
+  verification: ["proposalId", "label", "ai_generated"],
+};
+
+/** Marker set on every section this function narrowed, so renderers can drop chrome too. */
+export const CLIENT_REDACTED = "client_redacted";
+
+/**
  * The client's copy of the document.
  *
- * The per-section AI badge reads "AI-drafted, review before sending" — an
- * instruction to the freelancer that has no business on the copy the recipient
- * reads. Clearing `ai_generated` drops the badges in the renderer and the .docx
- * without touching a word of the content. Pure; the stored artifact is untouched.
+ * Redaction happens HERE, at render, rather than at generation — so a proposal stored
+ * before this contract existed stops leaking the moment this ships. Pure; the stored
+ * artifact is untouched.
+ *
+ * Withheld:
+ *  - the price band (`min`/`max`) and its sample size — discloses the freelancer's floor
+ *  - the pricing methodology link — internal decision support
+ *  - `contact.email` on artifacts built before it stopped falling back to the sign-in
+ *    address (no `contactEmailIsPublic` marker ⇒ it may be a login email)
+ *  - the per-section AI badge, which reads "AI-drafted, review before sending" — an
+ *    instruction to the freelancer, not to the recipient
  */
 export function forClientAudience(data: ArtifactData): ArtifactData {
   return {
-    sections: data.sections.map((section) =>
-      section.content["ai_generated"] === true
-        ? { ...section, content: { ...section.content, ai_generated: false } }
-        : section
-    ),
+    sections: data.sections.map((section) => {
+      let content = section.content;
+
+      const allowed = CLIENT_ALLOWED_KEYS[section.id];
+      if (allowed) {
+        const narrowed: Record<string, unknown> = { [CLIENT_REDACTED]: true };
+        for (const key of allowed) {
+          if (key in content) narrowed[key] = content[key];
+        }
+        content = narrowed;
+      }
+
+      // An email that predates the contact_email-only rule may be the sign-in address.
+      const contact = content["contact"];
+      if (
+        contact &&
+        typeof contact === "object" &&
+        content["contactEmailIsPublic"] !== true
+      ) {
+        content = {
+          ...content,
+          contact: { ...(contact as Record<string, unknown>), email: null },
+        };
+      }
+
+      if (content["ai_generated"] === true) {
+        content = { ...content, ai_generated: false };
+      }
+
+      return content === section.content ? section : { ...section, content };
+    }),
   };
 }
 
@@ -377,10 +467,11 @@ function buildBranding(input: ArtifactInput): Record<string, unknown> {
   return {
     name: input.freelancerName,
     brandName: input.brandNameAr ?? input.freelancerName,
-    tagline: input.taglineAr ?? RIZQ_DEFAULTS.taglineAr,
+    tagline: input.taglineAr,
     logoUrl: input.logoUrl,
     colors: input.brandColors ?? RIZQ_DEFAULTS.colors,
     contact: input.contact,
+    contactEmailIsPublic: true,
   };
 }
 

@@ -26,6 +26,9 @@ import { ItemPicker } from "@/components/items/ItemPicker";
 import { FeePicker } from "@/components/fees/FeePicker";
 import type { CreatedItem } from "@/app/actions/items/items";
 import type { CreatedFeePreset } from "@/app/actions/fees/fees";
+import type { VatEligibility } from "@/lib/invoices/vatEligibility";
+import { Link } from "@/i18n/navigation";
+import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
 
 const VAT_RATE = 15;
 
@@ -51,6 +54,8 @@ type Props = {
   catalogItems?: CreatedItem[];
   feePresets?: CreatedFeePreset[];
   initial?: InvoiceFormInitial;
+  /** Whether this freelancer may put a VAT line on an invoice at all (KSA law). */
+  vatEligibility: VatEligibility;
 };
 
 const PAYMENT_METHODS = ["bank_transfer", "stc_pay", "cash", "other"] as const;
@@ -77,7 +82,9 @@ function defaultDueDate(): string {
 
 function parseNum(s: string): number {
   const n = parseFloat(s.replace(/,/g, ""));
-  return isNaN(n) ? 0 : n;
+  // Halala precision at the boundary too — the totals must never see a third decimal
+  // that the printed unit price cannot show.
+  return isNaN(n) ? 0 : roundHalala(n);
 }
 
 export function InvoiceForm({
@@ -86,6 +93,7 @@ export function InvoiceForm({
   catalogItems = [],
   feePresets = [],
   initial,
+  vatEligibility,
 }: Props) {
   const t = useTranslations("Invoices.form");
   const router = useRouter();
@@ -114,12 +122,15 @@ export function InvoiceForm({
 
   const [fees, setFees] = useState<InvoiceFee[]>([]);
   const [vatOn, setVatOn] = useState(false);
+  // Charging VAT unregistered is a KSA violation, and a tax invoice without the seller's
+  // registration number is invalid. Ineligible → the switch is off and stays off.
+  const vatAllowed = vatEligibility.eligible;
   const [clientId, setClientId] = useState<string>(initial?.client_id ?? "");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [paymentDetails, setPaymentDetails] = useState("");
   const [dueDate, setDueDate] = useState(defaultDueDate());
 
-  const vatPct = vatOn ? VAT_RATE : 0;
+  const vatPct = vatOn && vatAllowed ? VAT_RATE : 0;
 
   const inputClass = `w-full rounded-xl border border-rizq-gold/30 bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream focus:border-rizq-green focus:bg-rizq-cream transition-colors placeholder:text-rizq-ink-soft/50 ${font}`;
   const labelClass = `block text-sm font-medium text-rizq-ink mb-2 ${font}`;
@@ -299,9 +310,17 @@ export function InvoiceForm({
                           aria-label={t("qtyLabel")}
                           inputMode="decimal"
                           min="0.01"
-                          step="any"
+                          step="0.01"
                           value={item.quantity}
-                          onChange={(e) => updateItem(idx, "quantity", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(idx, "quantity", clampMoneyInput(e.target.value))
+                          }
+                          onBlur={(e) => {
+                            const n = parseFloat(e.target.value);
+                            if (Number.isFinite(n)) {
+                              updateItem(idx, "quantity", String(roundHalala(n)));
+                            }
+                          }}
                           className="w-20 rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-2 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors text-center tabular font-sans"
                           dir="ltr"
                         />
@@ -317,9 +336,18 @@ export function InvoiceForm({
                             aria-label={t("unitPriceLabel")}
                             inputMode="decimal"
                             min="0"
-                            step="any"
+                            // Halala precision: what is printed must be what was multiplied.
+                            step="0.01"
                             value={item.unit_price_sar}
-                            onChange={(e) => updateItem(idx, "unit_price_sar", e.target.value)}
+                            onChange={(e) =>
+                              updateItem(idx, "unit_price_sar", clampMoneyInput(e.target.value))
+                            }
+                            onBlur={(e) => {
+                              const n = parseFloat(e.target.value);
+                              if (Number.isFinite(n)) {
+                                updateItem(idx, "unit_price_sar", String(roundHalala(n)));
+                              }
+                            }}
                             placeholder="0"
                             className="w-32 rounded-lg border border-rizq-gold/30 bg-rizq-cream/60 px-3 py-2 pe-10 text-base text-rizq-ink focus:outline-none focus:border-rizq-green focus:bg-rizq-cream transition-colors tabular font-sans"
                             dir="ltr"
@@ -355,7 +383,7 @@ export function InvoiceForm({
         <div className="rounded-2xl border border-rizq-gold/20 bg-rizq-cream/40 p-5 space-y-5">
           <p className={`text-sm font-semibold text-rizq-ink ${font}`}>{t("taxAndFeesLabel")}</p>
 
-          {/* VAT toggle — fixed 15% */}
+          {/* VAT toggle — fixed 15%, gated on VAT registration */}
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className={`text-sm font-medium text-rizq-ink ${font}`}>{t("vatToggleLabel")}</p>
@@ -364,16 +392,18 @@ export function InvoiceForm({
             <button
               type="button"
               role="switch"
-              aria-checked={vatOn}
+              aria-checked={vatOn && vatAllowed}
               aria-label={t("vatToggleLabel")}
+              disabled={!vatAllowed}
+              aria-describedby={vatAllowed ? undefined : "vat-blocked-reason"}
               onClick={() => setVatOn((v) => !v)}
-              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream ${
-                vatOn ? "bg-rizq-green" : "bg-rizq-ink/15"
+              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus-visible:ring-offset-2 focus-visible:ring-offset-rizq-cream disabled:cursor-not-allowed disabled:opacity-50 ${
+                vatOn && vatAllowed ? "bg-rizq-green" : "bg-rizq-ink/15"
               }`}
             >
               <span
                 className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow transition-transform ${
-                  vatOn
+                  vatOn && vatAllowed
                     ? isAr
                       ? "-translate-x-6"
                       : "translate-x-6"
@@ -382,10 +412,30 @@ export function InvoiceForm({
                     : "translate-x-1"
                 }`}
               >
-                {vatOn && <Check size={12} className="text-rizq-green" strokeWidth={3} />}
+                {vatOn && vatAllowed && (
+                  <Check size={12} className="text-rizq-green" strokeWidth={3} />
+                )}
               </span>
             </button>
           </div>
+
+          {/* Why VAT is unavailable + where to fix it */}
+          {!vatAllowed && (
+            <p
+              id="vat-blocked-reason"
+              className={`-mt-2 text-xs text-rizq-ink-soft ${font}`}
+            >
+              {vatEligibility.reason === "missing_number"
+                ? t("vatBlockedMissingNumber")
+                : t("vatBlockedNotRegistered")}{" "}
+              <Link
+                href="/settings/profile"
+                className="text-rizq-green underline underline-offset-2 hover:text-rizq-green-dark"
+              >
+                {t("vatBlockedCta")}
+              </Link>
+            </p>
+          )}
 
           {/* Fees */}
           <div>

@@ -397,6 +397,9 @@ export async function generateProposal(
     ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
+    // The client's own words about timing. Dates remain unset — we do not turn "3 months"
+    // into a delivery date nobody agreed to.
+    statedDuration: scope?.stated_duration ?? null,
     validityDays: 30,
     bioAr: brand.bioAr,
     bioEn: brand.bioEn,

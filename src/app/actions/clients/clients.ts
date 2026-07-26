@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { createClient as createSupabaseClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { fieldErrorsFromZod } from "@/lib/validation/fieldErrors";
+import type { FieldError } from "@/lib/validation/fieldErrors";
 
 // ─── Zod schemas ───────────────────────────────────────────────────────────
 
@@ -59,17 +61,30 @@ const LogContactSchema = z.object({ id: z.string().uuid() });
 
 export type ClientActionResult =
   | { ok: true; id: string }
-  | { ok: false; code: "unauthorized" | "invalid" | "quota_exhausted" | "not_found" | "error"; message?: string };
+  | {
+      ok: false;
+      code: "unauthorized" | "invalid" | "quota_exhausted" | "not_found" | "error";
+      message?: string;
+      /** Present on `invalid` only — which input failed and why (never a retry). */
+      fields?: FieldError[];
+    };
 
 export type SimpleActionResult =
   | { ok: true }
-  | { ok: false; code: "unauthorized" | "invalid" | "not_found" | "error"; message?: string };
+  | {
+      ok: false;
+      code: "unauthorized" | "invalid" | "not_found" | "error";
+      message?: string;
+      fields?: FieldError[];
+    };
 
 // ─── createClient ──────────────────────────────────────────────────────────
 
 export async function createClient(input: unknown): Promise<ClientActionResult> {
   const parsed = CreateClientSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, code: "invalid" };
+  if (!parsed.success) {
+    return { ok: false, code: "invalid", fields: fieldErrorsFromZod(parsed.error) };
+  }
 
   const supabase = await createSupabaseClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -119,7 +134,10 @@ export async function createClient(input: unknown): Promise<ClientActionResult> 
 
 export async function updateClient(input: unknown): Promise<SimpleActionResult> {
   const parsed = UpdateClientSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, code: "invalid" };
+  if (!parsed.success) {
+    // The form renders bare field names; "patch." is a wire-shape detail.
+    return { ok: false, code: "invalid", fields: fieldErrorsFromZod(parsed.error, "patch.") };
+  }
 
   const supabase = await createSupabaseClient();
   const { data: userData } = await supabase.auth.getUser();

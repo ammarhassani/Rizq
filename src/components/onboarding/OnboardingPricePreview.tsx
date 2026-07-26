@@ -18,11 +18,21 @@ function fmt(n: number, locale: "ar" | "en"): string {
 
 export function OnboardingPricePreview({
   locale,
-  userRate,
+  projectMin,
+  hourlyRate,
 }: {
   locale: "ar" | "en";
-  /** The freelancer's own floor/project rate — compared against the band for an honest reality check. */
-  userRate?: number | null;
+  /**
+   * The freelancer's minimum PROJECT price. The resolver returns a project band, so this is
+   * the only figure that can honestly be compared to it.
+   */
+  projectMin?: number | null;
+  /**
+   * The hourly rate, used only to decide whether to prompt for the missing project figure.
+   * It is never converted into a project price — there is no honest hours-per-project
+   * constant, and a verdict on an invented number is a verdict on nothing.
+   */
+  hourlyRate?: number | null;
 }) {
   const tI18n = useTranslations("Onboarding.v2");
   const isAr = locale === "ar";
@@ -60,31 +70,23 @@ export function OnboardingPricePreview({
 
   const citation = isAr ? state.citation_ar : state.citation_en;
 
-  // Rate reality check (spec M8 step-5): where the freelancer's own floor sits
-  // relative to the cited band. Factual comparison against the shown numbers —
-  // encouraging, never discouraging (Principle: empower, don't deflate).
-  let reality: { tone: "below" | "within" | "above"; text: string } | null = null;
-  if (typeof userRate === "number" && userRate > 0) {
-    if (userRate < state.min) {
-      reality = {
-        tone: "below",
-        text: isAr
-          ? "سعرك أقل من نطاق السوق — قد يكون هناك مجال لرفعه."
-          : "Your rate is below the market range — there may be room to raise it.",
-      };
-    } else if (userRate > state.max) {
-      reality = {
-        tone: "above",
-        text: isAr
-          ? "سعرك أعلى من النطاق — تأكّد أن تموضعك وخبرتك يدعمانه."
-          : "Your rate is above the range — make sure your positioning backs it up.",
-      };
+  // Rate reality check (spec M8 step-5): where the freelancer's own floor sits relative to
+  // the cited band. The verdict NAMES the figure it judged, because judging one number and
+  // reporting on "your rate" reads as a verdict on everything they typed.
+  let reality: { tone: "below" | "within" | "above" | "prompt"; text: string } | null = null;
+
+  if (typeof projectMin === "number" && projectMin > 0) {
+    const rate = fmt(projectMin, locale);
+    if (projectMin < state.min) {
+      reality = { tone: "below", text: tI18n("rateVerdictBelow", { rate }) };
+    } else if (projectMin > state.max) {
+      reality = { tone: "above", text: tI18n("rateVerdictAbove", { rate }) };
     } else {
-      reality = {
-        tone: "within",
-        text: tI18n("rateSitsWithinMarketRange"),
-      };
+      reality = { tone: "within", text: tI18n("rateVerdictWithin", { rate }) };
     }
+  } else if (typeof hourlyRate === "number" && hourlyRate > 0) {
+    // Silence here read as "your rate checks out". Say what is missing instead.
+    reality = { tone: "prompt", text: tI18n("rateVerdictNeedsProjectMin") };
   }
 
   return (
@@ -115,7 +117,9 @@ export function OnboardingPricePreview({
                 ? "text-[var(--warn)]"
                 : reality.tone === "above"
                   ? "text-rizq-gold-dark"
-                  : "text-rizq-green"
+                  : reality.tone === "prompt"
+                    ? "text-rizq-ink-soft"
+                    : "text-rizq-green"
             }`}
           >
             {reality.text}

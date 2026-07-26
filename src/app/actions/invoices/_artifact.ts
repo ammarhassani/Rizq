@@ -14,6 +14,7 @@ import { buildInvoiceArtifact } from "@/lib/invoices/artifact";
 import type { InvoiceArtifactData, InvoiceArtifactInput } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem, InvoiceFee } from "@/lib/invoices/items";
 import { loadUserBrandDefaults } from "@/lib/proposals/brand";
+import { resolveVatEligibility } from "@/lib/invoices/vatEligibility";
 
 // ---------------------------------------------------------------------------
 // Narrow invoice row shape (only the columns we actually SELECT in actions).
@@ -67,14 +68,20 @@ export async function buildInvoiceArtifactInputFromRow({
 }): Promise<InvoiceArtifactInput> {
   // 1. Load user brand/contact defaults + role for tier gate.
   //    We need `role` separately as it isn't in loadUserBrandDefaults.
+  //    vat_number rides along on the same query — a VAT-carrying invoice must print it.
   const { data: roleRow } = await supabase
     .from("users")
-    .select("role")
+    .select("role, vat_registered, vat_number")
     .eq("id", userId)
     .single();
 
   const role = (roleRow?.role as string | null) ?? "free";
   const isFreeTier = role !== "pro" && role !== "admin";
+
+  const vatEligibility = resolveVatEligibility(
+    roleRow?.vat_registered as boolean | null,
+    roleRow?.vat_number as string | null,
+  );
 
   // Load brand/contact/defaults (M8 columns).
   const brand = await loadUserBrandDefaults(supabase, userId);
@@ -174,6 +181,7 @@ export async function buildInvoiceArtifactInputFromRow({
     vatPct,
     vatSar,
     totalSar,
+    vatNumber: vatEligibility.eligible ? vatEligibility.vatNumber : null,
 
     paymentMethod: invoice.payment_method,
     paymentDetails: invoice.payment_details ?? null,

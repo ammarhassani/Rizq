@@ -24,9 +24,11 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
   const [monthlyGoal, setMonthlyGoal] = useState(
     profile.income_goal_monthly_sar?.toString() ?? ""
   );
-  const [rateConfidence, setRateConfidence] = useState<"exact" | "approximate" | "estimate">(
-    profile.rate_confidence ?? "approximate"
-  );
+  // null until the freelancer picks one. Defaulting to "approximate" both highlighted a
+  // choice nobody made and wrote it to the row as if they had.
+  const [rateConfidence, setRateConfidence] = useState<
+    "exact" | "approximate" | "estimate" | null
+  >(profile.rate_confidence ?? null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -45,7 +47,8 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
         // Only the min/floor project rate is asked; store it as the range (max = min).
         current_project_rate_range: min != null ? { min, max: min } : null,
         income_goal_monthly_sar: monthlyGoal ? parseFloat(monthlyGoal) : null,
-        rate_confidence: rateConfidence,
+        // Omitted entirely when unchosen — the column keeps whatever it held.
+        ...(rateConfidence ? { rate_confidence: rateConfidence } : {}),
       });
       if (result.ok) {
         onNext(result.completeness);
@@ -79,7 +82,8 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
           own rate. Ephemeral; cites provenance. */}
       <OnboardingPricePreview
         locale={locale}
-        userRate={projectMin ? parseFloat(projectMin) : null}
+        projectMin={projectMin ? parseFloat(projectMin) : null}
+        hourlyRate={hourlyRate ? parseFloat(hourlyRate) : null}
       />
 
       {/* Hourly rate + min/floor project rate (daily is derived = hourly × 8). */}

@@ -16,6 +16,8 @@ import { createClient } from "@/lib/supabase/server";
 import { computeStrength } from "@/lib/profile/strength";
 import { getCities, getSpecialties, getExperienceTiers } from "@/lib/pricing/refDataDb";
 import { tierSlugFromYears } from "@/lib/pricing/experienceTier";
+import { fieldErrorsFromZod, isSupportedUrl } from "@/lib/validation/fieldErrors";
+import type { FieldError } from "@/lib/validation/fieldErrors";
 
 // ── Per-step Zod schemas ─────────────────────────────────────────────────────
 
@@ -53,7 +55,19 @@ const StepRatesSchema = z.object({
   rate_confidence: z.enum(["exact", "approximate", "estimate"]).optional(),
 });
 
-const urlOrEmpty = z.string().url().max(500).optional().nullable().or(z.literal(""));
+/**
+ * Zod's `.url()` only asks whether the string parses — `javascript:alert(1)` passes it. The
+ * scheme allow-list is enforced HERE, on the trust boundary, and reports the rejection with
+ * its own reason code instead of quietly storing nothing (FR-011).
+ */
+const urlOrEmpty = z
+  .string()
+  .url()
+  .max(500)
+  .refine(isSupportedUrl, { error: "unsupported_scheme" })
+  .optional()
+  .nullable()
+  .or(z.literal(""));
 
 const StepPlatformsSchema = z.object({
   bahr_profile_url: urlOrEmpty,
@@ -211,7 +225,15 @@ async function resolveProfileForeignKeys(
 
 export type SaveOnboardingStepResult =
   | { ok: true; completeness: number }
-  | { ok: false; code: "no_session" | "invalid" | "unknown_step" | "error" };
+  | {
+      ok: false;
+      code: "no_session" | "invalid" | "unknown_step" | "error";
+      /**
+       * Present on `invalid` only. Names the field(s) that failed and why, so the form can
+       * point at the input instead of offering a retry that can never succeed.
+       */
+      fields?: FieldError[];
+    };
 
 export async function saveOnboardingStep(
   stepKey: string,
@@ -225,7 +247,9 @@ export async function saveOnboardingStep(
   const schema = STEP_SCHEMAS[key];
 
   const parsed = schema.safeParse(data);
-  if (!parsed.success) return { ok: false, code: "invalid" };
+  if (!parsed.success) {
+    return { ok: false, code: "invalid", fields: fieldErrorsFromZod(parsed.error) };
+  }
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();

@@ -190,7 +190,12 @@ export default async function SharedResultPage({
               aria-hidden
               className="inline-block h-1.5 w-1.5 rounded-full bg-rizq-green me-2 align-middle"
             />
-            {t("sampleSize", { n: fmt.format(row.result_sample_size ?? 0) })}
+            {/* `n` selects the plural category; `count` supplies digits in this page's
+                numbering system (ICU's own `#` would emit Latin digits for "ar"). */}
+            {t("sampleSize", {
+              n: row.result_sample_size ?? 0,
+              count: fmt.format(row.result_sample_size ?? 0),
+            })}
           </p>
         </article>
 

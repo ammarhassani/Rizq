@@ -13,6 +13,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { InvoiceForm } from "@/components/invoices/InvoiceForm";
 import { ContextualBackLink } from "@/components/nav/ContextualBackLink";
 import { parseOrigin } from "@/lib/nav/origin";
+import { resolveVatEligibility } from "@/lib/invoices/vatEligibility";
 
 type Params = { locale: string };
 type SearchParams = { gig?: string; from?: string; guided?: string };
@@ -97,6 +98,18 @@ export default async function InvoicesNewPage({
     })
   );
 
+  // VAT may only be applied by a registered freelancer who recorded their number.
+  const { data: vatProfile } = await supabase
+    .from("users")
+    .select("vat_registered, vat_number")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const vatEligibility = resolveVatEligibility(
+    vatProfile?.vat_registered as boolean | null,
+    vatProfile?.vat_number as string | null,
+  );
+
   // Pre-fill from gig if ?gig= is present (owner-scoped)
   let gigPrefill: { title?: string; client_id?: string | null; amount_sar?: number; gig_id?: string } | undefined;
 
@@ -134,6 +147,7 @@ export default async function InvoicesNewPage({
           catalogItems={catalogItems}
           feePresets={feePresets}
           initial={gigPrefill}
+          vatEligibility={vatEligibility}
         />
       </div>
     </AppShell>

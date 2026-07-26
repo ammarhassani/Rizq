@@ -15,6 +15,7 @@ import { useState, useTransition, useRef, useEffect } from "react";
 import { X, Check, Copy, ExternalLink, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { setProposalShare, logShareChannel } from "@/app/actions/proposals/shareActions";
+import { Link } from "@/i18n/navigation";
 
 // ---------------------------------------------------------------------------
 // WhatsApp SVG icon (inline to avoid an import)
@@ -46,6 +47,8 @@ type Props = {
   proposalId: string;
   initialShared: boolean;
   initialToken: string | null;
+  /** False when the document carries no email, phone or WhatsApp the client can use. */
+  hasClientContact: boolean;
   onClose: () => void;
 };
 
@@ -58,6 +61,7 @@ export function ShareModal({
   proposalId,
   initialShared,
   initialToken,
+  hasClientContact,
   onClose,
 }: Props) {
   const t = useTranslations("Proposals.detail.shareModal");
@@ -223,6 +227,23 @@ export function ShareModal({
         {isShared && (
           <p className={`text-xs text-rizq-ink-soft mb-4 ${font}`}>
             {t("shareNote")}
+          </p>
+        )}
+
+        {/* The document no longer falls back to the sign-in address, so a freelancer with
+            no contact details has nothing on it for the client to reply to. Nudge, never
+            block — the link still works (FR-008). */}
+        {!hasClientContact && (
+          <p
+            className={`mb-4 rounded-xl border border-rizq-gold/30 bg-rizq-gold/10 px-3 py-2 text-xs text-rizq-ink-soft ${font}`}
+          >
+            {t("noContactNudge")}{" "}
+            <Link
+              href="/settings/profile"
+              className="text-rizq-green underline underline-offset-2 hover:text-rizq-green-dark"
+            >
+              {t("noContactCta")}
+            </Link>
           </p>
         )}
 

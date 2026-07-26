@@ -188,6 +188,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
                 {t("summaryLine", {
                   total: fmtPrice(totalSar, locale as "ar" | "en"),
                   n: gigCount,
+                  count: fmtPrice(gigCount, locale as "ar" | "en"),
                   pending: fmtPrice(pendingCount, locale as "ar" | "en"),
                 })}
               </p>

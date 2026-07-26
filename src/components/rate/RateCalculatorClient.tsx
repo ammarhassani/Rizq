@@ -400,7 +400,11 @@ export function RateCalculatorClient({
             {/* Sample size */}
             {market && (
               <p className={`text-xs text-rizq-ink-soft mt-3 ${font}`}>
-                {t("sampleSizeNote", { n: fmtInt(market.sample_size, locale) })}
+                {/* `n` selects the plural category; `count` supplies the digits. */}
+                {t("sampleSizeNote", {
+                  n: market.sample_size,
+                  count: fmtInt(market.sample_size, locale),
+                })}
               </p>
             )}
           </div>

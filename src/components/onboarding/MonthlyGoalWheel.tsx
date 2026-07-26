@@ -47,6 +47,12 @@ export function MonthlyGoalWheel({
   const interacted = useRef(false);
 
   const selectedIdx = SEGMENTS.findIndex((s) => String(s.hi) === value);
+  /**
+   * Has a band actually been picked? The wheel has to rest somewhere, but resting on the
+   * first band was rendered as a selection while the column stayed null — a choice the
+   * freelancer never made, shown back to them as theirs.
+   */
+  const hasChoice = selectedIdx >= 0;
   const [active, setActive] = useState(selectedIdx >= 0 ? selectedIdx : 0);
 
   // Position the wheel to the current value (mount + external changes) without
@@ -76,7 +82,7 @@ export function MonthlyGoalWheel({
     ref.current?.scrollTo({ top: i * ITEM_H, behavior: "smooth" });
   };
 
-  const sel = active >= 0 ? SEGMENTS[active] : null;
+  const sel = hasChoice ? SEGMENTS[active] : null;
 
   return (
     <div dir={isAr ? "rtl" : "ltr"}>
@@ -84,7 +90,7 @@ export function MonthlyGoalWheel({
         <span className={`text-sm font-medium text-rizq-ink ${font}`}>
           {tI18n("monthlyIncomeGoal")}
         </span>
-        {value && sel && (
+        {sel && (
           <span className={`tabular text-sm font-bold text-rizq-green ${font}`}>
             {disp(sel.lo)}–{disp(sel.hi)} {currency}
           </span>
@@ -95,7 +101,9 @@ export function MonthlyGoalWheel({
         {/* Center selection window */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-2 top-1/2 -translate-y-1/2 rounded-lg border border-rizq-green/40 bg-rizq-green/[0.06]"
+          className={`pointer-events-none absolute inset-x-2 top-1/2 -translate-y-1/2 rounded-lg border ${
+            hasChoice ? "border-rizq-green/40 bg-rizq-green/[0.06]" : "border-rizq-ink/15"
+          }`}
           style={{ height: ITEM_H }}
         />
         <div
@@ -118,7 +126,7 @@ export function MonthlyGoalWheel({
         >
           {SEGMENTS.map((s, i) => {
             const d = Math.abs(i - active);
-            const isSel = i === active;
+            const isSel = hasChoice && i === active;
             return (
               <button
                 key={s.hi}

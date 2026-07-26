@@ -55,9 +55,12 @@ export const INVOICE_ARTIFACT_SECTIONS: InvoiceArtifactSectionMeta[] = [
 // Rizq invoice defaults (same brand constants as proposals/artifact.ts)
 // ---------------------------------------------------------------------------
 
+/**
+ * Brand fallbacks. Deliberately colours only: Rizq's own tagline is not the freelancer's,
+ * and a document handed to a client may not present it as theirs. An absent tagline renders
+ * as absent (contracts/client-facing-artifact.md).
+ */
 export const RIZQ_INVOICE_DEFAULTS = {
-  /** الشعار الافتراضي لتطبيق رِزق */
-  taglineAr: "سعّر بثقة. اقبض رزقك.",
   colors: { primary: "#1A5F3F", secondary: "#C8A951" },
 } as const;
 
@@ -102,6 +105,11 @@ export type InvoiceArtifactInput = {
   vatPct: number;
   vatSar: number;
   totalSar: number;
+  /**
+   * The freelancer's VAT registration number. Required on the document whenever a VAT line
+   * is present — a tax invoice without it is invalid. Null when the invoice carries no VAT.
+   */
+  vatNumber: string | null;
 
   // payment
   paymentMethod: string;
@@ -127,7 +135,7 @@ function buildBranding(input: InvoiceArtifactInput): Record<string, unknown> {
   return {
     freelancerName: input.freelancerName,
     brandName: input.brandNameAr ?? input.freelancerName,
-    tagline: input.taglineAr ?? RIZQ_INVOICE_DEFAULTS.taglineAr,
+    tagline: input.taglineAr,
     logoUrl: input.logoUrl,
     colors: input.brandColors ?? RIZQ_INVOICE_DEFAULTS.colors,
     contact: input.contact,
@@ -171,6 +179,8 @@ function buildTotals(input: InvoiceArtifactInput): Record<string, unknown> {
     vat_pct: input.vatPct,
     vat_sar: input.vatSar,
     total_sar: input.totalSar,
+    // Printed beside the VAT line. Carried only when there is a VAT line to justify it.
+    vat_number: input.vatPct > 0 ? input.vatNumber : null,
   };
 }
 

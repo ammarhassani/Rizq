@@ -119,8 +119,10 @@ function parsePortfolioSamples(
  *
  * @param supabase - authenticated Supabase client (RLS enforces ownership).
  * @param userId   - the authenticated user's UUID.
- * @param authEmail - fallback email from auth.getUser() (used when contact_email
- *                    and users.email are both null).
+ * @param authEmail - fallback email from auth.getUser(), used ONLY to name an otherwise
+ *                    nameless freelancer. It never becomes `contact.email`: an
+ *                    authentication address is not a contact address, and it used to be
+ *                    printed on every document the client read.
  */
 export async function loadUserBrandDefaults(
   supabase: SupabaseClient,
@@ -179,11 +181,12 @@ export async function loadUserBrandDefaults(
   const brandColors = parseBrandColors(p["brand_colors"]);
 
   const contact = {
-    email:
-      (p["contact_email"] as string | null) ??
-      (p["email"] as string | null) ??
-      authEmail ??
-      null,
+    /**
+     * `contact_email` ONLY. An authentication address is not a contact address: falling
+     * back to it printed the freelancer's sign-in email on every document their client
+     * read. When they have set none, the document simply carries no email.
+     */
+    email: (p["contact_email"] as string | null) ?? null,
     phone: (p["contact_phone"] as string | null) ?? null,
     whatsapp: (p["contact_whatsapp"] as string | null) ?? null,
   };

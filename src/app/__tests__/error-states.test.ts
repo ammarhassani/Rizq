@@ -137,8 +137,13 @@ const CASES = [
   },
 ] as const;
 
+// The first dynamic import in each case pulls a whole Next server page's module graph in.
+// Under the full suite that transform competes with every other worker and can exceed the
+// 5s default — a cost of loading, not of anything under test.
+const IMPORT_TIMEOUT_MS = 30_000;
+
 describe.each(CASES)("$name", ({ table, load, emptyKey, okComponent }) => {
-  it.each(["error", "throws"] as const)("read fails (%s) → error + retry, no empty CTA", async (mode) => {
+  it.each(["error", "throws"] as const)("read fails (%s) → error + retry, no empty CTA", { timeout: IMPORT_TIMEOUT_MS }, async (mode) => {
     createClient.mockResolvedValue(stubSupabase(table, mode));
     const { default: page } = await load();
     const { names, strings } = await inspect(page as never);
@@ -148,7 +153,7 @@ describe.each(CASES)("$name", ({ table, load, emptyKey, okComponent }) => {
     if (okComponent) expect(names).not.toContain(okComponent);
   });
 
-  it("read succeeds with zero rows → empty state, no error", async () => {
+  it("read succeeds with zero rows → empty state, no error", { timeout: IMPORT_TIMEOUT_MS }, async () => {
     createClient.mockResolvedValue(stubSupabase(table, "ok", []));
     const { default: page } = await load();
     const { names, strings } = await inspect(page as never);

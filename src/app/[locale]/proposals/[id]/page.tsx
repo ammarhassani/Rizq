@@ -28,6 +28,7 @@ import { ProposalDetailActions } from "@/components/proposals/ProposalDetailActi
 import { EditProposalForm } from "@/components/proposals/EditProposalForm";
 import { ProposalChatDock } from "@/components/proposals/ProposalChatDock";
 import type { ArtifactData } from "@/lib/proposals/artifact";
+import { forClientAudience } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
 
 // editProposal runs an AI change-summary; give the Server Action headroom.
@@ -164,6 +165,23 @@ export default async function ProposalDetailPage({
 
   const artifactData = proposal.artifact_json as ArtifactData | null;
   const scopeJson = proposal.scope_json as Scope | null;
+
+  // Can the client reach the freelancer from the document at all? The login email is no
+  // longer used as a fallback, so a freelancer who set none has a document with no reply
+  // path. Sharing is not blocked — they are just told (FR-008).
+  const clientContact = (
+    (artifactData
+      ? forClientAudience(artifactData).sections.find(
+          (s) => s.id === "cover" || s.id === "branding",
+        )?.content["contact"]
+      : null) as
+      | { email?: string | null; phone?: string | null; whatsapp?: string | null }
+      | null
+      | undefined
+  ) ?? {};
+  const hasClientContact = Boolean(
+    clientContact.email || clientContact.phone || clientContact.whatsapp,
+  );
   // Drafts are editable too: the freelancer should refine the title, prose, and
   // pricing before finalizing/sending. Accepted/declined proposals are locked.
   const canEdit =
@@ -264,6 +282,7 @@ export default async function ProposalDetailPage({
             status={proposal.status as string ?? "draft"}
             publicShare={proposal.public_share as boolean ?? false}
             shareToken={proposal.share_token as string | null}
+            hasClientContact={hasClientContact}
           />
 
           {/* Edit affordance — only for final / sent proposals */}

@@ -30,6 +30,8 @@ type Props = {
   status: string;
   publicShare: boolean;
   shareToken: string | null;
+  /** False when the document carries no email, phone or WhatsApp the client can use. */
+  hasClientContact: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -42,6 +44,7 @@ export function ProposalDetailActions({
   status,
   publicShare,
   shareToken,
+  hasClientContact,
 }: Props) {
   const t = useTranslations("Proposals.detail");
   const tTemplates = useTranslations("Proposals.templates");
@@ -437,6 +440,7 @@ export function ProposalDetailActions({
           proposalId={proposalId}
           initialShared={publicShare}
           initialToken={shareToken}
+          hasClientContact={hasClientContact}
           onClose={() => setShowShare(false)}
         />
       )}

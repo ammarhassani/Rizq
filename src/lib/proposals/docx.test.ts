@@ -33,6 +33,7 @@ function baseInput(overrides?: Partial<ArtifactInput>): ArtifactInput {
     depositPct: 50,
     ipTerms: "full_transfer",
     startDate: "2026-07-01",
+    statedDuration: null,
     deliveryDate: "2026-08-15",
     validityDays: 30,
     bioAr: null,

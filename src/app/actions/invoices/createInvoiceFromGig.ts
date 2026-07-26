@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { assembleArtifactJson } from "./_artifact";
 import type { InvoiceRowForArtifact } from "./_artifact";
+import { resolveVatEligibility } from "@/lib/invoices/vatEligibility";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -106,10 +107,17 @@ export async function createInvoiceFromGig(
   // KSA 15% when they're VAT-registered, and payment terms default from settings.
   const { data: prof } = await supabase
     .from("users")
-    .select("vat_registered, default_payment_method, default_payment_details")
+    .select("vat_registered, vat_number, default_payment_method, default_payment_details")
     .eq("id", userId)
     .maybeSingle();
-  const vatPct = prof?.vat_registered ? 15 : 0;
+  // A VAT line also needs a recorded registration number — without it the tax invoice is
+  // invalid, so registration alone is not enough to default VAT on.
+  const vatPct = resolveVatEligibility(
+    prof?.vat_registered as boolean | null,
+    prof?.vat_number as string | null,
+  ).eligible
+    ? 15
+    : 0;
   const paymentMethod =
     (gig.payment_method as string | null) ??
     (prof?.default_payment_method as string | null) ??

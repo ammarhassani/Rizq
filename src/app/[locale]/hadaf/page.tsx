@@ -190,7 +190,10 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                     : t("notQualifyingTitle")}
                 </h2>
                 <p className={`mt-1 text-sm text-rizq-ink-soft ${font}`}>
-                  {t("monthsToQualify", { n: status.months_to_qualify })}
+                  {t("monthsToQualify", {
+                    n: status.months_to_qualify,
+                    count: fmtSAR(status.months_to_qualify, locale as "ar" | "en"),
+                  })}
                 </p>
               </div>
             </div>
@@ -228,7 +231,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                 <div>
                   <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("daysRemainingLabel")}</p>
                   <p className={`text-lg font-bold text-rizq-ink ${font}`}>
-                    {t("daysCount", { n: daysLeft })}
+                    {t("daysCount", { n: daysLeft, count: fmtSAR(daysLeft, locale as "ar" | "en") })}
                   </p>
                 </div>
               </div>

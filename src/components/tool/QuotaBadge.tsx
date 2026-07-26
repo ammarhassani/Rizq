@@ -1,14 +1,26 @@
-import { getTranslations } from "next-intl/server";
+"use client";
+
+/**
+ * Client component so the count can be re-rendered from the pricing action's returned
+ * allowance the moment a lookup finishes — a server-rendered badge kept showing the
+ * page-load value while the enforced number had already moved.
+ */
+
+import { useTranslations } from "next-intl";
 
 type Props = {
   locale: "ar" | "en";
   mode: "anon" | "free" | "pro" | "admin";
   remaining: number | "unlimited";
-  limit?: number;
+  /**
+   * Required: a default here was a second place for the free-tier size to live, and it
+   * drifted (it still said 3 long after the enforced allowance became 5).
+   */
+  limit: number;
 };
 
-export async function QuotaBadge({ locale, mode, remaining, limit = 3 }: Props) {
-  const t = await getTranslations({ locale, namespace: "Tool.quota" });
+export function QuotaBadge({ locale, mode, remaining, limit }: Props) {
+  const t = useTranslations("Tool.quota");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
   const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US");

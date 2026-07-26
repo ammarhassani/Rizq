@@ -12,6 +12,8 @@ import { ResultCard } from "./ResultCard";
 import { ResultSkeleton } from "./ResultSkeleton";
 import { InsufficientCard } from "./InsufficientCard";
 import { QuotaExhaustedCard } from "./QuotaExhaustedCard";
+import { QuotaBadge } from "./QuotaBadge";
+import { resolvePrefill } from "@/lib/pricing/toolPrefill";
 
 type Option = { slug: string; label: string; hint?: string };
 
@@ -22,6 +24,24 @@ type Props = {
   tiers: Option[];
   canShare: boolean;
   isAuthed: boolean;
+  /**
+   * The freelancer's stored specialty/city/experience. Seeds the form so the tool opens
+   * ready to run instead of asking for what onboarding already captured. A URL parameter
+   * still wins, and every field stays editable.
+   */
+  profilePrefill?: {
+    specialtySlug: string | null;
+    citySlug: string | null;
+    tierSlug: string | null;
+  };
+  /** Allowance as of page load. Re-rendered from the action's result after each lookup. */
+  quota: {
+    mode: "anon" | "free" | "pro" | "admin";
+    remaining: number | "unlimited";
+    limit: number;
+  };
+  /** Page heading rendered above the tool; kept here so the badge can live beside it. */
+  header?: React.ReactNode;
 };
 
 const VALID_SIZES = new Set(["small", "medium", "large", "enterprise"]);
@@ -55,6 +75,9 @@ export function ToolFlow({
   tiers,
   canShare,
   isAuthed,
+  profilePrefill,
+  quota,
+  header,
 }: Props) {
   const t = useTranslations("Tool");
   const search = useSearchParams();
@@ -68,19 +91,22 @@ export function ToolFlow({
   const tierSlugs = new Set(tiers.map((t2) => t2.slug));
 
   const [specialty, setSpecialty] = useState(() =>
-    safeParam(search?.get("specialty") ?? null, specialtySlugs)
+    resolvePrefill(search?.get("specialty"), profilePrefill?.specialtySlug, specialtySlugs)
   );
   const [city, setCity] = useState(() =>
-    safeParam(search?.get("city") ?? null, citySlugs)
+    resolvePrefill(search?.get("city"), profilePrefill?.citySlug, citySlugs)
   );
   const [tier, setTier] = useState(() =>
-    safeParam(search?.get("tier") ?? null, tierSlugs)
+    resolvePrefill(search?.get("tier"), profilePrefill?.tierSlug, tierSlugs)
   );
   const [projectSize, setProjectSize] = useState<string>(() =>
     safeParam(search?.get("size") ?? null, VALID_SIZES)
   );
 
   const [view, setView] = useState<View>({ kind: "form" });
+  // The badge is server-rendered on load, then follows what the action actually enforced —
+  // including a repeated lookup that consumed nothing and leaves this unchanged.
+  const [remaining, setRemaining] = useState(quota.remaining);
   const [isPending, startTransition] = useTransition();
 
   const onSubmit = (e: React.FormEvent) => {
@@ -110,6 +136,7 @@ export function ToolFlow({
             locale,
             mode: result.cta === "signup" ? "anon" : "free",
           });
+          setRemaining(0);
           setView({
             kind: "exhausted",
             mode: (result.cta === "signup" ? "anon" : "free") as "anon" | "free",
@@ -125,6 +152,8 @@ export function ToolFlow({
         });
         return;
       }
+
+      setRemaining(result.quota.remaining);
 
       if (result.result.status === "insufficient_data") {
         track("query_insufficient_data", {
@@ -157,19 +186,41 @@ export function ToolFlow({
     setView({ kind: "form" });
   };
 
-  if (view.kind === "loading") return <ResultSkeleton />;
+  /** The heading + live allowance badge, rendered above whichever view is active. */
+  const chrome = (
+    <div className="mb-7 sm:mb-9 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      {header}
+      <div className="shrink-0">
+        <QuotaBadge
+          locale={locale}
+          mode={quota.mode}
+          remaining={remaining}
+          limit={quota.limit}
+        />
+      </div>
+    </div>
+  );
+
+  const withChrome = (body: React.ReactNode) => (
+    <>
+      {chrome}
+      {body}
+    </>
+  );
+
+  if (view.kind === "loading") return withChrome(<ResultSkeleton />);
 
   if (view.kind === "exhausted") {
-    return <QuotaExhaustedCard locale={locale} mode={view.mode} />;
+    return withChrome(<QuotaExhaustedCard locale={locale} mode={view.mode} />);
   }
 
   if (view.kind === "insufficient") {
-    return <InsufficientCard locale={locale} onReset={reset} />;
+    return withChrome(<InsufficientCard locale={locale} onReset={reset} />);
   }
 
   if (view.kind === "result" && view.data.result.status === "ok") {
     const r = view.data.result;
-    return (
+    return withChrome(
       <ResultCard
         locale={locale}
         query_id={view.data.query_id}
@@ -194,7 +245,7 @@ export function ToolFlow({
     );
   }
 
-  return (
+  return withChrome(
     <form
       onSubmit={onSubmit}
       className="card-wahaj p-7 sm:p-10 space-y-6 animate-fade-in"

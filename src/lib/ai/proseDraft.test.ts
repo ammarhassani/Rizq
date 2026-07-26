@@ -25,6 +25,7 @@ const scope: Scope = {
   geography_target: "ksa_local",
   language_preference: "ar",
   budget_mentioned: null,
+  stated_duration: null,
   ip_transfer: "full_transfer",
   field_confidence: { specialty: 0.97, deliverables: 0.9 },
 };
@@ -76,6 +77,7 @@ function freshArtifact(): ArtifactData {
     depositPct: 50,
     ipTerms: "full_transfer",
     startDate: null,
+    statedDuration: null,
     deliveryDate: null,
     validityDays: 30,
     bioAr: null,

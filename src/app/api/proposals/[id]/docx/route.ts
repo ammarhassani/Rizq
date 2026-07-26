@@ -11,6 +11,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { buildProposalDocxBuffer } from "@/lib/proposals/docx";
+import { forClientAudience } from "@/lib/proposals/artifact";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 
 export const runtime = "nodejs";
@@ -83,7 +84,9 @@ export async function GET(
           ? "en"
           : "ar";
 
-    const buffer = await buildProposalDocxBuffer(artifact, locale);
+    // The .docx exists to be handed to the client, so it is a client surface: same
+    // redaction as the share page, or the band the share page hides walks out in a file.
+    const buffer = await buildProposalDocxBuffer(forClientAudience(artifact), locale);
 
     // Filename: "<project> TO <client> Proposal <creation date>.docx"
     // (creation date, not export date). Each part is omitted when absent.

@@ -43,6 +43,7 @@ function baseInput(overrides?: Partial<ArtifactInput>): ArtifactInput {
     depositPct: 50,
     ipTerms: "full_transfer",
     startDate: "2026-07-01",
+    statedDuration: null,
     deliveryDate: "2026-08-15",
     validityDays: 30,
     bioAr: null,
@@ -390,6 +391,40 @@ describe("timeline section", () => {
     expect(s.content["deliveryDate"]).toBe("2026-08-15");
     expect(s.content["revisions"]).toBe(3);
   });
+
+  it("carries a duration the client stated, verbatim", () => {
+    const { sections } = buildArtifactData(
+      baseInput({ statedDuration: "المدة المطلوبة ٣ أشهر" })
+    );
+    const s = sections.find((s) => s.id === "timeline")!;
+    expect(s.content["statedDuration"]).toBe("المدة المطلوبة ٣ أشهر");
+  });
+
+  it("keeps the duration null when the brief stated none — nothing is invented", () => {
+    const { sections } = buildArtifactData(baseInput({ statedDuration: null }));
+    const s = sections.find((s) => s.id === "timeline")!;
+    expect(s.content["statedDuration"]).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// cover_letter section — addresses the named client (US7 / FR-018)
+// ---------------------------------------------------------------------------
+
+describe("cover_letter section", () => {
+  it("carries the client name so the letter greets them by name", () => {
+    // The renderer reads content.clientName; without it the letter opened with the
+    // generic "عميل محترم" on a proposal whose own header named the client.
+    const { sections } = buildArtifactData(baseInput({ clientName: "شركة الأفق" }));
+    const s = sections.find((s) => s.id === "cover_letter")!;
+    expect(s.content["clientName"]).toBe("شركة الأفق");
+  });
+
+  it("leaves the name null for a genuinely unnamed client (renderer falls back)", () => {
+    const { sections } = buildArtifactData(baseInput({ clientName: null }));
+    const s = sections.find((s) => s.id === "cover_letter")!;
+    expect(s.content["clientName"]).toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -503,7 +538,74 @@ describe("artifactTitle", () => {
   });
 });
 
-describe("forClientAudience", () => {
+describe("forClientAudience — what a client may see", () => {
+  const clientCopy = () => forClientAudience(buildArtifactData(baseInput()));
+  const section = (id: string) =>
+    clientCopy().sections.find((s) => s.id === id)!;
+
+  it("keeps the quoted price and its provenance citation", () => {
+    const pricing = section("pricing");
+    expect(pricing.content["anchor"]).toBe(
+      buildArtifactData(baseInput()).sections.find((s) => s.id === "pricing")!.content["anchor"]
+    );
+    expect(typeof pricing.content["citation"]).toBe("string");
+    expect(String(pricing.content["citation"]).length).toBeGreaterThan(0);
+  });
+
+  it("withholds the price band minimum and maximum", () => {
+    const owner = buildArtifactData(baseInput()).sections.find((s) => s.id === "pricing")!;
+    expect(owner.content["min"]).toBeGreaterThan(0);
+    expect(owner.content["max"]).toBeGreaterThan(0);
+
+    const pricing = section("pricing");
+    expect(pricing.content["min"]).toBeUndefined();
+    expect(pricing.content["max"]).toBeUndefined();
+  });
+
+  it("withholds the pricing methodology link from both pricing and verification", () => {
+    expect(section("pricing").content["methodologyHref"]).toBeUndefined();
+    expect(section("verification").content["methodologyHref"]).toBeUndefined();
+  });
+
+  it("keeps the proposal reference the client quotes back", () => {
+    expect(String(section("verification").content["proposalId"])).toMatch(/^RZQ-/);
+  });
+
+  it("withholds a field added to a redacted section until it is allow-listed", () => {
+    // Allow-list, not deny-list: a new pricing field defaults to withheld.
+    const data = buildArtifactData(baseInput());
+    const pricing = data.sections.find((s) => s.id === "pricing")!;
+    pricing.content["sample_size"] = 5;
+    pricing.content["someFutureInternalField"] = "secret";
+
+    const stripped = forClientAudience(data).sections.find((s) => s.id === "pricing")!;
+    expect(stripped.content["sample_size"]).toBeUndefined();
+    expect(stripped.content["someFutureInternalField"]).toBeUndefined();
+  });
+
+  it("withholds a contact email on an artifact built before the login-email fix", () => {
+    // Legacy artifact: has a contact email but no marker saying it was deliberate.
+    const legacy = buildArtifactData(baseInput());
+    const cover = legacy.sections.find((s) => s.id === "cover")!;
+    delete cover.content["contactEmailIsPublic"];
+
+    const stripped = forClientAudience(legacy).sections.find((s) => s.id === "cover")!;
+    expect((stripped.content["contact"] as { email: string | null }).email).toBeNull();
+  });
+
+  it("keeps a contact email the freelancer deliberately set", () => {
+    const cover = section("cover");
+    expect((cover.content["contact"] as { email: string | null }).email).toBe("m@example.com");
+  });
+
+  it("leaves the owner's copy untouched", () => {
+    const data = buildArtifactData(baseInput());
+    forClientAudience(data);
+    const pricing = data.sections.find((s) => s.id === "pricing")!;
+    expect(pricing.content["min"]).toBeGreaterThan(0);
+    expect(pricing.content["methodologyHref"]).toBe("/methodology");
+  });
+
   it("clears ai_generated so the client copy carries no review-before-sending badge", () => {
     const data = buildArtifactData(
       baseInput({ proseAiGenerated: true, coverLetterBody: "نص مولّد", understandingBody: "نص مولّد" })

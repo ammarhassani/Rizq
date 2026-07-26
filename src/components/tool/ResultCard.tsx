@@ -193,7 +193,10 @@ export function ResultCard({
             aria-hidden
             className="inline-block h-1.5 w-1.5 rounded-full bg-rizq-green me-2 align-middle"
           />
-          {t("sampleSize", { n: numberFmt.format(sample_size) })}
+          {/* `n` stays a raw number so the ICU plural picks the right Arabic category;
+              `count` carries the digits, because ICU formats `#` with plain "ar" — which
+              CLDR now resolves to Latin digits, next to this page's ar-SA Arabic-Indic. */}
+          {t("sampleSize", { n: sample_size, count: numberFmt.format(sample_size) })}
         </p>
         <p className={`text-sm text-rizq-ink ${font}`}>
           <span

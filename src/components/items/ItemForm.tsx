@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import { createItem, updateItem, type CreatedItem } from "@/app/actions/items/items";
 import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
+import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
 
 type Props = {
   locale: "ar" | "en";
@@ -150,9 +151,15 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
               type="number"
               inputMode="decimal"
               min="0"
-              step="any"
+              // SAR has halalas: two decimals. A third one printed rounded while the line
+              // total used the unrounded value, and the two disagreed on the document.
+              step="0.01"
               value={unitPrice}
-              onChange={(e) => setUnitPrice(e.target.value)}
+              onChange={(e) => setUnitPrice(clampMoneyInput(e.target.value))}
+              onBlur={(e) => {
+                const n = parseFloat(e.target.value);
+                if (Number.isFinite(n)) setUnitPrice(String(roundHalala(n)));
+              }}
               placeholder="0"
               className={cn(inputClass, "pe-12 tabular font-sans")}
               dir="ltr"

@@ -7,6 +7,8 @@ import { Loader2 } from "lucide-react";
 import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
 import type { StepProps } from "./types";
 import { useAutosave } from "./useAutosave";
+import { isSupportedUrl } from "@/lib/validation/fieldErrors";
+import type { FieldErrorReason } from "@/lib/validation/fieldErrors";
 
 // Freelancer platform-presence links. Columns + write-grants already exist
 // (migration 20260613230814); this step wires them into the wizard. Labels are
@@ -22,17 +24,23 @@ const FIELDS = [
 
 type FieldKey = (typeof FIELDS)[number]["key"];
 
-function isValidUrl(s: string): boolean {
+/**
+ * Why this link cannot be saved, or null when it can. Mirrors the server allow-list so the
+ * freelancer sees the reason before a round trip; the server still enforces it.
+ */
+function urlProblem(raw: string): FieldErrorReason | null {
+  let parsed: URL;
   try {
-    const u = new URL(s);
-    return u.protocol === "http:" || u.protocol === "https:";
+    parsed = new URL(raw);
   } catch {
-    return false;
+    return "invalid_url";
   }
+  return isSupportedUrl(parsed.href) ? null : "unsupported_scheme";
 }
 
 export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosave, onSaveError }: StepProps) {
   const tv2 = useTranslations("Onboarding.v2");
+  const tValidation = useTranslations("Validation");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
@@ -45,7 +53,7 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosav
     personal_website_url: profile.personal_website_url ?? "",
   }));
   const [error, setError] = useState<string | null>(null);
-  const [badFields, setBadFields] = useState<Set<FieldKey>>(new Set());
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, FieldErrorReason>>>({});
   const [isPending, startTransition] = useTransition();
 
   const inputCls = `w-full rounded-xl border border-[#8f7e48] bg-rizq-cream/60 px-4 py-3 text-base text-rizq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40 focus:border-rizq-green transition-colors`;
@@ -60,28 +68,40 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosav
       // then validate each independently. Save the VALID links; flag only the bad
       // ones instead of rejecting the whole step.
       const payload: Record<string, string> = {};
-      const bad = new Set<FieldKey>();
+      const bad: Partial<Record<FieldKey, FieldErrorReason>> = {};
       for (const f of FIELDS) {
         const raw = urls[f.key].trim();
         if (!raw) {
           payload[f.key] = ""; // cleared → action coerces to null
           continue;
         }
-        const normalized = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
-        if (isValidUrl(normalized)) payload[f.key] = normalized;
-        else bad.add(f.key); // omitted from payload → not saved, prior value kept
+        // Only a bare host gets a scheme added. A typed scheme is left alone so an
+        // unsupported one is reported as unsupported rather than mangled into a bad URL.
+        const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(raw);
+        const normalized = hasScheme ? raw : `https://${raw}`;
+        const problem = urlProblem(normalized);
+        if (problem) bad[f.key] = problem; // omitted from payload → prior value kept
+        else payload[f.key] = normalized;
       }
-      setBadFields(bad);
+      setFieldErrors(bad);
 
       const result = await saveOnboardingStep("platforms", payload);
       if (!result.ok) {
+        if (result.code === "invalid" && result.fields?.length) {
+          // Permanent: name the field. Retry copy would be false guidance.
+          const fromServer = { ...bad };
+          for (const fe of result.fields) {
+            fromServer[fe.field as FieldKey] = fe.reason;
+          }
+          setFieldErrors(fromServer);
+          return;
+        }
         setError(tv2("errorSave"));
         onSaveError?.();
         return;
       }
-      if (bad.size > 0) {
+      if (Object.keys(bad).length > 0) {
         // Valid links saved; stay on the step so the user can fix the flagged one(s).
-        setError(tv2("someLinksLookOffFix"));
         return;
       }
       onNext(result.completeness);
@@ -119,10 +139,16 @@ export function StepPlatforms({ locale, profile, onNext, onBack, onSkip, autosav
               value={urls[f.key]}
               onChange={(e) => set(f.key, e.target.value)}
               placeholder={f.ph}
-              aria-invalid={badFields.has(f.key) || undefined}
-              className={`${inputCls} ${badFields.has(f.key) ? "border-[var(--over)] focus:border-[var(--over)]" : ""}`}
+              aria-invalid={fieldErrors[f.key] ? true : undefined}
+              aria-describedby={fieldErrors[f.key] ? `${f.key}-error` : undefined}
+              className={`${inputCls} ${fieldErrors[f.key] ? "border-[var(--over)] focus:border-[var(--over)]" : ""}`}
               maxLength={500}
             />
+            {fieldErrors[f.key] && (
+              <p id={`${f.key}-error`} className={`mt-1 text-xs text-[var(--over)] ${font}`}>
+                {tValidation(fieldErrors[f.key]!)}
+              </p>
+            )}
           </div>
         ))}
       </div>

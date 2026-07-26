@@ -183,7 +183,7 @@ export default async function ClientDetailPage({
               </span>
               <StarRating
                 rating={client.rating}
-                label={tCommon("ratingStars", { n: client.rating ?? 0 })}
+                label={tCommon("ratingStars", { n: client.rating ?? 0, max: 5 })}
               />
             </div>
           </div>

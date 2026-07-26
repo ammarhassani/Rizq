@@ -26,6 +26,7 @@ import { StepBrand } from "./StepBrand";
 import { StepDefaults } from "./StepDefaults";
 import { StepGoals } from "./StepGoals";
 import { StepReview } from "./StepReview";
+import { resumeStepIndex } from "@/lib/onboarding/resume";
 
 const TOTAL_STEPS = 11;
 
@@ -73,9 +74,10 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
 
-  // Current step index (0-based, so step 1 = index 0 = welcome)
+  // Current step index (0-based, so step 1 = index 0 = welcome). `initialStep` is the step
+  // last SAVED, so resuming means the one after it — see lib/onboarding/resume.ts.
   const [currentIdx, setCurrentIdx] = useState<number>(
-    Math.max(0, Math.min(initialStep - 1, TOTAL_STEPS - 1))
+    resumeStepIndex(initialStep, TOTAL_STEPS)
   );
   const [profile, setProfile] = useState<ProfileSnapshot>(initialProfile);
 

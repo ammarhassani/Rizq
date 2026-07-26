@@ -38,6 +38,13 @@ export function buildScopeSchema(slugs: readonly string[]) {
     geography_target: z.enum(["ksa_local", "gcc", "international"]).nullable(),
     language_preference: z.enum(["ar", "en", "both"]).nullable(),
     budget_mentioned: z.number().positive().nullable(),
+    /**
+     * The duration the CLIENT stated, verbatim as written in the brief ("٣ أشهر",
+     * "خلال أسبوع", "6 weeks"). Not a computed delivery date and not an inference from
+     * urgency — null whenever the brief does not say. Echoing back what they wrote is the
+     * minimum a proposal owes them; inventing a calendar date is not.
+     */
+    stated_duration: z.string().max(80).nullable(),
     ip_transfer: z.enum(["full_transfer", "license", "unclear"]).nullable(),
     // Zod v4: two-arg signature z.record(keySchema, valueSchema)
     field_confidence: z.record(z.string(), z.number().min(0).max(1)),
@@ -82,6 +89,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "ar",
   "budget_mentioned": 1500,
+  "stated_duration": "خلال اسبوع",
   "ip_transfer": "full_transfer",
   "field_confidence": {
     "specialty": 0.97,
@@ -112,6 +120,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "ar",
   "budget_mentioned": null,
+  "stated_duration": null,
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.93,
@@ -141,6 +150,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "both",
   "budget_mentioned": null,
+  "stated_duration": "الوقت ما يزيد على شهر",
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.96,
@@ -171,6 +181,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "ar",
   "budget_mentioned": null,
+  "stated_duration": "خلال 3 أسابيع",
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.96,
@@ -200,6 +211,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "both",
   "budget_mentioned": null,
+  "stated_duration": "بكره او بعد بكره",
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.95,
@@ -229,6 +241,7 @@ Expected JSON:
   "geography_target": "ksa_local",
   "language_preference": "ar",
   "budget_mentioned": null,
+  "stated_duration": "خلال ٦ أسابيع",
   "ip_transfer": null,
   "field_confidence": {
     "specialty": 0.95,
@@ -280,6 +293,8 @@ Specialty guide (mind these overlaps — they are the common mistakes):
 - field_confidence: 0..1 per field you populated (how sure you are).
 - complexity_signals: short phrases from the brief that affect effort/price.
 - Never invent a budget; budget_mentioned only if the client states one.
+- stated_duration: copy the timeframe the client wrote, in their own words. Never convert it
+  to a date and never infer one from urgency — null if the brief does not state a duration.
 
 ${FEW_SHOTS}
 

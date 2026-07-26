@@ -9,6 +9,8 @@
 
 import type { InvoiceArtifactData, InvoiceArtifactSection } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem } from "@/lib/invoices/items";
+// Shared with proposals: stored artifacts substituted Rizq's own tagline for an absent one.
+import { ownTagline } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -44,6 +46,8 @@ const T = {
     fees: "الرسوم",
     vat: "ضريبة القيمة المضافة",
     vatNotRegistered: "غير خاضعة (غير مسجّل في ضريبة القيمة المضافة)",
+    vatNotApplied: "غير مطبّقة على هذه الفاتورة",
+    vatNumber: "الرقم الضريبي",
     total: "الإجمالي",
     currency: "ر.س",
     payment: "معلومات الدفع",
@@ -92,6 +96,8 @@ const T = {
     fees: "Fees",
     vat: "VAT",
     vatNotRegistered: "Not applicable (not VAT-registered)",
+    vatNotApplied: "Not applied to this invoice",
+    vatNumber: "VAT registration no.",
     total: "Total",
     currency: "SAR",
     payment: "Payment",
@@ -204,7 +210,7 @@ function BrandingSection({
   const t = T[locale];
   const c = section.content;
   const brandName = str(c["brandName"] ?? c["freelancerName"], str(c["freelancerName"]));
-  const tagline = str(c["tagline"] as string | undefined);
+  const tagline = ownTagline(str(c["tagline"] as string | undefined));
   const logoUrl = str(c["logoUrl"] as string | undefined | null);
   const colors = (c["colors"] as { primary?: string; secondary?: string } | null) ?? {};
   const primaryColor = str(colors.primary, "#1A5F3F");
@@ -446,7 +452,9 @@ function LineItemsSection({
                     {str(item.description)}
                   </td>
                   <td className="py-3 px-2 text-center tabular font-sans text-rizq-ink">
-                    {num(item.quantity)}
+                    {/* Same locale formatter as the money columns — an Arabic invoice must
+                        not mix Latin quantities into Arabic-Indic totals. */}
+                    {fmtMoney(num(item.quantity), locale)}
                   </td>
                   <td className="py-3 px-2 text-end tabular font-sans text-rizq-ink">
                     {fmtMoney(num(item.unit_price_sar), locale)}
@@ -487,6 +495,7 @@ function TotalsSection({
   const vatPct = num(c["vat_pct"] as number | undefined);
   const vatSar = num(c["vat_sar"] as number | undefined);
   const total = num(c["total_sar"] as number | undefined);
+  const vatNumber = str(c["vat_number"] as string | undefined);
   const fees = Array.isArray(c["fees"])
     ? (c["fees"] as unknown[])
         .filter((f): f is Record<string, unknown> => typeof f === "object" && f !== null)
@@ -535,7 +544,11 @@ function TotalsSection({
         {vatPct <= 0 && (
           <div className="flex items-center justify-between gap-4">
             <span className={`text-sm text-rizq-ink-soft ${font}`}>{t.vat}</span>
-            <span className={`text-xs text-rizq-ink-soft ${font}`}>{t.vatNotRegistered}</span>
+            {/* Only claim "not registered" when that is what the profile says. An eligible
+                freelancer may still issue a zero-rated or out-of-scope supply. */}
+            <span className={`text-xs text-rizq-ink-soft ${font}`}>
+              {vatNumber ? t.vatNotApplied : t.vatNotRegistered}
+            </span>
           </div>
         )}
         {vatPct > 0 && (
@@ -546,6 +559,15 @@ function TotalsSection({
             <span className="tabular font-sans text-sm font-medium text-rizq-ink">
               {fmtMoney(vatSar, locale)}{" "}
               <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t.currency}</span>
+            </span>
+          </div>
+        )}
+        {/* A tax invoice is invalid without the seller's registration number. */}
+        {vatPct > 0 && vatNumber && (
+          <div className="flex items-center justify-between gap-4">
+            <span className={`text-xs text-rizq-ink-soft/70 ${font}`}>{t.vatNumber}</span>
+            <span className="tabular font-sans text-xs text-rizq-ink-soft" dir="ltr">
+              {vatNumber}
             </span>
           </div>
         )}

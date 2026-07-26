@@ -9,9 +9,8 @@ import {
   getCities,
   getExperienceTiers,
 } from "@/lib/pricing/refDataDb";
-import { getQuotaState } from "@/lib/pricing/quota";
+import { getQuotaState, FREE_MONTHLY_QUERIES } from "@/lib/pricing/quota";
 import { ToolFlow } from "@/components/tool/ToolFlow";
-import { QuotaBadge } from "@/components/tool/QuotaBadge";
 
 export async function generateMetadata({
   params,
@@ -46,6 +45,37 @@ export default async function ToolPage({
   const { data: userData } = await supabase.auth.getUser();
   const isAuth = !!userData.user;
 
+  // Feature 006: the profile is the source of truth. Onboarding already captured these
+  // three, so the tool opens ready to run rather than asking for them again.
+  let profilePrefill:
+    | { specialtySlug: string | null; citySlug: string | null; tierSlug: string | null }
+    | undefined;
+
+  if (userData.user) {
+    const { data: profileRow } = await supabase
+      .from("users")
+      .select(
+        "primary_specialty:specialties!primary_specialty_id(slug), city:cities!city_id(slug), tier:experience_tiers!experience_tier_id(slug)"
+      )
+      .eq("id", userData.user.id)
+      .maybeSingle();
+
+    // Supabase types an embedded to-one join as an array in some shapes; normalise both.
+    const slugOf = (rel: unknown): string | null => {
+      const node = Array.isArray(rel) ? rel[0] : rel;
+      const slug = (node as { slug?: unknown } | null)?.slug;
+      return typeof slug === "string" ? slug : null;
+    };
+
+    if (profileRow) {
+      profilePrefill = {
+        specialtySlug: slugOf(profileRow.primary_specialty),
+        citySlug: slugOf(profileRow.city),
+        tierSlug: slugOf(profileRow.tier),
+      };
+    }
+  }
+
   // Map ref data to ToolFlow Option shape with locale-aware labels
   const specialtyOptions = specialties.map((s) => ({
     slug: s.slug,
@@ -67,9 +97,10 @@ export default async function ToolPage({
     ? quota.mode
     : ((quota.cta === "signup" ? "anon" : "free") as "anon" | "free");
   const remaining = quota.ok ? quota.remaining : 0;
-  // Limit (3 + bonus_quota for free; 1 for anon; "unlimited" for pro/admin).
-  // Passing this to QuotaBadge keeps it in sync with the dashboard.
-  const limit = typeof quota.limit === "number" ? quota.limit : 3;
+  // Limit (FREE_MONTHLY_QUERIES + bonus_quota for free; 1 for anon; "unlimited" for
+  // pro/admin, where the badge shows the Pro label and ignores this). Passing it through
+  // keeps the badge in sync with the dashboard.
+  const limit = typeof quota.limit === "number" ? quota.limit : FREE_MONTHLY_QUERIES;
 
   const isAr = locale === "ar";
 
@@ -80,19 +111,8 @@ export default async function ToolPage({
       maxWidth="reading"
     >
       <div dir={isAr ? "rtl" : "ltr"}>
-        <div className="mb-7 sm:mb-9 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <p className="eyebrow mb-3">{t("eyebrow")}</p>
-            <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
-            <p className={`mt-3 text-base sm:text-lg text-rizq-ink-soft max-w-xl ${font}`}>
-              {t("subtitle")}
-            </p>
-          </div>
-          <div className="shrink-0">
-            <QuotaBadge locale={locale} mode={mode} remaining={remaining} limit={limit} />
-          </div>
-        </div>
-
+        {/* Heading + allowance badge live inside ToolFlow so the badge can follow what the
+            pricing action actually enforced, without a page reload. */}
         <ToolFlow
           locale={locale}
           specialties={specialtyOptions}
@@ -100,6 +120,17 @@ export default async function ToolPage({
           tiers={tierOptions}
           canShare={isAuth}
           isAuthed={isAuth}
+          profilePrefill={profilePrefill}
+          quota={{ mode, remaining, limit }}
+          header={
+            <div>
+              <p className="eyebrow mb-3">{t("eyebrow")}</p>
+              <h1 className={`display-2 text-rizq-ink ${font}`}>{t("title")}</h1>
+              <p className={`mt-3 text-base sm:text-lg text-rizq-ink-soft max-w-xl ${font}`}>
+                {t("subtitle")}
+              </p>
+            </div>
+          }
         />
 
         {/* If quota was already exhausted server-side, the ToolFlow's quota

@@ -167,12 +167,32 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   stale. P3: cover letter doesn't name the client + stated duration never reaches the timeline;
   money input accepts 3 decimals, mixed numerals, 404 outside the app shell. Plan:
   [specs/011-power-user-pass-3/plan.md](specs/011-power-user-pass-3/plan.md).
-Active (`.specify/feature.json`): **011** — spec + plan done → **/speckit-tasks next**.
+  ✅ **SHIPPED** (2026-07-26, all 8 slices, T001–T066): Arabic counts + honest provenance
+  wording; VAT gated on `resolveVatEligibility` (registered **and** a recorded number, on the
+  invoice form **and** the gig→invoice path) with the number printed on any VAT-carrying
+  document; client-facing redaction via an allow-list in `forClientAudience()` (band, sample
+  size, methodology link) + `contact.email` = `contact_email` only + no Rizq-tagline
+  substitution, applied **at render** so stored artifacts stop leaking; field-level validation
+  errors (`lib/validation/fieldErrors.ts`, plus a URL scheme allow-list — Zod's `.url()` accepts
+  `javascript:`); onboarding verdict names the figure it judged, resume via
+  `lib/onboarding/resume.ts`, nothing shown or stored as chosen unless chosen; pricing-tool
+  profile prefill + live quota badge; cover letter names the client + `stated_duration` reaches
+  the timeline; halala-precise money entry, one numeral system per view, 404 in the app shell.
+  **Found while driving it, not in the plan:** CLDR resolves plain `ar` to LATIN digits, so
+  ICU's `#` printed "5" beside the app's `ar-SA` "٥". Every plural message now takes a raw
+  number for the category **and** a pre-formatted `{count}` for the digits; bare `#` is banned
+  and `src/lib/format/count.test.ts` enforces all of it statically across both catalogues and
+  every call site.
+Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in Arabic.
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.
 <!-- SPECKIT END -->
 ## Validation history (read before trusting a "SHIPPED" tag)
 - `docs/validation/business-logic-audit.md` — static spec-vs-code audit (2026-07-22).
 - `docs/validation/production-maturity-report.md` — pass 1 verdict (2026-07-22). **Partly superseded.**
+- `docs/validation/power-user-pass-3-2026-07-26.md` — **pass 3 remediation record**: the 18
+  defects fixed and re-verified in-browser, plus one the plan did not predict (plain `ar`
+  resolves to Latin digits, so ICU's `#` mixed numeral systems inside one Arabic sentence
+  pair). Lists the claims this feature falsified and what was deliberately left undone.
 - `docs/validation/power-user-pass-2026-07-26.md` — **pass 2**: the app driven as a freelancer would
   use it. Found 22 defects the static audit could not see, incl. three P0s that type-checked,
   unit-tested and conformed to spec while being visibly wrong in the product:

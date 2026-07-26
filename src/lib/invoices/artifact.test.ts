@@ -36,6 +36,7 @@ function baseInput(overrides?: Partial<InvoiceArtifactInput>): InvoiceArtifactIn
     vatPct: 15,
     vatSar: 450,
     totalSar: 3450,
+    vatNumber: "310000000000003",
     paymentMethod: "bank_transfer",
     paymentDetails: "IBAN: SA00 0000 0000 0000 0000 0000",
     isFreeTier: false,
@@ -115,11 +116,13 @@ describe("branding section", () => {
     expect(s.content["brandName"]).toBe("استوديو العمري");
   });
 
-  it("falls back to RIZQ_INVOICE_DEFAULTS.taglineAr when taglineAr is null", () => {
+  it("renders no tagline when the freelancer never wrote one", () => {
+    // Rizq's own marketing tagline is not the freelancer's; a client document may not
+    // present it as theirs. An absent value renders as absent.
     const { sections } = buildInvoiceArtifact(baseInput({ taglineAr: null }));
     const s = sections.find((s) => s.id === "branding")!;
-    expect(s.content["tagline"]).toBe(RIZQ_INVOICE_DEFAULTS.taglineAr);
-    expect(s.content["tagline"]).toBe("سعّر بثقة. اقبض رزقك.");
+    expect(s.content["tagline"]).toBeNull();
+    expect(JSON.stringify(s.content)).not.toContain("اقبض رزقك");
   });
 
   it("uses taglineAr when provided", () => {
@@ -196,6 +199,34 @@ describe("footer section — watermark", () => {
 // ---------------------------------------------------------------------------
 // totals section
 // ---------------------------------------------------------------------------
+
+describe("totals section — VAT registration number", () => {
+  it("carries the VAT registration number when the invoice has a VAT line", () => {
+    // A tax invoice without the seller's registration number is invalid.
+    const { sections } = buildInvoiceArtifact(
+      baseInput({ vatPct: 15, vatSar: 450, vatNumber: "310000000000003" })
+    );
+    const s = sections.find((s) => s.id === "totals")!;
+    expect(s.content["vat_number"]).toBe("310000000000003");
+    expect(JSON.stringify(s.content)).toContain("310000000000003");
+  });
+
+  it("carries no VAT number when the invoice has no VAT line", () => {
+    const { sections } = buildInvoiceArtifact(
+      baseInput({ vatPct: 0, vatSar: 0, vatNumber: "310000000000003" })
+    );
+    const s = sections.find((s) => s.id === "totals")!;
+    expect(s.content["vat_number"]).toBeNull();
+  });
+
+  it("keeps a null VAT number null even with a VAT line (nothing invented)", () => {
+    const { sections } = buildInvoiceArtifact(
+      baseInput({ vatPct: 15, vatSar: 450, vatNumber: null })
+    );
+    const s = sections.find((s) => s.id === "totals")!;
+    expect(s.content["vat_number"]).toBeNull();
+  });
+});
 
 describe("totals section", () => {
   it("carries the passed subtotal, vat_pct, vat_sar, total_sar", () => {

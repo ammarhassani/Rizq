@@ -15,7 +15,7 @@ import { BandMeter } from "@/components/charts/BandMeter";
 // Bilingual labels + templated defaults — a pure module shared with the Word
 // (.docx) export builder so preview == deliverable (single source of truth).
 import { PROPOSAL_STRINGS as T } from "@/lib/proposals/proposalStrings";
-import { forClientAudience } from "@/lib/proposals/artifact";
+import { forClientAudience, CLIENT_REDACTED, ownTagline } from "@/lib/proposals/artifact";
 import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
@@ -162,7 +162,7 @@ function CoverSection({
   const validityDays = num(c["validityDays"], 30);
   const brandName = str(c["brandName"]);
   const logoUrl = str(c["logoUrl"]);
-  const tagline = str(c["tagline"]);
+  const tagline = ownTagline(str(c["tagline"]));
   const colors = (c["colors"] as { primary?: string; secondary?: string } | null) ?? {};
   const primaryColor = str(colors.primary, "#1A5F3F");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
@@ -423,7 +423,7 @@ function BrandingSection({
   const t = T[locale];
   const c = section.content;
   const brandName = str(c["brandName"] ?? c["name"], str(c["name"]));
-  const tagline = str(c["tagline"]);
+  const tagline = ownTagline(str(c["tagline"]));
   const logoUrl = str(c["logoUrl"]);
   const colors = (c["colors"] as { primary?: string; secondary?: string } | null) ?? {};
   const primaryColor = str(colors.primary, "#1A5F3F");
@@ -583,6 +583,8 @@ function PricingSection({
   const t = T[locale];
   const c = section.content;
   const anchor = num(c["anchor"]);
+  const redacted = c[CLIENT_REDACTED] === true;
+  // Stripped by forClientAudience for a client audience → both fall to 0 and the band hides.
   const min = num(c["min"]);
   const max = num(c["max"]);
   const citation = str(c["citation"]);
@@ -657,13 +659,16 @@ function PricingSection({
         </p>
       )}
 
-      <Link
-        href="/methodology"
-        className={`mt-2 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
-      >
-        <span>{t.methodologyLink}</span>
-        <span className="inline-block rtl:rotate-180">→</span>
-      </Link>
+      {/* Owner-only: how the price was reached. Redacted out of the client copy. */}
+      {!redacted && (
+        <Link
+          href="/methodology"
+          className={`mt-2 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
+        >
+          <span>{t.methodologyLink}</span>
+          <span className="inline-block rtl:rotate-180">→</span>
+        </Link>
+      )}
     </SectionShell>
   );
 }
@@ -729,6 +734,7 @@ function TimelineSection({
   const c = section.content;
   const startDate = str(c["startDate"] as string | null | undefined);
   const deliveryDate = str(c["deliveryDate"] as string | null | undefined);
+  const statedDuration = str(c["statedDuration"] as string | null | undefined);
   const revisions = typeof c["revisions"] === "number" ? c["revisions"] : null;
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
@@ -747,6 +753,16 @@ function TimelineSection({
             {deliveryDate ? fmtDate(deliveryDate, locale) : t.noDates}
           </p>
         </div>
+        {/* The client wrote a timeframe in the brief. Echo it back verbatim; the dates
+            above stay "to be agreed" because no date has been agreed. */}
+        {statedDuration && (
+          <div className="col-span-2">
+            <p className={`text-xs text-rizq-ink-soft/70 mb-0.5 ${font}`}>
+              {t.statedDurationLabel}
+            </p>
+            <p className={`text-sm font-medium text-rizq-ink ${font}`}>{statedDuration}</p>
+          </div>
+        )}
         {revisions !== null && revisions > 0 && (
           <div className="col-span-2">
             <p className={`text-xs text-rizq-ink-soft ${font}`}>
@@ -1141,6 +1157,7 @@ function VerificationSection({
   // not the English string baked into artifact_json when it was generated.
   const proposalId = str(c["proposalId"]);
   const label = t.generatedBy;
+  const redacted = c[CLIENT_REDACTED] === true;
   const methodologyHref = str(c["methodologyHref"], "/methodology");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
@@ -1155,13 +1172,16 @@ function VerificationSection({
               {t.proposalId}: {proposalId}
             </p>
           )}
-          <Link
-            href={methodologyHref as "/methodology"}
-            className={`mt-1.5 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
-          >
-            <span>{t.methodologyLink}</span>
-            <span className="inline-block rtl:rotate-180">→</span>
-          </Link>
+          {/* Owner-only — the client gets the seal and the reference, not the method. */}
+          {!redacted && (
+            <Link
+              href={methodologyHref as "/methodology"}
+              className={`mt-1.5 inline-flex items-center gap-1 text-xs text-rizq-gold-dark hover:text-rizq-green transition-colors ${font}`}
+            >
+              <span>{t.methodologyLink}</span>
+              <span className="inline-block rtl:rotate-180">→</span>
+            </Link>
+          )}
         </div>
       </div>
     </SectionShell>

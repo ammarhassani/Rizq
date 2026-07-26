@@ -21,6 +21,7 @@ describe("ScopeSchema", () => {
     geography_target: null,
     language_preference: null,
     budget_mentioned: null,
+    stated_duration: null,
     ip_transfer: null,
     field_confidence: {
       specialty: 0.95,
@@ -168,4 +169,47 @@ describe("extractScope", () => {
   // Vitest 4 surfaces the mock-originated error as a test failure even though
   // extractScope catches it. The path is covered by inspection and exercised by
   // the generateProposal integration path (P2.9).
+});
+
+// ---------------------------------------------------------------------------
+// stated_duration — the client's own words about timing (US7 / FR-019)
+// ---------------------------------------------------------------------------
+
+describe("ScopeSchema.stated_duration", () => {
+  const base = {
+    specialty: "logo-design",
+    deliverables: ["شعار"],
+    deliverable_count: 1,
+    revisions: null,
+    urgency: null,
+    complexity_signals: [],
+    client_type: null,
+    geography_target: null,
+    language_preference: null,
+    budget_mentioned: null,
+    ip_transfer: null,
+    field_confidence: {},
+  };
+
+  it("accepts a duration stated in Arabic, verbatim", () => {
+    const parsed = ScopeSchema.safeParse({ ...base, stated_duration: "المدة المطلوبة ٣ أشهر" });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.stated_duration).toBe("المدة المطلوبة ٣ أشهر");
+  });
+
+  it("accepts a duration stated in English", () => {
+    const parsed = ScopeSchema.safeParse({ ...base, stated_duration: "within 6 weeks" });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("tolerates its absence as null — a vague brief states no duration", () => {
+    const parsed = ScopeSchema.safeParse({ ...base, stated_duration: null });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.stated_duration).toBeNull();
+  });
+
+  it("rejects an over-long value rather than storing an essay as a duration", () => {
+    const parsed = ScopeSchema.safeParse({ ...base, stated_duration: "x".repeat(200) });
+    expect(parsed.success).toBe(false);
+  });
 });

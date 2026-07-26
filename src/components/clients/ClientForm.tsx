@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient, updateClient } from "@/app/actions/clients/clients";
+import type { FieldErrorReason } from "@/lib/validation/fieldErrors";
 import { track } from "@/lib/analytics/track";
 import { Loader2 } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
@@ -49,13 +50,31 @@ const RATINGS = [1, 2, 3, 4, 5] as const;
 export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, embedded = false }: Props) {
   const t = useTranslations("Clients.form");
   const tCommon = useTranslations("Common");
+  const tValidation = useTranslations("Validation");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // Validation failures are permanent — they name their field instead of offering a retry.
+  const [fieldErrors, setFieldErrors] = useState<Record<string, FieldErrorReason>>({});
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  /**
+   * The server's reason, rendered under the input it belongs to, in the reader's language.
+   * A plain helper rather than a nested component — a component defined during render gets
+   * a new identity every pass and remounts the node.
+   */
+  function fieldError(field: string) {
+    const reason = fieldErrors[field];
+    if (!reason) return null;
+    return (
+      <p id={`${field}-error`} role="alert" className={`mt-1 text-xs text-[var(--over)] ${font}`}>
+        {tValidation(reason)}
+      </p>
+    );
+  }
 
   const [name, setName] = useState(initialData?.name ?? "");
   const [nameEn, setNameEn] = useState(initialData?.name_en ?? "");
@@ -86,6 +105,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       return;
     }
     setError(null);
+    setFieldErrors({});
 
     const tags = tagsInput
       .split(",")
@@ -114,6 +134,10 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
         if (!result.ok) {
           if (result.code === "quota_exhausted") {
             setShowUpgradeModal(true);
+          } else if (result.code === "invalid" && result.fields?.length) {
+            setFieldErrors(
+              Object.fromEntries(result.fields.map((f) => [f.field, f.reason]))
+            );
           } else {
             setError(t("errors.generic"));
           }
@@ -151,7 +175,13 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
         });
 
         if (!result.ok) {
-          setError(t("errors.generic"));
+          if (result.code === "invalid" && result.fields?.length) {
+            setFieldErrors(
+              Object.fromEntries(result.fields.map((f) => [f.field, f.reason]))
+            );
+          } else {
+            setError(t("errors.generic"));
+          }
           return;
         }
 
@@ -190,7 +220,8 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       {/* Name (required) */}
       <div>
         <label className={labelClass}>{t("nameLabel")} <span className="text-[var(--over)]">*</span></label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} className={inputClass} />
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} className={inputClass} aria-invalid={fieldErrors["name"] ? true : undefined} aria-describedby={fieldErrors["name"] ? "name-error" : undefined} />
+        {fieldError("name")}
       </div>
 
       {/* Name EN */}
@@ -215,18 +246,21 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>{t("phoneLabel")}</label>
-          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("phonePlaceholder")} className={`${inputClass} font-sans`} dir="ltr" />
+          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("phonePlaceholder")} className={`${inputClass} font-sans`} dir="ltr" aria-invalid={fieldErrors["phone"] ? true : undefined} aria-describedby={fieldErrors["phone"] ? "phone-error" : undefined} />
+          {fieldError("phone")}
         </div>
         <div>
           <label className={labelClass}>{t("phoneWaLabel")}</label>
-          <input type="tel" value={phoneWa} onChange={(e) => setPhoneWa(e.target.value)} placeholder={t("phoneWaPlaceholder")} className={`${inputClass} font-sans`} dir="ltr" />
+          <input type="tel" value={phoneWa} onChange={(e) => setPhoneWa(e.target.value)} placeholder={t("phoneWaPlaceholder")} className={`${inputClass} font-sans`} dir="ltr" aria-invalid={fieldErrors["phone_whatsapp"] ? true : undefined} aria-describedby={fieldErrors["phone_whatsapp"] ? "phone_whatsapp-error" : undefined} />
+          {fieldError("phone_whatsapp")}
         </div>
       </div>
 
       {/* Email */}
       <div>
         <label className={labelClass}>{t("emailLabel")}</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("emailPlaceholder")} className={`${inputClass} font-sans`} dir="ltr" />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("emailPlaceholder")} className={`${inputClass} font-sans`} dir="ltr" aria-invalid={fieldErrors["email"] ? true : undefined} aria-describedby={fieldErrors["email"] ? "email-error" : undefined} />
+        {fieldError("email")}
       </div>
 
       {/* City */}
@@ -278,7 +312,7 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
               type="button"
               onClick={() => setRating(rating === r ? null : r)}
               className={`text-2xl transition-colors ${rating && r <= rating ? "text-rizq-gold" : "text-rizq-gold/30 hover:text-rizq-gold/60"}`}
-              aria-label={tCommon("ratingStars", { n: r })}
+              aria-label={tCommon("ratingStars", { n: r, max: 5 })}
               aria-pressed={rating === r}
             >
               ★

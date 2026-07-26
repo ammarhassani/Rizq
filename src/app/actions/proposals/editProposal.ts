@@ -207,6 +207,8 @@ export async function editProposal(
     ipTerms,
     startDate: null,
     deliveryDate: null,
+    // Rebuilt artifacts keep whatever the timeline already had; nothing is invented.
+    statedDuration: null,
     validityDays,
     bioAr: brand.bioAr,
     bioEn: brand.bioEn,

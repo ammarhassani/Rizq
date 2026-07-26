@@ -208,6 +208,8 @@ export async function answerFollowUps(
     ipTerms: resolvedIpTerms,
     startDate: null,
     deliveryDate: null,
+    // Rebuilt artifacts keep whatever the timeline already had; nothing is invented.
+    statedDuration: null,
     validityDays: 30,
     bioAr: brand.bioAr,
     bioEn: brand.bioEn,
