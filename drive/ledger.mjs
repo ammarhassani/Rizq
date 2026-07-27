@@ -57,6 +57,46 @@ export function leastRecentlyDriven(flows) {
 }
 
 /**
+ * The roads nobody has driven.
+ *
+ * Coverage is three-dimensional here — who drives (persona), what they drive (flow), and what
+ * kind of question they ask (strategy) — and the interesting gaps are usually whole planes
+ * rather than single cells: a strategy never tried at all, a flow only ever driven by one kind
+ * of person. Reported that way so the agent leading a session can pick a gap worth closing
+ * instead of grinding the next cell in a list.
+ */
+export function uncoveredRoads({ personas = [], flows = [], strategies = [] }) {
+  const driven = new Set(coverage().map((r) => r.flow));
+  const parts = (key) => {
+    const [persona, flow, strategy] = key.split("/");
+    return { persona, flow, strategy };
+  };
+  const seen = { personas: new Set(), flows: new Set(), strategies: new Set(), pairs: new Set() };
+  for (const key of driven) {
+    const p = parts(key);
+    if (p.persona) seen.personas.add(p.persona);
+    if (p.flow) seen.flows.add(p.flow);
+    if (p.strategy) seen.strategies.add(p.strategy);
+    seen.pairs.add(`${p.persona}/${p.flow}`);
+  }
+  const missing = (all, got) => all.filter((x) => !got.has(x));
+  const untouchedPairs = [];
+  for (const persona of personas) {
+    for (const flow of flows) {
+      if (!seen.pairs.has(`${persona}/${flow}`)) untouchedPairs.push(`${persona}/${flow}`);
+    }
+  }
+  return {
+    strategiesNeverTried: missing(strategies, seen.strategies),
+    flowsNeverDriven: missing(flows, seen.flows),
+    personasNeverUsed: missing(personas, seen.personas),
+    untouchedPairs,
+    totalCells: personas.length * flows.length * strategies.length,
+    drivenCells: driven.size,
+  };
+}
+
+/**
  * The persona × flow pair due next.
  *
  * A defect is only visible to someone whose expectations it violates, so the same flow driven

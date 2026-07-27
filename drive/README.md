@@ -62,11 +62,43 @@ earlier one already noticed.
 6. **Record the run** with `recordRun(assignment.key, { findings })`, so the next iteration
    starts where this one stopped.
 
+## Three axes, not one
+
+| axis | file | varies |
+|---|---|---|
+| persona | `personas.mjs` | **who** drives — device, pace, what they are suspicious of |
+| flow | `flows.mjs` | **what** they are trying to get done |
+| strategy | `strategies.mjs` | **what kind of question** is being asked |
+
+Personas and flows alone re-ask the same question in new places. Strategies change the question,
+which is why an untried strategy is worth more than an untouched persona × flow cell:
+
+- **metamorphic** — when the input changes this way, how must the output change? The only oracle
+  available for a price nobody can call correct. Would have caught the band-ceiling P0.
+- **differential** — two renderings of one truth must agree; the client's copy must be a strict
+  subset of the owner's. This is the shape of every leak found so far.
+- **time-travel** — quotas reset on the Riyadh month boundary, Pro lapses, invoices turn overdue,
+  HADAF counts consecutive months. None of it is exercised by driving on a Tuesday.
+- **adversarial**, **fuzz**, **state-machine**, **scale** — the world misbehaving, input nobody
+  expected, transitions nobody legalised, and a real amount of data.
+
+```bash
+node drive/coverage.mjs    # what has been driven, and what nobody has
+```
+
 ## Running the loop
 
+Invoke the skill (`.claude/skills/drive/`), which tells the agent how to lead a session —
+choose the road, drive, verify, fix or record, update the ledger:
+
 ```
-/loop 30m read drive/ledger.md, drive the least-recently-driven flow through drive/,
-fix what you find, update the ledger, commit
+/drive
+```
+
+As a Ralph loop:
+
+```
+/loop 30m /drive
 ```
 
 Intervals under ~10 minutes are a false economy: Supabase rate-limits signups to 5 per 5
