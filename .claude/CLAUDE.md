@@ -204,6 +204,15 @@ Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on f
 ## Validation history (read before trusting a "SHIPPED" tag)
 - `docs/validation/business-logic-audit.md` — static spec-vs-code audit (2026-07-22).
 - `docs/validation/production-maturity-report.md` — pass 1 verdict (2026-07-22). **Partly superseded.**
+- `docs/validation/power-user-passes-5-6-2026-07-27.md` — **passes 5 + 6**. Pass 5 drove the
+  modules 3 and 4 never opened: HADAF served a week-old "no recorded projects" while the
+  dashboard showed the real figure (7-day cache, never invalidated on income change); logging
+  income saved the row and returned a blank form (`revalidatePath` undoing the push); income
+  accepted 3 decimals. Pass 6 stopped walking screens and **swept every Arabic route** —
+  7 surfaces printing the app's own figures in Latin digits, all fixed, guard widened to 9
+  routes. Also checked every paywall limit against its DB trigger: six match exactly, and
+  **"المشاريع · ٢٠/شهر" does not** — the trigger is on `gigs`, so `createBlankProject` makes
+  unlimited free projects (**founder call, deliberately unfixed**).
 - `docs/validation/power-user-pass-3-2026-07-26.md` — **pass 3 remediation record**: the 18
   defects fixed and re-verified in-browser, plus one the plan did not predict (plain `ar`
   resolves to Latin digits, so ICU's `#` mixed numeral systems inside one Arabic sentence
