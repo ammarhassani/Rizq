@@ -8,7 +8,24 @@ import { AnimatedNumber } from "./AnimatedNumber";
 import { toggleShare, getMarketTrendNarrative } from "@/app/actions/tool/calculate";
 import { track } from "@/lib/analytics/track";
 import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
-import type { MarketTrend } from "@/lib/pricing/trend";
+import type { MarketTrend, TrendScope } from "@/lib/pricing/trend";
+
+/**
+ * Name the market a trend describes. The direction is often computed nationally because
+ * no single (specialty, city, tier) cell carries enough dated rows — so the sentence says
+ * which market moved rather than letting the reader assume it was theirs.
+ */
+function trendScopeLabelAr(scope: TrendScope, city: string | undefined): string {
+  if (scope === "national") return "السوق على مستوى السعودية";
+  if (scope === "region") return city ? `السوق في منطقة ${city}` : "السوق في منطقتك";
+  return city ? `السوق في ${city}` : "السوق";
+}
+
+function trendScopeLabelEn(scope: TrendScope, city: string | undefined): string {
+  if (scope === "national") return "The market across Saudi Arabia";
+  if (scope === "region") return city ? `The market in the ${city} region` : "The market in your region";
+  return city ? `The market in ${city}` : "The market";
+}
 
 /** Maps dominant provenance kind to the corresponding methodology section anchor. */
 function methodologyFragment(kind: BenchmarkProvenance | undefined): string {
@@ -253,9 +270,13 @@ export function ResultCard({
               <Minus size={16} className="text-rizq-ink-soft shrink-0" aria-hidden />
             )}
             <span>
+              {/* The signal may come from a wider row set than this lookup's city (see
+                  resolveTrend): no (specialty, city, tier) cell in the corpus holds the 8
+                  dated rows a direction needs. So the line NAMES the market it describes —
+                  a nationwide move must never read as "your city moved". */}
               {locale === "ar"
-                ? `تحرّك السوق ${trend.percent > 0 ? "+" : ""}${numberFmt.format(trend.percent)}% خلال ${numberFmt.format(trend.span_months)} أشهر تقريبًا (بناءً على ${numberFmt.format(trend.sample_size)} سجل).`
-                : `Market moved ${trend.percent > 0 ? "+" : ""}${numberFmt.format(trend.percent)}% over ~${numberFmt.format(trend.span_months)} months (based on ${numberFmt.format(trend.sample_size)} records).`}
+                ? `تحرّك ${trendScopeLabelAr(trend.scope, cityName)} ${trend.clamped ? "أكثر من " : ""}${trend.percent > 0 ? "+" : ""}${numberFmt.format(Math.abs(trend.percent))}% خلال ${numberFmt.format(trend.span_months)} أشهر تقريبًا (بناءً على ${numberFmt.format(trend.sample_size)} سجل).`
+                : `${trendScopeLabelEn(trend.scope, cityName)} moved ${trend.clamped ? "over " : ""}${trend.percent > 0 ? "+" : ""}${numberFmt.format(Math.abs(trend.percent))}% over ~${numberFmt.format(trend.span_months)} months (based on ${numberFmt.format(trend.sample_size)} records).`}
             </span>
           </p>
           {trendNarrative && (

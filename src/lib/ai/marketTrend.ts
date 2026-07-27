@@ -48,13 +48,22 @@ const DIRECTION_AR: Record<MarketTrend["direction"], string> = {
 export function buildMarketTrendPrompt(ctx: MarketTrendNarrativeCtx): string {
   const { trend, specialty_name, city_name } = ctx;
   const absPct = Math.abs(trend.percent);
+  // The signal may be computed on a wider row set than the freelancer's own city.
+  // Tell the model which market it is describing, and forbid the narrower claim —
+  // otherwise it writes "in Jeddah" about a nationwide move.
+  const SCOPE_AR: Record<MarketTrend["scope"], string> = {
+    exact: `سوق ${specialty_name} في ${city_name}`,
+    region: `سوق ${specialty_name} في منطقة ${city_name}`,
+    national: `سوق ${specialty_name} على مستوى السعودية (وليس ${city_name} وحدها)`,
+  };
   return `أنت محلل رِزق (Rizq) لسوق العمل الحر السعودي. لديك إشارة اتجاه سعري محسوبة من بيانات حقيقية مؤرّخة. مهمتك: صياغة جملة واحدة قصيرة تفسّر هذه الإشارة بصدق.
 
 المعطيات (لا تخترع أي رقم غير موجود هنا):
 - التخصص: ${specialty_name}
 - المدينة: ${city_name}
+- نطاق الإشارة: ${SCOPE_AR[trend.scope]}
 - الاتجاه: ${DIRECTION_AR[trend.direction]} (${trend.direction})
-- نسبة التغيّر: ${trend.percent > 0 ? "+" : ""}${trend.percent}% (وسيط النصف الأحدث مقابل النصف الأقدم)
+- نسبة التغيّر: ${trend.clamped ? "أكثر من " : ""}${trend.percent > 0 ? "+" : ""}${Math.abs(trend.percent)}% (وسيط النصف الأحدث مقابل النصف الأقدم)
 - الوسيط الأقدم: ${trend.older_median} ريال — الوسيط الأحدث: ${trend.recent_median} ريال
 - المدى الزمني: ${trend.span_months} شهر تقريبًا، بناءً على ${trend.sample_size} سجل
 
@@ -63,6 +72,7 @@ export function buildMarketTrendPrompt(ctx: MarketTrendNarrativeCtx): string {
 - فسّر ماذا يعني ${absPct}% ${trend.direction} للمستقل (مثلاً: فرصة لمراجعة السعر) دون وعود.
 - لا تتنبّأ بالمستقبل. لا تقل "سيرتفع" أو "سينخفض". صف ما حدث فقط.
 - لا تخترع أرقامًا أو أسبابًا غير موجودة في المعطيات.
+- التزم بنطاق الإشارة أعلاه. إذا كان النطاق على مستوى السعودية فلا تنسب الحركة إلى ${city_name} وحدها.
 - لا تضف بادئة "تحليل رِزق" — الواجهة تضيفها.
 
 اكتب الآن:`;

@@ -210,3 +210,37 @@ MVP → US3 (monetization) → US5 (M4-trend + M8) → each tested + shipped ind
 - WidgetError and `fl_verified*` columns already exist — reuse, do not recreate.
 - Commit small + atomic per task; merge gate is typecheck + test green.
 - T014 is the root-cause fix (one shared `isPro`); do not patch expiry per-caller.
+
+---
+
+## T027 follow-up — M4 trend, resolved 2026-07-27
+
+The trend layer had never rendered for anyone. Two causes, one behind the other.
+
+**Scope.** A band settles at the tightest scope holding 3+ rows; a direction needs 8 rows
+over 3+ months, and no `(specialty, city, tier)` cell in the corpus holds 8 — the largest
+holds 6. `resolveTrend` now widens the ROW SET to the national one (same specialty and tier,
+every city) when the band's own rows are too thin, and the signal carries a `scope` that the
+line names: "تحرّك السوق على مستوى السعودية…" / "The market across Saudi Arabia moved…".
+The gates were left where they are; a direction drawn from 6 clustered records is not a
+direction, and `trend.test.ts` now fails if someone lowers `MIN_TREND_SAMPLE` to force the
+feature on screen.
+
+**What that surfaced.** With the wider set the trend rendered for the first time — and it was
+wrong. `graphic-design/junior` reported **+200%** (the display clamp; the raw figure was
++733%) and DeepSeek narrated it as a real market rise. The data:
+
+| Period | Rows | `project_size` | Prices |
+|---|---|---|---|
+| Nov 2025 – May 2026 | 7 | small / medium / large / enterprise | 250–610 |
+| June 2026 | 21 | **NULL** | 2,550–5,350 |
+
+The older half is sized-task pricing; the recent half is one June batch on a whole-project
+basis. The comparison measured a change of subject, not a change in the market. Fixed by
+requiring both halves to share the same set of `project_size` bases before a direction is
+computed, and by marking a clamped move so the UI says "أكثر من ٢٠٠٪" / "over 200%" instead
+of printing the clamp as the measurement.
+
+**Net effect today: still no trend line for this corpus** — but now for a reason that holds.
+It will appear as soon as the benchmark set carries dated rows of a consistent basis, which
+is a data-collection job, not a code one.

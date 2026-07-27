@@ -7,6 +7,14 @@ export type AggRow = {
   provenance: BenchmarkProvenance;
   confidence: number;
   captured_at: string; // ISO
+  /**
+   * Which project size the price was recorded for, when the record says. Optional
+   * because the band does not need it (the query already filters on size when the
+   * freelancer picks one) — but the TREND does: a "small task" price and a whole-project
+   * price are different bases, and comparing one period of the first against another
+   * period of the second manufactures a market move. See trend.ts.
+   */
+  project_size?: string | null;
 };
 
 export type ProvenanceSource = {

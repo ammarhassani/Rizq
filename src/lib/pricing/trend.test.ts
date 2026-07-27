@@ -88,3 +88,69 @@ describe("computeMarketTrend", () => {
     expect(computeMarketTrend(lopsided, NOW)).toBeNull();
   });
 });
+
+describe("trend scope — widen the rows, never the claim", () => {
+  it("defaults to the exact market when no scope is given", () => {
+    expect(computeMarketTrend(rising, NOW)!.scope).toBe("exact");
+  });
+
+  it("carries the scope it was computed at, so the UI can name that market", () => {
+    for (const scope of ["exact", "region", "national"] as const) {
+      expect(computeMarketTrend(rising, NOW, scope)!.scope).toBe(scope);
+    }
+  });
+
+  it("keeps the gates where they are — a wider row set is the answer, not a lower bar", () => {
+    // The trend never appeared in production because no (specialty, city, tier) cell holds
+    // 8 dated rows; the largest holds 6. The fix widens the ROWS (resolveTrend falls back to
+    // the national set) rather than accepting a direction drawn from 6 clustered records.
+    // If someone later lowers MIN_TREND_SAMPLE to "make the trend show up", this fails.
+    const sixRows: AggRow[] = [
+      row(1000, "2026-01-05"), row(1000, "2026-01-10"), row(1000, "2026-02-01"),
+      row(1200, "2026-06-01"), row(1200, "2026-06-10"), row(1200, "2026-07-01"),
+    ];
+    expect(computeMarketTrend(sixRows, NOW, "national")).toBeNull();
+  });
+});
+
+describe("comparable basis — a change of subject is not a market move", () => {
+  const sized = (price: number, iso: string, size: string | null): AggRow => ({
+    price_sar: price, provenance: "reasoned", confidence: 1, captured_at: iso, project_size: size,
+  });
+
+  it("refuses a direction when the halves price different kinds of work", () => {
+    // The shape found in production for graphic-design/junior: sized small-project records
+    // early, then one batch of unsized whole-project records. Comparing them reported a
+    // +733% "market rise" (displayed clamped to +200%) and the AI narrated it as real.
+    const mixed: AggRow[] = [
+      sized(490, "2025-11-15", "small"), sized(420, "2026-01-10", "small"),
+      sized(610, "2026-01-20", "medium"), sized(460, "2026-02-05", "large"),
+      ...Array.from({ length: 8 }, (_, i) => sized(2550 + i * 100, `2026-06-1${i % 10}`, null)),
+    ];
+    expect(computeMarketTrend(mixed, NOW, "national")).toBeNull();
+  });
+
+  it("still reports a direction when both halves price the same kind of work", () => {
+    const consistent: AggRow[] = [
+      ...Array.from({ length: 5 }, (_, i) => sized(1000, `2026-01-0${i + 1}`, "medium")),
+      ...Array.from({ length: 5 }, (_, i) => sized(1300, `2026-06-0${i + 1}`, "medium")),
+    ];
+    const t = computeMarketTrend(consistent, NOW, "national");
+    expect(t).not.toBeNull();
+    expect(t!.direction).toBe("rising");
+  });
+
+  it("marks a clamped move so the UI says 'over N%' instead of stating the clamp as fact", () => {
+    const explosive: AggRow[] = [
+      ...Array.from({ length: 5 }, (_, i) => sized(100, `2026-01-0${i + 1}`, "medium")),
+      ...Array.from({ length: 5 }, (_, i) => sized(5000, `2026-06-0${i + 1}`, "medium")),
+    ];
+    const t = computeMarketTrend(explosive, NOW)!;
+    expect(t.clamped).toBe(true);
+    expect(t.percent).toBe(200);
+  });
+
+  it("does not mark an unclamped move", () => {
+    expect(computeMarketTrend(rising, NOW)!.clamped).toBe(false);
+  });
+});

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { aggregate, type AggRow, type ProvenanceSource } from "./aggregate";
 import { buildCitation } from "./citation";
 import { applyKAnonymity } from "./contribution";
-import { computeMarketTrend, type MarketTrend } from "./trend";
+import { computeMarketTrend, type MarketTrend, type TrendScope } from "./trend";
 import type { BenchmarkProvenance } from "./provenance";
 
 export type ResolveInput = {
@@ -100,7 +100,7 @@ async function fetchRows(
 ): Promise<AggRow[]> {
   let query = supabase
     .from("benchmark_records")
-    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id")
+    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id, project_size")
     .eq("specialty_id", args.specialty_id)
     .eq("experience_tier_id", args.experience_tier_id)
     .eq("active", true)
@@ -125,6 +125,7 @@ async function fetchRows(
       provenance: (r as { provenance: BenchmarkProvenance }).provenance,
       confidence: conf,
       captured_at: captured,
+      project_size: (r as { project_size: string | null }).project_size ?? null,
       source_user_id: (r as { source_user_id: string | null }).source_user_id ?? null,
     };
   });
@@ -137,6 +138,42 @@ async function fetchRows(
     // not count toward MIN_SAMPLE, or an all-zero-confidence cell would yield a
     // 0/0/0 band). The DB also enforces price_sar >= 0; this keeps the count honest.
     .filter((r) => Number.isFinite(r.price_sar) && r.price_sar >= 0 && r.confidence > 0);
+}
+
+/**
+ * Resolve the market-trend signal, widening the ROW SET but never the claim.
+ *
+ * The band settles at the tightest scope holding 3+ rows; a direction needs 8 rows over
+ * 3+ months. No (specialty, city, tier) cell in the corpus has ever held 8 — the largest
+ * holds 6 — so the trend computed to null for every lookup ever made and the M4 layer,
+ * though shipped and tested, has never appeared on screen.
+ *
+ * Lowering the gate was the wrong fix: a direction drawn from 5 clustered records is not
+ * a direction. Instead the signal may be computed nationally (same specialty and tier,
+ * every city), where the corpus does carry ~27 rows across ~7 months — and it carries its
+ * scope so the UI names the market it describes. A nationwide move shown as the
+ * freelancer's own city would be the quiet overstatement Principle I exists to prevent.
+ */
+async function resolveTrend(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  rows: AggRow[],
+  fallback: "none" | "region" | "specialty",
+  specialty_id: string,
+  experience_tier_id: string,
+  now: Date
+): Promise<MarketTrend | null> {
+  // The rows the band already used, labelled with the scope they actually came from.
+  const bandScope: TrendScope =
+    fallback === "none" ? "exact" : fallback === "region" ? "region" : "national";
+  const fromBand = computeMarketTrend(rows, now, bandScope);
+  if (fromBand) return fromBand;
+
+  // The band's rows were too thin for a direction. Widen to the national set — unless
+  // that IS what the band already used, in which case there is nothing wider to try.
+  if (bandScope === "national") return null;
+
+  const nationalRows = await fetchRows(supabase, { specialty_id, experience_tier_id });
+  return computeMarketTrend(nationalRows, now, "national");
 }
 
 async function finalize(
@@ -190,10 +227,7 @@ async function finalize(
     provenance_citation_ar: citation.ar,
     provenance_citation_en: citation.en,
     date_range: agg.date_range,
-    // Only show a trend for an EXACT-match market. When the band widened to
-    // region/specialty fallback, a "this market moved X%" line would attribute
-    // fallback-wide rows to the specific query — honesty gap (Principle I).
-    trend: fallback === "none" ? computeMarketTrend(rows, now) : null,
+    trend: await resolveTrend(supabase, rows, fallback, specialty_id, ids.experience_tier_id, now),
     ids,
   };
 }

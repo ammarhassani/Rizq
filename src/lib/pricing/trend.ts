@@ -19,10 +19,30 @@ import { weightedPercentile } from "./weightedPercentile";
 
 export type TrendDirection = "rising" | "falling" | "stable";
 
+/**
+ * Which market the signal describes.
+ *
+ * A band resolves at the tightest scope with 3+ rows, but a *direction* needs 8 rows
+ * across 3+ months — and no (specialty, city, tier) cell in the corpus has ever held
+ * that many. The trend was therefore never shown to anyone. Rather than lowering the
+ * gate (a direction from 5 clustered records is not a direction), the signal may be
+ * computed on a wider row set and must then SAY so: a nationwide move presented as
+ * "your market" would be exactly the kind of quiet overstatement Principle I forbids.
+ */
+export type TrendScope = "exact" | "region" | "national";
+
 export type MarketTrend = {
   direction: TrendDirection;
+  /** The market this move describes — the UI must name it. */
+  scope: TrendScope;
   /** Signed percent change, recent vs older median, rounded to whole percent. */
   percent: number;
+  /**
+   * True when the real move exceeded the display clamp, so `percent` is a floor rather
+   * than the measurement. The UI must then say "over N%" — printing the clamp as an exact
+   * figure states a number nobody computed.
+   */
+  clamped: boolean;
   recent_median: number;
   older_median: number;
   recent_count: number;
@@ -58,10 +78,31 @@ function weightedMedian(rows: AggRow[], now: Date): number {
 }
 
 /**
+ * Do the two halves price comparable work?
+ *
+ * Rows carry the project size they were recorded for (or null when the source did not say).
+ * A period of small-task prices against a period of whole-project prices is not a market
+ * move, it is a change of subject — so the halves must draw on the same set of bases.
+ */
+function sameBasis(older: AggRow[], recent: AggRow[]): boolean {
+  const basis = (rows: AggRow[]) =>
+    new Set(rows.map((r) => r.project_size ?? "unspecified"));
+  const a = basis(older);
+  const b = basis(recent);
+  if (a.size !== b.size) return false;
+  for (const value of a) if (!b.has(value)) return false;
+  return true;
+}
+
+/**
  * Compute a directional market signal from dated rows, or null if the data is
  * too thin/clustered to honestly support one. Pure — exported for unit tests.
  */
-export function computeMarketTrend(rows: AggRow[], now: Date): MarketTrend | null {
+export function computeMarketTrend(
+  rows: AggRow[],
+  now: Date,
+  scope: TrendScope = "exact",
+): MarketTrend | null {
   const usable = rows.filter(
     (r) => Number.isFinite(r.price_sar) && r.price_sar >= 0 && !!r.captured_at,
   );
@@ -83,6 +124,14 @@ export function computeMarketTrend(rows: AggRow[], now: Date): MarketTrend | nul
   const recent = sorted.filter((r) => new Date(r.captured_at).getTime() >= midMs);
   if (older.length < MIN_BUCKET || recent.length < MIN_BUCKET) return null;
 
+  // Both halves must price the SAME KIND of work, or the "move" is a change in what was
+  // recorded rather than in what the market pays. Real case: seven sized-project records
+  // at 250–610 SAR spread over six months, then one June batch of twenty-one records with
+  // no project size at 2,550–5,350 — a different price basis entirely. The comparison
+  // reported a +733% market rise (clamped to +200% for display) and the AI dutifully
+  // narrated it. A direction is only honest across a like-for-like basis.
+  if (!sameBasis(older, recent)) return null;
+
   const older_median = weightedMedian(older, now);
   const recent_median = weightedMedian(recent, now);
   if (older_median <= 0) return null;
@@ -91,12 +140,15 @@ export function computeMarketTrend(rows: AggRow[], now: Date): MarketTrend | nul
   // Clamp so a thin outlier can't fabricate an absurd headline percent. Direction
   // is set from the (unclamped) sign; magnitude is bounded.
   const percent = Math.max(-MAX_PCT, Math.min(MAX_PCT, rawPct));
+  const clamped = Math.abs(rawPct) > MAX_PCT;
   const direction: TrendDirection =
     rawPct > STABLE_BAND_PCT ? "rising" : rawPct < -STABLE_BAND_PCT ? "falling" : "stable";
 
   return {
     direction,
+    scope,
     percent,
+    clamped,
     recent_median,
     older_median,
     recent_count: recent.length,

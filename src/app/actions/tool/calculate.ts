@@ -204,7 +204,11 @@ export async function toggleShare(input: unknown): Promise<{ ok: boolean }> {
 const TrendNarrativeSchema = z.object({
   trend: z.object({
     direction: z.enum(["rising", "falling", "stable"]),
+    // The market the signal describes. Passed to the model so a nationwide move is
+    // never narrated as the freelancer's own city.
+    scope: z.enum(["exact", "region", "national"]),
     percent: z.number(),
+    clamped: z.boolean(),
     recent_median: z.number(),
     older_median: z.number(),
     recent_count: z.number(),
