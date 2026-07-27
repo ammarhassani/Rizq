@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback, useRef } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createGig, updateGig } from "@/app/actions/gigs/gigs";
@@ -9,6 +9,7 @@ import {
   checkGigAnomalyAction,
 } from "@/app/actions/gigs/incomeAi";
 import { track } from "@/lib/analytics/track";
+import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
 import { Loader2 } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { ClientPicker } from "@/components/clients/ClientPicker";
@@ -67,6 +68,21 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [goToLedger, setGoToLedger] = useState(false);
+
+  /**
+   * Leave for the ledger only once the save transition has finished.
+   *
+   * `createGig` calls `revalidatePath("/[locale]/income")`, and a revalidation
+   * re-renders the route the action was invoked from. Pushing while that was still in
+   * flight produced a visible flicker to /income and straight back to /income/new: the
+   * freelancer was returned to a BLANK form with their income already saved, so the
+   * natural response was to fill it in and save again. Confirmed by removing the
+   * revalidatePath, after which the push stuck.
+   */
+  useEffect(() => {
+    if (goToLedger && !isPending) router.push("/income" as "/income");
+  }, [goToLedger, isPending, router]);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -126,7 +142,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
       setError(t("errors.titleRequired"));
       return;
     }
-    const parsedAmount = parseFloat(amount);
+    const parsedAmount = roundHalala(parseFloat(amount));
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
       setError(t("errors.amountRequired"));
       return;
@@ -163,11 +179,10 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
           void checkGigAnomalyAction({ gig_id: newId }).catch(() => {});
         }
 
-        // Navigate to the ledger AND refresh — without refresh() the client
-        // Router Cache serves a stale /income (missing the just-created gig),
-        // which reads as "nothing happened" and causes duplicate saves.
-        router.push("/income" as "/income");
-        router.refresh();
+        // Ask for the ledger; the effect below performs the navigation once this
+        // transition has settled. Pushing from inside the transition looked like it
+        // worked and then undid itself.
+        setGoToLedger(true);
       } else {
         if (!initialData?.id) return;
         const result = await updateGig({
@@ -226,9 +241,13 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
             type="number"
             inputMode="decimal"
             min="1"
-            step="any"
+            step="0.01"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(clampMoneyInput(e.target.value))}
+            onBlur={() => {
+              const n = parseFloat(amount);
+              if (Number.isFinite(n)) setAmount(String(roundHalala(n)));
+            }}
             placeholder={t("amountPlaceholder")}
             className={`${inputClass} text-2xl font-bold tabular pe-16`}
             dir="ltr"

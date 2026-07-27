@@ -39,20 +39,25 @@ for (const route of ARABIC_ROUTES) {
   });
 }
 
-test("the Arabic dashboard uses Arabic-Indic digits for its own figures", async ({ page }) => {
-  await gotoReady(page, "/ar/dashboard");
+// Money and counts live on these three. HADAF's headline read "شهر 1 من ٣" — one numeral
+// system beside the other in a single sentence — because next-intl formats a raw number
+// with plain "ar", which CLDR resolves to Latin digits.
+for (const route of ["/ar/dashboard", "/ar/hadaf", "/ar/income"] as const) {
+  test(`${route} uses one numeral system for its own figures`, async ({ page }) => {
+    await gotoReady(page, route);
 
-  // Latin digits are legitimate inside emails, URLs, brand names and reference codes, so
-  // only tokens free of Latin letters and identifier punctuation are examined — the same
-  // rule the app's own digit normaliser uses.
-  const offenders = await page.evaluate(() => {
-    const text = (document.body as HTMLElement).innerText;
-    return text
-      .split(/\s+/)
-      .filter((token) => /[0-9]/.test(token))
-      .filter((token) => !/[A-Za-z@:/._#\\-]/.test(token))
-      .slice(0, 10);
+    // Latin digits are legitimate inside emails, URLs, brand names and reference codes, so
+    // only tokens free of Latin letters and identifier punctuation are examined — the same
+    // rule the app's own digit normaliser uses.
+    const offenders = await page.evaluate(() => {
+      const text = (document.body as HTMLElement).innerText;
+      return text
+        .split(/\s+/)
+        .filter((token) => /[0-9]/.test(token))
+        .filter((token) => !/[A-Za-z@:/._#\\-]/.test(token))
+        .slice(0, 10);
+    });
+
+    expect(offenders, `Latin digits in Arabic figures: ${offenders.join(", ")}`).toEqual([]);
   });
-
-  expect(offenders, `Latin digits in Arabic figures: ${offenders.join(", ")}`).toEqual([]);
-});
+}

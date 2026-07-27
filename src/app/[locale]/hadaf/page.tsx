@@ -13,6 +13,7 @@ import { getHadafStatusAction } from "@/app/actions/hadaf/status";
 import { HadafStreakBar } from "@/components/hadaf/HadafStreakBar";
 import { HadafActionPlanClient } from "@/components/hadaf/HadafActionPlanClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
+import { fmtCount } from "@/lib/format/number";
 import { CheckCircle2, XCircle, ExternalLink, AlertTriangle, TrendingUp } from "lucide-react";
 
 type Params = { locale: string };
@@ -126,7 +127,10 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
               <CheckCircle2 size={28} className="text-[var(--acc)] shrink-0 mt-0.5" />
               <div>
                 <h2 className={`text-xl font-bold text-rizq-ink ${font}`}>
-                  {t("qualifyingTitle", { n: status.current_streak })}
+                  {t("qualifyingTitle", {
+                    n: fmtCount(status.current_streak, locale as "ar" | "en"),
+                    required: fmtCount(rules.consecutive_months_required, locale as "ar" | "en"),
+                  })}
                 </h2>
                 <p className={`mt-1 text-sm text-rizq-ink-soft ${font}`}>
                   {t("qualifyingSubtitle")}
@@ -167,7 +171,7 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
                   </span>
                 </p>
                 <p className={`text-xs text-rizq-ink-soft/50 mt-1 ${font}`}>
-                  {t("subsidyNote", { pct: rules.subsidy_pct })}
+                  {t("subsidyNote", { pct: fmtCount(rules.subsidy_pct, locale as "ar" | "en") })}
                 </p>
               </div>
             )}
@@ -186,7 +190,15 @@ export default async function HadafPage({ params }: { params: Promise<Params> })
               <div>
                 <h2 className={`text-xl font-bold text-rizq-ink ${font}`}>
                   {status.current_streak > 0
-                    ? t("inProgressTitle", { n: status.current_streak })
+                    ? t("inProgressTitle", {
+                        // Both figures pre-formatted: next-intl formats a raw number with
+                        // plain "ar", which CLDR resolves to LATIN digits — the headline
+                        // read "شهر 1 من ٣", one numeral system beside the other. The
+                        // required count comes from the rules rather than being hardcoded,
+                        // so the sentence cannot outlive a rule change.
+                        n: fmtCount(status.current_streak, locale as "ar" | "en"),
+                        required: fmtCount(rules.consecutive_months_required, locale as "ar" | "en"),
+                      })
                     : t("notQualifyingTitle")}
                 </h2>
                 <p className={`mt-1 text-sm text-rizq-ink-soft ${font}`}>

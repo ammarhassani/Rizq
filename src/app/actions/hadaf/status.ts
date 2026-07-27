@@ -51,7 +51,25 @@ export async function getHadafStatusAction(opts?: {
       .eq("user_id", userId)
       .maybeSingle();
 
-    if (cached?.valid_until && new Date(cached.valid_until as string) > now) {
+    // A 7-day TTL alone is not enough: the cache is derived from the freelancer's
+    // income, and income changes whenever they log, edit, delete or get paid for a
+    // gig. A freelancer who logged their FIRST payment was told "no recorded
+    // projects yet" for a week by the one screen that decides whether they qualify
+    // for a government subsidy, while the dashboard showed the real figure on the
+    // same account. So the cache is only trusted while nothing has changed under it.
+    const { data: latestGig } = await supabase
+      .from("gigs")
+      .select("updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const staleAgainstIncome =
+      !!latestGig?.updated_at &&
+      !!cached?.generated_at &&
+      new Date(latestGig.updated_at as string) > new Date(cached.generated_at as string);
+
+    if (cached?.valid_until && new Date(cached.valid_until as string) > now && !staleAgainstIncome) {
       // Load rules for the UI (source_url etc.) — always fresh from DB
       const { data: rulesRow } = await supabase
         .from("hadaf_rules_config")

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
+import { fmtCount } from "@/lib/format/number";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
 import { GigStatusQuickEdit } from "./GigStatusQuickEdit";
@@ -264,7 +265,12 @@ export function IncomeListClient({ gigs, locale }: Props) {
               </span>
               <span className={`text-xs text-[var(--content-muted)] ${font}`}>{t("sar")}</span>
             </div>
-            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>{fmtPrice(stats.yearCount, locale)} {t("gigs")}</div>
+            <div className={`mt-1 text-[10px] text-[var(--content-faint)] ${font}`}>
+              {/* `n` stays a number so ICU picks the Arabic plural category; `count` carries
+                  the digits in the view's own numerals. Concatenating a number with an
+                  invariant noun rendered "١ عملًا" / "1 gigs". */}
+              {t("gigsCount", { n: stats.yearCount, count: fmtCount(stats.yearCount, locale) })}
+            </div>
           </div>
           <div className="nm-raised rounded-[20px] bg-[var(--raised)] p-5">
             <div className={`mb-2 text-[11px] font-medium text-[var(--content-muted)] ${font}`}>{t("monthlyAverage")}</div>

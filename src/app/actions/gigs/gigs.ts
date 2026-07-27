@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { createClient as createSupabaseClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { moneySarSchema } from "@/lib/money/schema";
 
 // ─── Zod schemas ───────────────────────────────────────────────────────────
 
@@ -11,7 +12,7 @@ const PaymentMethodEnum = z.enum(["bank_transfer", "stc_pay", "cash", "other"]);
 
 const CreateGigSchema = z.object({
   title: z.string().min(1).max(255),
-  amount_sar: z.number().positive(),
+  amount_sar: moneySarSchema,
   client_id: z.string().uuid().optional(),
   status: GigStatusEnum.optional().default("pending"),
   delivery_date: z.string().optional(), // ISO date string
@@ -24,7 +25,7 @@ const UpdateGigSchema = z.object({
   id: z.string().uuid(),
   patch: z.object({
     title: z.string().min(1).max(255).optional(),
-    amount_sar: z.number().positive().optional(),
+    amount_sar: moneySarSchema.optional(),
     deposit_pct: z.number().int().min(0).max(100).optional(), // trigger recomputes deposit/remaining
     client_id: z.string().uuid().nullable().optional(),
     status: GigStatusEnum.optional(),
