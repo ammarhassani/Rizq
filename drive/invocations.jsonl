@@ -10,3 +10,10 @@
 {"at":"2026-07-27T12:09:58.380Z","session":"S-0002","step":"resumed","planRow":99}
 {"at":"2026-07-27T12:09:58.380Z","session":"S-0002","step":"aborted","note":"crash-safety self-test"}
 {"at":"2026-07-27T12:10:36.522Z","session":"S-0002","step":"completed","findings":0,"note":"crash-safety self-test, not a real run — plan row 99 is not a real row"}
+{"at":"2026-07-27T12:35:18.959Z","session":"S-0003","step":"started"}
+{"at":"2026-07-27T12:35:18.960Z","session":"S-0003","step":"row-claimed","planRow":3}
+{"at":"2026-07-27T12:37:01.560Z","session":"S-0003","step":"driven","planRow":3}
+{"at":"2026-07-27T12:41:15.260Z","session":"S-0003","step":"checked","planRow":3,"findings":7}
+{"at":"2026-07-27T12:41:15.266Z","session":"S-0003","step":"filed","planRow":3,"findings":7}
+{"at":"2026-07-27T12:41:15.268Z","session":"S-0003","step":"row-ticked","planRow":3}
+{"at":"2026-07-27T12:41:15.268Z","session":"S-0003","step":"completed","findings":7,"note":""}
