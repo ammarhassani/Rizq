@@ -164,4 +164,7 @@ between runs, so that limit only bites when `drive/.auth` has been cleared.
 | `personas.mjs` | Six people with different devices, paces and suspicions |
 | `ux.mjs` | The measurable half of "looks wrong" — layout, touch, focus, dead ends, axe |
 | `ledger.mjs` / `ledger.md` | The loop's memory: coverage, open findings, what is known and accepted |
+| `axes.mjs` / `plan.md` | The closed search space and its 88-run pairwise covering set |
+| `telemetry.mjs` / `runs.jsonl` | One record per run — what it drove, opened, closed |
+| `scoreboard.mjs` / `scoreboard.md` | Per-axis yield, dry streak and verdict: burn it or retire it |
 | `iteration.example.mjs` | The whole shape, runnable as-is |

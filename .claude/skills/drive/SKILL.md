@@ -32,9 +32,25 @@ on this, but a dead server wastes a signup.
 
 ### 2. Take the next row of the locked plan
 
-The search space is seven axes (`drive/axes.mjs`): **persona** (who drives), **flow** (what they
-are doing), **strategy** (what kind of question is asked), **surface** (where the output lands),
-**state** (what shape the account is in), **tier**, and **entry** (how they arrived).
+The search space is **seven axes, and only these seven** (`drive/axes.mjs`):
+
+| axis | question it varies | values |
+|---|---|---|
+| `persona` | who is driving | rusher · meticulous · newcomer · veteran · sceptic · english-first |
+| `flow` | what they are trying to do | onboarding · proposal-to-client · invoice-and-vat · income-and-hadaf · pricing-tool · clients-and-projects · documents-and-catalog · mobile · english-locale · recovery |
+| `strategy` | what KIND of question is asked | metamorphic · differential · time-travel · adversarial · fuzz · state-machine · scale |
+| `surface` | where the output lands | screen-desktop · screen-mobile · print-pdf · docx-export · share-anonymous · csv-export |
+| `state` | what shape the account is in | empty · minimal · realistic · heavy · edge-unicode · degraded-profile |
+| `tier` | which entitlement | anon · free · free-exhausted · pro-active · pro-lapsed |
+| `entry` | how they arrived | direct-url · in-app-navigation · shared-link · back-or-refresh-midflow · guided-context |
+
+> **The axis list is CLOSED. Do not add, rename or remove an axis — or a value — on your own.**
+>
+> Adding one invalidates `plan.md`, resets the dry counter, and makes every "we covered the
+> space" claim before it meaningless. If a defect class genuinely does not fit these seven,
+> **stop and put the case to the person who invoked you**: what the class is, why no existing
+> axis holds it, and what it would cost to reopen the plan. They decide, not you. Adding a value
+> to an existing axis is the same conversation, one size smaller.
 
 Crossed fully that is hundreds of thousands of runs. `drive/plan.md` is a pairwise covering set —
 **88 runs that contain every reachable pair** — so "we have covered the space" is a claim that can
@@ -117,7 +133,35 @@ never run out, and a loop chasing them churns the repo for no value.
 
 Write the grade into the ledger entry.
 
-### 7. Record and report
+### 7. Record the telemetry — this is not optional
+
+A loop without feedback cannot tell a mature axis from an untested one, and both look like
+"no findings". Every run appends one line to `drive/runs.jsonl`:
+
+```js
+import { recordRun } from "./telemetry.mjs";
+recordRun({
+  run,                                   // the full seven-axis assignment
+  findings: [{ text: "…", severity: "P1" }],   // what THIS run opened
+  closed: ["…"],                         // findings this run fixed, whenever they were opened
+  notes: "one line on what was driven",
+});
+```
+
+Then regenerate the scoreboard and read it before choosing anything next run:
+
+```bash
+node drive/scoreboard.mjs
+```
+
+It reports, per axis value: runs, P1/P2/P3 opened, fixes landed, **yield** (findings per run),
+**dry streak** (runs since it last found anything), days since its last finding, and a verdict —
+`untested`, `thin`, `fertile — burn it more`, `productive`, `cooling`, `mature — consider
+retiring`. A long dry streak with twenty runs behind it means field-tested; the same streak with
+two runs behind it means untested. Deciding which axis to burn and which to retire is the whole
+point, and it is impossible without this record.
+
+### 8. Report
 
 ```js
 recordRun(runKey(run), { findings });   // persona/flow/strategy/surface/state/tier/entry
