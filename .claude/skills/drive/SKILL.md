@@ -30,26 +30,32 @@ node drive/coverage.mjs
 If the dev server is down, start it (`pnpm dev`) before anything else — the harness fails fast
 on this, but a dead server wastes a signup.
 
-### 2. Choose the road — this is the part that needs judgement
+### 2. Take the next row of the locked plan
 
-`coverage.mjs` prints three dimensions:
+The search space is seven axes (`drive/axes.mjs`): **persona** (who drives), **flow** (what they
+are doing), **strategy** (what kind of question is asked), **surface** (where the output lands),
+**state** (what shape the account is in), **tier**, and **entry** (how they arrived).
 
-- **persona** (`drive/personas.mjs`) — who is driving; a defect is only visible to someone whose
-  expectations it violates
-- **flow** (`drive/flows.mjs`) — what they are trying to get done
-- **strategy** (`drive/strategies.mjs`) — what KIND of question is being asked
+Crossed fully that is hundreds of thousands of runs. `drive/plan.md` is a pairwise covering set —
+**88 runs that contain every reachable pair** — so "we have covered the space" is a claim that can
+actually be reached and checked. `coverage.mjs` prints the next unticked row.
 
-Pick deliberately, and say why in one line before you start:
+Follow the plan. Deviate only for a reason you can state in one line, such as:
 
-- An **untried strategy** beats an untouched cell of a strategy already used. Seven strategies
-  exist; a persona × flow pair only varies two of the three dimensions.
-- **Metamorphic** is the highest-value untried one for this product: Rizq has no ground truth for
-  a price, so relations ("more scope must not price lower") are the only oracle available. The
-  most expensive defect ever shipped here — every proposal priced at the band ceiling — was
-  invisible to every other kind of question.
-- Prefer flows that carry **money, a legal obligation, or something a client sees**.
-- If the ledger shows a flow driven only by one persona, a different persona on the same flow is
-  cheap and often productive.
+- a P1 from the last run needs its flow re-driven (that outranks new coverage)
+- the row is blocked by something broken, in which case say so and take the next one
+
+Two notes on judgement within a row:
+
+- **Metamorphic** is the highest-value strategy for this product: Rizq has no ground truth for a
+  price, so relations ("more scope must not price lower") are the only oracle available. The most
+  expensive defect ever shipped here — every proposal priced at the band ceiling — was invisible
+  to every other kind of question.
+- Prefer to spend the run's depth on **money, a legal obligation, or something a client sees**.
+
+**Adding an axis is allowed but expensive**: it reopens the search space, invalidates the plan,
+and resets the dry counter. Do it when a defect class genuinely does not fit the seven — and say
+that is what you are doing, rather than slipping it in.
 
 ### 3. Drive
 
@@ -114,18 +120,19 @@ Write the grade into the ledger entry.
 ### 7. Record and report
 
 ```js
-recordRun(`${persona}/${flow}/${strategy}`, { findings });
+recordRun(runKey(run), { findings });   // persona/flow/strategy/surface/state/tier/entry
 ```
 
-Then update `drive/ledger.md` prose if the run changed what is known, and commit. Report to the
+Then tick the row in `drive/plan.md`, update `drive/ledger.md` prose if the run changed what is
+known, and commit. Report to the
 user in caveman: what you drove, what you found, what you verified, what you fixed, what you
 left and why.
 
 ## When to stop looping
 
-Do not loop "until there are no defects" — there will always be a P3. Stop when **three
-consecutive iterations produce no new confirmed P1 or P2**, and say so plainly rather than
-manufacturing work to look busy.
+Do not loop "until there are no defects" — there will always be a P3. The space is exhausted when
+**every row of `drive/plan.md` is ticked** AND **three consecutive runs produced no new confirmed
+P1 or P2**. Say that plainly rather than manufacturing work to look busy.
 
 Stop early and escalate when:
 

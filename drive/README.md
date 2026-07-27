@@ -62,6 +62,27 @@ earlier one already noticed.
 6. **Record the run** with `recordRun(assignment.key, { findings })`, so the next iteration
    starts where this one stopped.
 
+## The locked search space
+
+Seven axes (`axes.mjs`), closed on purpose: every earlier pass "finished" and then found more the
+moment someone invented a new way of looking, so "done" never meant anything. Adding an axis now
+reopens the search and resets the dry counter — allowed, but deliberate.
+
+Crossed fully they are hundreds of thousands of runs. `plan.md` is a **pairwise covering set: 88
+runs containing every reachable pair**, with impossible combinations excluded by `isValid()` (an
+anonymous visitor cannot log income; a DOCX exists only for a proposal). A row nobody can execute
+is worse than a missing one, because a skipped row still looks covered.
+
+| axis | varies |
+|---|---|
+| persona | who drives — device, pace, what they are suspicious of |
+| flow | what they are trying to get done |
+| strategy | what kind of question is asked |
+| surface | where the output lands — screen, print, DOCX, share page, CSV |
+| state | empty, minimal, realistic, heavy, unicode-edge, degraded profile |
+| tier | anon, free, exhausted, pro, lapsed pro |
+| entry | direct URL, in-app, shared link, back/refresh mid-flow, guided context |
+
 ## Three axes, not one
 
 | axis | file | varies |
