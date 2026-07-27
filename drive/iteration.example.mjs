@@ -1,79 +1,101 @@
 /**
- * One Ralph-loop iteration, end to end.
+ * One iteration, end to end — the shape every run copies.
  *
  *   node drive/iteration.example.mjs
  *
- * The ledger names a persona and a flow; this script drives that pair. An iteration replaces
- * the "work" section with whatever the assigned flow calls for and keeps everything else:
- *
- *   1. ask the ledger which person should drive what, so an identical prompt lands somewhere
- *      new every run — six personas × ten flows is sixty distinct runs before anything repeats
- *   2. arrive as that person: their device, their locale, their pace
- *   3. do the work through the forms; the doing is itself under test
- *   4. check the product against itself and against the database
- *   5. review how it LOOKS and BEHAVES, not just what it stored
- *   6. run the standing sweeps, then record the run
+ * It takes the next unticked row of the locked plan, drives it, records what it found with
+ * severities, ticks the row, and leaves the scoreboard able to say whether that combination is
+ * worth driving again. The "work" section is the only part an iteration rewrites: what a
+ * `veteran` does on `proposal-to-client` is not what a `rusher` does on `recovery`.
  */
 import { open } from "./session.mjs";
 import { standardSweeps } from "./sweeps.mjs";
-import { addClient, logIncome, parseFigure } from "./work.mjs";
-import { nextAssignment, recordRun } from "./ledger.mjs";
-import { FLOW_NAMES, flowByName } from "./flows.mjs";
-import { PERSONA_NAMES, personaByName, sessionOptions } from "./personas.mjs";
 import { uxReview } from "./ux.mjs";
+import { addClient, logIncome, parseFigure } from "./work.mjs";
+import { nextPlanRow, tickPlanRow, planProgress } from "./plan.mjs";
+import { recordRun } from "./telemetry.mjs";
+import { personaByName, sessionOptions } from "./personas.mjs";
+import { flowByName } from "./flows.mjs";
+import { strategyByName } from "./strategies.mjs";
+import { runKey } from "./axes.mjs";
 
-const assignment = nextAssignment(PERSONA_NAMES, FLOW_NAMES);
-const persona = personaByName(assignment.persona);
-const flow = flowByName(assignment.flow);
-const stamp = new Date().toISOString().slice(11, 19);
+const row = nextPlanRow();
+if (!row) {
+  console.log("Every plan row is ticked. If three consecutive runs also found no new P1/P2,");
+  console.log("the search space is exhausted — say so instead of manufacturing work.");
+  process.exit(0);
+}
 
+const persona = personaByName(row.run.persona);
+const flow = flowByName(row.run.flow);
+const strategy = strategyByName(row.run.strategy);
+const progress = planProgress();
 const oneLine = (s) => s.replace(/\s+/g, " ").trim();
-console.log(`assignment: ${persona.name} × ${flow.name}`);
-console.log(`  who: ${persona.label}`);
-console.log(`  behaves: ${oneLine(persona.behaviour)}`);
-console.log(`  watches: ${oneLine(persona.watches)}`);
-console.log(`  flow: ${oneLine(flow.hint)}\n`);
+
+console.log(`plan row ${row.n} of ${progress.total} (${progress.done} ticked)`);
+console.log(`  ${runKey(row.run)}\n`);
+console.log(`  who      ${persona.label}`);
+console.log(`  behaves  ${oneLine(persona.behaviour)}`);
+console.log(`  watches  ${oneLine(persona.watches)}`);
+console.log(`  flow     ${oneLine(flow.hint)}`);
+console.log(`  asks     ${strategy.question}`);
+console.log(`  because  ${oneLine(strategy.why)}\n`);
+for (const relation of strategy.relations.slice(0, 4)) console.log(`   · ${relation}`);
+console.log("");
+
+const findings = [];
+/** Grade as you go: P1 money/legal/privacy/untruth, P2 self-contradiction, P3 cosmetic. */
+const found = (severity, text) => findings.push({ severity, text });
 
 await open(async (tools) => {
-  const { page, go, text, note, db, findings } = tools;
+  const { page, go, text, note, db } = tools;
   const mobile = persona.device.mobile;
+  const stamp = new Date().toISOString().slice(11, 19);
 
-  // ── work: what this person came to do ──────────────────────────────────────
-  // (Replace this section per flow. Shown here: income-and-hadaf.)
+  // ── work — REWRITE THIS PART for the assigned flow ─────────────────────────
   const client = await addClient(tools, `عميل ${persona.name} ${stamp}`);
-  if (!client.id) note(`saving a client did not land on its page (stayed at ${client.landedOn})`);
-
-  const income = await logIncome(tools, { amount: 4500, title: `مشروع ${stamp}` });
-  if (income.landedOn.includes("/income/new")) {
-    note("logging income left the freelancer on the form — the duplicate-save trap");
+  if (!client.id && note(`saving a client did not land on its page (${client.landedOn})`)) {
+    found("P2", "client save does not navigate to the created client");
   }
 
-  // ── does the product agree with itself? ────────────────────────────────────
+  const income = await logIncome(tools, { amount: 4500, title: `مشروع ${stamp}` });
+  if (income.landedOn.includes("/income/new") && note("logging income left a blank form")) {
+    found("P2", "logging income leaves the freelancer on a blank form (duplicate-save trap)");
+  }
+
+  // ── does the product agree with itself and with the database? ──────────────
   const { client: sb, userId } = await db();
   const { data: gigs } = await sb.from("gigs").select("amount_sar").eq("user_id", userId);
   const stored = (gigs ?? []).reduce((sum, g) => sum + Number(g.amount_sar), 0);
 
   await go("/ar/income");
-  const shownForYear = parseFigure((await text()).match(/هذا العام\n([^\n]+)/)?.[1]);
-  if (stored > 0 && shownForYear != null && Math.abs(shownForYear - stored) > 1) {
-    note(`income ledger shows ${shownForYear} for the year while the database holds ${stored}`);
+  const shown = parseFigure((await text()).match(/هذا العام\n([^\n]+)/)?.[1]);
+  if (stored > 0 && shown != null && Math.abs(shown - stored) > 1) {
+    if (note(`ledger shows ${shown} for the year, database holds ${stored}`)) {
+      found("P1", "income ledger disagrees with the database");
+    }
   }
 
-  await go("/ar/hadaf");
-  if (stored > 0 && /ما عندك مشاريع مسجلة/.test(await text())) {
-    note("HADAF reports no recorded projects while income exists — the stale-cache defect");
-  }
-
-  // ── how does it look and behave? ───────────────────────────────────────────
-  // Reviewed on the screens this person actually stood on, at their device size.
-  for (const route of ["/ar/dashboard", "/ar/income", "/ar/invoices/new", "/ar/hadaf"]) {
+  // ── how does it look, at this persona's device size? ───────────────────────
+  for (const route of ["/ar/dashboard", "/ar/income"]) {
     await go(route, 3500);
-    for (const finding of await uxReview(page, { mobile, route })) note(finding);
+    for (const finding of await uxReview(page, { mobile, route })) {
+      if (note(finding)) found("P3", finding);
+    }
   }
 
   // ── standing sweeps ────────────────────────────────────────────────────────
-  for (const finding of await standardSweeps(tools)) note(finding);
+  for (const finding of await standardSweeps(tools)) {
+    if (note(finding)) found("P2", finding);
+  }
 
-  recordRun(assignment.key, { findings });
-  console.log(`ledger updated: ${assignment.key}`);
+  // ── record, then tick — never the other way round ──────────────────────────
+  recordRun({
+    run: row.run,
+    findings,
+    closed: [],
+    notes: `plan row ${row.n}`,
+  });
+  tickPlanRow(row.n);
+  console.log(`\nrecorded row ${row.n}: ${findings.length} finding(s). Run scoreboard.mjs next.`);
 }, sessionOptions(persona));

@@ -1,6 +1,6 @@
 ---
 name: drive
-description: Drive Rizq as a real user through drive/ (Playwright, real browser, real Supabase) to find defects nobody has filed — choosing a persona, a flow and a testing strategy from the coverage ledger. Use when asked to test the app, run the loop, hunt for bugs, check UX/UI, or find what a pass has not covered. Also use for a Ralph-loop iteration.
+description: Drive Rizq as a real user through drive/ (Playwright, real browser, real Supabase) to find defects nobody has filed. Takes the next row of a locked seven-axis plan, does a freelancer's work through the real forms, checks the product against itself and the database, reviews UI/UX, then records per-axis telemetry. Use when asked to test or QA the app, run the loop or a Ralph-loop iteration, hunt for bugs, review UX/UI, or find what earlier passes did not cover.
 ---
 
 # Driving Rizq
@@ -75,7 +75,8 @@ that is what you are doing, rather than slipping it in.
 
 ### 3. Drive
 
-Write a short script (in `drive/` or the scratchpad) modelled on `drive/iteration.example.mjs`:
+Copy `drive/iteration.example.mjs` and rewrite only its **work** section for the assigned flow —
+everything around it (plan row, telemetry, ticking, sweeps) is already correct and must stay:
 
 ```js
 import { open } from "./session.mjs";
