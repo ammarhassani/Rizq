@@ -16,7 +16,7 @@ dry counter: allowed, but a deliberate decision rather than a quiet improvement.
 | # | persona | flow | strategy | surface | state | tier | entry | done |
 |---|---|---|---|---|---|---|---|---|
 | 1 | veteran | proposal-to-client | fuzz | share-anonymous | minimal | free | in-app-navigation | 2026-07-27 |
-| 2 | veteran | clients-and-projects | metamorphic | screen-desktop | empty | pro-lapsed | shared-link |  |
+| 2 | veteran | clients-and-projects | metamorphic | screen-desktop | empty | pro-lapsed | shared-link | 2026-07-27 |
 | 3 | veteran | invoice-and-vat | differential | print-pdf | degraded-profile | pro-active | direct-url |  |
 | 4 | veteran | income-and-hadaf | adversarial | csv-export | edge-unicode | free-exhausted | back-or-refresh-midflow |  |
 | 5 | newcomer | proposal-to-client | state-machine | screen-desktop | heavy | pro-active | back-or-refresh-midflow |  |

@@ -109,18 +109,27 @@ node drive/coverage.mjs    # what has been driven, and what nobody has
 
 ## Running the loop
 
-Invoke the skill (`.claude/skills/drive/`), which tells the agent how to lead a session —
-choose the road, drive, verify, fix or record, update the ledger:
+Invoke the skill (`.claude/skills/ammar-loop/`), which tells the agent how to lead a session —
+resume or start, take the next plan row, drive, verify, file, record:
 
 ```
-/drive
+/ammar-loop
 ```
 
-As a Ralph loop:
+As a loop:
 
 ```
-/loop 30m /drive
+/loop 30m /ammar-loop
 ```
+
+**The loop never fixes anything.** It files findings into `basket.md` with a reference number,
+title, description, severity and evidence; remediation is a separate, reviewed decision. Pass 4
+found six defects and five were created by pass 3's own fixes — discovery and change do not
+belong in the same pass.
+
+Every invocation is tracked in `invocations.jsonl` and every step is written *before* the work
+it names, so a dropped connection or a dead battery leaves a record that reads "not done" rather
+than "half done". The next invocation resumes it.
 
 Intervals under ~10 minutes are a false economy: Supabase rate-limits signups to 5 per 5
 minutes per IP, and each iteration burns real DeepSeek tokens. The driver reuses its account
@@ -165,6 +174,8 @@ between runs, so that limit only bites when `drive/.auth` has been cleared.
 | `ux.mjs` | The measurable half of "looks wrong" — layout, touch, focus, dead ends, axe |
 | `ledger.mjs` / `ledger.md` | The loop's memory: coverage, open findings, what is known and accepted |
 | `axes.mjs` / `plan.md` | The closed search space and its 88-run pairwise covering set |
+| `basket.mjs` / `basket.md` | Findings, filed with a reference and never fixed here |
+| `invocation.mjs` / `invocations.jsonl` | Session ids, step checkpoints, crash-safe resume |
 | `telemetry.mjs` / `runs.jsonl` | One record per run — what it drove, opened, closed |
 | `scoreboard.mjs` / `scoreboard.md` | Per-axis yield, dry streak and verdict: burn it or retire it |
 | `iteration.example.mjs` | The whole shape, runnable as-is |

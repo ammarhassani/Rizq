@@ -1,0 +1,12 @@
+{"at":"2026-07-27T12:04:19.734Z","session":"S-0001","step":"started"}
+{"at":"2026-07-27T12:04:19.736Z","session":"S-0001","step":"row-claimed","planRow":2}
+{"at":"2026-07-27T12:05:15.393Z","session":"S-0001","step":"driven","planRow":2}
+{"at":"2026-07-27T12:09:31.466Z","session":"S-0001","step":"checked","planRow":2,"findings":4}
+{"at":"2026-07-27T12:09:31.472Z","session":"S-0001","step":"filed","planRow":2,"findings":4}
+{"at":"2026-07-27T12:09:31.473Z","session":"S-0001","step":"row-ticked","planRow":2}
+{"at":"2026-07-27T12:09:31.473Z","session":"S-0001","step":"completed","findings":4,"note":""}
+{"at":"2026-07-27T12:09:58.379Z","session":"S-0002","step":"started"}
+{"at":"2026-07-27T12:09:58.379Z","session":"S-0002","step":"row-claimed","planRow":99}
+{"at":"2026-07-27T12:09:58.380Z","session":"S-0002","step":"resumed","planRow":99}
+{"at":"2026-07-27T12:09:58.380Z","session":"S-0002","step":"aborted","note":"crash-safety self-test"}
+{"at":"2026-07-27T12:10:36.522Z","session":"S-0002","step":"completed","findings":0,"note":"crash-safety self-test, not a real run — plan row 99 is not a real row"}
