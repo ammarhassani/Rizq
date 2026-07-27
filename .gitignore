@@ -64,3 +64,6 @@ next-env.d.ts
 
 # stray design bundles (content lives in docs/design/board/)
 *.zip
+
+# Ralph-loop driver: a real disposable account + its browser profile and screenshots
+/drive/.auth/
