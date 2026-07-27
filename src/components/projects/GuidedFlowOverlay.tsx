@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { X, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Lifecycle, LifecycleStageKey } from "@/lib/projects/lifecycle";
+import { fmtCount } from "@/lib/format/number";
 
 const STAGE_TITLE_KEY: Record<LifecycleStageKey, string> = {
   proposal: "stageProposalTitle",
@@ -95,7 +96,7 @@ export function GuidedFlowOverlay({
           </div>
 
           <p className={`text-xs text-rizq-ink-soft/70 ${font}`}>
-            {t("guidedStepOf", { current: stepNo, total: lifecycle.stages.length })}
+            {t("guidedStepOf", { current: fmtCount(stepNo, locale), total: fmtCount(lifecycle.stages.length, locale) })}
           </p>
           {currentTitleKey && (
             <p className={`text-sm font-bold text-amber-900 leading-snug mb-3 ${font}`}>{t(currentTitleKey)}</p>

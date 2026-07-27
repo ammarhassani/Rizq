@@ -8,6 +8,7 @@ import { completeOnboarding } from "@/app/actions/onboarding/completeOnboarding"
 import { getProfileSnapshot } from "@/app/actions/onboarding/getProfileSnapshot";
 import { useRouter } from "@/i18n/navigation";
 import type { ProfileSnapshot, StepProps } from "./types";
+import { fmtCount } from "@/lib/format/number";
 
 export function StepReview({ locale, profile, onBack, onNext, onSkip }: StepProps) {
   const t = useTranslations("Onboarding.v2.steps.review");
@@ -112,7 +113,7 @@ export function StepReview({ locale, profile, onBack, onNext, onSkip }: StepProp
           <span className={`text-sm font-medium text-rizq-ink ${font}`}>
             {t("completenessLabel")}
           </span>
-          <span className="text-sm font-bold text-rizq-green">{pct}%</span>
+          <span className="text-sm font-bold text-rizq-green">{fmtCount(pct, locale)}%</span>
         </div>
         <div className="h-2 rounded-full bg-rizq-gold/20 overflow-hidden">
           <div

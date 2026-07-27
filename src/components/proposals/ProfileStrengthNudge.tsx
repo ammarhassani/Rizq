@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { OPTIMAL_THRESHOLD } from "@/lib/profile/strength";
+import { fmtCount } from "@/lib/format/number";
 
 /**
  * Small profile-strength nudge (feature 009) shown where the retired studio-profile button was.
@@ -27,7 +28,7 @@ export function ProfileStrengthNudge({ locale, strength }: Props) {
     >
       <Sparkles size={16} strokeWidth={1.7} className="text-rizq-gold shrink-0" aria-hidden="true" />
       <span className="min-w-0">
-        <span className="tabular font-semibold text-rizq-green">{strength}%</span>{" "}
+        <span className="tabular font-semibold text-rizq-green">{fmtCount(strength, locale)}%</span>{" "}
         {tI18n("profileStrengthCompleteStrongerWork")}
       </span>
       <ArrowRight size={15} className="shrink-0 rtl:rotate-180" aria-hidden="true" />

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
-import { fmtCount } from "@/lib/format/number";
+import { fmtCount, fmtYear } from "@/lib/format/number";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
 import { GigStatusQuickEdit } from "./GigStatusQuickEdit";
@@ -285,7 +285,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
         </div>
         <div className="nm-raised rounded-[20px] bg-[var(--raised)] px-[22px] py-5">
           <div className={`mb-4 text-xs font-semibold text-[var(--content)] ${font}`}>
-            {t("monthlyIncome")} · {stats.year}
+            {t("monthlyIncome")} · {fmtYear(stats.year, locale)}
           </div>
           <div className="flex h-[150px] items-end gap-3.5">
             {stats.monthly.map((v, i) => {

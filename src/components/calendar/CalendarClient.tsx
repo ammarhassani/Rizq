@@ -20,6 +20,7 @@ import {
   formatDateKey,
   type CalendarEvent,
 } from "@/lib/calendar/group";
+import { fmtCount } from "@/lib/format/number";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -396,7 +397,7 @@ function MonthView({
                     );
                   })}
                   {dayEvents.length > 3 && (
-                    <span className="text-[9px] text-rizq-ink-soft/50 leading-none">+{dayEvents.length - 3}</span>
+                    <span className="text-[9px] text-rizq-ink-soft/50 leading-none">+{fmtCount(dayEvents.length - 3, locale)}</span>
                   )}
                 </div>
               </button>

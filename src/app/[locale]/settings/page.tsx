@@ -17,6 +17,7 @@ import { listProviderConnections } from "@/app/actions/projects/integrations/con
 import { isGithubConfigured } from "@/lib/integrations/github";
 import { loadProfileSnapshot } from "@/lib/profile/snapshot";
 import { computeStrength } from "@/lib/profile/strength";
+import { fmtCount } from "@/lib/format/number";
 import { User, Crown, Calendar, ArrowLeft } from "lucide-react";
 
 type Params = { locale: string };
@@ -165,7 +166,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
                   {t("profileStrength")}
                 </span>
                 <span className="tabular font-sans text-sm font-bold text-rizq-green">
-                  {profileStrength}%
+                  {fmtCount(profileStrength, locale as "ar" | "en")}%
                 </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-rizq-gold/15">

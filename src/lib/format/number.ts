@@ -12,6 +12,18 @@ export function fmtCount(n: number, locale: "ar" | "en"): string {
   }).format(n);
 }
 
+/**
+ * A year, in the view's numerals but WITHOUT thousands grouping.
+ *
+ * `fmtCount(2026, "ar")` renders "٢٬٠٢٦" — a year is an identifier, not a quantity.
+ */
+export function fmtYear(year: number, locale: "ar" | "en"): string {
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    useGrouping: false,
+    maximumFractionDigits: 0,
+  }).format(year);
+}
+
 const ARABIC_INDIC = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
 
 /**

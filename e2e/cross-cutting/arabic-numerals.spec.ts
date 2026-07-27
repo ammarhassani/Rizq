@@ -39,25 +39,54 @@ for (const route of ARABIC_ROUTES) {
   });
 }
 
-// Money and counts live on these three. HADAF's headline read "شهر 1 من ٣" — one numeral
-// system beside the other in a single sentence — because next-intl formats a raw number
-// with plain "ar", which CLDR resolves to Latin digits.
-for (const route of ["/ar/dashboard", "/ar/hadaf", "/ar/income"] as const) {
+/**
+ * Routes whose visible numbers are the APP's own — counts, percentages, money, steps.
+ *
+ * Dashboard, proposals and the pricing tool are deliberately absent: they render the
+ * freelancer's and their client's own words ("موقع 25 صفحة"), and a title someone typed is
+ * not the app mixing numeral systems.
+ *
+ * A sweep of these found Latin digits in seven places at once — the profile-strength meter
+ * and its "+N%" list, the VAT label, the income chart's year, the guided-wizard step
+ * counter, the calendar's overflow badge and the catalog tab counts — every one of them a
+ * figure the app itself printed.
+ */
+const APP_CHROME_ROUTES = [
+  "/ar/hadaf",
+  "/ar/income",
+  "/ar/invoices/new",
+  "/ar/settings",
+  "/ar/settings/profile",
+  "/ar/catalog",
+  "/ar/calendar",
+  "/ar/projects/start",
+  "/ar/upgrade",
+] as const;
+
+for (const route of APP_CHROME_ROUTES) {
   test(`${route} uses one numeral system for its own figures`, async ({ page }) => {
     await gotoReady(page, route);
 
-    // Latin digits are legitimate inside emails, URLs, brand names and reference codes, so
-    // only tokens free of Latin letters and identifier punctuation are examined — the same
-    // rule the app's own digit normaliser uses.
+    // Walk text nodes rather than innerText: a number glued to its label ("التسليم0") hides
+    // from a whitespace split. Latin digits are legitimate in emails, URLs, phone prefixes
+    // and reference codes, so nodes carrying Latin letters or identifier punctuation are
+    // skipped — the same rule the app's own digit normaliser uses.
     const offenders = await page.evaluate(() => {
-      const text = (document.body as HTMLElement).innerText;
-      return text
-        .split(/\s+/)
-        .filter((token) => /[0-9]/.test(token))
-        .filter((token) => !/[A-Za-z@:/._#\\-]/.test(token))
-        .slice(0, 10);
+      const out: string[] = [];
+      const walk = (el: Node) => {
+        for (const node of Array.from(el.childNodes)) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const text = (node.textContent ?? "").trim();
+            if (/[0-9]/.test(text) && !/[A-Za-z@:/._#+\\-]/.test(text)) out.push(text.slice(0, 40));
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            walk(node);
+          }
+        }
+      };
+      walk(document.body);
+      return [...new Set(out)].slice(0, 10);
     });
 
-    expect(offenders, `Latin digits in Arabic figures: ${offenders.join(", ")}`).toEqual([]);
+    expect(offenders, `Latin digits in Arabic figures: ${offenders.join(" | ")}`).toEqual([]);
   });
 }

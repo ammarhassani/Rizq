@@ -1,6 +1,7 @@
 import { type StrengthItem } from "@/lib/profile/strength";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, Circle } from "lucide-react";
+import { fmtCount } from "@/lib/format/number";
 
 /**
  * Profile-strength meter + "what's still missing (+N%)" checklist (feature 009).
@@ -31,7 +32,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
         <span className={`text-sm font-semibold text-rizq-ink ${font}`}>
           {tI18n("profileStrength")}
         </span>
-        <span className="tabular font-sans text-lg font-bold text-rizq-green">{strength}%</span>
+        <span className="tabular font-sans text-lg font-bold text-rizq-green">{fmtCount(strength, locale)}%</span>
       </div>
 
       <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-rizq-gold/15">
@@ -53,7 +54,7 @@ export function ProfileStrengthPanel({ locale, strength, items }: Props) {
                   <Circle className="h-3.5 w-3.5 text-rizq-ink-soft/40" aria-hidden="true" />
                   {isAr ? m.label_ar : m.label_en}
                 </span>
-                <span className="tabular text-xs font-medium text-rizq-green">+{m.weight}%</span>
+                <span className="tabular text-xs font-medium text-rizq-green">+{fmtCount(m.weight, locale)}%</span>
               </li>
             ))}
           </ul>

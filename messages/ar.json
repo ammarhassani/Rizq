@@ -557,7 +557,7 @@
           "paymentDetails": "تفاصيل الدفع (IBAN أو معرّف)",
           "paymentDetailsPlaceholder": "SA...",
           "warrantyDays": "أيام ضمان ما بعد التسليم",
-          "warrantyDaysHint": "0 = بدون ضمان"
+          "warrantyDaysHint": "٠ = بدون ضمان"
         },
         "goals": {
           "title": "الأهداف والتفضيلات",
@@ -1566,7 +1566,7 @@
       "unitPriceLabel": "سعر الوحدة",
       "lineTotalLabel": "الإجمالي",
       "taxAndFeesLabel": "الضريبة والرسوم",
-      "vatToggleLabel": "ضريبة القيمة المضافة (15%)",
+      "vatToggleLabel": "ضريبة القيمة المضافة (١٥%)",
       "vatToggleHint": "تُطبَّق على البنود والرسوم.",
       "vatBlockedNotRegistered": "لا يمكن إضافة ضريبة القيمة المضافة لأن حسابك غير مسجّل في الضريبة.",
       "vatBlockedMissingNumber": "أنت مسجّل في الضريبة لكن لم تُسجّل رقمك الضريبي، والفاتورة الضريبية غير صالحة بدونه.",

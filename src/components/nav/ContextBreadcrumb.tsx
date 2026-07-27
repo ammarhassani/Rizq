@@ -7,6 +7,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Briefcase } from "lucide-react";
+import { fmtCount } from "@/lib/format/number";
 
 export async function ContextBreadcrumb({
   locale,
@@ -38,7 +39,7 @@ export async function ContextBreadcrumb({
       </Link>
       {stepNo && totalSteps && (
         <span className={`text-rizq-ink-soft/60 ${font}`}>
-          {t("guidedStepOf", { current: stepNo, total: totalSteps })}
+          {t("guidedStepOf", { current: fmtCount(stepNo, locale), total: fmtCount(totalSteps, locale) })}
         </span>
       )}
     </div>

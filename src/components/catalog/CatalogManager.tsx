@@ -30,6 +30,7 @@ import { setFeePresetsActive, deleteFeePresets, importFeePresets, type CreatedFe
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { toCsv, csvToRecords, parseMoneyCell } from "@/lib/catalog/csv";
 import { cn } from "@/lib/utils";
+import { fmtCount } from "@/lib/format/number";
 
 export type CatalogItem = CreatedItem & { is_active: boolean };
 export type CatalogFee = CreatedFeePreset & { is_active: boolean };
@@ -265,7 +266,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
       )}
     >
       <span>{label}</span>
-      <span className={cn("tabular font-sans inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs", tab === key ? "bg-rizq-cream/25" : "bg-rizq-ink/8 text-rizq-ink-soft")}>{count}</span>
+      <span className={cn("tabular font-sans inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs", tab === key ? "bg-rizq-cream/25" : "bg-rizq-ink/8 text-rizq-ink-soft")}>{fmtCount(count, locale)}</span>
     </button>
   );
 
