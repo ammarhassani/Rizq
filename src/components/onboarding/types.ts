@@ -64,7 +64,8 @@ export interface ProfileSnapshot {
   current_project_rate_range: { min: number; max: number } | null;
   previous_year_income_sar: number | null;
   income_goal_monthly_sar: number | null;
-  rate_confidence: "exact" | "approximate" | "estimate";
+  /** null until the freelancer picks one — the column has no default (20260727083200). */
+  rate_confidence: "exact" | "approximate" | "estimate" | null;
   bahr_profile_url: string | null;
   mostaql_profile_url: string | null;
   khamsat_profile_url: string | null;

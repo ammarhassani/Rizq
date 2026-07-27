@@ -8,7 +8,7 @@ import {
   buildDeterministicInsights,
   buildBusinessInsightsPrompt,
   BusinessInsightsSchema,
-  stripEmDashes,
+  normalizeInsightText,
 } from "@/lib/ai/businessInsights";
 import type { BusinessInsightsCtx } from "@/lib/ai/businessInsights";
 
@@ -170,8 +170,8 @@ async function generateBusinessInsights(
     return {
       insights: result.object.insights.map((i) => ({
         ...i,
-        ar: stripEmDashes(i.ar, "ar"),
-        en: stripEmDashes(i.en, "en"),
+        ar: normalizeInsightText(i.ar, "ar"),
+        en: normalizeInsightText(i.en, "en"),
       })),
     };
   } catch (err) {

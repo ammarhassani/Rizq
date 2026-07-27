@@ -189,8 +189,14 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   the hostname, so the form and Zod disagreed — now ONE rule over the parsed parts, shared by
   both); VAT `%`, milestone `%` and fee `%` printed Latin digits on Arabic documents; a catalog
   price with 3 decimals reached the money field; the dashboard client count printed `1`.
-  **Open, needs a migration:** `users.rate_confidence` is `NOT NULL DEFAULT 'approximate'`, so
-  the row records a confidence nobody chose (the UI no longer shows it as chosen). Founder call.
+  **Both pass-4 leftovers closed 2026-07-27.** `users.rate_confidence` now has no default and
+  is nullable (migration `20260727083200`), with the 48 rows holding `'approximate'` nulled —
+  none was evidence of a choice (`'exact'` kept). `snapshot.ts` had been coercing null back to
+  `'approximate'` on read; `rateConfidence.test.ts` now guards every layer. Arabic insight prose
+  is converted to Arabic-Indic digits deterministically by `toArabicIndicDigits` inside
+  `normalizeInsightText` (was `stripEmDashes`) — a prompt instruction alone was a hope, and the
+  non-AI fallback formats en-US regardless of locale. Applied at render, so already-cached
+  insights are fixed without regenerating.
 Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in
 Arabic twice (pass 3 + the pass-4 re-drive on a fresh account).
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.

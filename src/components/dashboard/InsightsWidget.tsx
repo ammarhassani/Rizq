@@ -6,7 +6,7 @@ import { ThumbsUp, ThumbsDown, RefreshCw, Sparkles, ChevronDown } from "lucide-r
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { getBusinessInsightsAction, submitInsightFeedbackAction } from "@/app/actions/dashboard/insights";
 import type { InsightsActionResult } from "@/app/actions/dashboard/insights";
-import { BusinessInsightsSchema, stripEmDashes } from "@/lib/ai/businessInsights";
+import { BusinessInsightsSchema, normalizeInsightText } from "@/lib/ai/businessInsights";
 
 /** localStorage key for the collapsed/expanded preference (persists across reloads). */
 const COLLAPSE_KEY = "rizq.insights.collapsed";
@@ -33,8 +33,8 @@ const kindDot: Record<InsightItem["kind"], string> = {
  * already strips em dashes on persist, but partial stream chunks bypass that). */
 function cleanInsight(i: Partial<InsightItem> | undefined): InsightItem | null {
   if (!i) return null;
-  const ar = typeof i.ar === "string" ? stripEmDashes(i.ar, "ar") : "";
-  const en = typeof i.en === "string" ? stripEmDashes(i.en, "en") : "";
+  const ar = typeof i.ar === "string" ? normalizeInsightText(i.ar, "ar") : "";
+  const en = typeof i.en === "string" ? normalizeInsightText(i.en, "en") : "";
   if (!ar && !en) return null;
   return { ar, en, kind: i.kind ?? "general" };
 }

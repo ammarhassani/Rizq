@@ -2,13 +2,14 @@
  * Business-insights contract for the dashboard "Rizq Insights" card.
  *
  * This module is CLIENT-SAFE: the schema, types, prompt builder, deterministic
- * fallback, and `stripEmDashes` sanitizer carry no server-only dependency, so
- * the InsightsWidget can import `BusinessInsightsSchema` + `stripEmDashes` for
+ * fallback, and `normalizeInsightText` sanitizer carry no server-only dependency,
+ * so the InsightsWidget can import `BusinessInsightsSchema` + `normalizeInsightText` for
  * its `useObject` streaming pass. The DeepSeek call lives in the server action
  * (actions/dashboard/insights.ts) and the streaming route, never here, so this
  * module carries no server-only dependency.
  */
 import { z } from "zod";
+import { toArabicIndicDigits } from "@/lib/format/number";
 
 export type BusinessInsightsCtx = {
   proposals: Array<{ title: string | null; clientName: string | null; status: string; amount: number | null; date: string | null }>;
@@ -39,12 +40,23 @@ function fmtNum(n: number): string {
 }
 
 /**
- * Replace em/en dashes (a model-output tic the founder dislikes) with a comma.
- * Only touches — and – ; regular hyphens in ranges like "1000-1500" are kept.
+ * Normalise an insight sentence for the locale it will be read in.
+ *
+ * Every producer routes through here — the AI call, the streaming draft route, the widget
+ * rendering a cached or deterministic insight — so the rules apply once, wherever the text
+ * came from:
+ *
+ *  - em/en dashes (a model-output tic the founder dislikes) become a comma. Regular hyphens
+ *    in ranges like "1000-1500" are kept.
+ *  - Arabic sentences get Arabic-Indic digits. These strings are assembled outside a
+ *    formatter (a model wrote them, or a template used an en-US one), so they arrived with
+ *    Latin digits and sat beside Arabic-Indic figures on the same dashboard. The prompt asks
+ *    for Arabic-Indic; this makes it true whether or not the model complied.
  */
-export function stripEmDashes(s: string, locale: "ar" | "en"): string {
+export function normalizeInsightText(s: string, locale: "ar" | "en"): string {
   const sep = locale === "ar" ? "، " : ", ";
-  return s.replace(/\s*[—–]\s*/g, sep).replace(/\s{2,}/g, " ").trim();
+  const dashed = s.replace(/\s*[—–]\s*/g, sep).replace(/\s{2,}/g, " ").trim();
+  return locale === "ar" ? toArabicIndicDigits(dashed) : dashed;
 }
 
 /**

@@ -53,7 +53,9 @@ export function buildProfileSnapshot(profile: Record<string, unknown> | null): P
     current_project_rate_range: (p.current_project_rate_range as { min: number; max: number } | null) ?? null,
     previous_year_income_sar: (p.previous_year_income_sar as number | null) ?? null,
     income_goal_monthly_sar: (p.income_goal_monthly_sar as number | null) ?? null,
-    rate_confidence: (p.rate_confidence as "exact" | "approximate" | "estimate" | null) ?? "approximate",
+    // null = not chosen. Defaulting here would put the lie back on the other side of the
+    // column: the row says nothing was picked, the snapshot would say "approximate".
+    rate_confidence: (p.rate_confidence as "exact" | "approximate" | "estimate" | null) ?? null,
     bahr_profile_url: (p.bahr_profile_url as string | null) ?? null,
     mostaql_profile_url: (p.mostaql_profile_url as string | null) ?? null,
     khamsat_profile_url: (p.khamsat_profile_url as string | null) ?? null,

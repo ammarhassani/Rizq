@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBusinessInsightsPrompt, buildDeterministicInsights, stripEmDashes } from "./businessInsights";
+import { buildBusinessInsightsPrompt, buildDeterministicInsights, normalizeInsightText } from "./businessInsights";
 import type { BusinessInsightsCtx } from "./businessInsights";
 
 const baseCtx: BusinessInsightsCtx = {
@@ -125,17 +125,46 @@ describe("buildDeterministicInsights (AI fallback)", () => {
   });
 });
 
-describe("stripEmDashes", () => {
+describe("normalizeInsightText", () => {
   it("replaces a spaced em dash with a comma (en) and Arabic comma (ar)", () => {
-    expect(stripEmDashes("an automated insight — not advice", "en")).toBe("an automated insight, not advice");
-    expect(stripEmDashes("تحليل آلي — ليس استشارة", "ar")).toBe("تحليل آلي، ليس استشارة");
+    expect(normalizeInsightText("an automated insight — not advice", "en")).toBe("an automated insight, not advice");
+    expect(normalizeInsightText("تحليل آلي — ليس استشارة", "ar")).toBe("تحليل آلي، ليس استشارة");
   });
 
   it("handles en dashes too and collapses extra spaces", () => {
-    expect(stripEmDashes("a – b", "en")).toBe("a, b");
+    expect(normalizeInsightText("a – b", "en")).toBe("a, b");
   });
 
   it("leaves regular hyphens in ranges untouched", () => {
-    expect(stripEmDashes("1000-1500 SAR", "en")).toBe("1000-1500 SAR");
+    expect(normalizeInsightText("1000-1500 SAR", "en")).toBe("1000-1500 SAR");
+  });
+
+  it("rewrites digits in Arabic insights so the card reads in one numeral system", () => {
+    // Both producers hand over Latin digits: the model writes prose, and the deterministic
+    // fallback formats with en-US. The dashboard shows these beside Arabic-Indic figures.
+    expect(normalizeInsightText("لا يوجد دخل مسجل خلال آخر 6 أشهر.", "ar")).toBe(
+      "لا يوجد دخل مسجل خلال آخر ٦ أشهر.",
+    );
+    expect(normalizeInsightText("لديك 3 فواتير متأخرة بقيمة 5,400 ريال.", "ar")).toBe(
+      "لديك ٣ فواتير متأخرة بقيمة ٥٬٤٠٠ ريال.",
+    );
+  });
+
+  it("leaves English insights in Latin digits", () => {
+    expect(normalizeInsightText("You have 3 overdue invoices.", "en")).toBe(
+      "You have 3 overdue invoices.",
+    );
+  });
+
+  it("normalises the deterministic fallback insights too", () => {
+    // These are built with an en-US formatter, so they need the same pass as model output.
+    // Identifier-shaped tokens (an ISO month key like "2026-06-01:") keep their digits by
+    // design — the rule is that plain figures in the prose must not stay Latin.
+    for (const insight of buildDeterministicInsights(baseCtx)) {
+      const prose = normalizeInsightText(insight.ar, "ar")
+        .split(/\s+/)
+        .filter((token) => !/[A-Za-z@:/\\_#]/.test(token));
+      expect(prose.join(" "), insight.ar).not.toMatch(/[0-9]/);
+    }
   });
 });

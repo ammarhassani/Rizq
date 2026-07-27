@@ -153,19 +153,33 @@ it from what is printed.
 `{clients.length}` rendered `1` beside Arabic-Indic figures. Extracted `fmtCount` to
 `lib/format/number.ts` (replacing a local copy in `HadafStreakBar`) and applied it.
 
-### P4-6 — `rate_confidence` is stamped by the database, not by the freelancer
+### P4-6 — `rate_confidence` was stamped by the database, not by the freelancer — CLOSED
 
-`users.rate_confidence` is `NOT NULL DEFAULT 'approximate'`, so **every account carries that
-value from creation**. The client no longer sends it unless chosen, but the row still records a
-confidence nobody picked — FR-015's "the stored row MUST match" is **not** met.
+`users.rate_confidence` was `NOT NULL DEFAULT 'approximate'`, so **every account carried that
+value from creation**. The client had stopped sending it unless chosen, but the row still
+recorded a confidence nobody picked, and FR-015's "the stored row MUST match" was not met.
 
-Half-fixed without a migration: `exact` and `estimate` can only have been chosen, so they still
-show as selected; `approximate` is indistinguishable from the column default and is therefore
-not shown as a selection. Verified on a fresh account — all three pills unpressed, and the row
-still reads `approximate`.
+Closed on 2026-07-27 with migration `20260727083200_rate_confidence_only_when_chosen`:
 
-**The durable fix needs a migration** (`DROP DEFAULT`, `DROP NOT NULL`) that this feature
-deliberately does not carry. Founder call.
+- `DROP DEFAULT` and `DROP NOT NULL`, so NULL can mean "not chosen";
+- a one-time backfill nulling the **48 rows** holding `'approximate'`. None of them was
+  evidence of a choice: the column default wrote it at signup, and the pre-fix rates step sent
+  its own `'approximate'` fallback on every save regardless of what was clicked. The single row
+  holding `'exact'` was preserved — that value could only have come from a deliberate click.
+  **This step is not recoverable from the row**; it was applied deliberately rather than leave
+  49 accounts asserting a choice that never happened.
+
+Two further places were re-introducing the same claim above the database and are fixed:
+`snapshot.ts` coerced a null back to `'approximate'` on read, and the step's own type could not
+express null. The `StepRates` heuristic that ignored a stored `'approximate'` is gone — a stored
+value is now proof of a click and shows back as the selection.
+
+`rateConfidence.test.ts` guards every layer: the snapshot must not substitute a value, the step
+must seed from the profile without a fallback and omit the field when unchosen, the type must
+admit null, and the migration must exist.
+
+Verified live, both directions: a fresh account shows no pill pressed with the row NULL; picking
+`دقيقة` stores `exact` and shows back as pressed after a reload.
 
 ### Verified on the fresh account and the new artifacts
 
@@ -189,12 +203,28 @@ deliberately does not carry. Founder call.
 | 390px: dashboard, invoice, proposal, share, invoice form, onboarding | no horizontal scroll |
 | Cross-user proposal URL | 404 inside the app shell, no other account's data |
 
+### P4-7 — Arabic insight prose printed Latin digits — CLOSED
+
+The dashboard insight card read `لا يوجد دخل مسجل خلال آخر 6 أشهر` beside Arabic-Indic figures.
+Both producers were at fault: the model wrote prose with Latin digits, and the deterministic
+non-AI fallback formats with an **en-US** formatter regardless of locale.
+
+A prompt instruction was the first fix, which is a hope rather than a guarantee. Replaced with a
+deterministic pass: `toArabicIndicDigits` rewrites digits (and the separators between them) in
+Arabic strings, skipping any token carrying Latin letters or URL/identifier punctuation, so
+brands, emails, links and reference codes survive. It is folded into the one seam every insight
+already passes through — renamed `stripEmDashes` → `normalizeInsightText`, since it now does
+more than dashes — which the action, the streaming draft route and the widget all call.
+
+Because the widget normalises at render, insights **already cached** with Latin digits are fixed
+without regenerating. Verified live: the previously-cached card now reads `٥٤٠٠ ريال` and
+`٦ أشهر`, and the Arabic dashboard carries **zero** Latin digits.
+
 ### Still not fixed
 
-- **P4-6** above: the `rate_confidence` column default. Needs a migration.
-- AI-written dashboard insights composed Arabic prose with Latin digits. The prompt now asks
-  for Arabic-Indic digits in Arabic output; a model is not a guarantee, and this was **not**
-  re-verified against a fresh DeepSeek generation.
+Nothing from this pass. The one remaining known limitation is inherited, not introduced: a
+freelancer who set `contact_email` before the client-facing redaction shipped will have it
+withheld from client copies until the proposal is regenerated (see "Deliberately not done").
 
 ## Pass-2 regressions re-checked
 

@@ -25,7 +25,7 @@ import { deepseek, REASONING_MODEL, isAIConfigured } from "@/lib/ai/client";
 import {
   BusinessInsightsSchema,
   buildBusinessInsightsPrompt,
-  stripEmDashes,
+  normalizeInsightText,
 } from "@/lib/ai/businessInsights";
 import { buildInsightsContext } from "@/app/actions/dashboard/insights";
 
@@ -74,8 +74,8 @@ export async function POST() {
           // Belt-and-suspenders: strip em/en dashes the model may still emit.
           const insights = object.insights.map((i) => ({
             ...i,
-            ar: stripEmDashes(i.ar, "ar"),
-            en: stripEmDashes(i.en, "en"),
+            ar: normalizeInsightText(i.ar, "ar"),
+            en: normalizeInsightText(i.en, "en"),
           }));
           const now = new Date();
           const validUntil = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
