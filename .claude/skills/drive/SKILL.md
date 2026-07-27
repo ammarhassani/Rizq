@@ -88,13 +88,30 @@ Say plainly which findings you confirmed and which you could not.
 
 ### 5. Fix, or record — and be honest about which
 
+**Re-drive what you fixed, before you commit.** This is not optional. Pass 4 found six defects
+and *five of them were created by pass 3's own remediation* — the fixes type-checked, passed the
+suite, and broke the product. A fix is not done until the flow it touched has been driven again
+in the browser and seen to work.
+
 - Fix what is clearly a defect with a clear fix, with a test where the constitution requires one
   (money, quotas, eligibility, honesty paths).
 - **Do not fix** monetization semantics, pricing policy, or brand/design-system decisions.
   Record them for the founder with the evidence and the options.
 - Merge gate before committing: `pnpm typecheck` clean and `pnpm test` green.
 
-### 6. Record and report
+### 6. Grade what you found
+
+Tag every finding, because "we ran out of defects" is meaningless without it — cosmetic findings
+never run out, and a loop chasing them churns the repo for no value.
+
+- **P1** — money is wrong, a legal obligation is breached, something private reaches a client, a
+  screen states something untrue, or a core flow cannot be completed.
+- **P2** — the product contradicts itself, loses work, or misleads without lying.
+- **P3** — cosmetic, inconsistent, or annoying.
+
+Write the grade into the ledger entry.
+
+### 7. Record and report
 
 ```js
 recordRun(`${persona}/${flow}/${strategy}`, { findings });
@@ -103,6 +120,20 @@ recordRun(`${persona}/${flow}/${strategy}`, { findings });
 Then update `drive/ledger.md` prose if the run changed what is known, and commit. Report to the
 user in caveman: what you drove, what you found, what you verified, what you fixed, what you
 left and why.
+
+## When to stop looping
+
+Do not loop "until there are no defects" — there will always be a P3. Stop when **three
+consecutive iterations produce no new confirmed P1 or P2**, and say so plainly rather than
+manufacturing work to look busy.
+
+Stop early and escalate when:
+
+- the open-findings list grows several entries that need a founder decision (monetization,
+  pricing policy, brand) — the loop cannot proceed on those, and piling them up wastes runs
+- two iterations in a row find defects *introduced by the previous iteration's fixes* — that is
+  the signal to slow down and consolidate, not to keep going
+- the merge gate is red for a reason the iteration did not cause
 
 ## What this can and cannot do
 
