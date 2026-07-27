@@ -160,7 +160,9 @@ not double-grant; direct client write to `payments`/`users.pro_until` denied by 
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [~] T027 Quickstart validation — US1, US2 and US3 are covered by automated regressions (error-vs-empty tree test, status-label unit, `isPro` expiry + tone quota + `FREE_MONTHLY_QUERIES` units). **US5 steps remain manual** (a live DeepSeek trend line + a real FL document upload); not yet run.
+- [X] T027 Quickstart validation — US1, US2 and US3 are covered by automated regressions (error-vs-empty tree test, status-label unit, `isPro` expiry + tone quota + `FREE_MONTHLY_QUERIES` units). US5 driven live in Arabic on 2026-07-27, with two findings recorded rather than a tick:
+  - **The AI-trend line cannot render with today's corpus.** `computeMarketTrend` needs `MIN_TREND_SAMPLE = 8` rows for one (specialty, city, tier), but the largest such group in `benchmark_records` holds **6** — 0 of 420 groups reach 8 (1,621 records total, Nov 2025 – Jun 2026). Two lookups confirmed it in the browser: the price renders, the trend line is silently absent. The omission is *correct* behaviour (thin data must not assert a direction), but the feature is unreachable in production, so the "labeled, non-blocking" claim has never been seen by a user. Either the trend computes at a wider scope than the band (specialty + tier nationally does clear 8 with a 7-month span) and says so in its label, or the corpus grows first. **Founder call — not taken unilaterally.**
+  - The FL-upload half of this step is stale in `quickstart.md`: T020 dropped it permanently (a `fl_verified` boolean flipped on upload is a false credibility claim). Nothing sets `fl_verified` today, by design.
 - [X] T028 Merge gate — 2026-07-26: `tsc --noEmit` clean; `pnpm test` 768 tests / 64 files green.
 - [X] T029 [P] Follow-up recorded (not attempted here): the remaining inline-ternary copy → `next-intl` catalog migration, tracked in `.claude/CLAUDE.md` under feature 010.
 
