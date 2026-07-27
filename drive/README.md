@@ -42,12 +42,29 @@ earlier one already noticed.
 
 ## The shape of an iteration
 
-1. **Do a freelancer's work through the forms** (`work.mjs`). This builds the state everything
+1. **Ask the ledger what to drive** (`ledger.mjs` + `flows.mjs`). A Ralph loop fires an
+   identical prompt every time, so the variety has to come from state, not from the prompt.
+   `leastRecentlyDriven()` returns the flow untouched longest — and "never" sorts before every
+   date, so the parts nobody has opened get opened first.
+2. **Do a freelancer's work through the forms** (`work.mjs`). This builds the state everything
    else needs, and the doing is itself under test: two of pass 5's findings were in the act of
    saving, not in what was saved.
-2. **Check the product against itself and against the database.** Two screens disagreeing, or a
+3. **Check the product against itself and against the database.** Two screens disagreeing, or a
    screen disagreeing with its row, is the finding. This is where the next defect comes from.
-3. **Run the standing sweeps** (`sweeps.mjs`) for the classes earlier passes already paid for.
+4. **Run the standing sweeps** (`sweeps.mjs`) for the classes earlier passes already paid for.
+5. **Record the run** with `recordRun(flow, { findings })`, so the next iteration starts where
+   this one stopped.
+
+## Running the loop
+
+```
+/loop 30m read drive/ledger.md, drive the least-recently-driven flow through drive/,
+fix what you find, update the ledger, commit
+```
+
+Intervals under ~10 minutes are a false economy: Supabase rate-limits signups to 5 per 5
+minutes per IP, and each iteration burns real DeepSeek tokens. The driver reuses its account
+between runs, so that limit only bites when `drive/.auth` has been cleared.
 
 ## Rules that came from being wrong
 
@@ -65,6 +82,9 @@ earlier one already noticed.
 - **When an iteration finds a new class, add a sweep for it.** Pass 6 turned two one-off numeral
   bugs into seven found at once by checking every route instead of the two already known to be
   broken.
+- **Report what is new, not what is unfixed.** `note()` checks the finding against the ledger
+  and stays quiet about one already written down. A loop that re-reports a known defect every
+  half hour teaches the next iteration nothing.
 - **Distinguish the app's numbers from the user's words.** `موقع 25 صفحة` is a client's own
   wording, not a numeral bug; `+966` is a phone prefix. The numeral sweep runs only on routes
   whose figures belong to the app.
@@ -76,4 +96,6 @@ earlier one already noticed.
 | `session.mjs` | Signed-in browser, run accounting, findings log, matching DB client |
 | `work.mjs` | A freelancer's actions through the real forms — client, income, invoice, lookup |
 | `sweeps.mjs` | Standing checks worth re-running everywhere, one per defect class found |
-| `iteration.example.mjs` | The three-part shape, runnable as-is |
+| `flows.mjs` | What a freelancer does, as a rotation — with what a lie looks like on each screen |
+| `ledger.mjs` / `ledger.md` | The loop's memory: coverage, open findings, what is known and accepted |
+| `iteration.example.mjs` | The whole shape, runnable as-is |

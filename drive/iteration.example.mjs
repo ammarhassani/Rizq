@@ -1,28 +1,33 @@
 /**
- * One Ralph-loop iteration, in the shape every iteration should take.
+ * One Ralph-loop iteration, end to end.
  *
  *   node drive/iteration.example.mjs
  *
- * Three parts, in this order:
- *   1. do a freelancer's work through the forms — this builds the state everything else
- *      needs, and the doing is itself under test
- *   2. check the product against ITSELF and against the database — two screens disagreeing,
- *      or a screen disagreeing with the row, is the finding
- *   3. run the standing sweeps for the classes earlier passes already paid for
+ * This one drives `income-and-hadaf`. An iteration replaces the middle section with whatever
+ * flow the ledger says is due — the mechanics around it stay the same:
  *
- * The sweeps are the floor, not the point. They catch regressions; they do not find new
- * kinds of wrong. Part 2 is where the next defect comes from.
+ *   1. ask the ledger what to drive, so an identical prompt lands somewhere new each time
+ *   2. do a freelancer's work through the forms; the doing is itself under test
+ *   3. check the product against itself and against the database — disagreement is the finding
+ *   4. run the standing sweeps for classes earlier passes already paid for
+ *   5. record the run, so the next iteration starts where this one stopped
  */
 import { open } from "./session.mjs";
 import { standardSweeps } from "./sweeps.mjs";
 import { addClient, logIncome, parseFigure } from "./work.mjs";
+import { leastRecentlyDriven, recordRun } from "./ledger.mjs";
+import { FLOW_NAMES, flowByName } from "./flows.mjs";
 
+const FLOW = "income-and-hadaf";
 const stamp = new Date().toISOString().slice(11, 19);
 
-await open(async (tools) => {
-  const { go, text, note, db } = tools;
+console.log(`ledger says drive next: ${leastRecentlyDriven(FLOW_NAMES)}`);
+console.log(`this script drives: ${FLOW}\n${flowByName(FLOW).hint.replace(/\s+/g, " ")}\n`);
 
-  // ── 1. Work ────────────────────────────────────────────────────────────────
+await open(async (tools) => {
+  const { go, text, note, db, findings } = tools;
+
+  // ── work ───────────────────────────────────────────────────────────────────
   const client = await addClient(tools, `عميل التجربة ${stamp}`);
   if (!client.id) note(`saving a client did not land on its page (stayed at ${client.landedOn})`);
 
@@ -31,24 +36,27 @@ await open(async (tools) => {
     note("logging income left the freelancer on the form — the duplicate-save trap");
   }
 
-  // ── 2. Does the product agree with itself? ─────────────────────────────────
+  // ── does the product agree with itself? ────────────────────────────────────
   const { client: sb, userId } = await db();
   const { data: gigs } = await sb.from("gigs").select("amount_sar").eq("user_id", userId);
   const stored = (gigs ?? []).reduce((sum, g) => sum + Number(g.amount_sar), 0);
 
   await go("/ar/income");
-  const ledger = await text();
-  const ledgerTotal = parseFigure(ledger.match(/هذا العام\n([^\n]+)/)?.[1]);
-  if (stored > 0 && ledgerTotal != null && Math.abs(ledgerTotal - stored) > 1) {
-    note(`ledger shows ${ledgerTotal} for the year while the database holds ${stored}`);
+  const ledgerText = await text();
+  const shownForYear = parseFigure(ledgerText.match(/هذا العام\n([^\n]+)/)?.[1]);
+  if (stored > 0 && shownForYear != null && Math.abs(shownForYear - stored) > 1) {
+    note(`income ledger shows ${shownForYear} for the year while the database holds ${stored}`);
   }
 
   await go("/ar/hadaf");
-  const hadaf = await text();
-  if (stored > 0 && /ما عندك مشاريع مسجلة/.test(hadaf)) {
-    note("HADAF says no recorded projects while income exists — the stale-cache defect");
+  if (stored > 0 && /ما عندك مشاريع مسجلة/.test(await text())) {
+    note("HADAF reports no recorded projects while income exists — the stale-cache defect");
   }
 
-  // ── 3. Standing sweeps ─────────────────────────────────────────────────────
+  // ── standing sweeps ────────────────────────────────────────────────────────
   for (const finding of await standardSweeps(tools)) note(finding);
+
+  // ── record ─────────────────────────────────────────────────────────────────
+  recordRun(FLOW, { findings });
+  console.log(`ledger updated: ${FLOW}`);
 });

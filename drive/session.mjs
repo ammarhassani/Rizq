@@ -19,6 +19,7 @@
  * gitignored: the account is real, so its password must not be committed.
  */
 import { chromium } from "@playwright/test";
+import { isKnown } from "./ledger.mjs";
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -139,8 +140,27 @@ async function ensureOnboarded(user) {
  * @param {(tools: object) => Promise<void>} fn
  * @param {{ viewport?: {width:number,height:number}, locale?: string, fresh?: boolean }} [opts]
  */
+/**
+ * Fail loudly, before spending a browser launch and a signup on it.
+ *
+ * The dev server died mid-session more than once while these passes were running, and a driver
+ * that reports "route returned 0" for twenty routes buries the one fact that matters.
+ */
+async function preflight() {
+  try {
+    const res = await fetch(`${BASE}/ar`, { signal: AbortSignal.timeout(15_000) });
+    if (!res.ok) throw new Error(`status ${res.status}`);
+  } catch (err) {
+    throw new Error(
+      `${BASE} is not serving (${err.message}). Start it with \`pnpm dev\`, or point the driver ` +
+        `elsewhere with RIZQ_BASE_URL.`,
+    );
+  }
+}
+
 export async function open(fn, opts = {}) {
   const { viewport = { width: 1280, height: 900 }, locale = "ar-SA", fresh = false } = opts;
+  await preflight();
   mkdirSync(SHOTS_DIR, { recursive: true });
 
   const ctx = await chromium.launchPersistentContext(PROFILE_DIR, {
@@ -165,6 +185,7 @@ export async function open(fn, opts = {}) {
   });
 
   const findings = [];
+  const repeats = [];
 
   try {
     let user = fresh ? null : readUser();
@@ -188,12 +209,29 @@ export async function open(fn, opts = {}) {
       text: () => page.evaluate(() => document.body.innerText.replace(/\n{2,}/g, "\n")),
       shot: (name) => shot(page, name),
       db: () => signedInDb(user),
-      note: (finding) => { findings.push(finding); note(finding); },
+      /**
+       * Report something the product got wrong. A finding the ledger already carries is
+       * counted but not shouted about: a loop that re-reports a known defect every iteration
+       * teaches the next one nothing.
+       */
+      note: (finding) => {
+        if (isKnown(finding)) {
+          repeats.push(finding);
+          return false;
+        }
+        findings.push(finding);
+        note(finding);
+        return true;
+      },
+      findings,
       problems,
     });
   } finally {
     // A silent run must be distinguishable from a run that looked at nothing.
-    console.log(`\nvisited ${visited.length} route(s), ${findings.length} finding(s)`);
+    console.log(
+      `\nvisited ${visited.length} route(s), ${findings.length} new finding(s)` +
+        (repeats.length ? `, ${repeats.length} already in the ledger` : ""),
+    );
     const redirected = visited.filter((v) => v.includes("(redirected)"));
     if (redirected.length) {
       console.log(`  ${redirected.length} redirected away from the requested path:`);
