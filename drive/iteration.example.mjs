@@ -3,32 +3,44 @@
  *
  *   node drive/iteration.example.mjs
  *
- * This one drives `income-and-hadaf`. An iteration replaces the middle section with whatever
- * flow the ledger says is due — the mechanics around it stay the same:
+ * The ledger names a persona and a flow; this script drives that pair. An iteration replaces
+ * the "work" section with whatever the assigned flow calls for and keeps everything else:
  *
- *   1. ask the ledger what to drive, so an identical prompt lands somewhere new each time
- *   2. do a freelancer's work through the forms; the doing is itself under test
- *   3. check the product against itself and against the database — disagreement is the finding
- *   4. run the standing sweeps for classes earlier passes already paid for
- *   5. record the run, so the next iteration starts where this one stopped
+ *   1. ask the ledger which person should drive what, so an identical prompt lands somewhere
+ *      new every run — six personas × ten flows is sixty distinct runs before anything repeats
+ *   2. arrive as that person: their device, their locale, their pace
+ *   3. do the work through the forms; the doing is itself under test
+ *   4. check the product against itself and against the database
+ *   5. review how it LOOKS and BEHAVES, not just what it stored
+ *   6. run the standing sweeps, then record the run
  */
 import { open } from "./session.mjs";
 import { standardSweeps } from "./sweeps.mjs";
 import { addClient, logIncome, parseFigure } from "./work.mjs";
-import { leastRecentlyDriven, recordRun } from "./ledger.mjs";
+import { nextAssignment, recordRun } from "./ledger.mjs";
 import { FLOW_NAMES, flowByName } from "./flows.mjs";
+import { PERSONA_NAMES, personaByName, sessionOptions } from "./personas.mjs";
+import { uxReview } from "./ux.mjs";
 
-const FLOW = "income-and-hadaf";
+const assignment = nextAssignment(PERSONA_NAMES, FLOW_NAMES);
+const persona = personaByName(assignment.persona);
+const flow = flowByName(assignment.flow);
 const stamp = new Date().toISOString().slice(11, 19);
 
-console.log(`ledger says drive next: ${leastRecentlyDriven(FLOW_NAMES)}`);
-console.log(`this script drives: ${FLOW}\n${flowByName(FLOW).hint.replace(/\s+/g, " ")}\n`);
+const oneLine = (s) => s.replace(/\s+/g, " ").trim();
+console.log(`assignment: ${persona.name} × ${flow.name}`);
+console.log(`  who: ${persona.label}`);
+console.log(`  behaves: ${oneLine(persona.behaviour)}`);
+console.log(`  watches: ${oneLine(persona.watches)}`);
+console.log(`  flow: ${oneLine(flow.hint)}\n`);
 
 await open(async (tools) => {
-  const { go, text, note, db, findings } = tools;
+  const { page, go, text, note, db, findings } = tools;
+  const mobile = persona.device.mobile;
 
-  // ── work ───────────────────────────────────────────────────────────────────
-  const client = await addClient(tools, `عميل التجربة ${stamp}`);
+  // ── work: what this person came to do ──────────────────────────────────────
+  // (Replace this section per flow. Shown here: income-and-hadaf.)
+  const client = await addClient(tools, `عميل ${persona.name} ${stamp}`);
   if (!client.id) note(`saving a client did not land on its page (stayed at ${client.landedOn})`);
 
   const income = await logIncome(tools, { amount: 4500, title: `مشروع ${stamp}` });
@@ -42,8 +54,7 @@ await open(async (tools) => {
   const stored = (gigs ?? []).reduce((sum, g) => sum + Number(g.amount_sar), 0);
 
   await go("/ar/income");
-  const ledgerText = await text();
-  const shownForYear = parseFigure(ledgerText.match(/هذا العام\n([^\n]+)/)?.[1]);
+  const shownForYear = parseFigure((await text()).match(/هذا العام\n([^\n]+)/)?.[1]);
   if (stored > 0 && shownForYear != null && Math.abs(shownForYear - stored) > 1) {
     note(`income ledger shows ${shownForYear} for the year while the database holds ${stored}`);
   }
@@ -53,10 +64,16 @@ await open(async (tools) => {
     note("HADAF reports no recorded projects while income exists — the stale-cache defect");
   }
 
+  // ── how does it look and behave? ───────────────────────────────────────────
+  // Reviewed on the screens this person actually stood on, at their device size.
+  for (const route of ["/ar/dashboard", "/ar/income", "/ar/invoices/new", "/ar/hadaf"]) {
+    await go(route, 3500);
+    for (const finding of await uxReview(page, { mobile, route })) note(finding);
+  }
+
   // ── standing sweeps ────────────────────────────────────────────────────────
   for (const finding of await standardSweeps(tools)) note(finding);
 
-  // ── record ─────────────────────────────────────────────────────────────────
-  recordRun(FLOW, { findings });
-  console.log(`ledger updated: ${FLOW}`);
-});
+  recordRun(assignment.key, { findings });
+  console.log(`ledger updated: ${assignment.key}`);
+}, sessionOptions(persona));

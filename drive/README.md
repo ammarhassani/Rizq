@@ -42,18 +42,25 @@ earlier one already noticed.
 
 ## The shape of an iteration
 
-1. **Ask the ledger what to drive** (`ledger.mjs` + `flows.mjs`). A Ralph loop fires an
-   identical prompt every time, so the variety has to come from state, not from the prompt.
-   `leastRecentlyDriven()` returns the flow untouched longest — and "never" sorts before every
-   date, so the parts nobody has opened get opened first.
+1. **Ask the ledger who drives what** (`ledger.mjs` + `personas.mjs` + `flows.mjs`).
+   `nextAssignment()` returns the persona × flow pair untouched longest — six people × ten flows
+   is sixty distinct runs before anything repeats, and "never" sorts before every date, so the
+   parts nobody has opened get opened first.
+   **Six people, not one tester.** A defect is only visible to someone whose expectations it
+   violates: the rusher finds the double-submit, the accountant finds the halala that does not
+   add up, the sceptic finds the number with no provenance, the newcomer finds the screen that
+   assumes you already know what HADAF is.
 2. **Do a freelancer's work through the forms** (`work.mjs`). This builds the state everything
    else needs, and the doing is itself under test: two of pass 5's findings were in the act of
    saving, not in what was saved.
 3. **Check the product against itself and against the database.** Two screens disagreeing, or a
    screen disagreeing with its row, is the finding. This is where the next defect comes from.
-4. **Run the standing sweeps** (`sweeps.mjs`) for the classes earlier passes already paid for.
-5. **Record the run** with `recordRun(flow, { findings })`, so the next iteration starts where
-   this one stopped.
+4. **Review how it LOOKS** (`ux.mjs`) at that persona's device size — sideways scroll, tap
+   targets under 44px, focus you cannot see, a dead end, a disabled control that explains
+   nothing, serious axe violations. Taste stays human; the mechanical half does not have to.
+5. **Run the standing sweeps** (`sweeps.mjs`) for the classes earlier passes already paid for.
+6. **Record the run** with `recordRun(assignment.key, { findings })`, so the next iteration
+   starts where this one stopped.
 
 ## Running the loop
 
@@ -85,6 +92,10 @@ between runs, so that limit only bites when `drive/.auth` has been cleared.
 - **Report what is new, not what is unfixed.** `note()` checks the finding against the ledger
   and stays quiet about one already written down. A loop that re-reports a known defect every
   half hour teaches the next iteration nothing.
+- **Verify before you report, especially a visual one.** The font check first said "Arabic in a
+  Latin font", which reads as breakage. Blowing the glyph up to 120px showed the real ٠ from a
+  fallback — true finding, wrong severity. It now describes the actual risk: an undeclared
+  fallback that differs between a Mac and an Android.
 - **Distinguish the app's numbers from the user's words.** `موقع 25 صفحة` is a client's own
   wording, not a numeral bug; `+966` is a phone prefix. The numeral sweep runs only on routes
   whose figures belong to the app.
@@ -97,5 +108,7 @@ between runs, so that limit only bites when `drive/.auth` has been cleared.
 | `work.mjs` | A freelancer's actions through the real forms — client, income, invoice, lookup |
 | `sweeps.mjs` | Standing checks worth re-running everywhere, one per defect class found |
 | `flows.mjs` | What a freelancer does, as a rotation — with what a lie looks like on each screen |
+| `personas.mjs` | Six people with different devices, paces and suspicions |
+| `ux.mjs` | The measurable half of "looks wrong" — layout, touch, focus, dead ends, axe |
 | `ledger.mjs` / `ledger.md` | The loop's memory: coverage, open findings, what is known and accepted |
 | `iteration.example.mjs` | The whole shape, runnable as-is |

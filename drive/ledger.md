@@ -21,8 +21,21 @@ is **new**.
 | `pricing-tool` | never | 0 |
 | `proposal-to-client` | never | 0 |
 | `recovery` | never | 0 |
+| `rusher/onboarding` | 2026-07-27 | 1 |
 
 ## Open findings
+
+- 2026-07-27 · **Mobile tap targets under 44px** across the app shell — the apps-menu and
+  theme-toggle icon buttons are 36×36, the locale switch 94×16, filter chips 32px tall. 70%+ of
+  traffic is mobile (Principle III). Found by the `rusher` persona at 390px.
+- 2026-07-27 · **Serious colour-contrast violations** on dashboard, income, invoice builder and
+  HADAF (axe, WCAG 2 AA) — up to 10 nodes on one screen.
+- 2026-07-27 · **HADAF progress bar has no accessible name** (`aria-progressbar-name`).
+- 2026-07-27 · **Money figures declare a Latin-only font stack** (`font-mono`, `tabular
+  font-sans`), so Arabic-Indic digits render in whatever face the device falls back to. Verified
+  NOT to be tofu — a 120px zoom shows the real ٠ glyph — but the fallback is undeclared, so the
+  numerals differ between a Mac and an Android. Design-system gap; the brand specifies Tajawal.
+
 
 - 2026-07-27 · The paywall meters "المشاريع · ٢٠/شهر" but the quota trigger is on `gigs`, so
   `createBlankProject` ("set up directly") creates unlimited projects on the free tier. Either

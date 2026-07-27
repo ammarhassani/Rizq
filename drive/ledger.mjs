@@ -57,6 +57,34 @@ export function leastRecentlyDriven(flows) {
 }
 
 /**
+ * The persona × flow pair due next.
+ *
+ * A defect is only visible to someone whose expectations it violates, so the same flow driven
+ * by a different person is a genuinely different run — the rusher and the accountant break the
+ * invoice builder in different places. Pairing them here means an identical loop prompt keeps
+ * landing somewhere new long after every flow has been opened once.
+ */
+export function nextAssignment(personas, flows) {
+  const seen = new Map(coverage().map((r) => [r.flow, r]));
+  const pairs = [];
+  for (const persona of personas) {
+    for (const flow of flows) {
+      const key = `${persona}/${flow}`;
+      const row = seen.get(key);
+      pairs.push({
+        persona,
+        flow,
+        key,
+        when: !row || row.lastDriven === "never" ? "" : row.lastDriven,
+        runs: row?.runs ?? 0,
+      });
+    }
+  }
+  pairs.sort((a, b) => (a.when === b.when ? a.runs - b.runs : a.when < b.when ? -1 : 1));
+  return pairs[0];
+}
+
+/**
  * Findings already written down — so a run reports what is NEW, not what is unfixed.
  *
  * Bullets wrap across lines in a hand-edited ledger, so a continuation line is folded into the
