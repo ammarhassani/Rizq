@@ -6,7 +6,7 @@ The loop files findings here and never fixes them. Remediation is a separate, re
 decision — mixing discovery with change is how pass 3's fixes shipped five new defects.
 
 **7 open** — P1 2 · P2 0 · P3 5
-**2 closed** of 9 filed
+**0 closed** of 7 real · **2 withdrawn** (never defects)
 
 ## P1
 
@@ -78,8 +78,8 @@ toggle label in the same view: ضريبة القيمة المضافة (١٥%)
 sweeps.mjs APP_CHROME_ROUTES already includes /ar/invoices/new
 ```
 
-## Closed
+## Withdrawn — verification showed these were never defects
 
-- RZQ-0003 (wont-fix) — Printing the invoice drops figures the screen showed
-- RZQ-0006 (wont-fix) — /ar/catalog prints Latin digits: تصميم واجهة 123531
+- RZQ-0003 — Printing the invoice drops figures the screen showed
+- RZQ-0006 — /ar/catalog prints Latin digits: تصميم واجهة 123531
 

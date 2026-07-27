@@ -5,6 +5,15 @@
  * pass 6 turned two one-off numeral bugs into seven found at once by checking every route
  * instead of the two that had already failed. Each of these came from a defect that reached
  * production, so they earn their keep — add to them whenever an iteration finds a new class.
+ *
+ * ── What a sweep cannot see ─────────────────────────────────────────────────────────────────
+ * A sweep visits a route in whatever state the account happens to be in, so anything behind a
+ * state gate is invisible to it. Session S-0003 found the VAT rate printed in Latin digits on
+ * /ar/invoices/new — a route the numeral sweep already covered — because that line only renders
+ * once VAT is switched on, which needs a VAT-registered profile the sweeping account never has.
+ *
+ * So sweeps are a floor, not coverage. Anything gated behind a tier, a toggle, a populated list
+ * or an error condition has to be reached by the row's own driving before it can be swept.
  */
 
 /** Routes whose visible numbers are the APP's own, so a Latin digit is the app's fault. */

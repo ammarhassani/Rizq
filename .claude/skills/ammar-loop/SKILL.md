@@ -88,6 +88,10 @@ Everything around it — plan row, checkpoints, filing, telemetry, ticking — i
   of pass 5's findings were. The only sanctioned shortcut is the onboarding gate.
 - **A fresh account hides almost everything.** Do the work first, then look.
 - **Review how it looks** (`uxReview`) at the persona's device size, not only what it stored.
+- **Sweeps are a floor, not coverage.** They visit a route in whatever state the account is in,
+  so anything behind a tier, a toggle, a populated list or an error condition is invisible to
+  them — session S-0003 found a Latin VAT rate on a route the numeral sweep already covered,
+  because that line only appears once VAT is on. Reach the gated state by driving, then look.
 - **Check the product against itself and against the database** (`tools.db()`).
 
 ## 5. Verify before you file
@@ -130,6 +134,11 @@ not filed twice. Regenerate the index afterwards: `node drive/basket-index.mjs`.
 Anything needing a **product decision** — monetization, pricing policy, brand, design system —
 is still filed, with the description saying plainly that it needs a founder decision.
 
+**Withdrawing your own finding.** If verification shows something you filed was never a defect,
+`setStatus(ref, "withdrawn", reason)` — not `wont-fix`, which means real-but-not-fixing. A
+withdrawn finding is excluded from every count, because an axis credited with defects that do
+not exist is the loop lying in exactly the way it exists to catch.
+
 ## 7. Record the telemetry
 
 ```js
@@ -144,6 +153,17 @@ field-tested; the same streak with two runs behind it means untested. That diffe
 where the next run goes and is invisible without the record.
 
 `closed` stays empty here — it exists for a separate, human-reviewed remediation pass.
+
+**If verification changes what you found after you recorded it**, amend rather than leaving the
+scoreboard wrong:
+
+```js
+import { amendRun } from "./telemetry.mjs";
+amendRun({ session: session.id, findings: [/* the verified truth */], note: "what changed" });
+```
+
+The amendment supersedes the original without adding a run — the run happened, the findings it
+was credited with did not. Never re-record a run to correct it; that double-counts.
 
 ## 8. Tick, complete, commit
 

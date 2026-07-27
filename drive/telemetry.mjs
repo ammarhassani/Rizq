@@ -27,11 +27,35 @@ export const RUNS = resolve(HERE, "runs.jsonl");
  */
 export function recordRun({ run, findings = [], closed = [], notes = "" }) {
   const entry = {
+    kind: "run",
     at: new Date().toISOString(),
     run,
     findings: findings.map((f) => (typeof f === "string" ? { text: f, severity: "P3" } : f)),
     closed,
     notes,
+  };
+  appendFileSync(RUNS, JSON.stringify(entry) + "\n");
+  return entry;
+}
+
+/**
+ * Correct a run's findings after verification.
+ *
+ * A run records what it saw; verification then withdraws some of it. Session S-0003 filed seven
+ * findings and withdrew two as not real, and with no way to say so the scoreboard kept crediting
+ * an axis with defects that do not exist — the loop's own numbers lying in exactly the way it
+ * exists to catch.
+ *
+ * Appended, never rewritten: the original stays visible and the amendment supersedes it, so the
+ * record shows both what was believed and what turned out to be true.
+ */
+export function amendRun({ session, findings, note = "" }) {
+  const entry = {
+    kind: "amend",
+    at: new Date().toISOString(),
+    session,
+    findings: findings.map((f) => (typeof f === "string" ? { text: f, severity: "P3" } : f)),
+    note,
   };
   appendFileSync(RUNS, JSON.stringify(entry) + "\n");
   return entry;
@@ -63,7 +87,23 @@ const DAY = 24 * 60 * 60 * 1000;
  * one with a long dry streak and three runs behind it is just untested.
  */
 export function scoreboard({ now = Date.now() } = {}) {
-  const runs = readRuns();
+  const all = readRuns();
+
+  // An amendment replaces its session's findings without adding a run — the run happened, the
+  // findings it was credited with did not.
+  const amendments = new Map();
+  for (const row of all) {
+    if (row.kind === "amend" && row.session) amendments.set(row.session, row.findings);
+  }
+  const runs = all
+    .filter((row) => row.kind !== "amend")
+    .map((row) => {
+      const session = row.notes?.match(/S-\d+/)?.[0];
+      return session && amendments.has(session)
+        ? { ...row, findings: amendments.get(session), amended: true }
+        : row;
+    });
+
   const stats = {};
 
   for (const axis of AXIS_NAMES) {

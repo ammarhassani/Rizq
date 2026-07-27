@@ -132,9 +132,18 @@ export function findings() {
 }
 
 /**
- * Change a finding's status — `open`, `accepted`, `wont-fix`, `fixed`.
+ * Change a finding's status.
  *
- * Exported for a human or a separate remediation pass. The loop itself only ever files.
+ * - `open` — filed, undecided
+ * - `withdrawn` — verification showed it was never a defect (the checker was wrong, not the
+ *   product). Excluded from counts: a withdrawn finding must not inflate an axis's yield.
+ * - `accepted` — real, and we are choosing to live with it
+ * - `wont-fix` — real, and deliberately not being fixed
+ * - `fixed` — closed by a remediation pass
+ *
+ * `withdrawn` and `wont-fix` are not the same thing, and conflating them makes the basket claim
+ * defects that do not exist. The loop may withdraw its own findings; everything else is a human
+ * decision.
  */
 export function setStatus(ref, status, note = "") {
   appendFileSync(
@@ -146,7 +155,9 @@ export function setStatus(ref, status, note = "") {
 /** Regenerate the readable index. Derived — safe to delete, never hand-edited. */
 export function renderBasket() {
   const items = findings();
-  const open = items.filter((f) => f.status === "open");
+  const withdrawn = items.filter((f) => f.status === "withdrawn");
+  const live = items.filter((f) => f.status !== "withdrawn");
+  const open = live.filter((f) => f.status === "open");
   const bySeverity = (s) => open.filter((f) => f.severity === s);
 
   const lines = [
@@ -158,7 +169,7 @@ export function renderBasket() {
     "decision — mixing discovery with change is how pass 3's fixes shipped five new defects.",
     "",
     `**${open.length} open** — P1 ${bySeverity("P1").length} · P2 ${bySeverity("P2").length} · P3 ${bySeverity("P3").length}`,
-    `**${items.length - open.length} closed** of ${items.length} filed`,
+    `**${live.length - open.length} closed** of ${live.length} real · **${withdrawn.length} withdrawn** (never defects)`,
     "",
   ];
 
@@ -182,10 +193,16 @@ export function renderBasket() {
     }
   }
 
-  const closed = items.filter((f) => f.status !== "open");
+  const closed = live.filter((f) => f.status !== "open");
   if (closed.length) {
     lines.push("## Closed", "");
     for (const f of closed) lines.push(`- ${f.ref} (${f.status}) — ${f.title}`);
+    lines.push("");
+  }
+
+  if (withdrawn.length) {
+    lines.push("## Withdrawn — verification showed these were never defects", "");
+    for (const f of withdrawn) lines.push(`- ${f.ref} — ${f.title}`);
     lines.push("");
   }
 
