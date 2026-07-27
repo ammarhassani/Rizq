@@ -18,7 +18,7 @@ dry counter: allowed, but a deliberate decision rather than a quiet improvement.
 | 1 | veteran | proposal-to-client | fuzz | share-anonymous | minimal | free | in-app-navigation | 2026-07-27 |
 | 2 | veteran | clients-and-projects | metamorphic | screen-desktop | empty | pro-lapsed | shared-link | 2026-07-27 |
 | 3 | veteran | invoice-and-vat | differential | print-pdf | degraded-profile | pro-active | direct-url | 2026-07-27 |
-| 4 | veteran | income-and-hadaf | adversarial | csv-export | edge-unicode | free-exhausted | back-or-refresh-midflow |  |
+| 4 | veteran | income-and-hadaf | adversarial | csv-export | edge-unicode | free-exhausted | back-or-refresh-midflow | 2026-07-27 |
 | 5 | newcomer | proposal-to-client | state-machine | screen-desktop | heavy | pro-active | back-or-refresh-midflow |  |
 | 6 | meticulous | proposal-to-client | time-travel | screen-mobile | degraded-profile | anon | direct-url |  |
 | 7 | rusher | proposal-to-client | differential | docx-export | realistic | free-exhausted | shared-link |  |
