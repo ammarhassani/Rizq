@@ -734,14 +734,19 @@
       "again": "Run another query",
       "contributeYourPrice": "Paid a different price? Help improve the benchmark",
       "methodologyLink": "How did we calculate this?",
-      "confidenceLabel": "Confidence",
       "createProposal": "Create a full proposal",
       "min2": "Min",
       "max2": "Max",
       "marketAnchor": "Market anchor",
       "rate": "Your rate",
       "enoughDataYet": "Not enough data yet",
-      "peak": "Peak"
+      "peak": "Peak",
+      "evidenceLabel": "Evidence",
+      "evidence": {
+        "limited": "limited",
+        "moderate": "moderate",
+        "good": "good"
+      }
     },
     "insufficient": {
       "title": "Not enough data yet.",
@@ -2311,7 +2316,7 @@
       "heading": "AI that works for you, honestly labeled.",
       "sub": "Every AI output is clearly labeled as an estimate. You always know what's data and what's analysis.",
       "f1Title": "Data-backed pricing",
-      "f1Body": "Price ranges built on cited rate reports, with the sample size, the number of sources and the confidence shown on every result.",
+      "f1Body": "Price ranges built on cited rate reports, with the sample size, the number of sources and the strength of the evidence shown on every result.",
       "f2Title": "Proposal generation",
       "f2Body": "Paste the client's message. Rizq extracts the scope, prices it, and writes the full proposal.",
       "f3Title": "Income forecasting",

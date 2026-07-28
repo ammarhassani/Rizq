@@ -9,6 +9,7 @@ import { toggleShare, getMarketTrendNarrative } from "@/app/actions/tool/calcula
 import { track } from "@/lib/analytics/track";
 import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
 import type { MarketTrend, TrendScope } from "@/lib/pricing/trend";
+import { evidenceStrength } from "@/lib/pricing/evidenceStrength";
 
 /**
  * Name the market a trend describes. The direction is often computed nationally because
@@ -238,7 +239,7 @@ export function ResultCard({
             </span>
             {typeof confidenceScore === "number" && (
               <span className="text-xs text-rizq-ink-soft/70">
-                {t("confidenceLabel")}: {numberFmt.format(Math.round(confidenceScore * 100))}%
+                {t("evidenceLabel")}: {t(`evidence.${evidenceStrength(confidenceScore)}`)}
               </span>
             )}
           </p>
