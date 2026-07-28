@@ -158,8 +158,9 @@
   --over-soft: rgba(190, 67, 38, 0.1);
   --over-line: rgba(190, 67, 38, 0.3);
   --on-accent: #06110c;
-  /* status */
-  --warn: #94671f;
+  /* status — #94671f read 4.24:1 on --raised and 3.66:1 on --bg, so a pending amount in it
+     failed AA on every light surface. Darkened to clear 4.5:1 on all three. */
+  --warn: #805614;
   --over: #be4326;
   /* shimmer skeleton */
   --shim-d: #dbd1bf;

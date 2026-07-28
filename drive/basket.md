@@ -6,15 +6,9 @@ The loop files findings here and never fixes them. Remediation is a separate, re
 decision — mixing discovery with change is how pass 3's fixes shipped five new defects.
 
 **4 open** — P1 0 · P2 0 · P3 4
-**4 closed** of 8 real · **4 withdrawn** (never defects)
+**5 closed** of 9 real · **4 withdrawn** (never defects)
 
 ## P3
-
-### RZQ-0002 — /ar/dashboard — serious: color-contrast — Elements must meet minimum color contrast ratio 
-
-/ar/dashboard — serious: color-contrast — Elements must meet minimum color contrast ratio thresholds (1 node(s))
-
-_route `/ar/dashboard` · run `veteran/clients-and-projects/metamorphic/screen-desktop/empty/pro-lapsed/shared-link` · session `S-0001` · seen again ×171 · filed 2026-07-27_
 
 ### RZQ-0008 — Invoice totals are shown with the halalas dropped beside the document that keeps them
 
@@ -46,9 +40,23 @@ sweeps.mjs APP_CHROME_ROUTES already includes /ar/invoices/new
 
 _route `/ar/dashboard` · run `rusher/proposal-to-client/differential/docx-export/realistic/free-exhausted/shared-link` · session `S-0004` · seen again ×33 · filed 2026-07-27_
 
+### RZQ-0013 — Opacity-modified text tokens fail AA on income, calendar and settings
+
+text-rizq-ink-soft/60 cannot reach 4.5:1 on any light surface: /ar/income shows 21 failing nodes, all of them the delivery date and status caption on every gig card. /ar/calendar has 5 (a /50 overflow count and three filter chips), /ar/settings 1 (حذف الحساب). Same class as RZQ-0002, which was filed for /ar/dashboard alone because that is the only route the sweep ran axe against. The design system already has --content-faint for exactly this, darkened to clear AA; the opacity modifier bypasses it.
+
+_route `/ar/income` · session `ammar-fix` · filed 2026-07-28_
+
+```
+/ar/income: 21 color-contrast nodes, e.g. <p class="mt-1 text-xs text-rizq-ink-soft/60">التسليم: ٢٧ يوليو</p>
+/ar/calendar: 5 nodes incl. <span class="text-[9px] text-rizq-ink-soft/50">+١٥</span>
+/ar/settings: 1 node — حذف الحساب
+measured with axe wcag2aa after the RZQ-0002 fix landed
+```
+
 ## Closed
 
 - RZQ-0001 (fixed) — /ar/dashboard — 1 Arabic string(s) fall back to an undeclared font (Latin-only stack, so g
+- RZQ-0002 (fixed) — /ar/dashboard — serious: color-contrast — Elements must meet minimum color contrast ratio 
 - RZQ-0004 (fixed) — Client's copy leaks the freelancer's login email
 - RZQ-0005 (fixed) — /ar/invoices/71b2aeb4-7080-4a76-bf8a-344c6704f70d — 7 Arabic string(s) fall back to an und
 - RZQ-0007 (fixed) — Shared invoice puts the freelancer's login email in the link preview

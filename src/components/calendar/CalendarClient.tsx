@@ -380,7 +380,7 @@ function MonthView({
                 </span>
                 {/* Hijri */}
                 {showHijri && cell.isCurrentMonth && (
-                  <span className="text-[9px] text-rizq-ink-soft/40 leading-none mb-0.5 font-arabic truncate w-full">
+                  <span className="text-[9px] text-[var(--content-faint)] leading-none mb-0.5 font-arabic truncate w-full">
                     {formatHijri(cell.date)}
                   </span>
                 )}
@@ -556,7 +556,7 @@ function WeekView({
               )}
             </div>
             {dayEvents.length === 0 ? (
-              <p className={`text-xs text-rizq-ink-soft/40 ${font}`}>{t("emptyDay")}</p>
+              <p className={`text-xs text-[var(--content-faint)] ${font}`}>{t("emptyDay")}</p>
             ) : (
               <div className="space-y-2">
                 {dayEvents.map((ev) => (

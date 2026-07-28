@@ -406,7 +406,7 @@ export function InsightsWidget({ locale }: Props) {
                   : "Summary computed from your data"}
             </p>
             {generatedAt && !isStreaming && (
-              <p className={`text-xs text-rizq-ink-soft/40 ${font}`}>
+              <p className={`text-xs text-[var(--content-faint)] ${font}`}>
                 {isAr ? `آخر تحديث: ${new Date(generatedAt).toLocaleString("ar-SA")}` : `Last updated: ${new Date(generatedAt).toLocaleString("en-US")}`}
               </p>
             )}
