@@ -20,7 +20,7 @@ import {
   formatDateKey,
   type CalendarEvent,
 } from "@/lib/calendar/group";
-import { fmtCount } from "@/lib/format/number";
+import { fmtCount, fmtMoney } from "@/lib/format/number";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -166,7 +166,7 @@ function EventRow({
           <StatusBadge status={event.status} t={t} />
           {amount != null && (
             <span className={`tabular font-sans text-xs font-semibold text-rizq-green`}>
-              {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(amount)}{" "}
+              {fmtMoney(amount, isAr ? "ar" : "en")}{" "}
               <span className={`font-normal text-rizq-ink-soft/60 ${font}`}>{t("sarLabel")}</span>
             </span>
           )}

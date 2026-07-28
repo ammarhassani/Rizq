@@ -13,6 +13,30 @@ export function fmtCount(n: number, locale: "ar" | "en"): string {
 }
 
 /**
+ * A money figure, in the view's numerals, keeping its halalas if it has any.
+ *
+ * An invoice of 9,938.21 SAR used to be announced as ٩٬٩٣٨ in the summary strip and in the
+ * share link's preview while the document itself printed ٩٬٩٣٨٫٢١ — the same view stating
+ * two different amounts owed, the smaller one to the client. A round figure stays round, so
+ * nothing picks up a decorative ٫٠٠.
+ */
+export function fmtMoney(
+  amount: number,
+  locale: "ar" | "en",
+  /**
+   * Override when the figure is mid-animation: a count-up towards a whole number passes
+   * through floats, and deciding per frame makes it tick over in halalas and then snap.
+   */
+  fractionDigits?: 0 | 2,
+): string {
+  const digits = fractionDigits ?? (Number.isInteger(amount) ? 0 : 2);
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
+}
+
+/**
  * A year, in the view's numerals but WITHOUT thousands grouping.
  *
  * `fmtCount(2026, "ar")` renders "٢٬٠٢٦" — a year is an identifier, not a quantity.

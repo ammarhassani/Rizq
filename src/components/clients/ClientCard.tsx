@@ -4,6 +4,7 @@
  */
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { fmtMoney } from "@/lib/format/number";
 
 export type ClientRow = {
   id: string;
@@ -30,7 +31,7 @@ type Props = {
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (!n || !isFinite(n)) return locale === "ar" ? "٠" : "0";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 const PRIORITY: Record<string, { cls: string; ar: string; en: string }> = {

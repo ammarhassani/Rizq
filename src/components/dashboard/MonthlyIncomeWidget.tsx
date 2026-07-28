@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { WidgetError } from "./WidgetError";
+import { fmtMoney } from "@/lib/format/number";
 
 type MonthlyRow = {
   month: string | null;
@@ -26,7 +27,7 @@ type Props = {
 
 function fmt(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !Number.isFinite(n)) return locale === "ar" ? "٠" : "0";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 /**

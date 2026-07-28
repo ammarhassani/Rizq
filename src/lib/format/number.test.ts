@@ -1,5 +1,31 @@
 import { describe, it, expect } from "vitest";
-import { fmtCount, toArabicIndicDigits } from "./number";
+import { fmtCount, fmtMoney, toArabicIndicDigits } from "./number";
+
+describe("fmtMoney", () => {
+  it("keeps the halalas an invoice actually asks for", () => {
+    // The defect: 9,938.21 announced as ٩٬٩٣٨ beside a document printing ٩٬٩٣٨٫٢١.
+    expect(fmtMoney(9938.21, "ar")).toBe("٩٬٩٣٨٫٢١");
+    expect(fmtMoney(9938.21, "en")).toBe("9,938.21");
+  });
+
+  it("leaves a round figure round", () => {
+    expect(fmtMoney(22500, "ar")).toBe("٢٢٬٥٠٠");
+    expect(fmtMoney(22500, "en")).toBe("22,500");
+  });
+
+  it("holds the digit count steady through a count-up", () => {
+    // Mid-tween values towards 22,500 are floats; without the override each frame would
+    // decide for itself and the figure would tick in halalas, then snap.
+    expect(fmtMoney(21873.4471, "ar", 0)).toBe("٢١٬٨٧٣");
+    expect(fmtMoney(9000, "en", 2)).toBe("9,000.00");
+  });
+
+  it("never states less than is owed", () => {
+    for (const amount of [0.01, 1.5, 99.99, 1234.05]) {
+      expect(Number(fmtMoney(amount, "en").replace(/,/g, ""))).toBe(amount);
+    }
+  });
+});
 
 describe("fmtCount", () => {
   it("formats Arabic counts in Arabic-Indic digits", () => {

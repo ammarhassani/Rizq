@@ -18,6 +18,7 @@ import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogInvoiceView } from "@/components/invoices/LogInvoiceView";
 import type { InvoiceArtifactData } from "@/lib/invoices/artifact";
 import { ownName } from "@/lib/proposals/artifact";
+import { fmtMoney } from "@/lib/format/number";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -105,9 +106,11 @@ export async function generateMetadata({
   const artifact = parseArtifactData(row.artifact_json);
 
   const invoiceNumber = row.invoice_number ?? null;
-  const totalSar = typeof row.total_sar === "number" ? Math.round(row.total_sar) : null;
+  // Not rounded: this description is the link preview, and Math.round stated a total 0.21
+  // SAR below what the invoice itself asks for.
+  const totalSar = typeof row.total_sar === "number" ? row.total_sar : null;
 
-  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US");
+  const fmt = { format: (n: number) => fmtMoney(n, locale === "ar" ? "ar" : "en") };
 
   // Pull branding name from artifact for OG title. `ownName` because a nameless freelancer
   // used to be named by their sign-in address, and this title travels into every chat the

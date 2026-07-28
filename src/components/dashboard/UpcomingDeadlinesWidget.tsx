@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { CalendarClock, Plus } from "lucide-react";
 import type { UpcomingInvoice } from "@/lib/invoices/queries";
 import { WidgetError } from "./WidgetError";
+import { fmtMoney } from "@/lib/format/number";
 
 type Props = {
   invoices: UpcomingInvoice[];
@@ -73,7 +74,7 @@ export function UpcomingDeadlinesWidget({ invoices, error, locale }: Props) {
               <div className="min-w-0">
                 <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{inv.invoice_number}</p>
                 <p className={`text-xs tabular text-rizq-ink-soft ${font}`}>
-                  {new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(inv.total_sar)} {t("currencySarShort")}
+                  {fmtMoney(inv.total_sar, isAr ? "ar" : "en")} {t("currencySarShort")}
                 </p>
               </div>
               <div className="shrink-0 text-right">

@@ -68,11 +68,10 @@ function fmtDate(iso: string | null, locale: "ar" | "en"): string {
   } catch { return iso; }
 }
 
-function fmtPrice(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(n);
-}
+import { fmtMoney as fmtMoneyShared } from "@/lib/format/number";
+
+/** Money keeps its halalas — see fmtMoney. */
+const fmtPrice = (n: number, locale: "ar" | "en") => fmtMoneyShared(n, locale);
 
 export function GigCard({ gig, locale, statusSlot }: Props) {
   const tI18n = useTranslations("Income.list");
