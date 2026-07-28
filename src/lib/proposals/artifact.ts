@@ -124,6 +124,24 @@ export function ownTagline(tagline: string | null | undefined): string | null {
   return trimmed;
 }
 
+/** Anything shaped like an email address. Deliberately loose — a name never needs one. */
+const EMAIL_SHAPED = /\S+@\S+\.\S+/;
+
+/**
+ * A display name that is not a sign-in address, or null.
+ *
+ * `freelancerName` used to fall back to the account's email, and that name is what the
+ * branding block prints, what the logo's alt text says, and what a share link's og:title
+ * carries — so the freelancer's private login address reached everyone the client forwarded
+ * the link to, before anyone opened it. The loader no longer produces it; this is the
+ * render-time half, so artifacts stored before the fix stop leaking without a rewrite.
+ */
+export function ownName(name: string | null | undefined): string | null {
+  const trimmed = (name ?? "").trim();
+  if (!trimmed || EMAIL_SHAPED.test(trimmed)) return null;
+  return trimmed;
+}
+
 // ---------------------------------------------------------------------------
 // Input / output types
 // ---------------------------------------------------------------------------
@@ -418,6 +436,14 @@ export function forClientAudience(data: ArtifactData): ArtifactData {
           if (key in content) narrowed[key] = content[key];
         }
         content = narrowed;
+      }
+
+      // A name that predates the ownName rule may BE the sign-in address: freelancerName
+      // fell back to it, and `name`/`brandName` are what the document prints.
+      for (const key of ["name", "brandName", "freelancerName"] as const) {
+        if (typeof content[key] === "string" && ownName(content[key] as string) === null) {
+          content = { ...content, [key]: null };
+        }
       }
 
       // An email that predates the contact_email-only rule may be the sign-in address.

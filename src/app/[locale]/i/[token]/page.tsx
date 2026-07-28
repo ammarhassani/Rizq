@@ -17,6 +17,7 @@ import { InvoiceArtifact } from "@/components/invoices/InvoiceArtifact";
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogInvoiceView } from "@/components/invoices/LogInvoiceView";
 import type { InvoiceArtifactData } from "@/lib/invoices/artifact";
+import { ownName } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -108,11 +109,13 @@ export async function generateMetadata({
 
   const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US");
 
-  // Pull branding name from artifact for OG title (it's in the shared artifact — not secret)
+  // Pull branding name from artifact for OG title. `ownName` because a nameless freelancer
+  // used to be named by their sign-in address, and this title travels into every chat the
+  // link is pasted in without anyone opening the page. Null ⇒ the plain title below.
   const branding = artifact?.sections.find((s) => s.id === "branding");
   const brandName =
     typeof branding?.content["brandName"] === "string"
-      ? (branding.content["brandName"] as string)
+      ? ownName(branding.content["brandName"] as string)
       : null;
 
   const description =

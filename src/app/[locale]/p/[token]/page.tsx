@@ -19,7 +19,7 @@ import { ProposalPrintStyles } from "@/components/proposals/ProposalPrintStyles"
 import { PrintButton } from "@/components/proposals/PrintButton";
 import { LogProposalView } from "@/components/proposals/LogProposalView";
 import type { ArtifactData } from "@/lib/proposals/artifact";
-import { forClientAudience } from "@/lib/proposals/artifact";
+import { forClientAudience, ownName } from "@/lib/proposals/artifact";
 import { isValidShareToken } from "@/lib/proposals/shareToken";
 
 // ---------------------------------------------------------------------------
@@ -137,11 +137,13 @@ export async function generateMetadata({
     artifact?.sections.find((s) => s.id === "cover") ??
     artifact?.sections.find((s) => s.id === "branding");
 
+  // `ownName`: a nameless freelancer used to be named by their sign-in address, and this
+  // title and description travel into every chat the link is pasted in.
   const brandName =
     typeof branding?.content["brandName"] === "string"
-      ? branding.content["brandName"]
+      ? ownName(branding.content["brandName"])
       : typeof branding?.content["name"] === "string"
-      ? (branding.content["name"] as string)
+      ? ownName(branding.content["name"] as string)
       : null;
 
   const anchor =

@@ -5,6 +5,8 @@ import {
   RIZQ_DEFAULTS,
   artifactTitle,
   forClientAudience,
+  ownName,
+  type ArtifactData,
   type ArtifactInput,
 } from "./artifact";
 
@@ -535,6 +537,51 @@ describe("artifactTitle", () => {
     expect(artifactTitle({})).toBeNull();
     expect(artifactTitle({ sections: [] })).toBeNull();
     expect(artifactTitle({ sections: [{ id: "cover", content: { projectTitle: "  " } }] })).toBeNull();
+  });
+});
+
+describe("ownName — a sign-in address is not a name", () => {
+  it("rejects an address, however it was routed into the name", () => {
+    expect(ownName("azahrani337+rizqdrive-1785141690978-225228@gmail.com")).toBeNull();
+    expect(ownName("someone@example.co.uk")).toBeNull();
+    expect(ownName("  login@example.com  ")).toBeNull();
+  });
+
+  it("keeps a real name, Arabic or Latin", () => {
+    expect(ownName("محمد العمري")).toBe("محمد العمري");
+    expect(ownName("Studio Noor")).toBe("Studio Noor");
+    expect(ownName("  زهراني  ")).toBe("زهراني");
+  });
+
+  it("treats absent and blank as absent", () => {
+    expect(ownName(null)).toBeNull();
+    expect(ownName(undefined)).toBeNull();
+    expect(ownName("   ")).toBeNull();
+  });
+});
+
+describe("forClientAudience — a stored artifact naming the freelancer by their login", () => {
+  /** A legacy branding section as it sits in artifact_json, built before ownName existed. */
+  const storedBranding = (content: Record<string, unknown>): ArtifactData => ({
+    sections: [
+      { id: "branding", order: 0, editable: true, aiEditable: false, content },
+    ],
+  });
+
+  it("drops the address from the branding block instead of printing it", () => {
+    const branding = forClientAudience(
+      storedBranding({
+        name: "azahrani337+rizqdrive-1785141690978-225228@gmail.com",
+        brandName: "azahrani337+rizqdrive-1785141690978-225228@gmail.com",
+      }),
+    ).sections[0]!.content;
+    expect(branding["name"]).toBeNull();
+    expect(branding["brandName"]).toBeNull();
+  });
+
+  it("leaves a real brand name alone", () => {
+    const stored = storedBranding({ brandName: "زهراني" });
+    expect(forClientAudience(stored).sections[0]!.content["brandName"]).toBe("زهراني");
   });
 });
 

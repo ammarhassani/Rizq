@@ -9,8 +9,9 @@
 
 import type { InvoiceArtifactData, InvoiceArtifactSection } from "@/lib/invoices/artifact";
 import type { InvoiceLineItem } from "@/lib/invoices/items";
-// Shared with proposals: stored artifacts substituted Rizq's own tagline for an absent one.
-import { ownTagline } from "@/lib/proposals/artifact";
+// Shared with proposals: stored artifacts substituted Rizq's own tagline for an absent one,
+// and named a nameless freelancer with their sign-in address.
+import { ownName, ownTagline } from "@/lib/proposals/artifact";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -36,6 +37,7 @@ const T = {
     billTo: "إلى",
     billToEn: "Bill to",
     noClient: "العميل",
+    freelancer: "مستقل",
     lineItems: "البنود",
     description: "الوصف",
     colDescription: "البند",
@@ -86,6 +88,7 @@ const T = {
     billTo: "Bill to",
     billToEn: "Bill to",
     noClient: "Client",
+    freelancer: "Freelancer",
     lineItems: "Line items",
     description: "Description",
     colDescription: "Description",
@@ -209,7 +212,11 @@ function BrandingSection({
 }) {
   const t = T[locale];
   const c = section.content;
-  const brandName = str(c["brandName"] ?? c["freelancerName"], str(c["freelancerName"]));
+  // Scrubbed for every audience, not just the client's: the freelancer's own copy is the
+  // one they print and hand over, so an address here travels exactly as far.
+  const brandName =
+    ownName(str(c["brandName"] ?? c["freelancerName"], str(c["freelancerName"]))) ??
+    t.freelancer;
   const tagline = ownTagline(str(c["tagline"] as string | undefined));
   const logoUrl = str(c["logoUrl"] as string | undefined | null);
   const colors = (c["colors"] as { primary?: string; secondary?: string } | null) ?? {};

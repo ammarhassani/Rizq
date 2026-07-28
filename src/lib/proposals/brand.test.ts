@@ -32,7 +32,6 @@ describe("loadUserBrandDefaults — contact.email", () => {
         contact_email: "hello@omari.sa",
       }),
       "user-1",
-      AUTH_EMAIL,
     );
     expect(brand.contact.email).toBe("hello@omari.sa");
   });
@@ -45,7 +44,6 @@ describe("loadUserBrandDefaults — contact.email", () => {
         contact_email: null,
       }),
       "user-1",
-      AUTH_EMAIL,
     );
     expect(brand.contact.email).toBeNull();
   });
@@ -54,20 +52,37 @@ describe("loadUserBrandDefaults — contact.email", () => {
     const brand = await loadUserBrandDefaults(
       fakeSupabase({ name: "محمد العمري" }),
       "user-1",
-      AUTH_EMAIL,
     );
     expect(brand.contact.email).toBeNull();
   });
 
   it("is null when the profile row is missing entirely", async () => {
-    const brand = await loadUserBrandDefaults(fakeSupabase(null), "user-1", AUTH_EMAIL);
+    const brand = await loadUserBrandDefaults(fakeSupabase(null), "user-1");
     expect(brand.contact.email).toBeNull();
   });
 
-  it("still names a nameless freelancer from the auth email (that fallback stays)", async () => {
-    // The name has to come from somewhere; it is not an address handed to the client.
-    const brand = await loadUserBrandDefaults(fakeSupabase({}), "user-1", AUTH_EMAIL);
-    expect(brand.freelancerName).toBe(AUTH_EMAIL);
+  it("never names a nameless freelancer with an address", async () => {
+    // This assertion used to read the other way, on the grounds that a name "is not an
+    // address handed to the client". It is: the name is printed on the document, used as
+    // the logo's alt text, and carried in the share link's og:title.
+    const brand = await loadUserBrandDefaults(fakeSupabase({}), "user-1");
+    expect(brand.freelancerName).toBe("مستقل / Freelancer");
     expect(brand.contact.email).toBeNull();
+  });
+
+  it("does not use an address stored in name or full_name_ar either", async () => {
+    const brand = await loadUserBrandDefaults(
+      fakeSupabase({ name: AUTH_EMAIL, full_name_ar: null }),
+      "user-1",
+    );
+    expect(brand.freelancerName).toBe("مستقل / Freelancer");
+  });
+
+  it("still uses a real name", async () => {
+    const brand = await loadUserBrandDefaults(
+      fakeSupabase({ name: "Mohammed", full_name_ar: "محمد العمري" }),
+      "user-1",
+    );
+    expect(brand.freelancerName).toBe("محمد العمري");
   });
 });

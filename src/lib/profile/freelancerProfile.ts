@@ -51,7 +51,7 @@ export function statedProjectAnchor(p: Pick<FreelancerProfile, "projectRateRange
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function loadFreelancerProfile(supabase: SupabaseClient<any>, userId: string, email: string | null): Promise<FreelancerProfile> {
+export async function loadFreelancerProfile(supabase: SupabaseClient<any>, userId: string): Promise<FreelancerProfile> {
   const [{ data: row }, { data: specRows }, brand] = await Promise.all([
     supabase
       .from("users")
@@ -61,7 +61,7 @@ export async function loadFreelancerProfile(supabase: SupabaseClient<any>, userI
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("specialties").select("slug, name_en, name_ar"),
-  ]).then(async ([r, s]) => [r, s, await loadUserBrandDefaults(supabase, userId, email)] as const);
+  ]).then(async ([r, s]) => [r, s, await loadUserBrandDefaults(supabase, userId)] as const);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const r = (row ?? {}) as any;

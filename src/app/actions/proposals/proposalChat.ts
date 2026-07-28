@@ -138,7 +138,7 @@ export async function proposalChat(rawInput: unknown): Promise<ProposalChatResul
 
   // 2. Regenerate prose with the freelancer's revision applied; keep only targets.
   try {
-    const brand = await loadUserBrandDefaults(supabase, userId, userResult.user.email ?? null);
+    const brand = await loadUserBrandDefaults(supabase, userId);
     let prompt = buildProsePrompt(
       proposalProsePromptArgs(
         {

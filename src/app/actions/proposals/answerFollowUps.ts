@@ -145,11 +145,7 @@ export async function answerFollowUps(
       : resolveResult.provenance_citation_ar;
 
   // Load user brand defaults (M8 columns) for artifact personalisation.
-  const brand = await loadUserBrandDefaults(
-    supabase,
-    userId,
-    userResult.user.email ?? null
-  );
+  const brand = await loadUserBrandDefaults(supabase, userId);
   const testimonials = await loadTestimonials(supabase, userId);
 
   // IP terms: scope-derived → user default → 'full_transfer'

@@ -103,11 +103,7 @@ export async function editProposal(
       : currentAnchor;
 
   // Load user brand defaults (M8 columns) for artifact personalisation (non-fatal).
-  const brand = await loadUserBrandDefaults(
-    supabase,
-    userId,
-    userResult.user.email ?? null
-  );
+  const brand = await loadUserBrandDefaults(supabase, userId);
   const testimonials = await loadTestimonials(supabase, userId);
   const freelancerName = brand.freelancerName;
 

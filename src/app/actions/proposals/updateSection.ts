@@ -495,11 +495,7 @@ export async function regenerateSection(rawInput: unknown): Promise<UpdateSectio
 
   try {
     const scope = (proposal["scope_json"] ?? {}) as Scope;
-    const brand = await loadUserBrandDefaults(
-      supabase,
-      userId,
-      userResult.user.email ?? null
-    );
+    const brand = await loadUserBrandDefaults(supabase, userId);
 
     // Identical assembly to the streaming draft route, then a FOCUS directive.
     let prompt = buildProsePrompt(

@@ -10,6 +10,8 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { ownName } from "./artifact";
+
 // ---------------------------------------------------------------------------
 // Output type
 // ---------------------------------------------------------------------------
@@ -119,22 +121,21 @@ function parsePortfolioSamples(
  *
  * @param supabase - authenticated Supabase client (RLS enforces ownership).
  * @param userId   - the authenticated user's UUID.
- * @param authEmail - fallback email from auth.getUser(), used ONLY to name an otherwise
- *                    nameless freelancer. It never becomes `contact.email`: an
- *                    authentication address is not a contact address, and it used to be
- *                    printed on every document the client read.
+ *
+ * Takes no email. It used to accept the auth address to name an otherwise nameless
+ * freelancer, and that name is printed on every document their client reads and carried
+ * in the share link's og:title — a sign-in address is not a name any more than it is a
+ * contact address.
  */
 export async function loadUserBrandDefaults(
   supabase: SupabaseClient,
-  userId: string,
-  authEmail: string | null = null
+  userId: string
 ): Promise<UserBrandDefaults> {
   const { data: profile } = await supabase
     .from("users")
     .select(
       [
         "name",
-        "email",
         "full_name_ar",
         "brand_name",
         "brand_name_ar",
@@ -163,12 +164,12 @@ export async function loadUserBrandDefaults(
   const p = (profile ?? {}) as Record<string, unknown>;
 
   const name = (p["name"] as string | null) ?? null;
-  const email = (p["email"] as string | null) ?? authEmail ?? null;
   const fullNameAr = (p["full_name_ar"] as string | null) ?? null;
 
-  // freelancerName: full_name_ar → name → email → fallback
+  // freelancerName: full_name_ar → name → fallback. `ownName` guards both columns: a
+  // sign-in address stored in either one must not become the name on the client's copy.
   const freelancerName =
-    fullNameAr ?? name ?? email ?? "مستقل / Freelancer";
+    ownName(fullNameAr) ?? ownName(name) ?? "مستقل / Freelancer";
 
   // brandNameAr: brand_name_ar → brand_name → null
   const brandNameAr =

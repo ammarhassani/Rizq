@@ -334,11 +334,7 @@ export async function generateProposal(
   );
 
   // 10. Load user brand defaults (M8 columns) for artifact personalisation.
-  const brand = await loadUserBrandDefaults(
-    supabase,
-    userId,
-    userResult.user.email ?? null
-  );
+  const brand = await loadUserBrandDefaults(supabase, userId);
 
   // Load active testimonials once; reused across both buildArtifactData calls.
   const testimonials = await loadTestimonials(supabase, userId);

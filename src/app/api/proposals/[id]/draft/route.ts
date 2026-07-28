@@ -86,11 +86,7 @@ export async function POST(
     const scope = (proposal.scope_json ?? {}) as Scope;
 
     // Profile (brand defaults) for voice/bio context.
-    const brand = await loadUserBrandDefaults(
-      supabase,
-      user.id,
-      user.email ?? null
-    );
+    const brand = await loadUserBrandDefaults(supabase, user.id);
 
     // Shared assembly (identical to the Phase E single-section regen action).
     let prompt = buildProsePrompt(
