@@ -20,6 +20,7 @@ import {
 } from "@/app/actions/projects/tasks";
 import { normalizeStatus, completionRatio } from "@/lib/projects/taskStatus";
 import type { TaskStatus } from "@/lib/projects/types";
+import { fmtRate } from "@/lib/format/number";
 
 const NEXT: Record<TaskStatus, TaskStatus> = { todo: "doing", doing: "done", done: "todo" };
 const STATUS_KEY: Record<TaskStatus, string> = { todo: "statusTodo", doing: "statusDoing", done: "statusDone" };
@@ -162,7 +163,7 @@ export function TasksTab({
                     <span className="text-xs text-rizq-ink-soft/60">
                       {t("milestoneProgress", { done: groupTasks.filter((x) => normalizeStatus(x.status) === "done").length, total: groupTasks.length })}
                       {" · "}
-                      {Math.round(ratio * 100)}%
+                      {fmtRate(Math.round(ratio * 100), locale)}%
                     </span>
                   )}
                 </div>

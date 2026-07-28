@@ -13,6 +13,7 @@ import { IncomeListClient } from "@/components/income/IncomeListClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
 import type { GigRow } from "@/components/income/GigCard";
+import { fmtRate } from "@/lib/format/number";
 
 type Params = { locale: string };
 
@@ -202,7 +203,7 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
                     : "status-overdue"
                 }`}>
                   {changePercent >= 0 ? "↑" : "↓"}
-                  {Math.abs(changePercent)}%
+                  {fmtRate(Math.abs(changePercent), locale as "ar" | "en")}%
                   <span className={`font-normal text-xs opacity-80 ${font}`}>{t("vsLastMonth")}</span>
                 </span>
               </div>

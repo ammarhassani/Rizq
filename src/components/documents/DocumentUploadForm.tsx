@@ -7,6 +7,7 @@ import { uploadDocument, suggestCategoryAction, suggestExpiryAction } from "@/ap
 import { Loader2, Sparkles, CheckCircle } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { Combobox } from "@/components/ui/Combobox";
+import { fmtRate } from "@/lib/format/number";
 
 type CategoryOption = { id: string; name_ar: string; name_en: string };
 
@@ -187,7 +188,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
               <Sparkles size={12} className="text-rizq-gold" />
               {tI18n("aiSuggested")}
               <strong>{catName(categoryAI.value)}</strong>
-              <span className="opacity-60">({Math.round(categoryAI.confidence * 100)}%)</span>
+              <span className="opacity-60">({fmtRate(Math.round(categoryAI.confidence * 100), locale)}%)</span>
             </span>
             <button
               type="button"
@@ -255,7 +256,7 @@ export function DocumentUploadForm({ locale, categories }: Props) {
               <Sparkles size={12} className="text-rizq-gold" />
               {tI18n("aiSuggestedExpiry")}
               <strong>{expiryAI.value}</strong>
-              <span className="opacity-60">({Math.round(expiryAI.confidence * 100)}%)</span>
+              <span className="opacity-60">({fmtRate(Math.round(expiryAI.confidence * 100), locale)}%)</span>
             </span>
             <button
               type="button"

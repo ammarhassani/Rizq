@@ -30,7 +30,7 @@ import { setFeePresetsActive, deleteFeePresets, importFeePresets, type CreatedFe
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { toCsv, csvToRecords, parseMoneyCell } from "@/lib/catalog/csv";
 import { cn } from "@/lib/utils";
-import { fmtCount } from "@/lib/format/number";
+import { fmtCount, fmtRate } from "@/lib/format/number";
 
 export type CatalogItem = CreatedItem & { is_active: boolean };
 export type CatalogFee = CreatedFeePreset & { is_active: boolean };
@@ -399,7 +399,7 @@ export function CatalogManager({ locale, items, feePresets }: Props) {
                   <h3 className={cn("text-base font-semibold leading-snug text-rizq-ink", font)}>{p.name}</h3>
                   {p.category && <CategoryChip label={p.category} font={font} />}
                   {p.fee_type === "percentage" ? (
-                    <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{p.percentage ?? 0}%</p>
+                    <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{fmtRate(p.percentage ?? 0, locale)}%</p>
                   ) : (
                     <p className="mt-3 tabular font-sans text-lg font-bold text-rizq-green">{fmt(p.amount_sar)}{" "}<span className={cn("text-xs font-normal text-rizq-ink-soft/60", font)}>{currency}</span></p>
                   )}

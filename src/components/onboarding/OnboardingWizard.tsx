@@ -27,6 +27,7 @@ import { StepDefaults } from "./StepDefaults";
 import { StepGoals } from "./StepGoals";
 import { StepReview } from "./StepReview";
 import { resumeStepIndex } from "@/lib/onboarding/resume";
+import { fmtRate } from "@/lib/format/number";
 
 const TOTAL_STEPS = 11;
 
@@ -153,7 +154,7 @@ export function OnboardingWizard({ locale, profile: initialProfile, initialStep,
           <div className="pt-1">
             <div className={`flex items-center justify-between text-[11px] text-rizq-ink-soft/70 mb-1 ${font}`}>
               <span>{tv2("profileStrength")}</span>
-              <span className="tabular font-semibold text-rizq-green">{profile.profile_completeness_pct}%</span>
+              <span className="tabular font-semibold text-rizq-green">{fmtRate(profile.profile_completeness_pct, locale)}%</span>
             </div>
             <div className="h-1 rounded-full bg-rizq-gold/15 overflow-hidden">
               <div

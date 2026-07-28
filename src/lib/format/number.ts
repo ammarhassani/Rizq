@@ -37,6 +37,21 @@ export function fmtMoney(
 }
 
 /**
+ * A percentage rate, in the view's numerals — 15 → "١٥", 7.5 → "٧٫٥".
+ *
+ * The invoice builder interpolated `{vatPct}%` raw, so the totals panel read
+ * "ضريبة القيمة المضافة (15%)" while the toggle above it in the same view read "(١٥%)".
+ * Matches the artifact's own rate rendering (no decimals unless the rate has them), so the
+ * form and the document it produces state the rate identically.
+ */
+export function fmtRate(rate: number, locale: "ar" | "en"): string {
+  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(rate);
+}
+
+/**
  * A year, in the view's numerals but WITHOUT thousands grouping.
  *
  * `fmtCount(2026, "ar")` renders "٢٬٠٢٦" — a year is an identifier, not a quantity.

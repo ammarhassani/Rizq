@@ -18,6 +18,7 @@ import { FeeDialog } from "@/components/fees/FeeDialog";
 import type { CreatedFeePreset } from "@/app/actions/fees/fees";
 import type { InvoiceFee } from "@/lib/invoices/items";
 import { cn } from "@/lib/utils";
+import { fmtRate } from "@/lib/format/number";
 
 type Props = {
   locale: "ar" | "en";
@@ -50,7 +51,7 @@ export function FeePicker({ locale, presets, onPick, id }: Props) {
   /** Display value: "5%" for percentage presets, "50 SAR" for fixed. */
   const fmtValue = React.useCallback(
     (p: CreatedFeePreset) =>
-      p.fee_type === "percentage" ? `${p.percentage ?? 0}%` : fmtAmount(p.amount_sar),
+      p.fee_type === "percentage" ? `${fmtRate(p.percentage ?? 0, locale)}%` : fmtAmount(p.amount_sar),
     [fmtAmount]
   );
 

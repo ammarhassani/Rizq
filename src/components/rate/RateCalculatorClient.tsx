@@ -20,6 +20,7 @@ import { Combobox } from "@/components/ui/Combobox";
 import { BandMeter } from "@/components/charts/BandMeter";
 import type { RateCalculatorOutput, MarketBand } from "@/lib/rate/calculate";
 import type { RatePositioning } from "@/lib/ai/ratePositioning";
+import { fmtRate } from "@/lib/format/number";
 import type {
   SpecialtyOption,
   CityOption,
@@ -449,7 +450,7 @@ export function RateCalculatorClient({
               <div className={`flex justify-between text-xs text-rizq-ink-soft ${font}`}>
                 <span>P10</span>
                 <span className="font-medium text-rizq-ink">
-                  {output.market_percentile}%
+                  {fmtRate(output.market_percentile, locale)}%
                 </span>
                 <span>P90</span>
               </div>

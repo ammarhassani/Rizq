@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { WidgetError } from "./WidgetError";
-import { fmtMoney } from "@/lib/format/number";
+import { fmtMoney, fmtRate } from "@/lib/format/number";
 
 type MonthlyRow = {
   month: string | null;
@@ -110,7 +110,7 @@ export function MonthlyIncomeWidget({ current, previous, trend, error, locale, g
                     }}
                   >
                     {changePercent >= 0 ? "+" : ""}
-                    {changePercent}%
+                    {fmtRate(changePercent, locale)}%
                   </span>
                 )}
               </div>

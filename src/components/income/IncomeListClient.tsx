@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Download } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
-import { fmtCount, fmtYear } from "@/lib/format/number";
+import { fmtCount, fmtYear, fmtRate } from "@/lib/format/number";
 import { MotionList, MotionItem } from "@/components/motion/MotionList";
 import { GigCard, type GigRow } from "./GigCard";
 import { GigStatusQuickEdit } from "./GigStatusQuickEdit";
@@ -252,7 +252,7 @@ export function IncomeListClient({ gigs, locale }: Props) {
             </div>
             {stats.changePct !== null && (
               <div className={`mt-1 text-[10px] text-[var(--acc)] ${font}`}>
-                {stats.changePct >= 0 ? "+" : ""}{stats.changePct}% {t("vsLastMonth")}
+                {stats.changePct >= 0 ? "+" : ""}{fmtRate(stats.changePct, locale)}% {t("vsLastMonth")}
               </div>
             )}
           </div>

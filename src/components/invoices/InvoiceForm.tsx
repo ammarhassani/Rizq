@@ -29,6 +29,7 @@ import type { CreatedFeePreset } from "@/app/actions/fees/fees";
 import type { VatEligibility } from "@/lib/invoices/vatEligibility";
 import { Link } from "@/i18n/navigation";
 import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
+import { fmtRate } from "@/lib/format/number";
 
 const VAT_RATE = 15;
 
@@ -457,7 +458,7 @@ export function InvoiceForm({
                         {fee.name}
                         {fee.fee_type === "percentage" && (
                           <span className={`ms-1.5 text-xs font-normal text-rizq-ink-soft/60 ${font}`}>
-                            ({fee.rate ?? 0}%)
+                            ({fmtRate(fee.rate ?? 0, locale)}%)
                           </span>
                         )}
                       </p>
@@ -513,7 +514,7 @@ export function InvoiceForm({
             {vatPct > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-rizq-ink-soft">
-                  {t("vatLabel")} ({vatPct}%)
+                  {t("vatLabel")} ({fmtRate(vatPct, locale)}%)
                 </span>
                 <span className="tabular font-sans text-sm font-medium text-rizq-ink">
                   {fmtMoney(totals.vat_sar)}{" "}
