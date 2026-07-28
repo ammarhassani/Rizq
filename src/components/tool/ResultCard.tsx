@@ -10,6 +10,7 @@ import { track } from "@/lib/analytics/track";
 import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
 import type { MarketTrend, TrendScope } from "@/lib/pricing/trend";
 import { evidenceStrength } from "@/lib/pricing/evidenceStrength";
+import { statedRatePosition } from "@/lib/pricing/statedRatePosition";
 
 /**
  * Name the market a trend describes. The direction is often computed nationally because
@@ -57,6 +58,8 @@ type Props = {
   provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
   provenanceCitation?: string;  // pre-localized full citation sentence
   confidenceScore?: number;     // 0..1
+  /** What the freelancer said they charge, from their profile. Absent for most accounts. */
+  statedRange?: { min: number; max: number } | null;
   /** Raw dominant provenance kind — used to deep-link the methodology page */
   provenanceKind?: BenchmarkProvenance;
   /** Computed market-trend signal (M4), or null if data too thin to show one. */
@@ -86,6 +89,7 @@ export function ResultCard({
   provenanceLabel,
   provenanceCitation,
   confidenceScore,
+  statedRange,
   provenanceKind,
   trend,
   specialtyName,
@@ -244,6 +248,28 @@ export function ResultCard({
             )}
           </p>
         )}
+        {(() => {
+          // A band is information; where the freelancer sits inside it is a decision.
+          // Rendered only when the profile actually holds a stated rate — no rate, no line.
+          const pos = statedRatePosition({ min, anchor: median, max }, statedRange);
+          if (!pos) return null;
+          // "50% from the median" without a side is not a decision — inside the band the
+          // sentence still has to say which way.
+          const key =
+            pos.position === "within"
+              ? pos.percent_vs_anchor >= 0
+                ? "withinAbove"
+                : "withinBelow"
+              : pos.position;
+          return (
+            <p className={`sm:col-span-2 text-sm text-rizq-ink ${font}`}>
+              {t(`statedRate.${key}`, {
+                stated: numberFmt.format(pos.stated),
+                percent: numberFmt.format(Math.abs(pos.percent_vs_anchor)),
+              })}
+            </p>
+          );
+        })()}
         {provenanceCitation && (
           <p className={`sm:col-span-2 text-xs text-rizq-ink-soft italic ${font}`}>
             {provenanceCitation}

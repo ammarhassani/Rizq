@@ -746,6 +746,12 @@
         "limited": "limited",
         "moderate": "moderate",
         "good": "good"
+      },
+      "statedRate": {
+        "below": "You usually charge around {stated} SAR for work like this — {percent}% under the median, and below the band entirely. Nothing says you must move; it does say the market would bear more.",
+        "withinBelow": "You usually charge around {stated} SAR for work like this — inside the band, {percent}% below the median.",
+        "withinAbove": "You usually charge around {stated} SAR for work like this — inside the band, {percent}% above the median.",
+        "above": "You usually charge around {stated} SAR for work like this — {percent}% above the median, and above the band entirely. Worth knowing what you are defending in the conversation."
       }
     },
     "insufficient": {

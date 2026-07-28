@@ -34,6 +34,11 @@ type Props = {
     citySlug: string | null;
     tierSlug: string | null;
   };
+  /**
+   * What the freelancer said they charge for a project, from onboarding. Optional: most
+   * accounts have not filled it, and the result simply omits the comparison when absent.
+   */
+  statedRange?: { min: number; max: number } | null;
   /** Allowance as of page load. Re-rendered from the action's result after each lookup. */
   quota: {
     mode: "anon" | "free" | "pro" | "admin";
@@ -76,6 +81,7 @@ export function ToolFlow({
   canShare,
   isAuthed,
   profilePrefill,
+  statedRange,
   quota,
   header,
 }: Props) {
@@ -234,6 +240,7 @@ export function ToolFlow({
         provenanceLabel={PROVENANCE_LABEL[r.dominant_provenance][locale === "ar" ? "ar" : "en"]}
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
+        statedRange={statedRange}
         provenanceKind={r.dominant_provenance}
         trend={r.trend}
         specialtyName={specialties.find((s) => s.slug === specialty)?.label}

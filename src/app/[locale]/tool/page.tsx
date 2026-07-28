@@ -50,12 +50,15 @@ export default async function ToolPage({
   let profilePrefill:
     | { specialtySlug: string | null; citySlug: string | null; tierSlug: string | null }
     | undefined;
+  // What they said they charge, so the result can place them inside the band instead of
+  // handing over a 3.5x spread and leaving the decision entirely to them.
+  let statedRange: { min: number; max: number } | null = null;
 
   if (userData.user) {
     const { data: profileRow } = await supabase
       .from("users")
       .select(
-        "primary_specialty:specialties!primary_specialty_id(slug), city:cities!city_id(slug), tier:experience_tiers!experience_tier_id(slug)"
+        "current_project_rate_range, primary_specialty:specialties!primary_specialty_id(slug), city:cities!city_id(slug), tier:experience_tiers!experience_tier_id(slug)"
       )
       .eq("id", userData.user.id)
       .maybeSingle();
@@ -73,6 +76,13 @@ export default async function ToolPage({
         citySlug: slugOf(profileRow.city),
         tierSlug: slugOf(profileRow.tier),
       };
+      // jsonb — onboarding writes {min, max}, and a single figure arrives as min === max.
+      const raw = profileRow.current_project_rate_range as
+        | { min?: unknown; max?: unknown }
+        | null;
+      if (raw && typeof raw.min === "number" && typeof raw.max === "number") {
+        statedRange = { min: raw.min, max: raw.max };
+      }
     }
   }
 
@@ -121,6 +131,7 @@ export default async function ToolPage({
           canShare={isAuth}
           isAuthed={isAuth}
           profilePrefill={profilePrefill}
+          statedRange={statedRange}
           quota={{ mode, remaining, limit }}
           header={
             <div>
