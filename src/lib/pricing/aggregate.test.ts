@@ -31,6 +31,22 @@ describe("aggregate", () => {
     expect(out.min % 10).toBe(0);
   });
 
+  it("counts distinct citations, not rows — the published-ref triple is one source", () => {
+    const ref = "Saudi-adjusted global freelance reference — docs/published-ref-draft.md";
+    const triple = [300, 450, 650].map((p) => ({
+      ...row(p, "published_ref", 0.6),
+      source_ref: ref,
+    }));
+    const out = aggregate(triple, NOW)!;
+    expect(out.sample_size).toBe(3);
+    expect(out.source_count).toBe(1);
+  });
+
+  it("treats unattributed rows as one bucket, never one source apiece", () => {
+    const out = aggregate([row(900, "founder", 0.3), row(1100, "founder", 0.3)], NOW)!;
+    expect(out.source_count).toBe(1);
+  });
+
   it("picks the highest-total-weight provenance as dominant", () => {
     const rows = [
       row(1000, "published_ref", 0.6),

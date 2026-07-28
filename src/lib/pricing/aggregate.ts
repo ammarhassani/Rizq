@@ -15,6 +15,13 @@ export type AggRow = {
    * period of the second manufactures a market move. See trend.ts.
    */
   project_size?: string | null;
+  /**
+   * The citation the row came from. Rows are not observations: the published-reference
+   * seed expresses ONE reference as a min/median/max triple, so a cell holding three
+   * rows can rest on a single document. Counting rows and calling it a sample size
+   * overstates the evidence, which is the one thing the honesty layer exists to prevent.
+   */
+  source_ref?: string | null;
 };
 
 export type ProvenanceSource = {
@@ -28,6 +35,12 @@ export type Aggregate = {
   anchor: number;
   max: number;
   sample_size: number;
+  /**
+   * Distinct citations behind those rows. `sample_size` counts rows; this counts the
+   * things a reader would recognise as separate evidence. When it is 1, the band —
+   * however many rows fed it — rests on one source, and the citation must say so.
+   */
+  source_count: number;
   dominant_provenance: BenchmarkProvenance;
   sources: ProvenanceSource[];
   confidence_score: number;
@@ -80,12 +93,20 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
   const sampleFactor = Math.min(1, usable.length / CONFIDENCE_SAMPLE_TARGET);
   const confidence_score = round2(clamp01(meanWeight * sampleFactor));
 
+  // Rows sharing a citation are one piece of evidence. Rows with no citation collapse
+  // into a single "unattributed" bucket rather than counting one apiece — an unknown
+  // origin is not proof of an independent one.
+  const sourceKeys = new Set(
+    usable.map((r) => (r.source_ref ?? "").trim() || "__unattributed__")
+  );
+
   const dates = usable.map((r) => r.captured_at).sort();
   return {
     min,
     anchor,
     max,
     sample_size: usable.length,
+    source_count: sourceKeys.size,
     dominant_provenance,
     sources,
     confidence_score,

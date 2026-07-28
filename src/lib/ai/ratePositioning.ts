@@ -85,7 +85,7 @@ export function buildRatePositioningPrompt(ctx: RatePositioningCtx): string {
 مستوى الخبرة: ${tier_name_ar} (${tier_name_en})
 السعر المستهدف للمشروع: ${target_rate.toLocaleString("ar-SA")} ريال
 
-نطاق السوق (بناءً على ${sample_size} سجل حقيقي):
+نطاق السوق (بناءً على ${sample_size} سجل مرجعي في مؤشر رِزق):
 - الحد الأدنى (P10): ${market_p10.toLocaleString("ar-SA")} ريال
 - الوسيط (P50): ${market_p50.toLocaleString("ar-SA")} ريال
 - الحد الأعلى (P90): ${market_p90.toLocaleString("ar-SA")} ريال

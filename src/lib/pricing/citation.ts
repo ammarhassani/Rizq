@@ -3,6 +3,14 @@ import { PROVENANCE_LABEL, type BenchmarkProvenance } from "./provenance";
 export type CitationInput = {
   dominant: BenchmarkProvenance;
   sample_size: number;
+  /**
+   * Distinct citations behind the rows (aggregate.source_count). Named separately
+   * from sample_size because they are routinely different: the published-reference
+   * seed stores one document as a min/median/max triple, so "3 records" has meant
+   * one source since the day it was loaded. Stating the row count alone reads as
+   * three independent findings agreeing — a claim nobody made and nobody checked.
+   */
+  source_count: number;
   date_range: { earliest: string; latest: string };
   fallback_kind: "none" | "region" | "specialty";
 };
@@ -26,8 +34,10 @@ export function buildCitation(input: CitationInput): { ar: string; en: string } 
         ? " Widened across all cities."
         : "";
 
-  const ar = `تقدير رِزق بناءً على ${arabicRecordCount(n)} (${label.ar}) حتى عام ${arDigits(year)}.${widenAr}`;
-  const en = `Rizq estimate based on ${n} ${n === 1 ? "record" : "records"} (${label.en}) through ${year}.${widenEn}`;
+  const m = input.source_count;
+
+  const ar = `تقدير رِزق بناءً على ${arabicRecordCount(n)} من ${arabicSourceCount(m)} (${label.ar}) حتى عام ${arDigits(year)}.${widenAr}`;
+  const en = `Rizq estimate based on ${n} ${n === 1 ? "record" : "records"} from ${m} ${m === 1 ? "source" : "sources"} (${label.en}) through ${year}.${widenEn}`;
   return { ar, en };
 }
 
@@ -45,6 +55,14 @@ export function arabicRecordCount(n: number): string {
   if (n === 2) return "سجلين";
   if (n >= 3 && n <= 10) return `${arDigits(n)} سجلات`;
   return `${arDigits(n)} سجلاً`;
+}
+
+/** Same counted-noun agreement for "مصدر" — a Saudi reader notices "٣ مصدر" too. */
+export function arabicSourceCount(n: number): string {
+  if (n === 1) return "مصدر واحد";
+  if (n === 2) return "مصدرين";
+  if (n >= 3 && n <= 10) return `${arDigits(n)} مصادر`;
+  return `${arDigits(n)} مصدرًا`;
 }
 
 /**

@@ -1,5 +1,60 @@
 # Rizq data strategy — making the pricing data "insane" (2026-06-27)
 
+## Measured state of the corpus (2026-07-28 — check this before trusting anything below)
+1,621 rows: `published_ref` 1,260, `founder` 360, `submitted` 1, and **zero** `ingested` /
+`partner` / `reasoned`. Counted against the live DB, not the plan:
+
+- The 1,260 `published_ref` rows share **one** `source_ref` and **one** capture date. They are
+  ~420 min/median/max triples derived from a single draft document — not 1,260 observations.
+  Per cell: **240 of 420 cells hold 3 rows from 1 source**; 179 hold 5 rows from 2 sources.
+- Every cell therefore clears `MIN_SAMPLE = 3`, so `resolvePrice` has never widened and has
+  never returned `insufficient_data`. The fallback ladder and k-anonymity are unexercised.
+- The trend layer cannot fire: `sameBasis()` compares `founder` rows (sized) against
+  `published_ref` rows (`project_size` NULL) and rejects every national pool.
+- Tier 3 is **not running**: `contribute_benchmarks` is true for 0 of 53 users and no UI sets it,
+  so `contribute_benchmark` no-ops on every paid invoice. The single `submitted` row came from a
+  test account — and test accounts are indistinguishable (51/53 are gmail.com, `role` is only
+  free/pro/admin). **Any consent default flipped on would let the e2e harness write fabricated
+  prices into the corpus.** A test-account exclusion has to ship with the consent toggle, not after.
+- Every `proposals` / `gigs` row in the DB today is test data. Do not backfill the flywheel from it.
+
+### Where it stands after 2026-07-29
+
+| | before | after |
+|---|---|---|
+| rows | 1,621 | **1,793** |
+| distinct sources | 3 (2 unverifiable) | **9** (6 cited + 3 legacy) |
+| active specialties | 12 | **17** |
+| live cells resolving | 420 / 420 | **595 / 595** |
+| avg sources per cell | 1.0 | **2.32** |
+
+1. **The citation counts sources, not just rows** (`aggregate.source_count`). "3 records" now
+   reads "3 records from 1 source". Verified in-browser in both locales.
+2. **National rows.** `city_id` / `experience_tier_id` are nullable and mean "applies to any" —
+   a published report says "Software Engineering, £533/day", not "Riyadh, senior". Storing them
+   this way is what made the sources below usable without fanning one figure across 35 cells.
+3. **Six cited sources ingested**, all national, all with a real publication date:
+   YunoJuno 2026 (182k data points) · EFA 2026 (1,100+ respondents) · Stack Overflow 2025
+   (23,928) · ProCopywriters 2024 (298) · Nonprofit.ist 2025 (300+) · IEEE-USA 2025.
+4. **Everything foreign converts at purchasing power**, never the SAMA peg: World Bank
+   `PA.NUS.PPP` — Saudi 2024 = 1.85, UK 2024 = 0.664153. Salaried sources additionally pass the
+   employment→freelance bridge (`÷1250 billable h × 1.25 overhead × 1.30 premium`). Every row
+   carries its own arithmetic in `notes`.
+5. **Specialties expanded 12 → 22, then trimmed to 17.** Five were deactivated (not deleted)
+   for sitting under the 3-record floor: product-management, project-management, proofreading,
+   transcription, motion-graphics. Each needs 1–2 more sources and flips back automatically.
+6. **Monthly refresh agent** — `.claude/skills/refresh-pricing-sources/` + a scheduled cloud
+   routine. Re-reads every source, diffs against `docs/validation/source-checks.jsonl`, opens a
+   PR. **Never ingests**; the PR is the approval gate.
+7. **Copy corrected across the app.** "Real Saudi data", "based on N Saudi freelancers", "higher
+   than X% of freelancers", "every contribution is hand-reviewed", "the index updates continuously
+   as new submissions come in" — all were false, all replaced with what is actually true.
+
+Still weakest, in order: the 1,260-row unverifiable seed; `PROJECT_HOURS` (8/24/60/160) as the
+hours-per-project assumption; Stack Overflow's global medians treated as international dollars;
+and three specialties (photography, data-entry, voice-over) still resting on one source.
+
+
 ## Goal
 Turn Rizq's pricing from a thin editorial estimate into the **most credible, freshest,
 most granular freelance price-discovery dataset in Saudi Arabia** — and a compounding moat.
@@ -42,6 +97,25 @@ freelance_premium`, with billable-hours/overhead/premium constants published in 
 page. Implement `makeOpenDataCollector` (currently the stub) against the GASTAT/data.gov.sa
 wage dataset; normalize → `ingested` rows keyed by specialty × region. This **replaces the
 6-record seed with a national wage-grounded floor for every specialty/city.**
+
+**Status 2026-07-28 — built, blocked on the dataset.** `makeOpenDataCollector` now implements the
+conversion (`wageToHourlyRate` / `wageToProjectRate`, constants exported and unit-tested; each row
+records its own derivation in `notes`). What is missing is the data, and it cannot be fetched
+programmatically from here:
+
+- `open.data.gov.sa` (which carries *Average monthly wages for paid employees*) rejects automated
+  requests at the WAF; `od.data.gov.sa` 302s onto it. Not a scraping target either way.
+- KAPSARC's Opendatasoft API *is* reachable but carries no occupation-granular wage set —
+  `wages-and-salaries-by-establishment-size-and-economic-activity` is a 2017 sector wage bill and
+  `labor-force-survey-data` is unemployment rates by age.
+- The GASTAT figure that is publicly quotable (10,238 SAR average monthly wage across four
+  sectors) is **Q2 2018** and has no occupation dimension.
+
+So the export is downloaded by hand and passed to the collector. Two founder decisions are still
+open and neither should be guessed in code: the **occupation → specialty mapping**, and whether one
+national wage may be fanned across the city × tier grid (the collector deliberately refuses to do
+this on its own). Ingesting also needs a `collector_registry` row of its own — `open_data_etimad`
+is a different source (procurement) and stays disabled.
 
 ## Tier 2 — Published references (`published_ref`) — *cite, don't scrape*
 Reputable, citable rate reports (their **published aggregate numbers**, not scraped listings):

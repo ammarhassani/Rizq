@@ -16,6 +16,22 @@ export function projectSizeFromDeliverables(deliverableCount: number | null | un
   return "enterprise";
 }
 
+/**
+ * Assumed billable hours behind each project size.
+ *
+ * Every external source prices TIME (an hourly or day rate); Rizq prices PROJECTS.
+ * Bridging the two needs an hours-per-project assumption, and this is it — shared by
+ * every collector so the assumption is stated once and calibrated once. It is the
+ * weakest number in the pricing stack; the first real `submitted` data should replace
+ * it with a regression on paid price vs deliverable_count.
+ */
+export const PROJECT_HOURS: Record<ProjectSize, number> = {
+  small: 8,
+  medium: 24,
+  large: 60,
+  enterprise: 160,
+};
+
 /** Minimum distinct contributors before `submitted` rows may surface in a band. */
 export const SUBMITTED_K_ANON = 3;
 
