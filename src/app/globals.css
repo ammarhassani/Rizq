@@ -161,7 +161,9 @@
   /* status — #94671f read 4.24:1 on --raised and 3.66:1 on --bg, so a pending amount in it
      failed AA on every light surface. Darkened to clear 4.5:1 on all three. */
   --warn: #805614;
-  --over: #be4326;
+  /* #be4326 read 3.89:1 as text on --over-soft, so the delete control and every overdue
+     label failed AA. Darkened to clear 4.5:1 on the soft fill and on both page surfaces. */
+  --over: #a5391f;
   /* shimmer skeleton */
   --shim-d: #dbd1bf;
   --shim-l: #f1e9d8;

@@ -109,7 +109,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
             <p className={`mt-0.5 text-sm text-rizq-ink-soft truncate ${font}`}>{gig.client_name}</p>
           )}
           {gig.delivery_date && (
-            <p className="mt-1 text-xs text-rizq-ink-soft/60">
+            <p className="mt-1 text-xs text-[var(--content-muted)]">
               {tI18n("due")} {fmtDate(gig.delivery_date, locale)}
             </p>
           )}
@@ -118,7 +118,7 @@ export function GigCard({ gig, locale, statusSlot }: Props) {
           <p className="tabular font-sans text-base font-bold text-rizq-green leading-none">
             {fmtPrice(gig.amount_sar, locale)}
           </p>
-          <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{tI18n("sar")}</p>
+          <p className={`text-xs text-[var(--content-muted)] ${font}`}>{tI18n("sar")}</p>
           {statusSlot ?? (
             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyle} ${font}`}>
               {statusLabel}

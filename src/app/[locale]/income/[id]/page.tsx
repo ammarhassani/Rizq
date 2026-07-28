@@ -13,12 +13,13 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { GigDetailActions } from "@/components/income/GigDetailActions";
 import type { LinkedInvoice } from "@/components/income/GigDetailActions";
+import { fmtMoney } from "@/lib/format/number";
 
 type Params = { locale: string; id: string };
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "—";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {

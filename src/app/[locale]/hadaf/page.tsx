@@ -13,15 +13,13 @@ import { getHadafStatusAction } from "@/app/actions/hadaf/status";
 import { HadafStreakBar } from "@/components/hadaf/HadafStreakBar";
 import { HadafActionPlanClient } from "@/components/hadaf/HadafActionPlanClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
-import { fmtCount } from "@/lib/format/number";
+import { fmtCount, fmtMoney } from "@/lib/format/number";
 import { CheckCircle2, XCircle, ExternalLink, AlertTriangle, TrendingUp } from "lucide-react";
 
 type Params = { locale: string };
 
 function fmtSAR(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(n);
+  return { format: (n: number) => fmtMoney(n, locale) }.format(n);
 }
 
 function fmtMonth(ym: string, locale: "ar" | "en"): string {

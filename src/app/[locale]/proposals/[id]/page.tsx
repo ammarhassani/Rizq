@@ -30,6 +30,7 @@ import { ProposalChatDock } from "@/components/proposals/ProposalChatDock";
 import type { ArtifactData } from "@/lib/proposals/artifact";
 import { forClientAudience } from "@/lib/proposals/artifact";
 import type { Scope } from "@/lib/ai/scope";
+import { fmtMoney } from "@/lib/format/number";
 
 // editProposal runs an AI change-summary; give the Server Action headroom.
 export const maxDuration = 60;
@@ -59,9 +60,7 @@ export async function generateMetadata({
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(n);
+  return { format: (n: number) => fmtMoney(n, locale) }.format(n);
 }
 
 function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {

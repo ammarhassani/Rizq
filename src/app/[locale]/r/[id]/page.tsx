@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
 import { SiteNav } from "@/components/nav/SiteNav";
+import { fmtMoney } from "@/lib/format/number";
 
 type Params = { locale: string; id: string };
 
@@ -89,9 +90,7 @@ export default async function SharedResultPage({
   const tShare = await getTranslations({ locale, namespace: "Share" });
   const font = locale === "ar" ? "font-arabic" : "font-sans";
 
-  const fmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  });
+  const fmt = { format: (n: number) => fmtMoney(n, locale) };
 
   const min = Math.round(row.result_min ?? 0);
   const median = Math.round(row.result_median);

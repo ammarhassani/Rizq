@@ -14,6 +14,7 @@ import { StartProjectButton } from "@/components/wizard/StartProjectButton";
 import { listProjects } from "@/app/actions/projects/listProjects";
 import { WidgetError } from "@/components/dashboard/WidgetError";
 import type { LifecycleStageKey } from "@/lib/projects/lifecycle";
+import { fmtMoney } from "@/lib/format/number";
 
 type Params = { locale: string };
 
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "—";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 export default async function ProjectsIndexPage({ params }: { params: Promise<Params> }) {

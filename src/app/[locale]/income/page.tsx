@@ -13,7 +13,7 @@ import { IncomeListClient } from "@/components/income/IncomeListClient";
 import { AnimatedNumber } from "@/components/tool/AnimatedNumber";
 import { TrendChart } from "@/components/charts/TrendChart";
 import type { GigRow } from "@/components/income/GigCard";
-import { fmtRate } from "@/lib/format/number";
+import { fmtRate, fmtMoney } from "@/lib/format/number";
 
 type Params = { locale: string };
 
@@ -30,7 +30,7 @@ type MonthlyIncomeRow = {
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "٠";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 function fmtMonth(iso: string | null, locale: "ar" | "en"): string {
@@ -214,20 +214,20 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
           {(currentMonthRow) && (
             <div dir={dir} className="mt-4 pt-4 border-t border-rizq-gold/20 flex flex-wrap gap-4">
               <div>
-                <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("paid")}</p>
+                <p className="text-xs text-[var(--content-muted)] mb-0.5">{t("paid")}</p>
                 <p className="tabular font-sans text-base font-semibold text-[var(--acc)]">
                   {fmtPrice(currentMonthRow.paid_sar ?? 0, locale as "ar" | "en")}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("pending")}</p>
+                <p className="text-xs text-[var(--content-muted)] mb-0.5">{t("pending")}</p>
                 <p className="tabular font-sans text-base font-semibold text-[var(--warn)]">
                   {fmtPrice(currentMonthRow.pending_sar ?? 0, locale as "ar" | "en")}
                 </p>
               </div>
               {(currentMonthRow.overdue_sar ?? 0) > 0 && (
                 <div>
-                  <p className="text-xs text-rizq-ink-soft/60 mb-0.5">{t("overdue")}</p>
+                  <p className="text-xs text-[var(--content-muted)] mb-0.5">{t("overdue")}</p>
                   <p className="tabular font-sans text-base font-semibold text-[var(--over)]">
                     {fmtPrice(currentMonthRow.overdue_sar ?? 0, locale as "ar" | "en")}
                   </p>

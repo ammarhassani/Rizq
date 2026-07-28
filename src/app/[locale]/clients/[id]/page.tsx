@@ -15,12 +15,13 @@ import { ClientContactLinks } from "@/components/clients/ClientContactLinks";
 import { ClientGigHistory } from "@/components/clients/ClientGigHistory";
 import { ClientInvoiceHistory } from "@/components/clients/ClientInvoiceHistory";
 import { ClientTimeline } from "@/components/clients/ClientTimeline";
+import { fmtMoney } from "@/lib/format/number";
 
 type Params = { locale: string; id: string };
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "—";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {

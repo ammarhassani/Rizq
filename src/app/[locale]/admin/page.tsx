@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { ReviewActions } from "@/components/admin/ReviewActions";
+import { fmtMoney } from "@/lib/format/number";
 
 type Status = "pending" | "approved" | "rejected" | "needs_info";
 
@@ -133,9 +134,7 @@ export default async function AdminPage({
     locale === "ar" ? "ar-SA" : "en-US",
     { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }
   );
-  const priceFmt = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  });
+  const priceFmt = { format: (n: number) => fmtMoney(n, locale) };
 
   return (
     <div className="min-h-screen flex flex-col">

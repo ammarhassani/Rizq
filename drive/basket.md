@@ -6,21 +6,18 @@ The loop files findings here and never fixes them. Remediation is a separate, re
 decision — mixing discovery with change is how pass 3's fixes shipped five new defects.
 
 **1 open** — P1 0 · P2 0 · P3 1
-**8 closed** of 9 real · **4 withdrawn** (never defects)
+**9 closed** of 10 real · **4 withdrawn** (never defects)
 
 ## P3
 
-### RZQ-0013 — Opacity-modified text tokens fail AA on income, calendar and settings
+### RZQ-0014 — Money still rounded to whole SAR on the proposal and project surfaces
 
-text-rizq-ink-soft/60 cannot reach 4.5:1 on any light surface: /ar/income shows 21 failing nodes, all of them the delivery date and status caption on every gig card. /ar/calendar has 5 (a /50 overflow count and three filter chips), /ar/settings 1 (حذف الحساب). Same class as RZQ-0002, which was filed for /ar/dashboard alone because that is the only route the sweep ran axe against. The design system already has --content-faint for exactly this, darkened to clear AA; the opacity modifier bypasses it.
+RZQ-0008 replaced the money formatters on the invoice, income, client, dashboard and calendar surfaces with the shared fmtMoney, and a follow-up covered eight more under src/app. Twelve components still carry their own maximumFractionDigits: 0 and would drop halalas the same way: ProposalArtifact, ProposalCard, PriceEditor, docx export, ProjectMoneyPanel, ProjectInvoicesList, ProposalAnchorPicker, OnboardingPricePreview, RateCalculatorClient, ResultCard. Proposal prices are usually whole SAR, which is why this has never been visible, but the document and the figure beside it can disagree the moment one is not. Landing-page demo figures and chart axis ticks are deliberately excluded.
 
-_route `/ar/income` · session `ammar-fix` · filed 2026-07-28_
+_route `/ar/proposals/[id]` · session `ammar-fix` · filed 2026-07-28_
 
 ```
-/ar/income: 21 color-contrast nodes, e.g. <p class="mt-1 text-xs text-rizq-ink-soft/60">التسليم: ٢٧ يوليو</p>
-/ar/calendar: 5 nodes incl. <span class="text-[9px] text-rizq-ink-soft/50">+١٥</span>
-/ar/settings: 1 node — حذف الحساب
-measured with axe wcag2aa after the RZQ-0002 fix landed
+grep -rn "maximumFractionDigits: 0" src/components — 12 files outside charts/ and landing/
 ```
 
 ## Closed
@@ -33,6 +30,7 @@ measured with axe wcag2aa after the RZQ-0002 fix landed
 - RZQ-0008 (fixed) — Invoice totals are shown with the halalas dropped beside the document that keeps them
 - RZQ-0009 (fixed) — Invoice builder prints the VAT rate in Latin digits beside the same rate in Arabic-Indic
 - RZQ-0011 (accepted) — /ar/dashboard — 21 tap target(s) under 44px: 36×36px "فتح قائمة التطبيقات" | 36×36px "التب
+- RZQ-0013 (fixed) — Opacity-modified text tokens fail AA on income, calendar and settings
 
 ## Withdrawn — verification showed these were never defects
 

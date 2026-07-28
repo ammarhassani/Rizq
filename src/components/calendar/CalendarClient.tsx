@@ -156,7 +156,7 @@ function EventRow({
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium text-rizq-ink truncate ${font}`}>{title}</p>
         <div className="flex flex-wrap items-center gap-2 mt-1">
-          <span className={`text-xs text-rizq-ink-soft/60 ${font}`}>
+          <span className={`text-xs text-[var(--content-muted)] ${font}`}>
             {new Intl.DateTimeFormat(isAr ? "ar-SA" : "en-US", {
               weekday: "short",
               month: "short",
@@ -167,7 +167,7 @@ function EventRow({
           {amount != null && (
             <span className={`tabular font-sans text-xs font-semibold text-rizq-green`}>
               {fmtMoney(amount, isAr ? "ar" : "en")}{" "}
-              <span className={`font-normal text-rizq-ink-soft/60 ${font}`}>{t("sarLabel")}</span>
+              <span className={`font-normal text-[var(--content-muted)] ${font}`}>{t("sarLabel")}</span>
             </span>
           )}
         </div>
@@ -369,8 +369,18 @@ function MonthView({
                 <span
                   className={`
                     inline-flex items-center justify-center rounded-full w-7 h-7 text-xs font-medium leading-none mb-0.5
-                    ${isToday ? "bg-rizq-green text-rizq-cream" : ""}
-                    ${!isToday && cell.isCurrentMonth ? (weekend ? "text-rizq-gold/80" : "text-rizq-ink") : "text-rizq-ink-soft/40"}
+                    ${
+                      // One branch per state. The old pair applied the muted colour whenever
+                      // `!isToday` was false too, so today's number rendered muted ink on its
+                      // own green pill — 1.25:1, the worst contrast on the page.
+                      isToday
+                        ? "bg-rizq-green text-rizq-cream"
+                        : cell.isCurrentMonth
+                          ? weekend
+                            ? "text-rizq-gold-dark"
+                            : "text-rizq-ink"
+                          : "text-[var(--content-faint)]"
+                    }
                     ${font}
                   `}
                 >
@@ -380,7 +390,12 @@ function MonthView({
                 </span>
                 {/* Hijri */}
                 {showHijri && cell.isCurrentMonth && (
-                  <span className="text-[9px] text-[var(--content-faint)] leading-none mb-0.5 font-arabic truncate w-full">
+                  <span
+                    className={`text-[9px] leading-none mb-0.5 font-arabic truncate w-full ${
+                      // The today cell is filled with --acc; a muted ink label on it reads 1.25:1.
+                      isToday ? "text-rizq-cream" : "text-[var(--content-faint)]"
+                    }`}
+                  >
                     {formatHijri(cell.date)}
                   </span>
                 )}
@@ -397,7 +412,7 @@ function MonthView({
                     );
                   })}
                   {dayEvents.length > 3 && (
-                    <span className="text-[9px] text-rizq-ink-soft/50 leading-none">+{fmtCount(dayEvents.length - 3, locale)}</span>
+                    <span className="text-[9px] text-[var(--content-faint)] leading-none">+{fmtCount(dayEvents.length - 3, locale)}</span>
                   )}
                 </div>
               </button>
@@ -763,7 +778,7 @@ export function CalendarClient({ events, prefs, locale }: Props) {
               className={`rounded-full px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ${
                 sourceFilter === c.key
                   ? (color ? `${color.badge} border` : "bg-rizq-green text-rizq-cream")
-                  : "border border-rizq-gold/25 bg-[var(--raised)] text-rizq-ink-soft/60 hover:border-rizq-green/30"
+                  : "border border-rizq-gold/25 bg-[var(--raised)] text-[var(--content-muted)] hover:border-rizq-green/30"
               } ${font}`}
             >
               {color && <span className={`w-2 h-2 rounded-full flex-shrink-0 ${color.dot}`} />}
