@@ -68,6 +68,11 @@ export async function forceCompleteOnboarding(user: DisposableUser): Promise<str
       onboarding_completed_at: nowIso,
       onboarded_at: nowIso,
       last_active: nowIso,
+      // The harness drives the golden path to a PAID invoice, which calls
+      // contribute_benchmark. Declaring the account here is what stops a fabricated
+      // price entering the pricing corpus as a "verified freelancer submission" —
+      // nothing else distinguishes a disposable user from a real one.
+      is_test_account: true,
     })
     .eq("id", uid);
   if (upErr) throw new Error(`onboarding force-complete failed for ${user.email}: ${upErr.message}`);

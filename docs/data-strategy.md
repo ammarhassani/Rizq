@@ -22,11 +22,11 @@
 
 | | before | after |
 |---|---|---|
-| rows | 1,621 | **1,793** |
-| distinct sources | 3 (2 unverifiable) | **9** (6 cited + 3 legacy) |
-| active specialties | 12 | **17** |
-| live cells resolving | 420 / 420 | **595 / 595** |
-| avg sources per cell | 1.0 | **2.32** |
+| rows | 1,621 | **1,824** |
+| distinct sources | 3 (2 unverifiable) | **12** (7 cited + 3 legacy + 2 retired) |
+| active specialties | 12 | **20** |
+| live cells resolving | 420 / 420 | **700 / 700** |
+| avg sources per cell | 1.0 | **2.42** |
 
 1. **The citation counts sources, not just rows** (`aggregate.source_count`). "3 records" now
    reads "3 records from 1 source". Verified in-browser in both locales.
@@ -50,9 +50,28 @@
    than X% of freelancers", "every contribution is hand-reviewed", "the index updates continuously
    as new submissions come in" — all were false, all replaced with what is actually true.
 
-Still weakest, in order: the 1,260-row unverifiable seed; `PROJECT_HOURS` (8/24/60/160) as the
-hours-per-project assumption; Stack Overflow's global medians treated as international dollars;
-and three specialties (photography, data-entry, voice-over) still resting on one source.
+8. **Test-account firewall** (`users.is_test_account`, enforced inside `contribute_benchmark`
+   before consent is even read). The e2e harness drives invoice→paid, which calls that RPC;
+   only the opt-in default was stopping it, and test accounts are indistinguishable (51/53
+   gmail.com, `role` is only free/pro/admin). The harness now declares itself. The one existing
+   `submitted` row — contributed by a test account on 2026-05-14 — is deactivated.
+9. **Robert Half 2026 Salary Guide** added (placements + Textkernel validation + ~4,200
+   surveyed, Sept 2025), reactivating product-management, project-management and proofreading.
+   Only `transcription` and `motion-graphics` remain off, each needing one more source.
+
+Still weakest, in order:
+
+- **The 1,260-row unverifiable seed.** Measured, not guessed: retiring it today drops **310 of
+  700 cells** below the floor across 10 specialties. It stays until cited sources cover those
+  cells; replace it incrementally, never in one move.
+- `PROJECT_HOURS` (8/24/60/160) as the hours-per-project assumption — the weakest number in the
+  stack, and the first thing real `submitted` data should replace with a regression.
+- Stack Overflow's global medians treated as international dollars.
+- `photography` and `voice-over` still rest on a single source.
+- **Confidence renders 9–14%** on live results. That is the formula being honest
+  (`provenance 0.6 × confidence 0.5 × freshness × sample/10`), not a bug — with ≤5 records and
+  no first-party data it cannot go higher. Left alone deliberately: every way to make that
+  number look better is a way of inflating it.
 
 
 ## Goal
