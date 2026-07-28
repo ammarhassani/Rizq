@@ -159,7 +159,7 @@ async function preflight() {
 }
 
 export async function open(fn, opts = {}) {
-  const { viewport = { width: 1280, height: 900 }, locale = "ar-SA", fresh = false } = opts;
+  const { viewport = { width: 1280, height: 900 }, locale = "ar-SA", fresh = false, theme = "light" } = opts;
   await preflight();
   mkdirSync(SHOTS_DIR, { recursive: true });
 
@@ -169,6 +169,18 @@ export async function open(fn, opts = {}) {
     locale,
   });
   const page = ctx.pages()[0] ?? (await ctx.newPage());
+
+  // next-themes reads its own localStorage key before paint (attribute="data-theme",
+  // enableSystem off). Setting it up front means the FIRST render is already in the row's
+  // theme — clicking the toggle afterwards would leave every check before the click
+  // measuring light and quietly report it as dark coverage.
+  await page.addInitScript((value) => {
+    try {
+      window.localStorage.setItem("theme", value);
+    } catch {
+      /* storage blocked — the app falls back to its light default */
+    }
+  }, theme);
 
   // Everything the browser complains about is evidence — a loop iteration should not have
   // to remember to listen for it.

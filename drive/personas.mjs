@@ -93,7 +93,14 @@ export function personaByName(name) {
 
 /**
  * The session options a persona arrives with — pass straight into `open()`.
+ *
+ * `theme` comes from the plan row rather than the persona: it is a property of the run being
+ * driven, not of who is driving it.
  */
-export function sessionOptions(persona) {
-  return { viewport: persona.device.viewport, locale: persona.locale };
+export function sessionOptions(persona, run = {}) {
+  return {
+    viewport: persona.device.viewport,
+    locale: persona.locale,
+    theme: run.theme ?? "light",
+  };
 }

@@ -452,3 +452,8 @@
 {"at":"2026-07-28T08:23:21.708Z","session":"S-0004","step":"completed","findings":0,"note":"plan complete"}
 {"at":"2026-07-28T11:29:13.568Z","session":"S-0005","step":"started"}
 {"at":"2026-07-28T11:29:13.570Z","session":"S-0005","step":"completed","findings":0,"note":"plan complete"}
+{"at":"2026-07-28T11:36:17.595Z","session":"S-0006","step":"started"}
+{"at":"2026-07-28T11:36:17.598Z","session":"S-0006","step":"row-claimed","planRow":89}
+{"at":"2026-07-28T11:37:13.063Z","session":"S-0006","step":"driven","planRow":89}
+{"at":"2026-07-28T11:40:06.210Z","session":"S-0006","step":"resumed","planRow":89}
+{"at":"2026-07-28T11:40:06.220Z","session":"S-0006","step":"row-claimed","planRow":1}

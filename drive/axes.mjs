@@ -115,6 +115,21 @@ export const AXES = {
       "guided-context",
     ],
   },
+
+  /**
+   * WHICH set of tokens is painting it.
+   *
+   * Added 2026-07-28, deliberately, which reopens the space and resets the dry counter —
+   * the plan's own rule. The reason it earns that: every colour decision this product has
+   * audited was measured in light. The a11y remediation that closed RZQ-0002 and RZQ-0013
+   * darkened `--warn` and `--over` in the LIGHT block only; `[data-theme="dark"]` carries
+   * its own values for both, plus its own --content-faint, and no pass has ever looked at
+   * them. Dark is one attribute away for any user and half the token file.
+   */
+  theme: {
+    why: "the contrast work so far only ever measured the light half of the token file",
+    values: ["light", "dark"],
+  },
 };
 
 export const AXIS_NAMES = Object.keys(AXES);

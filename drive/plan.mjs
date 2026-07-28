@@ -49,6 +49,24 @@ export function tickPlanRow(n, date = new Date().toISOString().slice(0, 10)) {
   writeFileSync(PLAN, out);
 }
 
+/**
+ * Clear every tick so the plan can be driven again from row 1.
+ *
+ * The dates in the `done` column are not the coverage record — `runs.jsonl` is, and it keeps
+ * every run with its date and findings forever. This only decides what to drive NEXT, so
+ * wiping it loses nothing a reader needs; the scoreboard still reports the full history.
+ */
+export function resetPlan() {
+  const out = readFileSync(PLAN, "utf8")
+    .split("\n")
+    .map((line) => {
+      const m = line.match(ROW);
+      return m ? `| ${m[1]} |${m[2]}|  |` : line;
+    })
+    .join("\n");
+  writeFileSync(PLAN, out);
+}
+
 export function planProgress() {
   const rows = planRows();
   return { done: rows.filter((r) => r.done).length, total: rows.length };

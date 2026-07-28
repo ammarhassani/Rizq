@@ -17,6 +17,19 @@ import { checkpoint, complete } from "./invocation.mjs";
 import { personaByName, sessionOptions } from "./personas.mjs";
 import { runKey } from "./axes.mjs";
 
+/** Is the app telling the freelancer why the save was refused? */
+async function quotaRefusal(page) {
+  const dialog = page.getByRole("dialog");
+  return (await dialog.count()) > 0 && (await dialog.first().isVisible());
+}
+
+/** Did the row actually reach the database, as this same signed-in freelancer? */
+async function rowExists({ db }, table, column, value) {
+  const { client, userId } = await db();
+  const { data } = await client.from(table).select("id").eq("user_id", userId).eq(column, value);
+  return (data ?? []).length > 0;
+}
+
 export async function driveRow(row, sessionId) {
   const persona = personaByName(row.run.persona);
   const findings = [];
@@ -31,18 +44,42 @@ export async function driveRow(row, sessionId) {
     const mobile = persona.device.mobile;
     const stamp = new Date().toISOString().slice(11, 19);
 
-    const client = await addClient(tools, `عميل ${persona.name} ${stamp}`);
-    if (!client.id && note(`client save did not navigate (${client.landedOn})`)) {
-      found("P2", "Saving a client does not navigate to the created client",
-        `Submitted and stayed at ${client.landedOn}; a save that appears to do nothing invites a second submit.`,
-        [`landed on ${client.landedOn}`], "/ar/clients/new");
+    // A save that goes nowhere is only a defect if it also saved nothing NEW, or saved
+    // without saying so. Asserting on the landed URL alone filed the working paywall as a
+    // defect 137 times across one batch: at the quota ceiling the form correctly stays put
+    // and a dialog explains why. Both checks below ask the database and the screen.
+    const clientName = `عميل ${persona.name} ${stamp}`;
+    const client = await addClient(tools, clientName);
+    if (!client.id) {
+      const refused = await quotaRefusal(page);
+      const saved = await rowExists(tools, "clients", "name", clientName);
+      if (!refused && !saved && note(`client save did nothing (${client.landedOn})`)) {
+        found("P2", "Saving a client neither navigates nor saves",
+          `Submitted and stayed at ${client.landedOn} with no client row and no explanation on screen.`,
+          [`landed on ${client.landedOn}`, "no matching clients row", "no dialog shown"],
+          "/ar/clients/new");
+      } else if (saved && note(`client saved but stayed on the form (${client.landedOn})`)) {
+        found("P2", "A saved client leaves the freelancer on the empty form",
+          "The row is in the database but the form re-rendered blank — a duplicate-client trap.",
+          [`landed on ${client.landedOn}`, "clients row exists"], "/ar/clients/new");
+      }
     }
 
-    const income = await logIncome(tools, { amount: 4500, title: `مشروع ${stamp}` });
-    if (income.landedOn.includes("/income/new") && note("logging income left a blank form")) {
-      found("P2", "Logging income leaves the freelancer on a blank form",
-        "The row saves but the form re-renders empty — a duplicate-income trap.",
-        [`landed on ${income.landedOn}`], "/ar/income/new");
+    const incomeTitle = `مشروع ${stamp}`;
+    const income = await logIncome(tools, { amount: 4500, title: incomeTitle });
+    if (income.landedOn.includes("/income/new")) {
+      const refused = await quotaRefusal(page);
+      const saved = await rowExists(tools, "gigs", "title", incomeTitle);
+      if (saved && note("income saved but the form re-rendered blank")) {
+        found("P2", "Logging income leaves the freelancer on a blank form",
+          "The row saves but the form re-renders empty — a duplicate-income trap.",
+          [`landed on ${income.landedOn}`, "gigs row exists"], "/ar/income/new");
+      } else if (!refused && !saved && note("logging income did nothing")) {
+        found("P2", "Logging income neither saves nor explains why",
+          "Submitted with no gig row and no dialog — the freelancer is given no reason.",
+          [`landed on ${income.landedOn}`, "no matching gigs row", "no dialog shown"],
+          "/ar/income/new");
+      }
     }
 
     const { client: sb, userId } = await db();
@@ -92,7 +129,7 @@ export async function driveRow(row, sessionId) {
     checkpoint(sessionId, "row-ticked", { planRow: row.n });
 
     console.log(`   ${findings.length} finding(s)${filed.length ? ": " + filed.join(", ") : ""}`);
-  }, sessionOptions(persona));
+  }, sessionOptions(persona, row.run));
 
   return findings;
 }
