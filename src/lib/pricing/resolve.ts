@@ -25,6 +25,8 @@ export type ResolveResult =
       anchor: number;
       max: number;
       sample_size: number;
+      /** Distinct citations behind those rows — see aggregate.source_count. */
+      source_count: number;
       dominant_provenance: BenchmarkProvenance;
       sources: ProvenanceSource[];
       confidence_score: number;
@@ -100,16 +102,31 @@ async function fetchRows(
 ): Promise<AggRow[]> {
   let query = supabase
     .from("benchmark_records")
-    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id, project_size")
+    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id, project_size, source_ref")
     .eq("specialty_id", args.specialty_id)
-    .eq("experience_tier_id", args.experience_tier_id)
     .eq("active", true)
     .eq("verified", true)
-    .eq("flagged_as_outlier", false);
+    .eq("flagged_as_outlier", false)
+    // A NULL city/tier means the source published a national, seniority-agnostic
+    // figure — a published rate report says "Software Engineering, £533/day", not
+    // "Riyadh, senior". Such a row supports every cell of its specialty instead of
+    // being fanned across 35 of them and counted 35 times.
+    .or(`experience_tier_id.eq.${args.experience_tier_id},experience_tier_id.is.null`);
 
-  if (args.city_id) query = query.eq("city_id", args.city_id);
-  if (args.city_ids && args.city_ids.length > 0) query = query.in("city_id", args.city_ids);
-  if (args.project_size) query = query.eq("project_size", args.project_size);
+  if (args.city_id) query = query.or(`city_id.eq.${args.city_id},city_id.is.null`);
+  if (args.city_ids && args.city_ids.length > 0) {
+    query = query.or(`city_id.in.(${args.city_ids.join(",")}),city_id.is.null`);
+  }
+  // Project size follows the same wildcard rule as city and tier: a NULL means the
+  // source did not state a size, so the row supports any of them.
+  //
+  // When the CALLER states no size we answer for a typical (medium) project rather
+  // than blending every basis together. Sources are stored at four sizes derived from
+  // 8 to 160 assumed hours; pooling those produces a band running from a one-day task
+  // to a month-long engagement, which describes no project anyone is quoting.
+  query = args.project_size
+    ? query.or(`project_size.eq.${args.project_size},project_size.is.null`)
+    : query.or("project_size.eq.medium,project_size.is.null");
 
   const { data, error } = await query;
   if (error || !data) return [];
@@ -126,6 +143,7 @@ async function fetchRows(
       confidence: conf,
       captured_at: captured,
       project_size: (r as { project_size: string | null }).project_size ?? null,
+      source_ref: (r as { source_ref: string | null }).source_ref ?? null,
       source_user_id: (r as { source_user_id: string | null }).source_user_id ?? null,
     };
   });
@@ -208,6 +226,7 @@ async function finalize(
   const citation = buildCitation({
     dominant: agg.dominant_provenance,
     sample_size: agg.sample_size,
+    source_count: agg.source_count,
     date_range: agg.date_range,
     fallback_kind: fallback,
   });
@@ -218,6 +237,7 @@ async function finalize(
     anchor: agg.anchor,
     max: agg.max,
     sample_size: agg.sample_size,
+    source_count: agg.source_count,
     dominant_provenance: agg.dominant_provenance,
     sources: agg.sources,
     confidence_score: agg.confidence_score,

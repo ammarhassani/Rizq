@@ -1,4 +1,31 @@
+import { PROJECT_HOURS, type ProjectSize } from "../contribution";
 import type { BenchmarkRow, Collector, RawRecord } from "./types";
+
+/**
+ * Purchasing-power bridge for foreign rate reports.
+ *
+ * Every credible freelance rate report is US/UK. Converting $88/hr at the SAMA peg
+ * (3.75) would say a Saudi client pays 330 SAR/hr for work a US client pays $88 for,
+ * which is a claim about exchange rates, not about what the work is worth here.
+ * The World Bank's PPP conversion factor is the standard, citable bridge — and unlike
+ * a factor we invent, it has a publisher, a year, and a revision history.
+ *
+ * Source: World Bank, "PPP conversion factor, GDP (LCU per international $)"
+ * (indicator PA.NUS.PPP), Saudi Arabia, 2024. Prior years: 1.89 (2023), 2.01 (2022).
+ * Refresh annually — the refresh agent tracks this alongside the rate reports.
+ */
+export const SAR_PER_INTERNATIONAL_DOLLAR = 1.85;
+export const PPP_SOURCE_REF =
+  "World Bank PA.NUS.PPP (PPP conversion factor, GDP), Saudi Arabia 2024 = 1.85";
+
+/**
+ * A published USD hourly rate → a SAR price for one project size.
+ * No overhead or freelance premium here: unlike a salary, a published freelance rate
+ * already carries both.
+ */
+export function usdHourlyToSarProject(usdHourly: number, size: ProjectSize): number {
+  return Math.round(usdHourly * SAR_PER_INTERNATIONAL_DOLLAR * PROJECT_HOURS[size]);
+}
 
 /**
  * Collector 1 — curated published references (Qemma 2026, agency rate cards,

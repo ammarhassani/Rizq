@@ -197,6 +197,31 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   `normalizeInsightText` (was `stripEmDashes`) — a prompt instruction alone was a hope, and the
   non-AI fallback formats en-US regardless of locale. Applied at render, so already-cached
   insights are fixed without regenerating.
+- **Pricing data moat (2026-07-29, no spec dir — see `docs/data-strategy.md`).** The corpus was
+  1,621 rows that looked like 1,621 observations and were not: 1,260 shared **one** `source_ref`
+  and one capture date (a min/median/max triple per cell from a single draft document), so every
+  cell cleared `MIN_SAMPLE` and `resolvePrice` had never once widened or returned
+  `insufficient_data`. Fixed in three moves. (1) **`aggregate.source_count`** — the citation counts
+  distinct citations, not rows, so "3 records" reads "3 records from 1 source". (2) **National
+  rows** — `benchmark_records.city_id` / `experience_tier_id` are nullable, meaning "applies to
+  any"; a published report states one figure per discipline and is now stored that way instead of
+  being fanned across 35 cells. `resolvePrice` reads NULL as a wildcard (same rule for
+  `project_size`, and an unstated size resolves as *medium* rather than blending an 8-hour task
+  with a 160-hour engagement). (3) **Six cited sources ingested** — YunoJuno 2026, EFA 2026,
+  Stack Overflow 2025, ProCopywriters 2024, Nonprofit.ist 2025, IEEE-USA 2025 — converted at
+  **World Bank PPP** (`PA.NUS.PPP`: Saudi 1.85, UK 0.664153), never the SAMA peg, with salaried
+  sources also crossing the employment→freelance bridge. Result: 1,793 rows, **9 sources**,
+  **2.32 sources/cell**, 595/595 live cells resolving. Specialties 12 → 22 → **17 active** (five
+  deactivated, not deleted, for sitting under the floor). A **monthly cloud routine** re-reads
+  every source and opens a PR — it never ingests.
+  **Found by driving it, not by planning it:** six user-facing strings claimed data the app does
+  not have — "real Saudi data", "based on N Saudi freelancers", "higher than X% of *freelancers*
+  in your specialty" (it counts rows), "every contribution is hand-reviewed" (no review pipeline
+  exists), "the index updates continuously as new submissions come in" (`contribute_benchmarks`
+  is true for 0 of 53 users). All corrected. **Unfixed and deliberate:** the e2e harness drives
+  invoice→paid, which calls `contribute_benchmark`; only the opt-in default stops it writing
+  fabricated prices into the corpus, and test accounts are indistinguishable (51/53 gmail.com,
+  `role` is only free/pro/admin). A test-account exclusion must ship *with* the consent toggle.
 Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in
 Arabic twice (pass 3 + the pass-4 re-drive on a fresh account).
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.

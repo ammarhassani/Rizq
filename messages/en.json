@@ -1,7 +1,7 @@
 {
   "Meta": {
     "title": "Rizq: the Saudi freelancer operating system",
-    "description": "Price with confidence. Earn your rizq. A real Saudi-market pricing benchmark, built on local data, so you know what to charge before you bid."
+    "description": "Price with confidence. Earn your rizq. A pricing benchmark built on cited rate reports and converted to Saudi purchasing power, so you know what to charge before you bid."
   },
   "Hero": {
     "wordmark": "Rizq",
@@ -29,7 +29,7 @@
     "step2Title": "Set your city and experience",
     "step2Body": "Riyadh is not Jeddah. A beginner is not an expert. The details shape the number.",
     "step3Title": "Get your fair rate",
-    "step3Body": "You'll receive a precise price range built on data from real Saudi freelancers like you."
+    "step3Body": "You will receive a price range built on cited rate reports, converted to Saudi purchasing power — with the sample size and the number of sources behind it shown."
   },
   "Pricing": {
     "eyebrow": "Pricing",
@@ -67,7 +67,7 @@
     "q1": "Where does Rizq's data come from?",
     "a1": "Three independent, transparent sources: AI reasoned estimates (clearly labeled \"Rizq analysis\"), publicly published rate cards and references, and Saudi open government data, plus optional contributions from freelancers themselves. We do not scrape freelance marketplaces. Every number carries its source and a confidence score.",
     "q2": "Is the benchmark really accurate?",
-    "a2": "We always show the sample size honestly. If it's based on 12 freelancers, we'll tell you. Transparency matters more than claimed precision.",
+    "a2": "We always show the sample size honestly — and how many distinct sources are behind it. If 12 records trace back to 2 references, we say both numbers. Transparency matters more than claimed precision.",
     "q3": "Why monthly and not annual?",
     "a3": "We want you to try us. If we don't earn it, you cancel. An annual plan with a discount is on the way for those who already trust the product.",
     "q4": "Is my data safe?",
@@ -257,17 +257,17 @@
     "s1Title": "1 · Where data comes from",
     "s1Body": "Four transparent sources: (a) AI reasoned estimates, clearly labeled \"Rizq analysis\"; (b) publicly published rate cards and references; (c) Saudi open government data; (d) optional submissions from Saudi freelancers who recorded real project prices. We do not scrape freelance marketplaces. Every record carries its source, date, and a trust weight. We don't blend them into a single faceless number.",
     "s2Title": "2 · How the range is built",
-    "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is a real market range, not a softened average.",
+    "s2Body": "Records are bucketed by specialty × city × experience tier × project size. Within each bucket we compute three points: the minimum, the median (50th percentile), and the maximum. What you see is the spread of the records in that bucket, not a softened average — and the citation beneath it names how many records, and how many sources, produced it.",
     "s3Title": "3 · Why median, not mean",
     "s3Body": "A mean is pulled around by outliers: a single luxury or underpriced project distorts it. The median says: half the market earns less, half earns more. That's the truer everyday-pricing signal. The min and max give you the full shape if you need it.",
     "s4Title": "4 · Sample size and confidence",
-    "s4Body": "Every result shows \"based on N Saudi freelancers\". N matters: 5 records is our floor. Under that we say \"insufficient data\" rather than guess. As N grows, the range narrows and confidence rises. We don't hide thin samples behind round numbers.",
+    "s4Body": "Every result shows how many records it rests on — and how many distinct sources those records came from. Three records that all trace back to one reference are one piece of evidence, and the citation says so. Our floor is 3 records; below that we say \"insufficient data\" rather than guess. As real data arrives the range narrows and the citation upgrades itself.",
     "s5Title": "5 · What we don't yet model",
     "s5Body": "Today we don't account for: exact project complexity, individual freelancer reputation, client urgency, or your network signals. These move real prices, but they need a smarter engine, which we're building for the next version. For now: the range is market-wide, not personal.",
     "s6Title": "6 · Data freshness",
-    "s6Body": "Records older than 18 months are flagged and down-weighted. The Saudi market moves. \"Market price\" today isn't necessarily \"market price\" last year. The index updates continuously as new submissions come in.",
+    "s6Body": "Records older than 18 months are down-weighted, and every record carries the date its source published it. The Saudi market moves, and so do the reports behind these numbers. The sources are re-checked on a monthly schedule; when one publishes a new edition, the change is reviewed before it reaches the index.",
     "s7Title": "7 · Submission review",
-    "s7Body": "Every contribution is hand-reviewed before it enters the public dataset. We reject incomplete or unrealistic records. This is slow, but it's the only way to protect the quality of every number after yours.",
+    "s7Body": "Contributing is opt-in and anonymous, and a price only enters the index when an invoice for it has actually been paid — not when it was merely quoted. It then stays hidden until at least 3 different freelancers have contributed to the same bucket, so no one person's rate can be read back out. Records flagged as outliers are excluded.",
     "s8Title": "8 · A question or correction?",
     "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest, email me. Rizq gets sharper with every note.",
     "contact": "Reach me directly: {email}",
@@ -691,7 +691,7 @@
   "Tool": {
     "eyebrow": "Pricing tool",
     "title": "Find your fair rate.",
-    "subtitle": "Pick the details and we'll give you a range built on real Saudi data.",
+    "subtitle": "Pick the details and we will give you a range built on cited rate reports, converted to Saudi purchasing power.",
     "specialtyLabel": "Specialty",
     "specialtyPlaceholder": "Pick your specialty",
     "cityLabel": "City",
@@ -720,10 +720,10 @@
       "min": "Low end",
       "median": "Median",
       "max": "High end",
-      "sampleSize": "{n, plural, =0 {No records from the Saudi market} one {Based on 1 record from the Saudi market} other {Based on {count} records from the Saudi market}}",
+      "sampleSize": "{n, plural, =0 {No records in Rizq's index} one {Based on 1 record in Rizq's index} other {Based on {count} records in Rizq's index}}",
       "fallbackRegion": "We widened the search to your whole region.",
       "fallbackSpecialty": "We widened the search across all cities.",
-      "comparison": "Higher than {percent}% of freelancers in your specialty.",
+      "comparison": "Higher than {percent}% of the records in your specialty.",
       "shareTitle": "Share this result",
       "shareCopy": "Copy link",
       "shareCopied": "Copied",
@@ -1909,7 +1909,7 @@
     "saveDefaultsError": "Could not save. Try again.",
     "noPerProjectNote": "Enter target projects per month to compare against the market.",
     "currentEarningNote": "Your current 3-month average: {avg} SAR/month",
-    "sampleSizeNote": "{n, plural, =0 {No records from the Saudi market} one {Based on 1 record from the Saudi market} other {Based on {count} records from the Saudi market}}",
+    "sampleSizeNote": "{n, plural, =0 {No records in Rizq's index} one {Based on 1 record in Rizq's index} other {Based on {count} records in Rizq's index}}",
     "backToDashboard": "Back to dashboard"
   },
   "Validation": {
@@ -2205,7 +2205,7 @@
       "ctaPrimary": "Start free",
       "ctaSecondary": "Explore the apps",
       "liveChip": "Live now: 13 tools",
-      "chip1": "Real Saudi data",
+      "chip1": "Cited sources",
       "chip2": "No hidden fees",
       "chip3": "Labeled AI",
       "chip4": "Free to start"
@@ -2241,7 +2241,7 @@
       "heading": "Your project's journey, step by step.",
       "sub": "Five connected steps. What you enter in one flows automatically into the next, so your data moves with you.",
       "step1Title": "Price it",
-      "step1Body": "Compute your fair rate from real Saudi market data.",
+      "step1Body": "Compute your fair rate from cited rate benchmarks.",
       "step2Title": "Send a proposal",
       "step2Body": "Paste the client's message and let Rizq write a priced, professional proposal.",
       "step3Title": "Run the project",
@@ -2311,7 +2311,7 @@
       "heading": "AI that works for you, honestly labeled.",
       "sub": "Every AI output is clearly labeled as an estimate. You always know what's data and what's analysis.",
       "f1Title": "Data-backed pricing",
-      "f1Body": "Price ranges built on real Saudi market data, with sample size and confidence shown on every result.",
+      "f1Body": "Price ranges built on cited rate reports, with the sample size, the number of sources and the confidence shown on every result.",
       "f2Title": "Proposal generation",
       "f2Body": "Paste the client's message. Rizq extracts the scope, prices it, and writes the full proposal.",
       "f3Title": "Income forecasting",
