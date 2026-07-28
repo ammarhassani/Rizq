@@ -97,6 +97,10 @@ export async function focusVisibility(page, steps = 8) {
     const state = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
+      // `next dev` injects <nextjs-portal> for its own error/status overlay. It is not
+      // product UI, it has no focus ring by design, and it does not exist in a production
+      // build — reporting it as an app defect cost RZQ-0016 and 16 findings in one run.
+      if (el.tagName.toLowerCase() === "nextjs-portal" || el.closest("nextjs-portal")) return null;
       const s = getComputedStyle(el);
       const marked =
         (s.outlineStyle !== "none" && parseFloat(s.outlineWidth) > 0) ||

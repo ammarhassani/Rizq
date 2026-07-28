@@ -29,30 +29,30 @@ cannot report dark coverage for checks that ran while the page was still light.
 
 | # | persona | flow | strategy | surface | state | tier | entry | theme | done |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | veteran | proposal-to-client | fuzz | share-anonymous | minimal | free | in-app-navigation | light |  |
-| 2 | veteran | clients-and-projects | metamorphic | screen-desktop | empty | pro-lapsed | shared-link | light |  |
-| 3 | veteran | invoice-and-vat | differential | print-pdf | degraded-profile | pro-active | direct-url | light |  |
-| 4 | veteran | income-and-hadaf | adversarial | csv-export | edge-unicode | free-exhausted | back-or-refresh-midflow | light |  |
-| 5 | newcomer | proposal-to-client | state-machine | screen-desktop | heavy | pro-active | back-or-refresh-midflow | light |  |
-| 6 | meticulous | proposal-to-client | time-travel | screen-mobile | degraded-profile | anon | direct-url | light |  |
-| 7 | rusher | proposal-to-client | differential | docx-export | realistic | free-exhausted | shared-link | light |  |
-| 8 | sceptic | mobile | fuzz | screen-desktop | edge-unicode | pro-lapsed | direct-url | light |  |
-| 9 | rusher | pricing-tool | fuzz | share-anonymous | degraded-profile | pro-lapsed | back-or-refresh-midflow | light |  |
-| 10 | english-first | clients-and-projects | fuzz | screen-mobile | heavy | free-exhausted | guided-context | light |  |
-| 11 | sceptic | recovery | time-travel | screen-desktop | degraded-profile | free-exhausted | in-app-navigation | light |  |
-| 12 | rusher | income-and-hadaf | metamorphic | screen-mobile | edge-unicode | pro-active | in-app-navigation | light |  |
-| 13 | rusher | invoice-and-vat | metamorphic | screen-desktop | heavy | free | direct-url | light |  |
-| 14 | rusher | clients-and-projects | differential | csv-export | minimal | free | back-or-refresh-midflow | light |  |
-| 15 | sceptic | proposal-to-client | metamorphic | print-pdf | minimal | anon | back-or-refresh-midflow | light |  |
-| 16 | meticulous | income-and-hadaf | adversarial | screen-desktop | minimal | free | shared-link | light |  |
-| 17 | english-first | pricing-tool | time-travel | share-anonymous | edge-unicode | pro-active | shared-link | light |  |
-| 18 | english-first | income-and-hadaf | state-machine | csv-export | realistic | pro-lapsed | in-app-navigation | light |  |
-| 19 | newcomer | pricing-tool | adversarial | share-anonymous | realistic | anon | direct-url | light |  |
-| 20 | meticulous | pricing-tool | metamorphic | share-anonymous | heavy | free-exhausted | in-app-navigation | light |  |
-| 21 | meticulous | english-locale | fuzz | screen-desktop | realistic | pro-active | back-or-refresh-midflow | light |  |
-| 22 | newcomer | documents-and-catalog | fuzz | csv-export | degraded-profile | pro-lapsed | shared-link | light |  |
-| 23 | sceptic | pricing-tool | state-machine | screen-mobile | empty | anon | direct-url | light |  |
-| 24 | sceptic | mobile | scale | screen-mobile | heavy | free | shared-link | light |  |
+| 1 | veteran | proposal-to-client | fuzz | share-anonymous | minimal | free | in-app-navigation | light | 2026-07-28 |
+| 2 | veteran | clients-and-projects | metamorphic | screen-desktop | empty | pro-lapsed | shared-link | light | 2026-07-28 |
+| 3 | veteran | invoice-and-vat | differential | print-pdf | degraded-profile | pro-active | direct-url | light | 2026-07-28 |
+| 4 | veteran | income-and-hadaf | adversarial | csv-export | edge-unicode | free-exhausted | back-or-refresh-midflow | light | 2026-07-28 |
+| 5 | newcomer | proposal-to-client | state-machine | screen-desktop | heavy | pro-active | back-or-refresh-midflow | light | 2026-07-28 |
+| 6 | meticulous | proposal-to-client | time-travel | screen-mobile | degraded-profile | anon | direct-url | light | 2026-07-28 |
+| 7 | rusher | proposal-to-client | differential | docx-export | realistic | free-exhausted | shared-link | light | 2026-07-28 |
+| 8 | sceptic | mobile | fuzz | screen-desktop | edge-unicode | pro-lapsed | direct-url | light | 2026-07-28 |
+| 9 | rusher | pricing-tool | fuzz | share-anonymous | degraded-profile | pro-lapsed | back-or-refresh-midflow | light | 2026-07-28 |
+| 10 | english-first | clients-and-projects | fuzz | screen-mobile | heavy | free-exhausted | guided-context | light | 2026-07-28 |
+| 11 | sceptic | recovery | time-travel | screen-desktop | degraded-profile | free-exhausted | in-app-navigation | light | 2026-07-28 |
+| 12 | rusher | income-and-hadaf | metamorphic | screen-mobile | edge-unicode | pro-active | in-app-navigation | light | 2026-07-28 |
+| 13 | rusher | invoice-and-vat | metamorphic | screen-desktop | heavy | free | direct-url | light | 2026-07-28 |
+| 14 | rusher | clients-and-projects | differential | csv-export | minimal | free | back-or-refresh-midflow | light | 2026-07-28 |
+| 15 | sceptic | proposal-to-client | metamorphic | print-pdf | minimal | anon | back-or-refresh-midflow | light | 2026-07-28 |
+| 16 | meticulous | income-and-hadaf | adversarial | screen-desktop | minimal | free | shared-link | light | 2026-07-28 |
+| 17 | english-first | pricing-tool | time-travel | share-anonymous | edge-unicode | pro-active | shared-link | light | 2026-07-28 |
+| 18 | english-first | income-and-hadaf | state-machine | csv-export | realistic | pro-lapsed | in-app-navigation | light | 2026-07-28 |
+| 19 | newcomer | pricing-tool | adversarial | share-anonymous | realistic | anon | direct-url | light | 2026-07-28 |
+| 20 | meticulous | pricing-tool | metamorphic | share-anonymous | heavy | free-exhausted | in-app-navigation | light | 2026-07-28 |
+| 21 | meticulous | english-locale | fuzz | screen-desktop | realistic | pro-active | back-or-refresh-midflow | light | 2026-07-28 |
+| 22 | newcomer | documents-and-catalog | fuzz | csv-export | degraded-profile | pro-lapsed | shared-link | light | 2026-07-28 |
+| 23 | sceptic | pricing-tool | state-machine | screen-mobile | empty | anon | direct-url | light | 2026-07-28 |
+| 24 | sceptic | mobile | scale | screen-mobile | heavy | free | shared-link | light | 2026-07-28 |
 | 25 | english-first | pricing-tool | differential | screen-desktop | empty | free | back-or-refresh-midflow | light |  |
 | 26 | veteran | pricing-tool | state-machine | share-anonymous | minimal | free-exhausted | direct-url | light |  |
 | 27 | english-first | mobile | adversarial | screen-mobile | minimal | pro-lapsed | back-or-refresh-midflow | light |  |
