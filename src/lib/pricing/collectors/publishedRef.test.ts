@@ -56,3 +56,39 @@ describe("makePublishedRefCollector", () => {
     expect(rows.every((r) => r.provenance === "published_ref")).toBe(true);
   });
 });
+
+describe("confidence is derived from the published sample, never hand-picked", () => {
+  const base = {
+    specialty_id: "s",
+    city_id: "c",
+    experience_tier_id: "t",
+    price_sar: 1000,
+    source_ref: "https://www.yunojuno.com/freelancer-rates-report",
+  };
+
+  it("a large stated sample outweighs a small one through the collector", async () => {
+    const c = makePublishedRefCollector(
+      [
+        { ...base, published_sample: 182_000 },
+        { ...base, published_sample: 298 },
+        { ...base }, // publisher stated none
+      ],
+      "2026-07-29T00:00:00Z"
+    );
+    const [big, small, unstated] = await c.normalize(await c.fetch());
+    expect(big!.confidence).toBe(0.9);
+    expect(small!.confidence).toBe(0.6);
+    expect(unstated!.confidence).toBe(0.5);
+    // The defect this replaces: all three used to be 0.6.
+    expect(new Set([big!.confidence, small!.confidence, unstated!.confidence]).size).toBe(3);
+  });
+
+  it("carries the sample onto the row so the weighting stays auditable", async () => {
+    const c = makePublishedRefCollector(
+      [{ ...base, published_sample: 23_928 }],
+      "2026-07-29T00:00:00Z"
+    );
+    const [row] = await c.normalize(await c.fetch());
+    expect(row!.published_sample).toBe(23_928);
+  });
+});

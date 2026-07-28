@@ -1,4 +1,5 @@
 import { PROJECT_HOURS, type ProjectSize } from "../contribution";
+import { sourceConfidence } from "../sourceConfidence";
 import type { BenchmarkRow, Collector, RawRecord } from "./types";
 
 /**
@@ -29,13 +30,15 @@ export function usdHourlyToSarProject(usdHourly: number, size: ProjectSize): num
 
 /**
  * Collector 1 — curated published references (Qemma 2026, agency rate cards,
- * HRDF/MHRSD stats). provenance='published_ref', confidence=0.60.
+ * HRDF/MHRSD stats). provenance='published_ref'; confidence is DERIVED from the
+ * sample the publisher states, never hand-picked (feature 012).
  *
  * INPUT CONTRACT (founder supplies an array of these; one per published cell):
  *   {
  *     specialty_id, city_id, experience_tier_id,
  *     project_size?, price_sar,
- *     source_ref   // REQUIRED: the citation URL or document reference
+ *     source_ref,       // REQUIRED: the citation URL or document reference
+ *     published_sample  // observations behind THIS figure; omit only if none is stated
  *   }
  * Rows missing source_ref are rejected — a published reference without a
  * citation is not a published reference (honesty architecture, spec §II.2).
@@ -51,6 +54,13 @@ export type PublishedRefInput = {
   project_size?: "small" | "medium" | "large" | "enterprise" | null;
   price_sar: number;
   source_ref: string;
+  /**
+   * Observations the publisher states stand behind this figure. Pass the discipline-level
+   * figure where the source gives one (ProCopywriters: 220 copywriters, not 298 total) and
+   * the conservative end of any approximation ("over 1,100" -> 1100). Omit only when the
+   * publisher genuinely states no sample.
+   */
+  published_sample?: number | null;
 };
 
 export function makePublishedRefCollector(
@@ -61,6 +71,8 @@ export function makePublishedRefCollector(
     id: "published_ref_v1",
     name: "Curated published references",
     provenance: "published_ref",
+    // Registry-level nominal value only, matching collector_registry.default_confidence.
+    // Rows do NOT use it — each derives its own from the sample its publisher stated.
     confidence: 0.6,
     async fetch(): Promise<RawRecord[]> {
       return inputs as unknown as RawRecord[];
@@ -76,8 +88,11 @@ export function makePublishedRefCollector(
           experience_tier_id: r.experience_tier_id,
           project_size: r.project_size ?? null,
           price_sar: r.price_sar,
-          provenance: "published_ref",
-          confidence: 0.6,
+          provenance: "published_ref" as const,
+          published_sample: r.published_sample ?? null,
+          // Derived, not chosen. A flat 0.6 here is what made a 182,000-point survey and a
+          // 298-respondent survey weigh the same.
+          confidence: sourceConfidence(r.published_sample),
           source_ref: r.source_ref,
           captured_at: capturedAtISO,
         }));

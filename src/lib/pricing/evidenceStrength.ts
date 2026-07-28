@@ -5,9 +5,14 @@
  *
  *   mean(provenanceWeight × row.confidence × freshnessDecay) × min(1, n / 10)
  *
- * The highest provenance weight in the taxonomy is `published_ref` at 0.6, and rows carry
- * a confidence of 0.5–0.6, so the mean weight cannot exceed ~0.36. Measured across the
- * live corpus the best cell reaches 0.35 and the average sits at 0.12.
+ * The highest provenance weight in the taxonomy is `published_ref` at 0.6, and the highest
+ * confidence a source can earn is 0.9 (a published sample of 50,000+, see
+ * `sourceConfidence.ts`), so the mean weight cannot exceed 0.54.
+ *
+ * That ceiling was 0.36 until feature 012, when confidence stopped being hand-set at 0.5–0.6
+ * and started tracking each source's published sample. The constant is not decoration: the
+ * test below asserts the top band is reachable at the maximum, so leaving it stale would let
+ * the bands drift out of calibration without anything failing.
  *
  * Printed as "Confidence: 12%" that reads as twelve-out-of-a-hundred, and a hundred is
  * unreachable by construction — the scale has no attainable top. Renormalising so 0.36
@@ -21,8 +26,11 @@
 
 export type EvidenceStrength = "limited" | "moderate" | "good";
 
-/** Ceiling the score can reach with the best provenance the taxonomy admits. */
-export const MAX_ATTAINABLE_SCORE = 0.36;
+/**
+ * Ceiling the score can reach: best provenance (`published_ref`, 0.6) × best earnable
+ * confidence (0.9, from a published sample of 50,000+) × a fresh capture × a full sample.
+ */
+export const MAX_ATTAINABLE_SCORE = 0.54;
 
 export function evidenceStrength(confidenceScore: number): EvidenceStrength {
   if (!Number.isFinite(confidenceScore) || confidenceScore < 0.1) return "limited";

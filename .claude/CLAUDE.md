@@ -222,8 +222,24 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   invoice→paid, which calls `contribute_benchmark`; only the opt-in default stops it writing
   fabricated prices into the corpus, and test accounts are indistinguishable (51/53 gmail.com,
   `role` is only free/pro/admin). A test-account exclusion must ship *with* the consent toggle.
-Active (`.specify/feature.json`): **011** — ✅ shipped end to end; re-verified in-browser in
-Arabic twice (pass 3 + the pass-4 re-drive on a fresh account).
+- `specs/012-source-sample-confidence/` — **Weight each source by the sample it published**
+  (Phase 1 of [`docs/pricing-confidence-plan.md`](../docs/pricing-confidence-plan.md)). Every
+  `published_ref` row carries a hand-set `confidence` of 0.50–0.60, so YunoJuno's **182,000
+  data points** and ProCopywriters' **298 respondents** are trusted identically — the sample
+  was published by both, written into ingestion prose, and discarded where it mattered. Adds
+  `benchmark_records.published_sample` + a deterministic mapping (≥50k → 0.90 · 5k → 0.80 ·
+  500 → 0.70 · 50 → 0.60 · below/unstated → 0.50), derived at ingest **and** backfilled.
+  **Phase 0 falsified the plan's own headline:** projected effect is **+10.7%, not +40%**, and
+  **315 of 700 cells go DOWN** — the 1,260-row unverifiable seed is 69% of the corpus and holds
+  the joint-highest confidence today while stating no sample, so it correctly falls 0.60 → 0.50.
+  Restated as an accuracy change, not an uplift; SC-002 revised 30% → 8% and SC-002a added
+  requiring the decrease. Scoped to `published_ref`/`ingested` only: applying it to `founder`
+  would *raise* editorial rows 0.30 → 0.50, an inflation dressed as an honesty fix.
+  Plan: [specs/012-source-sample-confidence/plan.md](specs/012-source-sample-confidence/plan.md).
+  spec+research+plan done → **tasks next**.
+Active (`.specify/feature.json`): **012** — spec + Phase 0/1 artifacts complete, not yet implemented.
+Feature 011: ✅ shipped end to end; re-verified in-browser in Arabic twice (pass 3 + the pass-4
+re-drive on a fresh account).
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.
 <!-- SPECKIT END -->
 ## Validation history (read before trusting a "SHIPPED" tag)

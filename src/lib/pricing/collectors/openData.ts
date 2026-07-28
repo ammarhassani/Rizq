@@ -1,4 +1,5 @@
 import { PROJECT_HOURS, type ProjectSize } from "../contribution";
+import { sourceConfidence } from "../sourceConfidence";
 import type { BenchmarkRow, Collector, RawRecord } from "./types";
 
 /**
@@ -49,6 +50,11 @@ export type WageObservation = {
   occupation_label: string;
   /** REQUIRED: dataset URL or publication reference. No citation, no row. */
   source_ref: string;
+  /**
+   * Observations the publishing authority states stand behind this wage figure — a labour
+   * force survey states its base. Omit only when the release genuinely gives none.
+   */
+  published_sample?: number | null;
 };
 
 /** Monthly employment wage → freelance hourly rate, via the published model above. */
@@ -70,6 +76,7 @@ export function makeOpenDataCollector(
     id: "open_data_gastat_wages",
     name: "Saudi open government wage data (GASTAT)",
     provenance: "ingested",
+    // Registry-level nominal value only. Rows derive their own from the published survey base.
     confidence: 0.4,
     async fetch(): Promise<RawRecord[]> {
       return inputs as unknown as RawRecord[];
@@ -93,7 +100,9 @@ export function makeOpenDataCollector(
             project_size: r.project_size,
             price_sar: Math.round(hourly * hours),
             provenance: "ingested" as const,
-            confidence: 0.4,
+            published_sample: r.published_sample ?? null,
+            // Derived from the survey base the authority published, not a flat constant.
+            confidence: sourceConfidence(r.published_sample),
             source_ref: r.source_ref,
             captured_at: capturedAtISO,
             // `notes` is the only free-text field run_ingestion persists, so the whole

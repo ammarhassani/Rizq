@@ -60,7 +60,10 @@ describe("makeOpenDataCollector", () => {
     expect(rows).toHaveLength(1);
     const row = rows[0]!;
     expect(row.provenance).toBe("ingested");
-    expect(row.confidence).toBe(0.4);
+    // Was a hardcoded 0.4. Confidence now derives from the survey base the authority
+    // published, and this fixture states none — so it lands in the unstated band.
+    expect(row.confidence).toBe(0.5);
+    expect(row.published_sample).toBeNull();
     expect(row.captured_at).toBe(captured);
     expect(row.price_sar).toBe(wageToProjectRate(10_238, "medium"));
     // The reader must be able to retrace the number from the row alone.
@@ -76,5 +79,17 @@ describe("makeOpenDataCollector", () => {
     );
     const rows = await c.normalize(await c.fetch());
     expect(rows).toHaveLength(1);
+  });
+});
+
+describe("confidence follows the published survey base", () => {
+  it("a stated base earns its band; an unstated one does not", async () => {
+    const captured = "2026-07-28T00:00:00Z";
+    const big = makeOpenDataCollector([obs({ published_sample: 60_000 })], captured);
+    const none = makeOpenDataCollector([obs()], captured);
+    const [bigRow] = await big.normalize(await big.fetch());
+    const [noneRow] = await none.normalize(await none.fetch());
+    expect(bigRow!.confidence).toBe(0.9);
+    expect(noneRow!.confidence).toBe(0.5);
   });
 });

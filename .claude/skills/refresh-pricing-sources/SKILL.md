@@ -53,8 +53,17 @@ compare against the baseline entry:
 |---|---|---|
 | Edition/year changed | A new report is out | `new_edition` — ingest candidate |
 | Figures changed, same edition | Publisher revised, or the old parse was wrong | `revised` — investigate before ingesting |
+| **Published sample changed** | The evidence behind the figure grew or shrank | `revised` — it moves confidence, see below |
 | Page 404s, paywalls, or blocks the fetch | The citation no longer resolves | `unreachable` — the honesty problem, see below |
 | Nothing changed | Still current | `unchanged` |
+
+**Always re-read the published sample size**, not only the rates. Since feature 012 each row's
+`confidence` is derived from it (`src/lib/pricing/sourceConfidence.ts`: ≥50k → 0.90 · ≥5k →
+0.80 · ≥500 → 0.70 · ≥50 → 0.60 · below or unstated → 0.50), so a survey growing from 298 to
+5,200 respondents changes what the app claims even when every published rate is identical.
+Record it as `published_sample` in the check line, and use the **discipline-level** figure where
+the source gives one — ProCopywriters reports 220 copywriters within 298 total, and 220 is the
+number behind the copywriting rows. For an approximation, take the conservative end.
 
 Also re-check the **World Bank PPP factor** (`PA.NUS.PPP`, Saudi Arabia) via
 `https://api.worldbank.org/v2/country/SAU/indicator/PA.NUS.PPP?format=json` — it is a

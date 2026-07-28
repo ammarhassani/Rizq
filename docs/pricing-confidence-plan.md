@@ -62,8 +62,16 @@ Sources whose sample is not stated stay at 0.50 — the rule doubles as a filter
 report that will not say how many people it asked has told you something.
 
 Effect on mean weight: `0.6 × 0.9 = 0.54` for the Stack Overflow and YunoJuno rows, against
-`0.6 × 0.6 = 0.36` today. **Score rises ~40% with zero new evidence**, because the evidence
-was always there and the schema was flattening it.
+`0.6 × 0.6 = 0.36` before.
+
+> **Shipped 2026-07-29 — and the +40% written here was wrong.** Measured against the live
+> corpus, the actual effect is **+10.7%** (12.1% → 13.4%), and **315 of 700 cells went DOWN**.
+> The estimate above was arithmetic over the large surveys alone; it ignored that the 1,260-row
+> unverifiable seed is 69% of all rows and held the joint-*highest* confidence (0.60) while
+> publishing no sample at all. Under the rule it correctly falls to 0.50, cancelling most of the
+> gain. Phase 1's value is **accuracy, not uplift** — the corpus was rating its least verifiable
+> source as its most trustworthy. The volume increase belongs to Phase 2. See
+> [`specs/012-source-sample-confidence/research.md`](../specs/012-source-sample-confidence/research.md).
 
 Work: a `sourceConfidence()` helper + unit test, a column of sample sizes in
 `source-checks.jsonl`, one backfill migration. No product change.
@@ -132,7 +140,7 @@ become defensible.
 | Stage | Mean weight | n | Score | Reads as |
 |---|---|---|---|---|
 | today | 0.30–0.35 | 3–8 | **0.12** | limited / moderate |
-| + Phase 1 | 0.54 | 3–8 | **0.22** | moderate / good |
+| + Phase 1 *(shipped, measured)* | 0.24–0.42 | 3–8 | **0.134** | limited / moderate / good |
 | + Phase 2 | 0.54 | ≥10 | **0.54** | good |
 | + Phase 3 | 0.75 | ≥10 | **0.75** | good, and true |
 
