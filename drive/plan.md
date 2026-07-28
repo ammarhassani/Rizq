@@ -59,14 +59,14 @@ cannot report dark coverage for checks that ran while the page was still light.
 | 28 | english-first | proposal-to-client | adversarial | screen-desktop | degraded-profile | pro-lapsed | guided-context | light | 2026-07-28 |
 | 29 | newcomer | mobile | state-machine | screen-desktop | empty | free | in-app-navigation | light | 2026-07-28 |
 | 30 | meticulous | mobile | differential | screen-mobile | degraded-profile | free-exhausted | in-app-navigation | light | 2026-07-28 |
-| 31 | rusher | invoice-and-vat | state-machine | print-pdf | degraded-profile | free | in-app-navigation | light |  |
-| 32 | english-first | income-and-hadaf | scale | csv-export | heavy | pro-active | direct-url | light |  |
-| 33 | meticulous | clients-and-projects | state-machine | screen-mobile | edge-unicode | free | guided-context | light |  |
-| 34 | sceptic | clients-and-projects | differential | screen-mobile | realistic | pro-active | guided-context | light |  |
-| 35 | newcomer | clients-and-projects | time-travel | screen-desktop | empty | free-exhausted | direct-url | light |  |
-| 36 | newcomer | income-and-hadaf | metamorphic | csv-export | minimal | free-exhausted | guided-context | light |  |
-| 37 | meticulous | income-and-hadaf | fuzz | csv-export | empty | pro-lapsed | back-or-refresh-midflow | light |  |
-| 38 | newcomer | invoice-and-vat | differential | print-pdf | heavy | pro-lapsed | shared-link | light |  |
+| 31 | rusher | invoice-and-vat | state-machine | print-pdf | degraded-profile | free | in-app-navigation | light | 2026-07-28 |
+| 32 | english-first | income-and-hadaf | scale | csv-export | heavy | pro-active | direct-url | light | 2026-07-28 |
+| 33 | meticulous | clients-and-projects | state-machine | screen-mobile | edge-unicode | free | guided-context | light | 2026-07-28 |
+| 34 | sceptic | clients-and-projects | differential | screen-mobile | realistic | pro-active | guided-context | light | 2026-07-28 |
+| 35 | newcomer | clients-and-projects | time-travel | screen-desktop | empty | free-exhausted | direct-url | light | 2026-07-28 |
+| 36 | newcomer | income-and-hadaf | metamorphic | csv-export | minimal | free-exhausted | guided-context | light | 2026-07-28 |
+| 37 | meticulous | income-and-hadaf | fuzz | csv-export | empty | pro-lapsed | back-or-refresh-midflow | light | 2026-07-28 |
+| 38 | newcomer | invoice-and-vat | differential | print-pdf | heavy | pro-lapsed | shared-link | light | 2026-07-28 |
 | 39 | newcomer | proposal-to-client | adversarial | docx-export | edge-unicode | pro-active | guided-context | light |  |
 | 40 | english-first | proposal-to-client | metamorphic | print-pdf | empty | free-exhausted | guided-context | light |  |
 | 41 | rusher | proposal-to-client | time-travel | docx-export | empty | pro-lapsed | back-or-refresh-midflow | light |  |
