@@ -297,7 +297,7 @@ export function InsightsWidget({ locale }: Props) {
           onClick={toggleCollapsed}
           aria-expanded={!collapsed}
           aria-controls="rizq-insights-body"
-          className="group -ms-1 flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-rizq-gold/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40"
+          className="group -ms-1 flex min-h-6 items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-rizq-gold/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rizq-green/40"
         >
           <Sparkles className={`h-4 w-4 text-rizq-gold ${isStreaming ? "animate-pulse" : ""}`} />
           <span className={`text-xs font-semibold text-rizq-ink-soft/70 uppercase tracking-wide ${font}`}>
@@ -323,7 +323,7 @@ export function InsightsWidget({ locale }: Props) {
             <button
               onClick={handleRefresh}
               disabled={refreshing || isStreaming}
-              className="flex items-center gap-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
+              className="flex min-h-6 items-center gap-1 px-1 text-xs text-rizq-green hover:text-rizq-green-dark transition-colors disabled:opacity-50"
               aria-label={tI18n("insightsRefresh")}
             >
               <RefreshCw className={`h-3 w-3 ${refreshing || isStreaming ? "animate-spin" : ""}`} />
@@ -352,14 +352,14 @@ export function InsightsWidget({ locale }: Props) {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => handleVote(i, "up")}
-                        className={`p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-[var(--acc)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        className={`inline-flex min-h-6 min-w-6 items-center justify-center p-1 rounded-full transition-colors ${votes[i] === "up" ? "text-[var(--acc)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
                         aria-label={tCommon("useful")}
                       >
                         <ThumbsUp className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => handleVote(i, "down")}
-                        className={`p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-[var(--over)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
+                        className={`inline-flex min-h-6 min-w-6 items-center justify-center p-1 rounded-full transition-colors ${votes[i] === "down" ? "text-[var(--over)]" : "text-rizq-ink-soft/40 hover:text-rizq-ink-soft/70"}`}
                         aria-label={tCommon("notUseful")}
                       >
                         <ThumbsDown className="h-3 w-3" />
