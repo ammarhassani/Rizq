@@ -60,7 +60,16 @@ export function findExisting(title, basket = readBasket()) {
     );
   const a = words(title);
   if (a.size === 0) return null;
+  const routeOf = (s) => String(s).match(/\/[a-z]{2}\/[^\s—]*/i)?.[0] ?? null;
+  const aRoute = routeOf(title);
   for (const item of basket) {
+    // Same message, different page, is a different defect. A sweep finding is mostly the
+    // tool's own boilerplate — "Elements must meet minimum color contrast ratio thresholds"
+    // is 8 shared words against the 1 that says WHERE — so word overlap alone merged
+    // /ar/income into a /ar/dashboard reference that was already closed, and hid a
+    // mobile-only contrast failure for 124 rows.
+    const bRoute = routeOf(item.title);
+    if (aRoute && bRoute && aRoute !== bRoute) continue;
     const b = words(item.title);
     let shared = 0;
     for (const w of a) if (b.has(w)) shared++;

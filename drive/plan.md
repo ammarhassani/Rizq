@@ -56,9 +56,9 @@ cannot report dark coverage for checks that ran while the page was still light.
 | 25 | english-first | pricing-tool | differential | screen-desktop | empty | free | back-or-refresh-midflow | light | 2026-07-28 |
 | 26 | veteran | pricing-tool | state-machine | share-anonymous | minimal | free-exhausted | direct-url | light | 2026-07-28 |
 | 27 | english-first | mobile | adversarial | screen-mobile | minimal | pro-lapsed | back-or-refresh-midflow | light | 2026-07-28 |
-| 28 | english-first | proposal-to-client | adversarial | screen-desktop | degraded-profile | pro-lapsed | guided-context | light |  |
-| 29 | newcomer | mobile | state-machine | screen-desktop | empty | free | in-app-navigation | light |  |
-| 30 | meticulous | mobile | differential | screen-mobile | degraded-profile | free-exhausted | in-app-navigation | light |  |
+| 28 | english-first | proposal-to-client | adversarial | screen-desktop | degraded-profile | pro-lapsed | guided-context | light | 2026-07-28 |
+| 29 | newcomer | mobile | state-machine | screen-desktop | empty | free | in-app-navigation | light | 2026-07-28 |
+| 30 | meticulous | mobile | differential | screen-mobile | degraded-profile | free-exhausted | in-app-navigation | light | 2026-07-28 |
 | 31 | rusher | invoice-and-vat | state-machine | print-pdf | degraded-profile | free | in-app-navigation | light |  |
 | 32 | english-first | income-and-hadaf | scale | csv-export | heavy | pro-active | direct-url | light |  |
 | 33 | meticulous | clients-and-projects | state-machine | screen-mobile | edge-unicode | free | guided-context | light |  |
