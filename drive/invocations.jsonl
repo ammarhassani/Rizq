@@ -1079,3 +1079,21 @@
 {"at":"2026-07-28T21:29:50.200Z","session":"S-0006","step":"row-claimed","planRow":25}
 {"at":"2026-07-28T21:30:47.673Z","session":"S-0006","step":"driven","planRow":25}
 {"at":"2026-07-28T21:36:10.517Z","session":"S-0006","step":"aborted","note":"Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/ar/upgrade\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/ar/upgrade\", waiting until \"domcontentloaded\"\u001b[22m\n"}
+{"at":"2026-07-28T21:41:45.365Z","session":"S-0006","step":"resumed","planRow":25}
+{"at":"2026-07-28T21:41:45.367Z","session":"S-0006","step":"row-claimed","planRow":25}
+{"at":"2026-07-28T21:42:37.308Z","session":"S-0006","step":"driven","planRow":25}
+{"at":"2026-07-28T21:46:50.381Z","session":"S-0006","step":"checked","planRow":25,"findings":0}
+{"at":"2026-07-28T21:46:50.385Z","session":"S-0006","step":"filed","planRow":25,"findings":0}
+{"at":"2026-07-28T21:46:50.386Z","session":"S-0006","step":"row-ticked","planRow":25}
+{"at":"2026-07-28T21:46:50.493Z","session":"S-0006","step":"row-claimed","planRow":26}
+{"at":"2026-07-28T21:47:43.018Z","session":"S-0006","step":"driven","planRow":26}
+{"at":"2026-07-28T21:51:39.289Z","session":"S-0006","step":"checked","planRow":26,"findings":0}
+{"at":"2026-07-28T21:51:39.293Z","session":"S-0006","step":"filed","planRow":26,"findings":0}
+{"at":"2026-07-28T21:51:39.294Z","session":"S-0006","step":"row-ticked","planRow":26}
+{"at":"2026-07-28T21:51:39.411Z","session":"S-0006","step":"row-claimed","planRow":27}
+{"at":"2026-07-28T21:52:32.614Z","session":"S-0006","step":"driven","planRow":27}
+{"at":"2026-07-28T21:56:30.551Z","session":"S-0006","step":"checked","planRow":27,"findings":0}
+{"at":"2026-07-28T21:56:30.554Z","session":"S-0006","step":"filed","planRow":27,"findings":0}
+{"at":"2026-07-28T21:56:30.556Z","session":"S-0006","step":"row-ticked","planRow":27}
+{"at":"2026-07-28T21:56:30.656Z","session":"S-0006","step":"row-claimed","planRow":28}
+{"at":"2026-07-28T21:57:22.863Z","session":"S-0006","step":"driven","planRow":28}

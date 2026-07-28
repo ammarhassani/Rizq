@@ -14,7 +14,7 @@ import { tickPlanRow } from "./plan.mjs";
 import { recordRun } from "./telemetry.mjs";
 import { fileFinding, writeIndex } from "./basket.mjs";
 import { checkpoint, complete } from "./invocation.mjs";
-import { personaByName, sessionOptions } from "./personas.mjs";
+import { personaByName, sessionOptions, screenFor } from "./personas.mjs";
 import { runKey } from "./axes.mjs";
 
 /** Is the app telling the freelancer why the save was refused? */
@@ -41,7 +41,8 @@ export async function driveRow(row, sessionId) {
 
   await open(async (tools) => {
     const { page, go, text, note, db } = tools;
-    const mobile = persona.device.mobile;
+    // The row's surface decides the screen, not the persona alone — see screenFor.
+    const mobile = screenFor(persona, row.run).mobile;
     const stamp = new Date().toISOString().slice(11, 19);
 
     // A save that goes nowhere is only a defect if it also saved nothing NEW, or saved

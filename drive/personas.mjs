@@ -99,8 +99,31 @@ export function personaByName(name) {
  */
 export function sessionOptions(persona, run = {}) {
   return {
-    viewport: persona.device.viewport,
+    ...screenFor(persona, run),
     locale: persona.locale,
     theme: run.theme ?? "light",
   };
+}
+
+/** A phone, for rows that ask for one. */
+const PHONE = { viewport: { width: 390, height: 844 }, mobile: true };
+
+/**
+ * Which screen the row is actually driven on.
+ *
+ * `surface` used to reach nothing: the viewport came from the persona alone, so a row reading
+ * `screen-mobile` with any persona except the rusher drove at 1280x900 and reported mobile
+ * coverage it never had. RZQ-0018 — /ar/income failing AA contrast ONLY at phone width —
+ * survived 124 rows because of it, on a product where mobile is most of the traffic.
+ *
+ * The surface is an explicit statement about the screen, so it wins; the persona's own device
+ * is the default for every surface that says nothing about width (an export, a print, a
+ * shared link).
+ */
+export function screenFor(persona, run = {}) {
+  if (run.surface === "screen-mobile") return PHONE;
+  if (run.surface === "screen-desktop" && persona.device.mobile) {
+    return { viewport: { width: 1280, height: 900 }, mobile: false };
+  }
+  return { viewport: persona.device.viewport, mobile: persona.device.mobile };
 }
