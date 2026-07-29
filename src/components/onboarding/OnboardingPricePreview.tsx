@@ -11,9 +11,10 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { previewPrice, type PricePreview } from "@/app/actions/pricing/previewPrice";
+import { fmtMoney } from "@/lib/format/number";
 
 function fmt(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+  return fmtMoney(n, locale);
 }
 
 export function OnboardingPricePreview({

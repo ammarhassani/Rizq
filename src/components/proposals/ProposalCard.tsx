@@ -7,6 +7,7 @@
  */
 
 import { Link } from "@/i18n/navigation";
+import { fmtMoney } from "@/lib/format/number";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -133,9 +134,7 @@ function relativeDate(iso: string | null, t: typeof T["ar"] | typeof T["en"]): s
 
 function fmtPrice(n: number | null, locale: "ar" | "en"): string {
   if (n == null || !isFinite(n)) return "";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(n);
+  return fmtMoney(n, locale);
 }
 
 // ---------------------------------------------------------------------------

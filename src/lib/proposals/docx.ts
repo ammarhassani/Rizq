@@ -27,6 +27,7 @@ import {
 import type { ArtifactData } from "./artifact";
 import { ownTagline } from "./artifact";
 import { PROPOSAL_STRINGS as T } from "./proposalStrings";
+import { fmtMoney } from "@/lib/format/number";
 
 type Locale = "ar" | "en";
 
@@ -61,9 +62,7 @@ export async function buildProposalDocxBuffer(
   const get = (id: string): Record<string, unknown> => byId.get(id) ?? {};
 
   function fmtPrice(x: number): string {
-    return new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", {
-      maximumFractionDigits: 0,
-    }).format(x);
+    return fmtMoney(x, isAr ? "ar" : "en");
   }
   function fmtDate(iso: string | null | undefined): string {
     if (!iso) return "";

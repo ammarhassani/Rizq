@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { updateProposalPrice } from "@/app/actions/proposals/updateSection";
+import { fmtMoney } from "@/lib/format/number";
 
 type Props = {
   proposalId: string;
@@ -42,7 +43,7 @@ export function PriceEditor({ proposalId, locale, initialAnchor, min, max }: Pro
   const dirty = valid && Math.round(parsed) !== saved;
 
   function fmt(n: number): string {
-    return new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+    return fmtMoney(n, isAr ? "ar" : "en");
   }
 
   function save() {

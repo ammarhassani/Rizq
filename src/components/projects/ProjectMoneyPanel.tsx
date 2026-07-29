@@ -6,6 +6,7 @@
  * reads identically to the old /income/[id] page. Server component.
  */
 import { getTranslations } from "next-intl/server";
+import { fmtMoney } from "@/lib/format/number";
 
 type Locale = "ar" | "en";
 
@@ -14,9 +15,7 @@ type Gig = any;
 
 function fmtPrice(n: number | null, locale: Locale): string {
   if (n == null || !isFinite(Number(n))) return "—";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(Number(n));
+  return fmtMoney(Number(n), locale === "ar" ? "ar" : "en");
 }
 
 function fmtDateTime(iso: string | null | undefined, locale: Locale): string {

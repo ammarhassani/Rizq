@@ -17,6 +17,7 @@ import { BandMeter } from "@/components/charts/BandMeter";
 import { PROPOSAL_STRINGS as T } from "@/lib/proposals/proposalStrings";
 import { forClientAudience, CLIENT_REDACTED, ownTagline } from "@/lib/proposals/artifact";
 import type { ArtifactData, ArtifactSection } from "@/lib/proposals/artifact";
+import { fmtMoney } from "@/lib/format/number";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -62,9 +63,7 @@ function num(v: unknown, fallback = 0): number {
 }
 
 function fmtPrice(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(n);
+  return fmtMoney(n, locale);
 }
 
 function fmtDate(iso: string | null | undefined, locale: "ar" | "en"): string {

@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { listProposalsForAnchor, type AnchorProposal } from "@/app/actions/projects/listProposalsForAnchor";
 import { createProjectFromProposal } from "@/app/actions/projects/createProjectFromProposal";
+import { fmtMoney } from "@/lib/format/number";
 
 const STATUS_AR: Record<string, string> = {
   accepted: "مقبول", sent: "أُرسل", viewed: "اطُّلع عليه", draft: "مسودة", declined: "مرفوض", expired: "منتهٍ", final: "نهائي",
@@ -69,7 +70,7 @@ export function ProposalAnchorPicker({ locale, onCreateNew }: { locale: "ar" | "
   }
 
   const fmt = (n: number | null) =>
-    n == null ? "" : new Intl.NumberFormat(isAr ? "ar-SA" : "en-US", { maximumFractionDigits: 0 }).format(n);
+    n == null ? "" : fmtMoney(n, isAr ? "ar" : "en");
 
   if (status === "loading") {
     return (

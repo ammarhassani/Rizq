@@ -20,7 +20,7 @@ import { Combobox } from "@/components/ui/Combobox";
 import { BandMeter } from "@/components/charts/BandMeter";
 import type { RateCalculatorOutput, MarketBand } from "@/lib/rate/calculate";
 import type { RatePositioning } from "@/lib/ai/ratePositioning";
-import { fmtRate } from "@/lib/format/number";
+import { fmtRate, fmtMoney } from "@/lib/format/number";
 import type {
   SpecialtyOption,
   CityOption,
@@ -38,10 +38,7 @@ type Props = {
 };
 
 function fmtSAR(n: number, locale: "ar" | "en"): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    style: "decimal",
-    maximumFractionDigits: 0,
-  }).format(n);
+  return fmtMoney(n, locale);
 }
 
 function fmtInt(n: number, locale: "ar" | "en"): string {

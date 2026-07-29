@@ -5,6 +5,7 @@
  */
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { fmtMoney } from "@/lib/format/number";
 
 type Locale = "ar" | "en";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,9 +30,7 @@ const STATUS_LABELS_EN: Record<string, string> = {
 
 function fmtPrice(n: number | null, locale: Locale): string {
   if (n == null || !isFinite(Number(n))) return "—";
-  return new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-US", {
-    maximumFractionDigits: 0,
-  }).format(Number(n));
+  return fmtMoney(Number(n), locale === "ar" ? "ar" : "en");
 }
 
 export async function ProjectInvoicesList({
