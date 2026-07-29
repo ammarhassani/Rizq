@@ -77,6 +77,13 @@ if (next) {
     `\nThe plan covers every reachable pair. Follow it unless there is a reason not to, and`,
   );
   console.log(`say the reason. Tick the row when the run is recorded.`);
+  console.log(
+    `\nA BATCH run (drive/e2e.mjs) varies only persona, surface and theme — tier, state and`,
+  );
+  console.log(
+    `entry reach nothing, so pairs differing only in those are ticked without having differed.`,
+  );
+  console.log(`Drive the combination by hand (ammar-loop) when it is the point of the row.`);
 } else {
   console.log(
     `\nEvery row ticked. If three consecutive runs also found no new P1/P2, the space is`,
