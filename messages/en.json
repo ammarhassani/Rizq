@@ -2395,7 +2395,13 @@
     "profile": "Your profile",
     "completeProfile2": "Complete your profile",
     "couldnTSaveCheckConnection": "Couldn't save — check your connection and try again",
-    "testimonials": "Testimonials"
+    "testimonials": "Testimonials",
+    "benchmark": {
+      "title": "Help build the Saudi price benchmark",
+      "body": "When this is on, the prices you finalise and the invoices you mark paid are added to Rizq's benchmark — anonymously, and only as part of an aggregate. A paid invoice counts for more than a quoted proposal, because one is a price a client paid and the other is a price you asked for.",
+      "privacy": "Off by default. Your figures are never shown to anyone individually: a price stays hidden until at least 3 different freelancers have contributed to the same specialty, city and experience level. Turning this off stops future contributions — figures already blended into a band cannot be pulled back out, because nothing records which of them was yours.",
+      "error": "Could not save that. Try again."
+    }
   },
   "StudioProfile": {
     "testimonials": {

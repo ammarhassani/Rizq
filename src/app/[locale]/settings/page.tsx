@@ -12,6 +12,7 @@ import { resolveDisplayName } from "@/lib/profile/displayName";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/shell/AppShell";
 import { SettingsClient } from "@/components/settings/SettingsClient";
+import { BenchmarkConsent } from "@/components/settings/BenchmarkConsent";
 import { AccountIntegrations } from "@/components/settings/AccountIntegrations";
 import { listProviderConnections } from "@/app/actions/projects/integrations/connect";
 import { isGithubConfigured } from "@/lib/integrations/github";
@@ -61,7 +62,7 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
   // Fetch user profile
   const { data: profile } = await supabase
     .from("users")
-    .select("id, email, name, full_name_ar, role, created_at")
+    .select("id, email, name, full_name_ar, role, created_at, contribute_benchmarks")
     .eq("id", userData.user.id)
     .single();
 
@@ -204,6 +205,12 @@ export default async function SettingsPage({ params }: { params: Promise<Params>
           locale={locale as "ar" | "en"}
           githubConfigured={isGithubConfigured()}
           connections={await listProviderConnections()}
+        />
+
+        {/* ── Benchmark contribution (opt-in, PDPL) ──────────────────── */}
+        <BenchmarkConsent
+          locale={locale as "ar" | "en"}
+          initialEnabled={!!profile?.contribute_benchmarks}
         />
 
         {/* ── PDPL: Privacy & data + Danger zone ─────────────────────── */}

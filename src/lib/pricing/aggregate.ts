@@ -73,6 +73,30 @@ const FULL_CREDIT_SAMPLE = 10_000;
  */
 const UNSIZED_SAMPLE_CREDIT = 0.25;
 
+/**
+ * Agreement between independent bodies of evidence.
+ *
+ * Provenance and sample size answer "how good are these sources". They do not answer the
+ * question a freelancer is actually asking, which is "do they agree". Meta-analysis treats
+ * these as separate axes: inverse-variance weighting handles precision, and heterogeneity
+ * (I²) is reported alongside it precisely because a pooled estimate from studies that
+ * disagree is not the same claim as one from studies that concur.
+ *
+ * Rizq had only the first axis, and it showed. Measured on the live corpus before this was
+ * added: 146 of 581 multi-family cells held sources disagreeing by more than 3×, and 109 of
+ * those were reporting "good" evidence. The average score for cells whose sources disagreed
+ * 3× was 63.5% — HIGHER than the 62.4% overall. Well-sampled sources contradicting each other
+ * were scoring better than modest sources concurring, which is backwards.
+ *
+ * Spread is the ratio of the highest family median to the lowest. Full credit up to 1.5×
+ * (sources within 50% of each other are telling the same story); floored at 0.3 by 5×, which
+ * is where the content-writing regime conflict sits — a 4× disagreement between the Saudi seed
+ * and the PPP-converted foreign reports is not a market band, it is two different claims.
+ */
+const SPREAD_FULL_CREDIT = 1.5;
+const SPREAD_FLOOR_AT = 5;
+const MIN_AGREEMENT = 0.3;
+
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const round10 = (n: number) => Math.round(n / 10) * 10;
@@ -121,12 +145,14 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
   // and only genuinely different derivations compound. See evidenceFamily.ts.
   const bestByFamily = new Map<EvidenceFamily, number>();
   const sampleByFamily = new Map<EvidenceFamily, number>();
+  const pricesByFamily = new Map<EvidenceFamily, number[]>();
   for (const r of weighted) {
     const family = evidenceFamily(r.provenance, r.source_ref);
     bestByFamily.set(family, Math.max(bestByFamily.get(family) ?? 0, r.weight));
     // Summed within a family, because two roles from one survey really are two samples of it.
     const sample = typeof r.published_sample === "number" && r.published_sample > 0 ? r.published_sample : 0;
     sampleByFamily.set(family, (sampleByFamily.get(family) ?? 0) + sample);
+    if (r.price_sar > 0) pricesByFamily.set(family, [...(pricesByFamily.get(family) ?? []), r.price_sar]);
   }
 
   // Noisy-or: each family independently fails to establish the price with probability
@@ -143,7 +169,31 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
     UNSIZED_SAMPLE_CREDIT,
     Math.min(1, Math.log(Math.max(1, totalSample)) / Math.log(FULL_CREDIT_SAMPLE))
   );
-  const confidence_score = round2(clamp01(accumulated * sampleFactor));
+  // How far apart the independent families land. One family cannot disagree with itself, so a
+  // single-family cell is neither rewarded nor punished here — its thinness is already carried
+  // by the accumulation term.
+  const familyMedians = [...pricesByFamily.values()]
+    .map((prices) => {
+      const sorted = [...prices].sort((a, b) => a - b);
+      return sorted[Math.floor(sorted.length / 2)]!;
+    })
+    .filter((p) => p > 0);
+  const spread =
+    familyMedians.length > 1
+      ? Math.max(...familyMedians) / Math.min(...familyMedians)
+      : 1;
+  const agreement =
+    spread <= SPREAD_FULL_CREDIT
+      ? 1
+      : Math.max(
+          MIN_AGREEMENT,
+          1 -
+            (1 - MIN_AGREEMENT) *
+              (Math.log(spread / SPREAD_FULL_CREDIT) /
+                Math.log(SPREAD_FLOOR_AT / SPREAD_FULL_CREDIT))
+        );
+
+  const confidence_score = round2(clamp01(accumulated * sampleFactor * agreement));
 
   // Rows sharing a citation are one piece of evidence. Rows with no citation collapse
   // into a single "unattributed" bucket rather than counting one apiece — an unknown

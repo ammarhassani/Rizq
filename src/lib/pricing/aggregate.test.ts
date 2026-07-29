@@ -138,3 +138,42 @@ describe("aggregate", () => {
     });
   }
 });
+
+describe("agreement between evidence families", () => {
+  /**
+   * The flaw this guards, measured on the live corpus before the fix: 146 of 581 multi-family
+   * cells held sources disagreeing by more than 3x, and 109 of them reported "good" evidence.
+   * Cells whose sources contradicted each other scored HIGHER than cells whose sources agreed.
+   */
+  it("sources that disagree score lower than sources that concur", () => {
+    const agreeing = aggregate(
+      [
+        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno", published_sample: 182_000 },
+        { ...row(1100, "founder", 0.5, 0), source_ref: "Rizq founder editorial seed" },
+      ],
+      NOW
+    )!;
+    const disagreeing = aggregate(
+      [
+        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno", published_sample: 182_000 },
+        { ...row(5000, "founder", 0.5, 0), source_ref: "Rizq founder editorial seed" },
+      ],
+      NOW
+    )!;
+    expect(disagreeing.confidence_score).toBeLessThan(agreeing.confidence_score);
+  });
+
+  it("a single family is not punished for disagreeing with itself", () => {
+    const tight = aggregate(
+      [row(1000, "published_ref", 0.9, 0), row(1050, "published_ref", 0.9, 0)],
+      NOW
+    )!;
+    const wide = aggregate(
+      [row(1000, "published_ref", 0.9, 0), row(9000, "published_ref", 0.9, 0)],
+      NOW
+    )!;
+    // Both are one family, so the spread term must not fire — only genuinely independent
+    // bodies of evidence can contradict one another.
+    expect(wide.confidence_score).toBe(tight.confidence_score);
+  });
+});
