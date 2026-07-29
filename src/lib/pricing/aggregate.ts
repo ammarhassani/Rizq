@@ -1,7 +1,7 @@
-import { weightedPercentile } from "./weightedPercentile";
 import { freshnessDecay, monthsBetween } from "./freshness";
 import { provenanceWeight, type BenchmarkProvenance } from "./provenance";
-import { evidenceFamily, type EvidenceFamily } from "./evidenceFamily";
+import type { EvidenceFamily } from "./evidenceFamily";
+import { summariseFamilies, combine, type BandKind } from "./latentTruth";
 
 export type AggRow = {
   price_sar: number;
@@ -50,7 +50,17 @@ export type Aggregate = {
   source_count: number;
   dominant_provenance: BenchmarkProvenance;
   sources: ProvenanceSource[];
+  /**
+   * Retained for the stored `queries` row and the share page, but no longer displayed. Evidence
+   * is now communicated by composition and band width, not by a scalar nobody could interpret.
+   */
   confidence_score: number;
+  /** Which bodies of evidence produced this, and how many sources stood behind each. */
+  families: Array<{ family: EvidenceFamily; adjusted: number; sourceCount: number; rowCount: number }>;
+  /** agreed · disagreement · insufficient — drives what the card is allowed to claim. */
+  band_kind: BandKind;
+  /** Ratio between the highest and lowest family estimate. 1 when a single family. */
+  family_spread: number;
   date_range: { earliest: string; latest: string };
 };
 
@@ -73,30 +83,6 @@ const FULL_CREDIT_SAMPLE = 10_000;
  */
 const UNSIZED_SAMPLE_CREDIT = 0.25;
 
-/**
- * Agreement between independent bodies of evidence.
- *
- * Provenance and sample size answer "how good are these sources". They do not answer the
- * question a freelancer is actually asking, which is "do they agree". Meta-analysis treats
- * these as separate axes: inverse-variance weighting handles precision, and heterogeneity
- * (I²) is reported alongside it precisely because a pooled estimate from studies that
- * disagree is not the same claim as one from studies that concur.
- *
- * Rizq had only the first axis, and it showed. Measured on the live corpus before this was
- * added: 146 of 581 multi-family cells held sources disagreeing by more than 3×, and 109 of
- * those were reporting "good" evidence. The average score for cells whose sources disagreed
- * 3× was 63.5% — HIGHER than the 62.4% overall. Well-sampled sources contradicting each other
- * were scoring better than modest sources concurring, which is backwards.
- *
- * Spread is the ratio of the highest family median to the lowest. Full credit up to 1.5×
- * (sources within 50% of each other are telling the same story); floored at 0.3 by 5×, which
- * is where the content-writing regime conflict sits — a 4× disagreement between the Saudi seed
- * and the PPP-converted foreign reports is not a market band, it is two different claims.
- */
-const SPREAD_FULL_CREDIT = 1.5;
-const SPREAD_FLOOR_AT = 5;
-const MIN_AGREEMENT = 0.3;
-
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const round10 = (n: number) => Math.round(n / 10) * 10;
@@ -115,14 +101,20 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
     return { ...r, weight };
   });
 
-  const pairs = weighted.map((r) => ({ value: r.price_sar, weight: r.weight }));
-  const min = round10(weightedPercentile(pairs, 0.1));
-  const max = round10(weightedPercentile(pairs, 0.9));
-  // The anchor (median) rounds to the nearest 50 SAR for a clean headline price,
-  // while min/max round to 10. In very tight markets that coarser rounding can
-  // overshoot the band edges, so clamp the anchor back inside [min, max] — the
-  // Aggregate contract guarantees min ≤ anchor ≤ max.
-  const anchor = Math.max(min, Math.min(max, round50(weightedPercentile(pairs, 0.5))));
+  // The band comes from a bias-adjusted mixture over evidence families, not from percentiles
+  // over pooled rows. Pooling was the root defect: a weighted median over a bimodal set lands in
+  // whichever cluster carries more weight and JUMPS when weights move (measured: 199 of 700
+  // bands, −85.9% to +44.4%). Every component stays in a mixture, so disagreement widens the
+  // band instead of flipping it. See latentTruth.ts.
+  const mixture = combine(summariseFamilies(weighted));
+  if (!mixture) return null;
+
+  const min = round10(mixture.min);
+  const max = round10(mixture.max);
+  // The anchor rounds to the nearest 50 SAR for a clean headline; clamp it back inside the band
+  // because the coarser rounding can overshoot in a tight market. min ≤ anchor ≤ max is the
+  // Aggregate contract.
+  const anchor = Math.max(min, Math.min(max, round50(mixture.anchor)));
 
   const byProv = new Map<BenchmarkProvenance, { count: number; weight: number }>();
   for (const r of weighted) {
@@ -136,67 +128,26 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
     .sort((a, b) => b.weight - a.weight);
   const dominant_provenance = sources[0]!.provenance;
 
-  // Evidence accumulates across independent families and does NOT accumulate within one.
-  //
-  // Averaging every row was the old behaviour and it had a perverse consequence: adding a
-  // mediocre source LOWERED a cell's confidence, so the engine punished corroboration. But
-  // naive accumulation over rows is worse — three rows from one document would read as three
-  // agreeing witnesses. Families split the difference: the strongest row speaks for its family,
-  // and only genuinely different derivations compound. See evidenceFamily.ts.
-  const bestByFamily = new Map<EvidenceFamily, number>();
-  const pricesByFamily = new Map<EvidenceFamily, number[]>();
-  // Sample is counted ONCE PER SOURCE, not once per row. Ten roles lifted from one 100,000-role
-  // survey are ten readings of that survey, not a million observations — summing per row would
-  // have inflated the sample by an order of magnitude and handed thin cells full credit.
+  // Retained for storage compatibility only. The published sample behind the cell, log-scaled,
+  // with the floor that unquantified evidence is not absent evidence. It is no longer displayed:
+  // the noisy-or accumulation, the agreement multiplier and the standalone sample factor were all
+  // deleted in feature 013 for claiming a probabilistic meaning they never had. Evidence now
+  // reaches the reader as composition and band width.
   const sampleBySource = new Map<string, number>();
   for (const r of weighted) {
-    const family = evidenceFamily(r.provenance, r.source_ref);
-    bestByFamily.set(family, Math.max(bestByFamily.get(family) ?? 0, r.weight));
     const sample = typeof r.published_sample === "number" && r.published_sample > 0 ? r.published_sample : 0;
-    const sourceKey = (r.source_ref ?? "").trim() || "__unattributed__";
-    sampleBySource.set(sourceKey, Math.max(sampleBySource.get(sourceKey) ?? 0, sample));
-    if (r.price_sar > 0) pricesByFamily.set(family, [...(pricesByFamily.get(family) ?? []), r.price_sar]);
+    const key = (r.source_ref ?? "").trim() || "__unattributed__";
+    sampleBySource.set(key, Math.max(sampleBySource.get(key) ?? 0, sample));
   }
-
-  // Noisy-or: each family independently fails to establish the price with probability
-  // (1 - weight), so the chance at least one succeeds is 1 - the product of the failures.
-  const accumulated = 1 - [...bestByFamily.values()].reduce((p, w) => p * (1 - clamp01(w)), 1);
-
   const totalSample = [...sampleBySource.values()].reduce((s, n) => s + n, 0);
-  // Floored, not zeroed. A source that states no sample has given us an unquantified figure,
-  // not an absent one — and it is already penalised once, at `sourceConfidence`, which puts
-  // every unstated source in the lowest band. Letting log(0) drive the factor to zero would
-  // punish it a second time and collapse the whole score to 0 for editorial-only cells,
-  // which reads as "no evidence exists" rather than "we cannot size the evidence".
-  const sampleFactor = Math.max(
-    UNSIZED_SAMPLE_CREDIT,
-    Math.min(1, Math.log(Math.max(1, totalSample)) / Math.log(FULL_CREDIT_SAMPLE))
+  const confidence_score = round2(
+    clamp01(
+      Math.max(
+        UNSIZED_SAMPLE_CREDIT,
+        Math.min(1, Math.log(Math.max(1, totalSample)) / Math.log(FULL_CREDIT_SAMPLE))
+      )
+    )
   );
-  // How far apart the independent families land. One family cannot disagree with itself, so a
-  // single-family cell is neither rewarded nor punished here — its thinness is already carried
-  // by the accumulation term.
-  const familyMedians = [...pricesByFamily.values()]
-    .map((prices) => {
-      const sorted = [...prices].sort((a, b) => a - b);
-      return sorted[Math.floor(sorted.length / 2)]!;
-    })
-    .filter((p) => p > 0);
-  const spread =
-    familyMedians.length > 1
-      ? Math.max(...familyMedians) / Math.min(...familyMedians)
-      : 1;
-  const agreement =
-    spread <= SPREAD_FULL_CREDIT
-      ? 1
-      : Math.max(
-          MIN_AGREEMENT,
-          1 -
-            (1 - MIN_AGREEMENT) *
-              (Math.log(spread / SPREAD_FULL_CREDIT) /
-                Math.log(SPREAD_FLOOR_AT / SPREAD_FULL_CREDIT))
-        );
-
-  const confidence_score = round2(clamp01(accumulated * sampleFactor * agreement));
 
   // Rows sharing a citation are one piece of evidence. Rows with no citation collapse
   // into a single "unattributed" bucket rather than counting one apiece — an unknown
@@ -215,6 +166,9 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
     dominant_provenance,
     sources,
     confidence_score,
+    families: mixture.families,
+    band_kind: mixture.kind,
+    family_spread: mixture.spread,
     date_range: { earliest: dates[0]!, latest: dates[dates.length - 1]! },
   };
 }

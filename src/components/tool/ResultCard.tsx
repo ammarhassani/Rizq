@@ -9,7 +9,6 @@ import { toggleShare, getMarketTrendNarrative } from "@/app/actions/tool/calcula
 import { track } from "@/lib/analytics/track";
 import type { BenchmarkProvenance } from "@/lib/pricing/collectors/types";
 import type { MarketTrend, TrendScope } from "@/lib/pricing/trend";
-import { evidenceStrength } from "@/lib/pricing/evidenceStrength";
 import { statedRatePosition } from "@/lib/pricing/statedRatePosition";
 
 /**
@@ -57,7 +56,9 @@ type Props = {
   comparison_percent_below: number;
   provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
   provenanceCitation?: string;  // pre-localized full citation sentence
-  confidenceScore?: number;     // 0..1
+  confidenceScore?: number;     // 0..1 — stored, no longer displayed
+  /** agreed · disagreement · insufficient. Governs what this card is allowed to claim. */
+  bandKind?: "agreed" | "disagreement" | "insufficient";
   /** What the freelancer said they charge, from their profile. Absent for most accounts. */
   statedRange?: { min: number; max: number } | null;
   /** Raw dominant provenance kind — used to deep-link the methodology page */
@@ -89,6 +90,7 @@ export function ResultCard({
   provenanceLabel,
   provenanceCitation,
   confidenceScore,
+  bandKind,
   statedRange,
   provenanceKind,
   trend,
@@ -239,10 +241,8 @@ export function ResultCard({
             <span className="inline-flex items-center gap-1 rounded-full border border-rizq-green/30 bg-rizq-green/10 px-2.5 py-0.5 text-xs text-rizq-green">
               {provenanceLabel}
             </span>
-            {typeof confidenceScore === "number" && (
-              <span className="text-xs text-rizq-ink-soft/70">
-                {t("evidenceLabel")}: {t(`evidence.${evidenceStrength(confidenceScore)}`)}
-              </span>
+            {bandKind === "disagreement" && (
+              <span className="text-xs text-rizq-ink-soft/70">{t("evidence.disagreement")}</span>
             )}
           </p>
         )}

@@ -240,6 +240,7 @@ export function ToolFlow({
         provenanceLabel={PROVENANCE_LABEL[r.dominant_provenance][locale === "ar" ? "ar" : "en"]}
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
+        bandKind={r.band_kind}
         statedRange={statedRange}
         provenanceKind={r.dominant_provenance}
         trend={r.trend}

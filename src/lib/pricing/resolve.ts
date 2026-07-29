@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { aggregate, type AggRow, type ProvenanceSource } from "./aggregate";
+import { aggregate, type AggRow, type Aggregate, type ProvenanceSource } from "./aggregate";
 import { buildCitation } from "./citation";
 import { applyKAnonymity } from "./contribution";
 import { computeMarketTrend, type MarketTrend, type TrendScope } from "./trend";
@@ -27,6 +27,14 @@ export type ResolveResult =
       sample_size: number;
       /** Distinct citations behind those rows — see aggregate.source_count. */
       source_count: number;
+      /** Which bodies of evidence produced this band, and how many sources stood behind each. */
+      families: Aggregate["families"];
+      /** agreed · disagreement · insufficient — governs what the card may claim. */
+      band_kind: Aggregate["band_kind"];
+      /** Ratio between the highest and lowest family estimate. 1 when a single family. */
+      family_spread: number;
+      /** False until a city earns its own figures from 3 distinct local contributors. */
+      city_backed: boolean;
       dominant_provenance: BenchmarkProvenance;
       sources: ProvenanceSource[];
       confidence_score: number;
@@ -234,6 +242,12 @@ async function finalize(
     max: agg.max,
     sample_size: agg.sample_size,
     source_count: agg.source_count,
+    families: agg.families,
+    band_kind: agg.band_kind,
+    family_spread: agg.family_spread,
+    // No cited source distinguishes Saudi cities, so nothing is city-backed yet. This flips per
+    // city once 3 distinct local contributors clear the k-anonymity gate.
+    city_backed: false,
     dominant_provenance: agg.dominant_provenance,
     sources: agg.sources,
     confidence_score: agg.confidence_score,

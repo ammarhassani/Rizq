@@ -739,11 +739,8 @@
       "rate": "Your rate",
       "enoughDataYet": "Not enough data yet",
       "peak": "Peak",
-      "evidenceLabel": "Evidence",
       "evidence": {
-        "limited": "limited",
-        "moderate": "moderate",
-        "good": "good"
+        "disagreement": "Sources disagree — the range reflects that"
       },
       "statedRate": {
         "below": "You usually charge around {stated} SAR for work like this — {percent}% under the median, and below the band entirely. Nothing says you must move; it does say the market would bear more.",

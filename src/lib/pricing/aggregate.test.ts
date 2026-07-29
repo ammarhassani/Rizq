@@ -58,65 +58,55 @@ describe("aggregate", () => {
     expect(out.sources[0]!.provenance).toBe("published_ref");
   });
 
-  it("rewards larger, fresher, higher-provenance samples with higher confidence", () => {
-    const weakSmall = aggregate(
-      [row(1000, "reasoned", 0.2, 30), row(1100, "reasoned", 0.2, 30)],
-      NOW
-    )!;
-    const strongLarge = aggregate(
-      Array.from({ length: 12 }, (_, i) => row(1000 + i * 20, "published_ref", 0.6, 1)),
-      NOW
-    )!;
-    expect(strongLarge.confidence_score).toBeGreaterThan(weakSmall.confidence_score);
-    expect(weakSmall.confidence_score).toBeGreaterThanOrEqual(0);
-    expect(strongLarge.confidence_score).toBeLessThanOrEqual(1);
-  });
-
-  it("pins the confidence_score formula (family accumulation × sample factor)", () => {
-    // 10 fresh published_ref rows from ONE family, each weight 0.6 × 0.6 × 1.0 = 0.36.
-    // They corroborate nothing each other does not already say, so the family contributes its
-    // strongest row and no more: accumulated = 0.36. Sample is unstated, so the factor floors
-    // at 0.25 → 0.36 × 0.25 = 0.09.
+  it("no longer exposes a scalar confidence anyone could interpret", () => {
+    // Feature 013 deleted the noisy-or accumulation, the agreement multiplier and the standalone
+    // sample factor. `confidence_score` survives only so the stored `queries` row and the share
+    // page keep their shape; nothing renders it. Evidence now reaches the reader as composition
+    // and band width, so the assertions that used to pin its formula are gone with the formula.
     const out = aggregate(
       Array.from({ length: 10 }, (_, i) => row(1000 + i * 20, "published_ref", 0.6, 0)),
       NOW
     )!;
-    expect(out.confidence_score).toBeCloseTo(0.09, 2);
+    expect(out.confidence_score).toBeGreaterThanOrEqual(0);
+    expect(out.confidence_score).toBeLessThanOrEqual(1);
   });
 
-  it("a second independent family raises the score; a second row of the same family does not", () => {
-    const oneFamily = aggregate(
-      [row(1000, "published_ref", 0.6, 0), row(1100, "published_ref", 0.6, 0)],
+  it("reports which families produced the band and how many sources stood behind each", () => {
+    const out = aggregate(
+      [
+        { ...row(1000, "published_ref", 0.6, 0), source_ref: "YunoJuno 2026" },
+        { ...row(3000, "published_ref", 0.6, 0), source_ref: "Robert Walters Middle East" },
+      ],
       NOW
     )!;
-    const twoFamilies = aggregate(
-      [row(1000, "published_ref", 0.6, 0), { ...row(1100, "founder", 0.6, 0) }],
-      NOW
-    )!;
-    // This is the behaviour change: averaging used to make corroboration LOWER the score.
-    expect(twoFamilies.confidence_score).toBeGreaterThan(oneFamily.confidence_score);
+    const fams = out.families.map((f) => f.family).sort();
+    expect(fams).toEqual(["freelance_rate", "gulf_recruiter"]);
+    expect(out.families.every((f) => f.sourceCount >= 1)).toBe(true);
   });
 
-  it("a stated sample beats an unstated one of the same weight", () => {
+  it("a stated sample tightens the band against an unstated one", () => {
     const unstated = aggregate([row(1000, "published_ref", 0.6, 0)], NOW)!;
     const stated = aggregate(
       [{ ...row(1000, "published_ref", 0.6, 0), published_sample: 182_000 }],
       NOW
     )!;
-    expect(stated.confidence_score).toBeGreaterThan(unstated.confidence_score);
+    // Sample size moved from a standalone multiplier on a hidden score into the component
+    // variance, where it does visible work: 182,000 respondents earn a narrower band.
+    expect(stated.max - stated.min).toBeLessThan(unstated.max - unstated.min);
   });
 
   it("keeps min ≤ anchor ≤ max when 50-SAR anchor rounding overshoots a tight band", () => {
-    // Regression: round50(p50≈976)=1000 would exceed the 10-SAR-rounded max (980).
+    // Regression on the ordering invariant, which survives the estimator change. The exact
+    // edges no longer come from percentiles over pooled rows — a mixture over one family with a
+    // wide editorial prior is deliberately wider than the raw spread — but round50 on the anchor
+    // can still overshoot round10 on the max, and the clamp must still catch it.
     const out = aggregate(
       [974, 975, 976, 977, 978].map((p) => row(p, "founder", 0.3)),
       NOW
     )!;
-    expect(out.min).toBe(970);
-    expect(out.max).toBe(980);
-    expect(out.anchor).toBe(980); // clamped down from 1000 into [min, max]
     expect(out.min).toBeLessThanOrEqual(out.anchor);
     expect(out.anchor).toBeLessThanOrEqual(out.max);
+    expect(out.anchor % 50).toBe(0);
   });
 
   const SCENARIOS: { name: string; rows: AggRow[]; expectDominant: BenchmarkProvenance }[] = [
@@ -145,25 +135,48 @@ describe("agreement between evidence families", () => {
    * cells held sources disagreeing by more than 3x, and 109 of them reported "good" evidence.
    * Cells whose sources contradicted each other scored HIGHER than cells whose sources agreed.
    */
-  it("sources that disagree score lower than sources that concur", () => {
+  it("sources that disagree produce a WIDER band than sources that concur", () => {
+    // Two CITED families. Pairing a cited family with editorial would prove nothing here:
+    // editorial is excluded from the anchor wherever a cited family exists, so its figure cannot
+    // move the band either way — which the test below asserts directly.
     const agreeing = aggregate(
       [
-        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno", published_sample: 182_000 },
-        { ...row(1100, "founder", 0.5, 0), source_ref: "Rizq founder editorial seed" },
+        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno 2026", published_sample: 182_000 },
+        { ...row(1100, "published_ref", 0.9, 0), source_ref: "Robert Walters Middle East", published_sample: 100_000 },
       ],
       NOW
     )!;
     const disagreeing = aggregate(
       [
-        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno", published_sample: 182_000 },
-        { ...row(5000, "founder", 0.5, 0), source_ref: "Rizq founder editorial seed" },
+        { ...row(1000, "published_ref", 0.9, 0), source_ref: "YunoJuno 2026", published_sample: 182_000 },
+        { ...row(2600, "published_ref", 0.9, 0), source_ref: "Robert Walters Middle East", published_sample: 100_000 },
       ],
       NOW
     )!;
-    expect(disagreeing.confidence_score).toBeLessThan(agreeing.confidence_score);
+    // The mechanism moved: disagreement used to shave an invisible score, and now widens the
+    // visible band. Width is something the freelancer can act on; the score never was.
+    expect(disagreeing.max - disagreeing.min).toBeGreaterThan(agreeing.max - agreeing.min);
+    expect(disagreeing.band_kind).not.toBe("agreed");
+    expect(agreeing.band_kind).toBe("agreed");
   });
 
-  it("a single family is not punished for disagreeing with itself", () => {
+  it("editorial evidence cannot move a band that has a cited family in it", () => {
+    const citedOnly = aggregate(
+      [{ ...row(4000, "published_ref", 0.9, 0), source_ref: "YunoJuno 2026", published_sample: 182_000 }],
+      NOW
+    )!;
+    const withEditorial = aggregate(
+      [
+        { ...row(4000, "published_ref", 0.9, 0), source_ref: "YunoJuno 2026", published_sample: 182_000 },
+        { ...row(400, "founder", 0.5, 0), source_ref: "Rizq founder editorial seed" },
+      ],
+      NOW
+    )!;
+    // The 4x content-writing conflict was the seed dragging an anchor it had no standing to move.
+    expect(withEditorial.anchor).toBe(citedOnly.anchor);
+  });
+
+  it("a single family cannot disagree with itself", () => {
     const tight = aggregate(
       [row(1000, "published_ref", 0.9, 0), row(1050, "published_ref", 0.9, 0)],
       NOW
@@ -174,7 +187,9 @@ describe("agreement between evidence families", () => {
     )!;
     // Both are one family, so the spread term must not fire — only genuinely independent
     // bodies of evidence can contradict one another.
-    expect(wide.confidence_score).toBe(tight.confidence_score);
+    expect(wide.family_spread).toBe(1);
+    expect(tight.family_spread).toBe(1);
+    expect(wide.band_kind).toBe("agreed");
   });
 });
 
@@ -194,5 +209,7 @@ describe("published sample is counted once per source, not once per row", () => 
     )!;
     // Same survey, same stated sample — more rows lifted from it is not more evidence.
     expect(ten.confidence_score).toBe(one.confidence_score);
+    expect(ten.families[0]!.sourceCount).toBe(1);
+    expect(one.families[0]!.sourceCount).toBe(1);
   });
 });
