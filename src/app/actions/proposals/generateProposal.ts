@@ -460,6 +460,32 @@ export async function generateProposal(
 
   const proposalId = insertData.id as string;
 
+  // Record what Rizq showed at the moment this price was set, and whether the freelancer saw it
+  // before choosing. Without this, any future calibration on paid prices measures how persuasive
+  // our own suggestion was rather than what Saudi clients pay — the anchor comes back to us
+  // wearing the market's clothes. Best-effort: a snapshot failure must never cost a proposal.
+  //
+  // saw_band_first is TRUE here because the proposal flow prices from the band it just resolved.
+  // The FALSE case — a freelancer who priced without seeing our number — is the clean
+  // observation, and it arrives from the onboarding stated rate rather than from this path.
+  try {
+    await supabase.from("band_snapshots").insert({
+      user_id: userResult.user.id,
+      proposal_id: proposalId,
+      specialty_id: resolveResult.ids.specialty_id,
+      experience_tier_id: resolveResult.ids.experience_tier_id,
+      project_size: projectSize ?? null,
+      anchor_sar: resolveResult.anchor,
+      min_sar: resolveResult.min,
+      max_sar: resolveResult.max,
+      band_kind: resolveResult.band_kind,
+      evidence_composition: resolveResult.families,
+      saw_band_first: true,
+    });
+  } catch {
+    /* never block the freelancer's proposal on an instrument */
+  }
+
   // Update artifact_json with the real proposal ID (keep brand fields consistent)
   const artifactWithId = buildArtifactData({
     ...artifactBase,

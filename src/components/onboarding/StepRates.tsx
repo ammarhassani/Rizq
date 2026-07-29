@@ -81,15 +81,6 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
       dir={isAr ? "rtl" : "ltr"}
       className={`space-y-5 ${font}`}
     >
-      {/* Live market-rate preview (feature 006) — the freelancer sees what the
-          engine derives from their specialty/city/experience while setting their
-          own rate. Ephemeral; cites provenance. */}
-      <OnboardingPricePreview
-        locale={locale}
-        projectMin={projectMin ? parseFloat(projectMin) : null}
-        hourlyRate={hourlyRate ? parseFloat(hourlyRate) : null}
-      />
-
       {/* Hourly rate + min/floor project rate (daily is derived = hourly × 8). */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -139,6 +130,22 @@ export function StepRates({ locale, profile, onNext, onBack, onSkip, autosave, o
           ))}
         </div>
       </div>
+
+      {/* Market-rate preview — deliberately BELOW the inputs, and hidden until the freelancer has
+          entered a rate of their own (feature 013).
+
+          It used to render first. That made every stated rate an echo of our own suggestion: the
+          freelancer read our number, then typed something near it, and the figure we later treated
+          as independent evidence was partly our own. A stated rate captured before the anchor is
+          the single clean, pre-anchor observation Rizq will ever get from a user, and showing the
+          band first destroyed it. */}
+      {(projectMin || hourlyRate) && (
+        <OnboardingPricePreview
+          locale={locale}
+          projectMin={projectMin ? parseFloat(projectMin) : null}
+          hourlyRate={hourlyRate ? parseFloat(hourlyRate) : null}
+        />
+      )}
 
       {error && (
         <p role="alert" className={`text-sm text-[var(--over)] ${font}`}>
