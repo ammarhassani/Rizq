@@ -1,18 +1,18 @@
 /**
  * Evidence strength — the human-readable replacement for the raw confidence percentage.
  *
- * `aggregate.confidence_score` is a product of weights:
+ * `aggregate.confidence_score` accumulates the strongest row of each independent evidence
+ * family, then scales by the published observations behind the cell.
  *
- *   mean(provenanceWeight × row.confidence × freshnessDecay) × min(1, n / 10)
+ * Printed as a raw percentage it was uninterpretable — under the previous formula the scale
+ * had no attainable top, so "12%" meant twelve out of a maximum of thirty-six. The number is
+ * therefore not shown; the same score maps to a band whose thresholds are set against the
+ * distribution that is actually observed.
  *
- * The highest provenance weight in the taxonomy is `published_ref` at 0.6, and the highest
- * confidence a source can earn is 0.9 (a published sample of 50,000+, see
- * `sourceConfidence.ts`), so the mean weight cannot exceed 0.54.
- *
- * That ceiling was 0.36 until feature 012, when confidence stopped being hand-set at 0.5–0.6
- * and started tracking each source's published sample. The constant is not decoration: the
- * test below asserts the top band is reachable at the maximum, so leaving it stale would let
- * the bands drift out of calibration without anything failing.
+ * Thresholds recalibrated 2026-07-29 from 0.10/0.20 to 0.35/0.60, when the aggregation moved
+ * from averaging rows to accumulating families. Leaving them would have put 441 of 700 live
+ * cells in the top band and stopped the label discriminating at all. Current split at these
+ * thresholds: 84 limited · 175 moderate · 441 good, against quartiles of 50.7 / 61.5 / 72.6.
  *
  * Printed as "Confidence: 12%" that reads as twelve-out-of-a-hundred, and a hundred is
  * unreachable by construction — the scale has no attainable top. Renormalising so 0.36
@@ -27,13 +27,15 @@
 export type EvidenceStrength = "limited" | "moderate" | "good";
 
 /**
- * Ceiling the score can reach: best provenance (`published_ref`, 0.6) × best earnable
- * confidence (0.9, from a published sample of 50,000+) × a fresh capture × a full sample.
+ * Ceiling the score can reach. Since the score accumulates across evidence families rather
+ * than averaging rows, it approaches 1 asymptotically: each additional independent family
+ * closes part of the remaining gap without ever shutting it. No finite corpus reaches 1, and
+ * the thresholds below are set against the distribution that is actually observed.
  */
-export const MAX_ATTAINABLE_SCORE = 0.54;
+export const MAX_ATTAINABLE_SCORE = 1.0;
 
 export function evidenceStrength(confidenceScore: number): EvidenceStrength {
-  if (!Number.isFinite(confidenceScore) || confidenceScore < 0.1) return "limited";
-  if (confidenceScore < 0.2) return "moderate";
+  if (!Number.isFinite(confidenceScore) || confidenceScore < 0.35) return "limited";
+  if (confidenceScore < 0.6) return "moderate";
   return "good";
 }

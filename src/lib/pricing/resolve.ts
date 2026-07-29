@@ -102,7 +102,7 @@ async function fetchRows(
 ): Promise<AggRow[]> {
   let query = supabase
     .from("benchmark_records")
-    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id, project_size, source_ref")
+    .select("price_sar, provenance, confidence, captured_at, recorded_at, source_user_id, project_size, source_ref, published_sample")
     .eq("specialty_id", args.specialty_id)
     .eq("active", true)
     .eq("verified", true)
@@ -144,6 +144,7 @@ async function fetchRows(
       captured_at: captured,
       project_size: (r as { project_size: string | null }).project_size ?? null,
       source_ref: (r as { source_ref: string | null }).source_ref ?? null,
+      published_sample: (r as { published_sample: number | null }).published_sample ?? null,
       source_user_id: (r as { source_user_id: string | null }).source_user_id ?? null,
     };
   });

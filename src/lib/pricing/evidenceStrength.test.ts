@@ -3,9 +3,9 @@ import { evidenceStrength, MAX_ATTAINABLE_SCORE } from "./evidenceStrength";
 
 describe("evidenceStrength", () => {
   it("maps the three bands", () => {
-    expect(evidenceStrength(0.05)).toBe("limited");
-    expect(evidenceStrength(0.12)).toBe("moderate"); // corpus average today
-    expect(evidenceStrength(0.25)).toBe("good");
+    expect(evidenceStrength(0.2)).toBe("limited");
+    expect(evidenceStrength(0.5)).toBe("moderate");
+    expect(evidenceStrength(0.65)).toBe("good"); // corpus median today is 0.615
   });
 
   it("the top band is reachable inside the attainable range", () => {

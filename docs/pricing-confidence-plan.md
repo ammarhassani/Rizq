@@ -144,6 +144,32 @@ become defensible.
 | + Phase 2 | 0.54 | ≥10 | **0.54** | good |
 | + Phase 3 | 0.75 | ≥10 | **0.75** | good, and true |
 
+## Superseded 2026-07-29 — the formula was most of the problem, not the data
+
+The phases above assume the scoring formula is sound and only the corpus is thin. Measuring
+said otherwise. Three separate things were wrong, and fixing them moved the average from
+**16.1% to ~55%** without adding a single row:
+
+1. **The sample factor counted rows.** `min(1, n/10)` was a stand-in for "how much evidence is
+   behind this" — obsolete once every source records its published sample. The average cell
+   rests on ~130,000 published observations and the row count was calling it thin because it
+   held five rows. Now log-scaled on observations, floored at 0.25 for sources that state no
+   sample (unquantified evidence is not absent evidence, and it is already penalised once at
+   `sourceConfidence`).
+2. **The score averaged rows**, so adding a mediocre source *lowered* confidence — the engine
+   punished corroboration. It now accumulates the strongest row of each independent evidence
+   family (`evidenceFamily.ts`). Not over rows: three rows from one document would otherwise
+   read as three agreeing witnesses.
+3. **`submitted` was weighted 0.5, below `published_ref` 0.6** — a paid Saudi invoice ranked
+   below a US salary survey. Now 0.85, with the paid/quoted tiers separated by row confidence
+   (0.70 vs 0.40) rather than by weight.
+
+**The known weakness in this**: family accumulation assumes families fail independently. The
+`editorial` family — the 1,260-row seed — is treated as an independent check on the foreign
+reports, and it is not really evidence at all. It is the reason the average is ~55% rather
+than the ~45% the cited sources alone would justify. Retire the seed and the number falls; that
+was measured and reversed on the same day. Watch this if the seed ever leaves.
+
 Phase 1 is engineering and ships in a day. Phase 2 is sourcing work, and the monthly
 refresh agent already reports which specialties are starving. Phase 3 is gated on having
 real users, and no amount of engineering shortens it.

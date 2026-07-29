@@ -1,6 +1,7 @@
 import { weightedPercentile } from "./weightedPercentile";
 import { freshnessDecay, monthsBetween } from "./freshness";
 import { provenanceWeight, type BenchmarkProvenance } from "./provenance";
+import { evidenceFamily, type EvidenceFamily } from "./evidenceFamily";
 
 export type AggRow = {
   price_sar: number;
@@ -22,6 +23,12 @@ export type AggRow = {
    * overstates the evidence, which is the one thing the honesty layer exists to prevent.
    */
   source_ref?: string | null;
+  /**
+   * Observations the source's publisher states stand behind this figure. Drives the sample
+   * factor: a cell resting on 210,000 published observations is not "thin" because it happens
+   * to hold five rows.
+   */
+  published_sample?: number | null;
 };
 
 export type ProvenanceSource = {
@@ -47,7 +54,24 @@ export type Aggregate = {
   date_range: { earliest: string; latest: string };
 };
 
-const CONFIDENCE_SAMPLE_TARGET = 10;
+/**
+ * Published observations at which a cell earns full credit for its sample.
+ *
+ * This replaced a row count (`min(1, n/10)`). Counting rows was a stand-in for "how much
+ * evidence is behind this", and it stopped being needed the moment each source began recording
+ * the sample its publisher stated. The stand-in was actively wrong: the average cell rests on
+ * ~130,000 published observations, and the row count was calling it thin because it held five
+ * rows. Log-scaled, so the step from 100 to 1,000 observations counts for as much as 1,000 to
+ * 10,000 — which is how sample size actually behaves.
+ */
+const FULL_CREDIT_SAMPLE = 10_000;
+
+/**
+ * Floor for a cell whose sources publish no sample size — roughly the credit 10 observations
+ * would earn. Such a cell is not evidence-free; it is evidence we cannot size, and the
+ * penalty for that already lands on `confidence` at ingestion.
+ */
+const UNSIZED_SAMPLE_CREDIT = 0.25;
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -88,10 +112,38 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
     .sort((a, b) => b.weight - a.weight);
   const dominant_provenance = sources[0]!.provenance;
 
-  const meanWeight =
-    weighted.reduce((s, r) => s + r.weight, 0) / weighted.length;
-  const sampleFactor = Math.min(1, usable.length / CONFIDENCE_SAMPLE_TARGET);
-  const confidence_score = round2(clamp01(meanWeight * sampleFactor));
+  // Evidence accumulates across independent families and does NOT accumulate within one.
+  //
+  // Averaging every row was the old behaviour and it had a perverse consequence: adding a
+  // mediocre source LOWERED a cell's confidence, so the engine punished corroboration. But
+  // naive accumulation over rows is worse — three rows from one document would read as three
+  // agreeing witnesses. Families split the difference: the strongest row speaks for its family,
+  // and only genuinely different derivations compound. See evidenceFamily.ts.
+  const bestByFamily = new Map<EvidenceFamily, number>();
+  const sampleByFamily = new Map<EvidenceFamily, number>();
+  for (const r of weighted) {
+    const family = evidenceFamily(r.provenance, r.source_ref);
+    bestByFamily.set(family, Math.max(bestByFamily.get(family) ?? 0, r.weight));
+    // Summed within a family, because two roles from one survey really are two samples of it.
+    const sample = typeof r.published_sample === "number" && r.published_sample > 0 ? r.published_sample : 0;
+    sampleByFamily.set(family, (sampleByFamily.get(family) ?? 0) + sample);
+  }
+
+  // Noisy-or: each family independently fails to establish the price with probability
+  // (1 - weight), so the chance at least one succeeds is 1 - the product of the failures.
+  const accumulated = 1 - [...bestByFamily.values()].reduce((p, w) => p * (1 - clamp01(w)), 1);
+
+  const totalSample = [...sampleByFamily.values()].reduce((s, n) => s + n, 0);
+  // Floored, not zeroed. A source that states no sample has given us an unquantified figure,
+  // not an absent one — and it is already penalised once, at `sourceConfidence`, which puts
+  // every unstated source in the lowest band. Letting log(0) drive the factor to zero would
+  // punish it a second time and collapse the whole score to 0 for editorial-only cells,
+  // which reads as "no evidence exists" rather than "we cannot size the evidence".
+  const sampleFactor = Math.max(
+    UNSIZED_SAMPLE_CREDIT,
+    Math.min(1, Math.log(Math.max(1, totalSample)) / Math.log(FULL_CREDIT_SAMPLE))
+  );
+  const confidence_score = round2(clamp01(accumulated * sampleFactor));
 
   // Rows sharing a citation are one piece of evidence. Rows with no citation collapse
   // into a single "unattributed" bucket rather than counting one apiece — an unknown

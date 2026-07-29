@@ -7,7 +7,15 @@ export const PROVENANCE_WEIGHT: Record<BenchmarkProvenance, number> = {
   published_ref: 0.6,
   ingested: 0.4,
   partner: 0.5,
-  submitted: 0.5,
+  /**
+   * Above `published_ref` (0.6) since 2026-07-29, and deliberately so. A report describes a
+   * market; a submitted row records a transaction a Saudi client actually paid a Saudi
+   * freelancer. Ranking the report higher was an inversion nobody had noticed. The two
+   * verification tiers inside `submitted` are separated by row confidence, not by weight:
+   * a paid invoice carries 0.70 (0.85 x 0.70 = 0.595, above the best published row at 0.54)
+   * and a finalized proposal carries 0.40 (0.34, below it), because an ask is not a sale.
+   */
+  submitted: 0.85,
   reasoned: 0.2,
   founder: 0.3,
 };

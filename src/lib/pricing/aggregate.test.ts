@@ -72,14 +72,38 @@ describe("aggregate", () => {
     expect(strongLarge.confidence_score).toBeLessThanOrEqual(1);
   });
 
-  it("pins the confidence_score formula (meanWeight × sample factor)", () => {
-    // 10 fresh published_ref rows: weight = 0.6 × 0.6 × 1.0 = 0.36 each;
-    // meanWeight 0.36 × sampleFactor min(1, 10/10)=1 → 0.36.
+  it("pins the confidence_score formula (family accumulation × sample factor)", () => {
+    // 10 fresh published_ref rows from ONE family, each weight 0.6 × 0.6 × 1.0 = 0.36.
+    // They corroborate nothing each other does not already say, so the family contributes its
+    // strongest row and no more: accumulated = 0.36. Sample is unstated, so the factor floors
+    // at 0.25 → 0.36 × 0.25 = 0.09.
     const out = aggregate(
       Array.from({ length: 10 }, (_, i) => row(1000 + i * 20, "published_ref", 0.6, 0)),
       NOW
     )!;
-    expect(out.confidence_score).toBeCloseTo(0.36, 2);
+    expect(out.confidence_score).toBeCloseTo(0.09, 2);
+  });
+
+  it("a second independent family raises the score; a second row of the same family does not", () => {
+    const oneFamily = aggregate(
+      [row(1000, "published_ref", 0.6, 0), row(1100, "published_ref", 0.6, 0)],
+      NOW
+    )!;
+    const twoFamilies = aggregate(
+      [row(1000, "published_ref", 0.6, 0), { ...row(1100, "founder", 0.6, 0) }],
+      NOW
+    )!;
+    // This is the behaviour change: averaging used to make corroboration LOWER the score.
+    expect(twoFamilies.confidence_score).toBeGreaterThan(oneFamily.confidence_score);
+  });
+
+  it("a stated sample beats an unstated one of the same weight", () => {
+    const unstated = aggregate([row(1000, "published_ref", 0.6, 0)], NOW)!;
+    const stated = aggregate(
+      [{ ...row(1000, "published_ref", 0.6, 0), published_sample: 182_000 }],
+      NOW
+    )!;
+    expect(stated.confidence_score).toBeGreaterThan(unstated.confidence_score);
   });
 
   it("keeps min ≤ anchor ≤ max when 50-SAR anchor rounding overshoots a tight band", () => {
