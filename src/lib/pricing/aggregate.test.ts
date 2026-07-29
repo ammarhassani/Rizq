@@ -177,3 +177,22 @@ describe("agreement between evidence families", () => {
     expect(wide.confidence_score).toBe(tight.confidence_score);
   });
 });
+
+describe("published sample is counted once per source, not once per row", () => {
+  it("ten roles from one survey do not read as ten surveys", () => {
+    const one = aggregate(
+      [{ ...row(1000, "published_ref", 0.9, 0), source_ref: "Robert Walters", published_sample: 100_000 }],
+      NOW
+    )!;
+    const ten = aggregate(
+      Array.from({ length: 10 }, (_, i) => ({
+        ...row(1000 + i, "published_ref", 0.9, 0),
+        source_ref: "Robert Walters",
+        published_sample: 100_000,
+      })),
+      NOW
+    )!;
+    // Same survey, same stated sample — more rows lifted from it is not more evidence.
+    expect(ten.confidence_score).toBe(one.confidence_score);
+  });
+});

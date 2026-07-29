@@ -144,14 +144,17 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
   // agreeing witnesses. Families split the difference: the strongest row speaks for its family,
   // and only genuinely different derivations compound. See evidenceFamily.ts.
   const bestByFamily = new Map<EvidenceFamily, number>();
-  const sampleByFamily = new Map<EvidenceFamily, number>();
   const pricesByFamily = new Map<EvidenceFamily, number[]>();
+  // Sample is counted ONCE PER SOURCE, not once per row. Ten roles lifted from one 100,000-role
+  // survey are ten readings of that survey, not a million observations — summing per row would
+  // have inflated the sample by an order of magnitude and handed thin cells full credit.
+  const sampleBySource = new Map<string, number>();
   for (const r of weighted) {
     const family = evidenceFamily(r.provenance, r.source_ref);
     bestByFamily.set(family, Math.max(bestByFamily.get(family) ?? 0, r.weight));
-    // Summed within a family, because two roles from one survey really are two samples of it.
     const sample = typeof r.published_sample === "number" && r.published_sample > 0 ? r.published_sample : 0;
-    sampleByFamily.set(family, (sampleByFamily.get(family) ?? 0) + sample);
+    const sourceKey = (r.source_ref ?? "").trim() || "__unattributed__";
+    sampleBySource.set(sourceKey, Math.max(sampleBySource.get(sourceKey) ?? 0, sample));
     if (r.price_sar > 0) pricesByFamily.set(family, [...(pricesByFamily.get(family) ?? []), r.price_sar]);
   }
 
@@ -159,7 +162,7 @@ export function aggregate(rows: AggRow[], now: Date): Aggregate | null {
   // (1 - weight), so the chance at least one succeeds is 1 - the product of the failures.
   const accumulated = 1 - [...bestByFamily.values()].reduce((p, w) => p * (1 - clamp01(w)), 1);
 
-  const totalSample = [...sampleByFamily.values()].reduce((s, n) => s + n, 0);
+  const totalSample = [...sampleBySource.values()].reduce((s, n) => s + n, 0);
   // Floored, not zeroed. A source that states no sample has given us an unquantified figure,
   // not an absent one — and it is already penalised once, at `sourceConfidence`, which puts
   // every unstated source in the lowest band. Letting log(0) drive the factor to zero would
