@@ -151,15 +151,31 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
 
     startTransition(async () => {
       if (mode === "create") {
-        const result = await createGig({
-          title: title.trim(),
-          amount_sar: parsedAmount,
-          client_id: clientId || undefined,
-          status: status as "pending" | "deposit_paid" | "paid",
-          delivery_date: deliveryDate || undefined,
-          category: category.trim() || undefined,
-          payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
-        });
+        let result: Awaited<ReturnType<typeof createGig>>;
+        try {
+          result = await createGig({
+            title: title.trim(),
+            amount_sar: parsedAmount,
+            client_id: clientId || undefined,
+            status: status as "pending" | "deposit_paid" | "paid",
+            delivery_date: deliveryDate || undefined,
+            category: category.trim() || undefined,
+            payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
+          });
+        } catch {
+          /**
+           * The request never came back. Measured: roughly 7% of submits under load, because
+           * the sidebar prefetches every link and saturates the HTTP/1.1 connection pool, so
+           * the action POST is aborted (net::ERR_ABORTED). Without this the freelancer saw a
+           * filled form, no row and no message — they could not tell whether their income had
+           * been recorded.
+           *
+           * The message does NOT say "try again": an aborted response may still have reached
+           * the server, and a blind retry on the money path logs the same income twice.
+           */
+          setError(t("errors.unconfirmed"));
+          return;
+        }
 
         if (!result.ok) {
           if (result.code === "quota_exhausted") {
@@ -185,19 +201,26 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
         setGoToLedger(true);
       } else {
         if (!initialData?.id) return;
-        const result = await updateGig({
-          id: initialData.id,
-          patch: {
-            title: title.trim(),
-            amount_sar: parsedAmount,
-            client_id: clientId || null,
-            status: status as "pending" | "deposit_paid" | "in_progress" | "delivered" | "paid" | "overdue" | "cancelled",
-            delivery_date: deliveryDate || null,
-            category: category.trim() || null,
-            payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
-            payment_notes: notes.trim() || null,
-          },
-        });
+        let result: Awaited<ReturnType<typeof updateGig>>;
+        try {
+          result = await updateGig({
+            id: initialData.id,
+            patch: {
+              title: title.trim(),
+              amount_sar: parsedAmount,
+              client_id: clientId || null,
+              status: status as "pending" | "deposit_paid" | "in_progress" | "delivered" | "paid" | "overdue" | "cancelled",
+              delivery_date: deliveryDate || null,
+              category: category.trim() || null,
+              payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
+              payment_notes: notes.trim() || null,
+            },
+          });
+        } catch {
+          // Same aborted-request exposure as the create branch above.
+          setError(t("errors.unconfirmed"));
+          return;
+        }
 
         if (!result.ok) {
           setError(t("errors.generic"));

@@ -6,20 +6,20 @@ The loop files findings here and never fixes them. Remediation is a separate, re
 decision — mixing discovery with change is how pass 3's fixes shipped five new defects.
 
 **3 open** — P1 0 · P2 1 · P3 2
-**10 closed** of 13 real · **9 withdrawn** (never defects)
+**11 closed** of 14 real · **9 withdrawn** (never defects)
 
 ## P2
 
-### RZQ-0015 — Logging income neither saves nor explains why
+### RZQ-0023 — A server action that throws leaves 47 forms silent
 
-Submitted with no gig row and no dialog — the freelancer is given no reason.
+RZQ-0015 was one instance of a pattern. 55 components call a server action inside startTransition and only 8 have any try/catch, so whenever the request is aborted or the action throws, the promise rejects, isPending clears and nothing is shown — the user cannot tell whether their work was saved. Measured at roughly 7% of submits under load on /ar/income/new, caused by RSC prefetches saturating the connection pool. GigForm is fixed; ClientForm, InvoiceForm, ItemForm, FeeForm, the auth forms and the rest are not. The lasting fix is one wrapper every form calls rather than 47 copies of the same try/catch, and it should say what GigForm now says: the save is unconfirmed, check before retrying.
 
-_route `/ar/income/new` · run `english-first/invoice-and-vat/differential/share-anonymous/edge-unicode/free-exhausted/guided-context/light` · session `S-0006` · seen again ×2 · filed 2026-07-28_
+_route `/ar/clients/new` · session `ammar-fix` · filed 2026-07-29_
 
 ```
-landed on http://localhost:3000/ar/income/new
-no matching gigs row
-no dialog shown
+55 components match startTransition(async; 8 contain try {
+measured 2 silent failures in 30 submits on /ar/income/new
+requestfailed: /ar/income/new net::ERR_ABORTED with 17 concurrent ?_rsc= prefetch aborts
 ```
 
 ## P3
@@ -38,7 +38,7 @@ grep -rn "maximumFractionDigits: 0" src/components — 12 files outside charts/ 
 
 /ar/income — serious: color-contrast — Elements must meet minimum color contrast ratio thresholds (2 node(s))
 
-_route `/ar/income` · run `rusher/invoice-and-vat/state-machine/print-pdf/degraded-profile/free/in-app-navigation/light` · session `S-0006` · seen again ×41 · filed 2026-07-28_
+_route `/ar/income` · run `rusher/invoice-and-vat/state-machine/print-pdf/degraded-profile/free/in-app-navigation/light` · session `S-0006` · seen again ×53 · filed 2026-07-28_
 
 ## Closed
 
@@ -51,6 +51,7 @@ _route `/ar/income` · run `rusher/invoice-and-vat/state-machine/print-pdf/degra
 - RZQ-0009 (fixed) — Invoice builder prints the VAT rate in Latin digits beside the same rate in Arabic-Indic
 - RZQ-0011 (accepted) — /ar/dashboard — 21 tap target(s) under 44px: 36×36px "فتح قائمة التطبيقات" | 36×36px "التب
 - RZQ-0013 (fixed) — Opacity-modified text tokens fail AA on income, calendar and settings
+- RZQ-0015 (fixed) — Logging income neither saves nor explains why
 - RZQ-0020 (accepted) — /ar/income — 31 tap target(s) under 44px: 36×36px "فتح قائمة التطبيقات" | 36×36px "التبديل
 
 ## Withdrawn — verification showed these were never defects

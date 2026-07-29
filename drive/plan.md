@@ -96,37 +96,37 @@ cannot report dark coverage for checks that ran while the page was still light.
 | 44 | meticulous | invoice-and-vat | time-travel | print-pdf | empty | free-exhausted | guided-context | light | 2026-07-29 |
 | 45 | sceptic | invoice-and-vat | fuzz | share-anonymous | empty | pro-active | direct-url | light | 2026-07-29 |
 | 46 | veteran | invoice-and-vat | state-machine | screen-mobile | realistic | free | back-or-refresh-midflow | light | 2026-07-29 |
-| 47 | veteran | documents-and-catalog | metamorphic | screen-desktop | realistic | free | shared-link | light |  |
-| 48 | meticulous | recovery | scale | screen-mobile | heavy | pro-active | back-or-refresh-midflow | light |  |
-| 49 | newcomer | recovery | differential | screen-mobile | edge-unicode | free | direct-url | light |  |
-| 50 | rusher | recovery | adversarial | screen-desktop | heavy | pro-lapsed | shared-link | light |  |
-| 51 | english-first | onboarding | time-travel | screen-desktop | empty | free | shared-link | light |  |
-| 52 | sceptic | english-locale | adversarial | screen-desktop | empty | free | in-app-navigation | light |  |
-| 53 | veteran | english-locale | state-machine | screen-mobile | edge-unicode | pro-lapsed | shared-link | light |  |
-| 54 | rusher | proposal-to-client | scale | screen-desktop | heavy | anon | shared-link | light |  |
-| 55 | veteran | proposal-to-client | fuzz | print-pdf | edge-unicode | anon | back-or-refresh-midflow | light |  |
-| 56 | english-first | invoice-and-vat | differential | share-anonymous | edge-unicode | free-exhausted | guided-context | light |  |
-| 57 | veteran | income-and-hadaf | time-travel | csv-export | heavy | free | guided-context | light |  |
-| 58 | english-first | documents-and-catalog | adversarial | csv-export | empty | free-exhausted | back-or-refresh-midflow | light |  |
-| 59 | sceptic | documents-and-catalog | differential | screen-mobile | heavy | free | in-app-navigation | light |  |
-| 60 | veteran | mobile | time-travel | screen-mobile | realistic | free-exhausted | direct-url | light |  |
-| 61 | newcomer | mobile | metamorphic | screen-mobile | degraded-profile | pro-active | shared-link | light |  |
-| 62 | rusher | documents-and-catalog | state-machine | screen-mobile | edge-unicode | pro-lapsed | back-or-refresh-midflow | light |  |
-| 63 | veteran | recovery | fuzz | screen-desktop | minimal | pro-active | shared-link | light |  |
-| 64 | english-first | recovery | metamorphic | screen-mobile | empty | pro-active | direct-url | light |  |
-| 65 | rusher | english-locale | differential | screen-desktop | degraded-profile | pro-active | direct-url | light |  |
-| 66 | sceptic | income-and-hadaf | fuzz | screen-desktop | degraded-profile | pro-active | guided-context | light |  |
-| 67 | english-first | invoice-and-vat | adversarial | print-pdf | minimal | free-exhausted | back-or-refresh-midflow | light |  |
-| 68 | rusher | clients-and-projects | adversarial | screen-desktop | degraded-profile | free-exhausted | guided-context | light |  |
-| 69 | meticulous | onboarding | metamorphic | screen-mobile | degraded-profile | free | back-or-refresh-midflow | light |  |
-| 70 | newcomer | onboarding | differential | screen-mobile | degraded-profile | free | direct-url | light |  |
-| 71 | english-first | english-locale | metamorphic | screen-desktop | minimal | pro-lapsed | in-app-navigation | light |  |
-| 72 | english-first | proposal-to-client | differential | print-pdf | realistic | anon | shared-link | light |  |
-| 73 | rusher | clients-and-projects | scale | csv-export | heavy | free | in-app-navigation | light |  |
-| 74 | veteran | proposal-to-client | scale | docx-export | heavy | free-exhausted | back-or-refresh-midflow | light |  |
-| 75 | rusher | mobile | time-travel | screen-desktop | heavy | free-exhausted | shared-link | light |  |
-| 76 | sceptic | documents-and-catalog | scale | csv-export | heavy | pro-lapsed | shared-link | light |  |
-| 77 | english-first | income-and-hadaf | differential | screen-mobile | degraded-profile | pro-active | back-or-refresh-midflow | light |  |
+| 47 | veteran | documents-and-catalog | metamorphic | screen-desktop | realistic | free | shared-link | light | 2026-07-29 |
+| 48 | meticulous | recovery | scale | screen-mobile | heavy | pro-active | back-or-refresh-midflow | light | 2026-07-29 |
+| 49 | newcomer | recovery | differential | screen-mobile | edge-unicode | free | direct-url | light | 2026-07-29 |
+| 50 | rusher | recovery | adversarial | screen-desktop | heavy | pro-lapsed | shared-link | light | 2026-07-29 |
+| 51 | english-first | onboarding | time-travel | screen-desktop | empty | free | shared-link | light | 2026-07-29 |
+| 52 | sceptic | english-locale | adversarial | screen-desktop | empty | free | in-app-navigation | light | 2026-07-29 |
+| 53 | veteran | english-locale | state-machine | screen-mobile | edge-unicode | pro-lapsed | shared-link | light | 2026-07-29 |
+| 54 | rusher | proposal-to-client | scale | screen-desktop | heavy | anon | shared-link | light | 2026-07-29 |
+| 55 | veteran | proposal-to-client | fuzz | print-pdf | edge-unicode | anon | back-or-refresh-midflow | light | 2026-07-29 |
+| 56 | english-first | invoice-and-vat | differential | share-anonymous | edge-unicode | free-exhausted | guided-context | light | 2026-07-29 |
+| 57 | veteran | income-and-hadaf | time-travel | csv-export | heavy | free | guided-context | light | 2026-07-29 |
+| 58 | english-first | documents-and-catalog | adversarial | csv-export | empty | free-exhausted | back-or-refresh-midflow | light | 2026-07-29 |
+| 59 | sceptic | documents-and-catalog | differential | screen-mobile | heavy | free | in-app-navigation | light | 2026-07-29 |
+| 60 | veteran | mobile | time-travel | screen-mobile | realistic | free-exhausted | direct-url | light | 2026-07-29 |
+| 61 | newcomer | mobile | metamorphic | screen-mobile | degraded-profile | pro-active | shared-link | light | 2026-07-29 |
+| 62 | rusher | documents-and-catalog | state-machine | screen-mobile | edge-unicode | pro-lapsed | back-or-refresh-midflow | light | 2026-07-29 |
+| 63 | veteran | recovery | fuzz | screen-desktop | minimal | pro-active | shared-link | light | 2026-07-29 |
+| 64 | english-first | recovery | metamorphic | screen-mobile | empty | pro-active | direct-url | light | 2026-07-29 |
+| 65 | rusher | english-locale | differential | screen-desktop | degraded-profile | pro-active | direct-url | light | 2026-07-29 |
+| 66 | sceptic | income-and-hadaf | fuzz | screen-desktop | degraded-profile | pro-active | guided-context | light | 2026-07-29 |
+| 67 | english-first | invoice-and-vat | adversarial | print-pdf | minimal | free-exhausted | back-or-refresh-midflow | light | 2026-07-29 |
+| 68 | rusher | clients-and-projects | adversarial | screen-desktop | degraded-profile | free-exhausted | guided-context | light | 2026-07-29 |
+| 69 | meticulous | onboarding | metamorphic | screen-mobile | degraded-profile | free | back-or-refresh-midflow | light | 2026-07-29 |
+| 70 | newcomer | onboarding | differential | screen-mobile | degraded-profile | free | direct-url | light | 2026-07-29 |
+| 71 | english-first | english-locale | metamorphic | screen-desktop | minimal | pro-lapsed | in-app-navigation | light | 2026-07-29 |
+| 72 | english-first | proposal-to-client | differential | print-pdf | realistic | anon | shared-link | light | 2026-07-29 |
+| 73 | rusher | clients-and-projects | scale | csv-export | heavy | free | in-app-navigation | light | 2026-07-29 |
+| 74 | veteran | proposal-to-client | scale | docx-export | heavy | free-exhausted | back-or-refresh-midflow | light | 2026-07-29 |
+| 75 | rusher | mobile | time-travel | screen-desktop | heavy | free-exhausted | shared-link | light | 2026-07-29 |
+| 76 | sceptic | documents-and-catalog | scale | csv-export | heavy | pro-lapsed | shared-link | light | 2026-07-29 |
+| 77 | english-first | income-and-hadaf | differential | screen-mobile | degraded-profile | pro-active | back-or-refresh-midflow | light | 2026-07-29 |
 | 78 | newcomer | invoice-and-vat | scale | share-anonymous | heavy | pro-lapsed | guided-context | light |  |
 | 79 | sceptic | proposal-to-client | state-machine | docx-export | minimal | free | in-app-navigation | light |  |
 | 80 | english-first | proposal-to-client | metamorphic | docx-export | realistic | pro-active | direct-url | light |  |
