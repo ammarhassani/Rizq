@@ -267,7 +267,7 @@
     "s6Title": "6 · Data freshness",
     "s6Body": "Records older than 18 months are down-weighted, and every record carries the date its source published it. The Saudi market moves, and so do the reports behind these numbers. The sources are re-checked on a monthly schedule; when one publishes a new edition, the change is reviewed before it reaches the index.",
     "s7Title": "7 · Submission review",
-    "s7Body": "Contributing is opt-in and anonymous, and a price only enters the index when an invoice for it has actually been paid — not when it was merely quoted. It then stays hidden until at least 3 different freelancers have contributed to the same bucket, so no one person's rate can be read back out. Records flagged as outliers are excluded.",
+    "s7Body": "Contributing is opt-in and anonymous. Two things can enter the index: a proposal you finalise, and an invoice you mark paid. They are not weighted the same — a paid invoice is a price a client actually paid, while a finalised proposal is a price you asked for and nobody has agreed to yet, so it counts for less. Either way it stays hidden until at least 3 different freelancers have contributed to the same bucket, so no one person's rate can be read back out. Records flagged as outliers are excluded.",
     "s8Title": "8 · A question or correction?",
     "s8Body": "If you see a price that doesn't match your market, you'd compute it differently, or you have a data source to suggest, email me. Rizq gets sharper with every note.",
     "contact": "Reach me directly: {email}",

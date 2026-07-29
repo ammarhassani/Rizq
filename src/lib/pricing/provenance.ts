@@ -17,7 +17,10 @@ export const PROVENANCE_LABEL: Record<BenchmarkProvenance, { ar: string; en: str
   published_ref: { ar: "مراجع منشورة", en: "published references" },
   ingested: { ar: "بيانات حكومية مفتوحة", en: "open government data" },
   partner: { ar: "بيانات شركاء", en: "partner data" },
-  submitted: { ar: "مساهمات موثّقة من المستقلين", en: "verified freelancer submissions" },
+  // NOT "verified": since the proposal path opened, this covers both a paid invoice (0.70)
+  // and a finalized proposal nobody has yet agreed to (0.40). Calling an ask "verified"
+  // would be the overstatement the whole provenance layer exists to prevent.
+  submitted: { ar: "مساهمات من مستقلين سعوديين", en: "Saudi freelancer submissions" },
   reasoned: { ar: "تقدير رِزق المبني على مراجع منشورة", en: "Rizq estimate anchored to published references" },
   founder: { ar: "تقدير تحريري من رِزق", en: "Rizq editorial estimate" },
 };

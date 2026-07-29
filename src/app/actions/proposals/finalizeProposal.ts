@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { contributeBenchmarkFromProposal } from "@/app/actions/pricing/contributeBenchmarkFromProposal";
 
 // ---------------------------------------------------------------------------
 // Input schema
@@ -76,6 +77,11 @@ export async function finalizeProposal(
     });
     return { ok: false, code: "error" };
   }
+
+  // Feed the benchmark. Consent, the test-account firewall and k-anonymity are all enforced
+  // inside the RPC; this call is best-effort and deliberately after the update, so a
+  // contribution failure can never cost the freelancer their finalized proposal.
+  await contributeBenchmarkFromProposal(proposal_id);
 
   return { ok: true };
 }
