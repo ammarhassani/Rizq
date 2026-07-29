@@ -268,11 +268,15 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   **SC-001 failed first at 5.7% against a 5% budget and the ESTIMATOR was fixed, not the
   threshold** — precision used the sum of row weights, conflating evidence quality with how many
   rows we happened to lift; mean weight under a square root now.
-  Still open: P6 hours loader (`projectHours.ts` precedence), the derived-only card treatment
-  (≈ prefix, round-to-500, evidence sentence above the figure) and the two-readings disagreement
-  block.
-Active (`.specify/feature.json`): **013** — P1–P5 shipped; P6 + the derived-only/disagreement card
-states remain.
+  ✅ **P6 + card states SHIPPED**: `projectHours.ts` with precedence measured > stated > reasoned
+  (an observed figure only outranks the assumption at n ≥ 5 — below that it is a smaller guess,
+  not a better one); derived-only cards lead with the evidence sentence, prefix ≈ and round to
+  500; the disagreement state shows two readings named by derivation, never ranked. Verified in
+  Arabic: `graphic-design` renders ≈١٬٥٠٠/≈٣٬٠٠٠/≈٦٬٥٠٠ under a derived-only banner, and
+  `web-dev` shows «من رواتب سعودية منشورة، محوَّلة لعمل حر ≈٩٬٥٠٠» against «من رواتب أجنبية
+  منشورة، محوَّلة ومعدَّلة ≈٤٬٠٠٠» with the footer that no recorded Saudi deal settles it yet.
+Active (`.specify/feature.json`): **013** — ✅ shipped end to end (P1–P6), 999 tests green,
+verified in-browser in Arabic. Not yet driven by a real user.
 Feature 012: ✅ shipped (source-sample confidence + national reference rows).
 Feature 011: ✅ shipped end to end; re-verified in-browser in Arabic twice (pass 3 + the pass-4
 re-drive on a fresh account).

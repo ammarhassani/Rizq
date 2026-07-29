@@ -749,7 +749,18 @@
         "above": "You usually charge around {stated} SAR for work like this — {percent}% above the median, and above the band entirely. Worth knowing what you are defending in the conversation."
       },
       "fallbackSize": "Widened across all project sizes to find enough evidence.",
-      "nationalScope": "Prices are national — no published source distinguishes Saudi cities yet."
+      "nationalScope": "Prices are national — no published source distinguishes Saudi cities yet.",
+      "derivedOnly": "Estimated from global sources — no Saudi pricing data for this specialty yet. Treat it as a floor to negotiate from, not a confirmed market price.",
+      "readingsIntro": "The sources behind this disagree. Both readings, named by where they come from:",
+      "readingsFooter": "No recorded Saudi deals settle this yet. If your client is an organisation that pays these salaries, the higher figure is your reference.",
+      "family": {
+        "first_party": "Recorded Saudi deals",
+        "gulf_recruiter": "From published Saudi salaries, converted to freelance",
+        "salary_bridged": "From published foreign salaries, converted and adjusted",
+        "freelance_rate": "From global freelance rates, adjusted for Saudi Arabia",
+        "open_data": "From open government data",
+        "editorial": "Editorial estimate"
+      }
     },
     "insufficient": {
       "title": "Not enough data yet.",

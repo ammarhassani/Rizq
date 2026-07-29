@@ -166,6 +166,29 @@ export function ResultCard({
     { maximumFractionDigits: 0 }
   );
 
+  /**
+   * Does any evidence here actually price Saudi work, or is every figure a foreign number that
+   * crossed a bridge to get here? For 14 of 20 specialties it is the latter, and the card should
+   * say so BEFORE it shows a price — visual hierarchy is itself a claim, and a big confident
+   * number over a quiet footnote claims "measured" when the honest word is "estimated".
+   */
+  const saudiBacked = (families ?? []).some(
+    (f) => f.family === "first_party" || f.family === "gulf_recruiter"
+  );
+  const derivedOnly = (families?.length ?? 0) > 0 && !saudiBacked;
+
+  // Coarsen derived figures to the nearest 500. Printing 3,347 from a chain of assumptions is a
+  // precision claim the evidence cannot support; ≈3,500 says the same thing honestly.
+  const round500 = (n: number) => Math.round(n / 500) * 500;
+  const showMin = derivedOnly ? round500(min) : min;
+  const showMedian = derivedOnly ? round500(median) : median;
+  const showMax = derivedOnly ? round500(max) : max;
+
+  /** The two readings, named by derivation — never ranked. */
+  const readings = [...(families ?? [])]
+    .sort((a, b) => b.adjusted - a.adjusted)
+    .slice(0, 2);
+
   // Confidence band: visualises the spread between min/median/max as a bar
   const range = max - min;
   const medianPct = range > 0 ? ((median - min) / range) * 100 : 50;
@@ -176,24 +199,36 @@ export function ResultCard({
     >
       <p className="eyebrow mb-4">{t("eyebrow")}</p>
 
+      {/* When nothing here prices Saudi work, the evidence leads and the number follows. */}
+      {derivedOnly && (
+        <p
+          className={`mb-5 rounded-xl border border-rizq-gold/40 bg-rizq-gold/10 px-4 py-3 text-sm text-rizq-ink ${font}`}
+        >
+          {t("derivedOnly")}
+        </p>
+      )}
+
       {/* Three big numbers */}
       <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
         <PriceColumn
           locale={locale}
           label={t("min")}
-          value={min}
+          value={showMin}
+          approx={derivedOnly}
           dim
         />
         <PriceColumn
           locale={locale}
           label={t("median")}
-          value={median}
+          value={showMedian}
+          approx={derivedOnly}
           big
         />
         <PriceColumn
           locale={locale}
           label={t("max")}
-          value={max}
+          value={showMax}
+          approx={derivedOnly}
           dim
         />
       </div>
@@ -276,6 +311,23 @@ export function ResultCard({
             </p>
           );
         })()}
+        {bandKind === "disagreement" && readings.length === 2 && (
+          <div className="sm:col-span-2 rounded-xl border border-rizq-gold/30 bg-rizq-cream/50 px-4 py-3">
+            <p className={`mb-2 text-xs text-rizq-ink-soft ${font}`}>{t("readingsIntro")}</p>
+            {readings.map((r) => (
+              <p
+                key={r.family}
+                className={`flex items-baseline justify-between gap-3 py-0.5 text-sm ${font}`}
+              >
+                <span className="text-rizq-ink-soft">{t(`family.${r.family}`)}</span>
+                <span className="tabular font-sans text-rizq-ink">
+                  ≈{numberFmt.format(Math.round(r.adjusted / 500) * 500)}
+                </span>
+              </p>
+            ))}
+            <p className={`mt-2 text-xs text-rizq-ink-soft/80 ${font}`}>{t("readingsFooter")}</p>
+          </div>
+        )}
         {provenanceCitation && (
           <p className={`sm:col-span-2 text-xs text-rizq-ink-soft italic ${font}`}>
             {provenanceCitation}
@@ -424,12 +476,15 @@ function PriceColumn({
   value,
   big = false,
   dim = false,
+  approx = false,
 }: {
   locale: "ar" | "en";
   label: string;
   value: number;
   big?: boolean;
   dim?: boolean;
+  /** Prefix with ≈ when the figure is derived rather than observed. */
+  approx?: boolean;
 }) {
   const t = useTranslations("Tool.result");
   const font = locale === "ar" ? "font-arabic" : "font-sans";
@@ -450,6 +505,7 @@ function PriceColumn({
             : "text-2xl sm:text-3xl text-rizq-ink/70 font-medium"
         }`}
       >
+        {approx && <span aria-hidden className="me-0.5 opacity-60">≈</span>}
         <AnimatedNumber value={value} duration={big ? 1.4 : 1.0} locale={locale} />
       </span>
       <span
