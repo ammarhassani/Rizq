@@ -8,6 +8,7 @@ import type { FieldErrorReason } from "@/lib/validation/fieldErrors";
 import { track } from "@/lib/analytics/track";
 import { Loader2 } from "lucide-react";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { attempt } from "@/lib/actions/attempt";
 
 type ClientFormData = {
   id?: string;
@@ -114,22 +115,29 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
 
     startTransition(async () => {
       if (mode === "create") {
-        const result = await createClient({
-          name: name.trim(),
-          name_en: nameEn.trim() || undefined,
-          company: company.trim() || undefined,
-          title: title.trim() || undefined,
-          email: email.trim() || undefined,
-          phone: phone.trim() || undefined,
-          phone_whatsapp: phoneWa.trim() || undefined,
-          city: city.trim() || undefined,
-          client_type: clientType as "individual" | "smb" | "corporate" | "government" | "agency",
-          industry: industry.trim() || undefined,
-          source: source as "referral" | "platform" | "social_media" | "direct" | "other",
-          tags,
-          notes: notes.trim() || undefined,
-          rating: rating ?? undefined,
-        });
+        const result = await attempt(() =>
+          createClient({
+            name: name.trim(),
+            name_en: nameEn.trim() || undefined,
+            company: company.trim() || undefined,
+            title: title.trim() || undefined,
+            email: email.trim() || undefined,
+            phone: phone.trim() || undefined,
+            phone_whatsapp: phoneWa.trim() || undefined,
+            city: city.trim() || undefined,
+            client_type: clientType as "individual" | "smb" | "corporate" | "government" | "agency",
+            industry: industry.trim() || undefined,
+            source: source as "referral" | "platform" | "social_media" | "direct" | "other",
+            tags,
+            notes: notes.trim() || undefined,
+            rating: rating ?? undefined,
+          }),
+        );
+        if (!result) {
+          // The request never came back — see lib/actions/attempt.
+          setError(tCommon("saveUnconfirmed"));
+          return;
+        }
 
         if (!result.ok) {
           if (result.code === "quota_exhausted") {
@@ -154,25 +162,32 @@ export function ClientForm({ locale, mode, initialData, onSuccess, onCreated, em
         }
       } else {
         if (!initialData?.id) return;
-        const result = await updateClient({
-          id: initialData.id,
-          patch: {
-            name: name.trim(),
-            name_en: nameEn.trim() || undefined,
-            company: company.trim() || undefined,
-            title: title.trim() || undefined,
-            email: email.trim() || undefined,
-            phone: phone.trim() || undefined,
-            phone_whatsapp: phoneWa.trim() || undefined,
-            city: city.trim() || undefined,
-            client_type: clientType as "individual" | "smb" | "corporate" | "government" | "agency",
-            industry: industry.trim() || undefined,
-            source: source as "referral" | "platform" | "social_media" | "direct" | "other",
-            tags,
-            notes: notes.trim() || undefined,
-            rating: rating,
-          },
-        });
+        const result = await attempt(() =>
+          updateClient({
+            id: initialData.id,
+            patch: {
+              name: name.trim(),
+              name_en: nameEn.trim() || undefined,
+              company: company.trim() || undefined,
+              title: title.trim() || undefined,
+              email: email.trim() || undefined,
+              phone: phone.trim() || undefined,
+              phone_whatsapp: phoneWa.trim() || undefined,
+              city: city.trim() || undefined,
+              client_type: clientType as "individual" | "smb" | "corporate" | "government" | "agency",
+              industry: industry.trim() || undefined,
+              source: source as "referral" | "platform" | "social_media" | "direct" | "other",
+              tags,
+              notes: notes.trim() || undefined,
+              rating: rating,
+            },
+          }),
+        );
+        if (!result) {
+          // The request never came back — see lib/actions/attempt.
+          setError(tCommon("saveUnconfirmed"));
+          return;
+        }
 
         if (!result.ok) {
           if (result.code === "invalid" && result.fields?.length) {

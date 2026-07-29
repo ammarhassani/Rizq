@@ -15,6 +15,7 @@ import { createItem, updateItem, type CreatedItem } from "@/app/actions/items/it
 import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = {
   locale: "ar" | "en";
@@ -35,6 +36,7 @@ function parseNum(s: string): number {
 
 export function ItemForm({ locale, mode = "create", initialData, onSaved, embedded = false }: Props) {
   const t = useTranslations("Items.form");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -78,15 +80,22 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
 
     startTransition(async () => {
       if (mode === "edit" && initialData) {
-        const result = await updateItem({
-          id: initialData.id,
-          patch: {
-            name: trimmedName,
-            description: description.trim() || null,
-            unit_price_sar: price,
-            category: category.trim() || null,
-          },
-        });
+        const result = await attempt(() =>
+          updateItem({
+            id: initialData.id,
+            patch: {
+              name: trimmedName,
+              description: description.trim() || null,
+              unit_price_sar: price,
+              category: category.trim() || null,
+            },
+          }),
+        );
+        if (!result) {
+          // The request never came back — see lib/actions/attempt.
+          setError(tCommon("saveUnconfirmed"));
+          return;
+        }
         if (!result.ok) {
           setError(t("errors.generic"));
           return;
@@ -96,12 +105,19 @@ export function ItemForm({ locale, mode = "create", initialData, onSaved, embedd
         return;
       }
 
-      const result = await createItem({
-        name: trimmedName,
-        description: description.trim() || undefined,
-        unit_price_sar: price,
-        category: category.trim() || undefined,
-      });
+      const result = await attempt(() =>
+        createItem({
+          name: trimmedName,
+          description: description.trim() || undefined,
+          unit_price_sar: price,
+          category: category.trim() || undefined,
+        }),
+      );
+      if (!result) {
+        // The request never came back — see lib/actions/attempt.
+        setError(tCommon("saveUnconfirmed"));
+        return;
+      }
 
       if (!result.ok) {
         setError(t("errors.generic"));

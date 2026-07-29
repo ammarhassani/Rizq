@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import { createFeePreset, updateFeePreset, type CreatedFeePreset } from "@/app/actions/fees/fees";
 import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = {
   locale: "ar" | "en";
@@ -33,6 +34,7 @@ function parseNum(s: string): number {
 
 export function FeeForm({ locale, mode = "create", initialData, onSaved, embedded = false }: Props) {
   const t = useTranslations("Fees.form");
+  const tCommon = useTranslations("Common");
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
   const dir = isAr ? "rtl" : "ltr";
@@ -89,16 +91,23 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
 
     startTransition(async () => {
       if (mode === "edit" && initialData) {
-        const result = await updateFeePreset({
-          id: initialData.id,
-          patch: {
-            name: trimmedName,
-            category: category.trim() || null,
-            fee_type: feeType,
-            amount_sar: isPct ? 0 : amt,
-            percentage: isPct ? pct : null,
-          },
-        });
+        const result = await attempt(() =>
+          updateFeePreset({
+            id: initialData.id,
+            patch: {
+              name: trimmedName,
+              category: category.trim() || null,
+              fee_type: feeType,
+              amount_sar: isPct ? 0 : amt,
+              percentage: isPct ? pct : null,
+            },
+          }),
+        );
+        if (!result) {
+          // The request never came back — see lib/actions/attempt.
+          setError(tCommon("saveUnconfirmed"));
+          return;
+        }
         if (!result.ok) {
           setError(t("errors.generic"));
           return;
@@ -108,13 +117,20 @@ export function FeeForm({ locale, mode = "create", initialData, onSaved, embedde
         return;
       }
 
-      const result = await createFeePreset({
-        name: trimmedName,
-        category: category.trim() || undefined,
-        fee_type: feeType,
-        amount_sar: isPct ? 0 : amt,
-        percentage: isPct ? pct : undefined,
-      });
+      const result = await attempt(() =>
+        createFeePreset({
+          name: trimmedName,
+          category: category.trim() || undefined,
+          fee_type: feeType,
+          amount_sar: isPct ? 0 : amt,
+          percentage: isPct ? pct : undefined,
+        }),
+      );
+      if (!result) {
+        // The request never came back — see lib/actions/attempt.
+        setError(tCommon("saveUnconfirmed"));
+        return;
+      }
 
       if (!result.ok) {
         setError(t("errors.generic"));

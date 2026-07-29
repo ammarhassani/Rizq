@@ -930,7 +930,8 @@
     "home": "الرئيسية",
     "useful": "مفيد",
     "notUseful": "غير مفيد",
-    "ratingStars": "{n, number} من {max, number} نجوم"
+    "ratingStars": "{n, number} من {max, number} نجوم",
+    "saveUnconfirmed": "لم نتمكّن من تأكيد الحفظ. تحقّق قبل إعادة المحاولة حتى لا يُسجَّل مرتين."
   },
   "MySubmissions": {
     "heading": "مساهماتك",

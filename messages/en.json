@@ -930,7 +930,8 @@
     "home": "Home",
     "useful": "Useful",
     "notUseful": "Not useful",
-    "ratingStars": "{n, number} out of {max, number} stars"
+    "ratingStars": "{n, number} out of {max, number} stars",
+    "saveUnconfirmed": "We could not confirm the save. Check before retrying, so it is not recorded twice."
   },
   "MySubmissions": {
     "heading": "Your contributions",

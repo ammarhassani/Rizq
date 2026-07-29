@@ -30,6 +30,7 @@ import type { VatEligibility } from "@/lib/invoices/vatEligibility";
 import { Link } from "@/i18n/navigation";
 import { clampMoneyInput, roundHalala } from "@/lib/money/halala";
 import { fmtRate } from "@/lib/format/number";
+import { attempt } from "@/lib/actions/attempt";
 
 const VAT_RATE = 15;
 
@@ -97,6 +98,7 @@ export function InvoiceForm({
   vatEligibility,
 }: Props) {
   const t = useTranslations("Invoices.form");
+  const tCommon = useTranslations("Common");
   const router = useRouter();
   const isAr = locale === "ar";
   const font = isAr ? "font-arabic" : "font-sans";
@@ -212,16 +214,23 @@ export function InvoiceForm({
     setError(null);
 
     startTransition(async () => {
-      const result = await createInvoice({
-        client_id: clientId,
-        items: validItems,
-        fees,
-        vat_pct: vatPct,
-        gig_id: initial?.gig_id,
-        payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
-        payment_details: paymentDetails.trim() || undefined,
-        due_date: dueDate,
-      });
+      const result = await attempt(() =>
+        createInvoice({
+          client_id: clientId,
+          items: validItems,
+          fees,
+          vat_pct: vatPct,
+          gig_id: initial?.gig_id,
+          payment_method: paymentMethod as "bank_transfer" | "stc_pay" | "cash" | "other",
+          payment_details: paymentDetails.trim() || undefined,
+          due_date: dueDate,
+        }),
+      );
+      if (!result) {
+        // The request never came back — see lib/actions/attempt.
+        setError(tCommon("saveUnconfirmed"));
+        return;
+      }
 
       if (!result.ok) {
         if (result.code === "quota_exhausted") {
