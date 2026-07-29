@@ -12,7 +12,7 @@ export type CitationInput = {
    */
   source_count: number;
   date_range: { earliest: string; latest: string };
-  fallback_kind: "none" | "region" | "specialty";
+  fallback_kind: "none" | "size";
 };
 
 /** Builds the bilingual provenance citation string (spec §II.2 honesty layer). */
@@ -21,18 +21,11 @@ export function buildCitation(input: CitationInput): { ar: string; en: string } 
   const year = new Date(input.date_range.latest).getUTCFullYear();
   const n = input.sample_size;
 
-  const widenAr =
-    input.fallback_kind === "region"
-      ? " وُسّع النطاق ليشمل المنطقة."
-      : input.fallback_kind === "specialty"
-        ? " وُسّع النطاق ليشمل جميع المدن."
-        : "";
-  const widenEn =
-    input.fallback_kind === "region"
-      ? " Widened to the whole region."
-      : input.fallback_kind === "specialty"
-        ? " Widened across all cities."
-        : "";
+  // City widening no longer exists — prices are national (feature 013). The only remaining
+  // fallback is a widened project size, and it is still worth naming: a band drawn from every
+  // size is answering a slightly different question than the one asked.
+  const widenAr = input.fallback_kind === "size" ? " وُسّع النطاق ليشمل كل أحجام المشاريع." : "";
+  const widenEn = input.fallback_kind === "size" ? " Widened across all project sizes." : "";
 
   const m = input.source_count;
 

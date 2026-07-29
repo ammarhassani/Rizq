@@ -721,8 +721,6 @@
       "median": "Median",
       "max": "High end",
       "sampleSize": "{n, plural, =0 {No records in Rizq's index} one {Based on 1 record in Rizq's index} other {Based on {count} records in Rizq's index}}",
-      "fallbackRegion": "We widened the search to your whole region.",
-      "fallbackSpecialty": "We widened the search across all cities.",
       "comparison": "Higher than {percent}% of the records in your specialty.",
       "shareTitle": "Share this result",
       "shareCopy": "Copy link",
@@ -752,7 +750,9 @@
         "withinBelow": "You usually charge around {stated} SAR for work like this — inside the band, {percent}% below the median.",
         "withinAbove": "You usually charge around {stated} SAR for work like this — inside the band, {percent}% above the median.",
         "above": "You usually charge around {stated} SAR for work like this — {percent}% above the median, and above the band entirely. Worth knowing what you are defending in the conversation."
-      }
+      },
+      "fallbackSize": "Widened across all project sizes to find enough evidence.",
+      "nationalScope": "Prices are national — no published source distinguishes Saudi cities yet."
     },
     "insufficient": {
       "title": "Not enough data yet.",
@@ -1325,7 +1325,8 @@
         "titleRequired": "Project name is required.",
         "amountRequired": "Enter a valid amount greater than zero.",
         "quotaExhausted": "Free limit reached (20 projects/month). Upgrade to Pro.",
-        "generic": "Something went wrong. Try again."
+        "generic": "Something went wrong. Try again.",
+        "unconfirmed": "We could not confirm the save. Check your income ledger before retrying, so the project is not recorded twice."
       },
       "logProject": "Log a Project",
       "sar": "SAR"

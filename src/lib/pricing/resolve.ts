@@ -31,7 +31,7 @@ export type ResolveResult =
       sources: ProvenanceSource[];
       confidence_score: number;
       fallback_used: boolean;
-      fallback_kind: "none" | "region" | "specialty";
+      fallback_kind: "none" | "size";
       comparison_percent_below: number;
       provenance_citation_ar: string;
       provenance_citation_en: string;
@@ -45,13 +45,22 @@ export type ResolveResult =
 
 const MIN_SAMPLE = 3; // spec §M4.3
 
-/** Provenance-weighted resolver with fallback widening (size → region → specialty). */
+/**
+ * Provenance-weighted resolver. Ladder is size → national, and nothing else.
+ *
+ * The city and region passes were deleted in feature 013. Not one of the 492 rows from cited
+ * publications ever carried a city — every real source reports nationally — so the entire
+ * Riyadh-vs-Jeddah differentiation came from the unverifiable editorial seed, while the UI asked
+ * the freelancer to choose a city that then changed their answer on that basis. The city is still
+ * accepted and validated (it identifies the freelancer, and contributions still record it), but
+ * it no longer selects rows until a city earns its own figures from 3 distinct local contributors.
+ */
 export async function resolvePrice(input: ResolveInput): Promise<ResolveResult> {
   const supabase = await createClient();
 
   const [specRes, cityRes, tierRes] = await Promise.all([
     supabase.from("specialties").select("id").eq("slug", input.specialty_slug).eq("active", true).maybeSingle(),
-    supabase.from("cities").select("id, region").eq("slug", input.city_slug).eq("active", true).maybeSingle(),
+    supabase.from("cities").select("id").eq("slug", input.city_slug).eq("active", true).maybeSingle(),
     supabase.from("experience_tiers").select("id").eq("slug", input.experience_tier_slug).maybeSingle(),
   ]);
 
@@ -61,28 +70,20 @@ export async function resolvePrice(input: ResolveInput): Promise<ResolveResult> 
 
   const specialty_id = specRes.data.id as string;
   const city_id = cityRes.data.id as string;
-  const region = (cityRes.data as { region: string }).region;
   const experience_tier_id = tierRes.data.id as string;
   const ids: ResolvedIds = { specialty_id, city_id, experience_tier_id };
-
-  const regionCityIds = await supabase.from("cities").select("id").eq("region", region).eq("active", true);
-  const regionIds = (regionCityIds.data ?? []).map((r) => r.id as string);
 
   const passes = input.project_size ? [input.project_size, undefined] : [undefined];
   const now = new Date();
   let bestSample = 0;
 
   for (const ps of passes) {
-    const exact = await fetchRows(supabase, { specialty_id, city_id, experience_tier_id, project_size: ps ?? null });
-    if (exact.length >= MIN_SAMPLE) return finalize(supabase, exact, "none", specialty_id, ids, now);
-
-    const regionRows = await fetchRows(supabase, { specialty_id, city_ids: regionIds, experience_tier_id, project_size: ps ?? null });
-    if (regionRows.length >= MIN_SAMPLE) return finalize(supabase, regionRows, "region", specialty_id, ids, now);
-
-    const specRows = await fetchRows(supabase, { specialty_id, experience_tier_id, project_size: ps ?? null });
-    if (specRows.length >= MIN_SAMPLE) return finalize(supabase, specRows, "specialty", specialty_id, ids, now);
-
-    bestSample = Math.max(bestSample, exact.length, regionRows.length, specRows.length);
+    const rows = await fetchRows(supabase, { specialty_id, experience_tier_id, project_size: ps ?? null });
+    if (rows.length >= MIN_SAMPLE) {
+      // A widened size pass is the only fallback left; ps === undefined on the second lap.
+      return finalize(supabase, rows, ps ? "none" : "size", specialty_id, ids, now);
+    }
+    bestSample = Math.max(bestSample, rows.length);
   }
 
   return { status: "insufficient_data", sample_size: bestSample, ids };
@@ -90,8 +91,6 @@ export async function resolvePrice(input: ResolveInput): Promise<ResolveResult> 
 
 type FetchArgs = {
   specialty_id: string;
-  city_id?: string;
-  city_ids?: string[];
   experience_tier_id: string;
   project_size?: "small" | "medium" | "large" | "enterprise" | null;
 };
@@ -113,10 +112,6 @@ async function fetchRows(
     // being fanned across 35 of them and counted 35 times.
     .or(`experience_tier_id.eq.${args.experience_tier_id},experience_tier_id.is.null`);
 
-  if (args.city_id) query = query.or(`city_id.eq.${args.city_id},city_id.is.null`);
-  if (args.city_ids && args.city_ids.length > 0) {
-    query = query.or(`city_id.in.(${args.city_ids.join(",")}),city_id.is.null`);
-  }
   // Project size follows the same wildcard rule as city and tier: a NULL means the
   // source did not state a size, so the row supports any of them.
   //
@@ -176,14 +171,14 @@ async function fetchRows(
 async function resolveTrend(
   supabase: Awaited<ReturnType<typeof createClient>>,
   rows: AggRow[],
-  fallback: "none" | "region" | "specialty",
+  fallback: "none" | "size",
   specialty_id: string,
   experience_tier_id: string,
   now: Date
 ): Promise<MarketTrend | null> {
   // The rows the band already used, labelled with the scope they actually came from.
   const bandScope: TrendScope =
-    fallback === "none" ? "exact" : fallback === "region" ? "region" : "national";
+    fallback === "none" ? "national" : "national";
   const fromBand = computeMarketTrend(rows, now, bandScope);
   if (fromBand) return fromBand;
 
@@ -198,7 +193,7 @@ async function resolveTrend(
 async function finalize(
   supabase: Awaited<ReturnType<typeof createClient>>,
   rows: AggRow[],
-  fallback: "none" | "region" | "specialty",
+  fallback: "none" | "size",
   specialty_id: string,
   ids: ResolvedIds,
   now: Date

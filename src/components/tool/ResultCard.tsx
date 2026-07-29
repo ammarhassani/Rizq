@@ -53,7 +53,7 @@ type Props = {
   max: number;
   sample_size: number;
   fallback_used: boolean;
-  fallback_kind: "none" | "region" | "specialty";
+  fallback_kind: "none" | "size";
   comparison_percent_below: number;
   provenanceLabel?: string;     // pre-localized dominant-provenance label for the badge
   provenanceCitation?: string;  // pre-localized full citation sentence
@@ -231,9 +231,7 @@ export function ResultCard({
           <p
             className={`sm:col-span-2 text-xs text-rizq-ink-soft italic ${font}`}
           >
-            {fallback_kind === "region"
-              ? t("fallbackRegion")
-              : t("fallbackSpecialty")}
+            {t("fallbackSize")}
           </p>
         )}
         {provenanceLabel && (

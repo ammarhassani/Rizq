@@ -24,28 +24,28 @@ describe("buildCitation", () => {
     expect(c.ar).not.toContain("47");
   });
 
-  it("appends a widening note when fallback was used", () => {
+  it("appends a widening note when the size pass widened", () => {
     const c = buildCitation({
       dominant: "submitted",
       sample_size: 6,
       source_count: 6,
       date_range: { earliest: "2026-01-01T00:00:00Z", latest: "2026-06-01T00:00:00Z" },
-      fallback_kind: "region",
+      fallback_kind: "size",
     });
-    expect(c.en.toLowerCase()).toContain("region");
-    expect(c.ar).toContain("المنطقة");
+    expect(c.en.toLowerCase()).toContain("project sizes");
+    expect(c.ar).toContain("أحجام المشاريع");
   });
 
-  it("uses the all-cities note for a specialty-level widening", () => {
+  it("uses the same size note however the widening arose", () => {
     const c = buildCitation({
       dominant: "reasoned",
       sample_size: 4,
       source_count: 1,
       date_range: { earliest: "2026-02-01T00:00:00Z", latest: "2026-06-01T00:00:00Z" },
-      fallback_kind: "specialty",
+      fallback_kind: "size",
     });
-    expect(c.en.toLowerCase()).toContain("all cities");
-    expect(c.ar).toContain("جميع المدن");
+    expect(c.en.toLowerCase()).toContain("project sizes");
+    expect(c.ar).toContain("أحجام المشاريع");
   });
 });
 
