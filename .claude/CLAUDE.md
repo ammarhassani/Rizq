@@ -237,7 +237,30 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   would *raise* editorial rows 0.30 → 0.50, an inflation dressed as an honesty fix.
   Plan: [specs/012-source-sample-confidence/plan.md](specs/012-source-sample-confidence/plan.md).
   spec+research+plan done → **tasks next**.
-Active (`.specify/feature.json`): **012** — spec + Phase 0/1 artifacts complete, not yet implemented.
+- `specs/013-family-mixture-estimator/` — **Price the disagreement, not around it.** An
+  eleven-agent expert council ([`docs/pricing-council-verdict.md`](../docs/pricing-council-verdict.md))
+  reviewed the whole pricing problem ([`docs/pricing-problem-statement.md`](../docs/pricing-problem-statement.md))
+  and found the organising fact: **peg/PPP = 3.75/1.85 = 2.03, and the measured Saudi-vs-PPP
+  disagreement (1.88x-2.76x) brackets it** — the "regime conflict" is mostly one currency
+  assumption, so it becomes one parameter (lambda between PPP and peg, default 0.5, cited) rather
+  than a fight to adjudicate. Replaces the pooled weighted percentile with a **bias-adjusted
+  log-normal mixture over evidence families** (a median over a bimodal set lurches; a mixture
+  cannot, because every component stays in the result). **Deletes three mechanisms shipped days
+  earlier**: noisy-or accumulation (provenance weights are not probabilities), the agreement
+  multiplier (survives only as a display trigger) and the standalone sample factor (folds into
+  per-family variance); `evidenceStrength.ts` dies with the score it read. **Drops the city axis
+  to national** — 0 of 492 cited rows carry a city, so Riyadh-vs-Jeddah rested entirely on the
+  unverifiable seed; dedupe the fan-out, never NULL `city_id` (that turns duplicates into
+  wildcards and inflates evidence 7x). Ships **reflexivity instrumentation before any calibration**:
+  users anchor on the band we show them, so `ln(paid/anchor) ~ 0` regardless of the market and the
+  posterior converges to our own prior — three of five hostile reviewers caught this, none of the
+  five experts did. Collapses the three invented constants to one composite bridge (only the
+  product is identifiable) and moves `PROJECT_HOURS` to a provenance-carrying table, never
+  invoice-implied (circular). 6 phases, 4 migrations, no new dependency, closed-form throughout.
+  Plan: [specs/013-family-mixture-estimator/plan.md](specs/013-family-mixture-estimator/plan.md).
+  spec+research+plan+contracts done → **tasks next**.
+Active (`.specify/feature.json`): **013** — spec + Phase 0/1 artifacts complete, not yet implemented.
+Feature 012: ✅ shipped (source-sample confidence + national reference rows).
 Feature 011: ✅ shipped end to end; re-verified in-browser in Arabic twice (pass 3 + the pass-4
 re-drive on a fresh account).
 Feature 010: P1–P3 implemented, merge gate green; US4 (Tap) still blocked on founder approval.
