@@ -666,3 +666,41 @@ describe("forClientAudience — what a client may see", () => {
     expect(stripped.sections.length).toBe(data.sections.length);
   });
 });
+
+describe("client redaction covers the evidence structures added in feature 013", () => {
+  /**
+   * The allow-list design means new pricing fields are excluded by default, which is exactly
+   * why it is an allow-list. This pins that: the estimator now produces a family breakdown, a
+   * band_kind and an evidence composition, and every one of them is negotiation ammunition for
+   * the client if it ever reaches their copy. "Sources disagree, the low reading is 5,200" is a
+   * bigger leak than the band that feature 011's redaction was built to hide.
+   */
+  it("never leaks families, band_kind, composition or spread to the client", () => {
+    const data = buildArtifactData(baseInput());
+    const pricing = data.sections.find((s) => s.id === "pricing")!;
+    // Simulate a future generator that starts attaching estimator output to the section.
+    pricing.content["families"] = [{ family: "gulf_recruiter", adjusted: 12168 }];
+    pricing.content["band_kind"] = "disagreement";
+    pricing.content["evidence_composition"] = { freelance_rate: 2 };
+    pricing.content["family_spread"] = 2.33;
+    pricing.content["min"] = 1530;
+    pricing.content["max"] = 6620;
+
+    const client = forClientAudience(data);
+    const clientPricing = client.sections.find((s) => s.id === "pricing")!;
+
+    for (const leaked of [
+      "families",
+      "band_kind",
+      "evidence_composition",
+      "family_spread",
+      "min",
+      "max",
+      "sample_size",
+    ]) {
+      expect(clientPricing.content[leaked]).toBeUndefined();
+    }
+    // The chosen price and its citation still reach the client — that is the point of the doc.
+    expect(clientPricing.content["anchor"]).toBeDefined();
+  });
+});

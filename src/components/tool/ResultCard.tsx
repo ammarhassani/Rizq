@@ -59,6 +59,8 @@ type Props = {
   confidenceScore?: number;     // 0..1 — stored, no longer displayed
   /** agreed · disagreement · insufficient. Governs what this card is allowed to claim. */
   bandKind?: "agreed" | "disagreement" | "insufficient";
+  /** Which bodies of evidence produced the band. Drives whether this is a measurement or an estimate. */
+  families?: Array<{ family: string; adjusted: number; sourceCount: number }>;
   /** What the freelancer said they charge, from their profile. Absent for most accounts. */
   statedRange?: { min: number; max: number } | null;
   /** Raw dominant provenance kind — used to deep-link the methodology page */
@@ -91,6 +93,7 @@ export function ResultCard({
   provenanceCitation,
   confidenceScore,
   bandKind,
+  families,
   statedRange,
   provenanceKind,
   trend,
@@ -209,6 +212,11 @@ export function ResultCard({
           />
         </div>
       </div>
+
+      {/* Prices are national until a city earns its own figures from 3 local contributors.
+          No cited source distinguishes Saudi cities, so claiming otherwise would be inventing
+          a difference the evidence does not contain. */}
+      <p className={`mb-4 text-xs text-rizq-ink-soft/80 ${font}`}>{t("nationalScope")}</p>
 
       {/* Sample size + comparison + fallback note */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 mb-8">

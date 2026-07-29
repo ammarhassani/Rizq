@@ -258,8 +258,21 @@ M8 Onboarding v2 · M9 Calendar · M10 Rate Calculator · M12 Document Vault.
   product is identifiable) and moves `PROJECT_HOURS` to a provenance-carrying table, never
   invoice-implied (circular). 6 phases, 4 migrations, no new dependency, closed-form throughout.
   Plan: [specs/013-family-mixture-estimator/plan.md](specs/013-family-mixture-estimator/plan.md).
-  spec+research+plan+contracts done → **tasks next**.
-Active (`.specify/feature.json`): **013** — spec + Phase 0/1 artifacts complete, not yet implemented.
+  ✅ **P1–P5 SHIPPED**: city collapsed (2,112 active rows → 1,032, 0 carrying a city, 14 sources
+  retained, no cell below the floor) and the city/region passes deleted from `resolve.ts`;
+  `latentTruth.ts` mixture live (`graphic-design · mid` moved 1,890/4,000/6,700 → 1,530/3,100/6,620);
+  noisy-or, agreement multiplier, sample factor and `evidenceStrength.ts` all deleted;
+  `band_snapshots` + `pricing_calibration` + `project_hours` landed with calibration **inert**;
+  onboarding preview moved BELOW the rate inputs so the stated rate is captured pre-anchor;
+  national-scope line on every card; redaction pinned against the new evidence structures.
+  **SC-001 failed first at 5.7% against a 5% budget and the ESTIMATOR was fixed, not the
+  threshold** — precision used the sum of row weights, conflating evidence quality with how many
+  rows we happened to lift; mean weight under a square root now.
+  Still open: P6 hours loader (`projectHours.ts` precedence), the derived-only card treatment
+  (≈ prefix, round-to-500, evidence sentence above the figure) and the two-readings disagreement
+  block.
+Active (`.specify/feature.json`): **013** — P1–P5 shipped; P6 + the derived-only/disagreement card
+states remain.
 Feature 012: ✅ shipped (source-sample confidence + national reference rows).
 Feature 011: ✅ shipped end to end; re-verified in-browser in Arabic twice (pass 3 + the pass-4
 re-drive on a fresh account).

@@ -241,6 +241,7 @@ export function ToolFlow({
         provenanceCitation={locale === "ar" ? r.provenance_citation_ar : r.provenance_citation_en}
         confidenceScore={r.confidence_score}
         bandKind={r.band_kind}
+        families={r.families}
         statedRange={statedRange}
         provenanceKind={r.dominant_provenance}
         trend={r.trend}
