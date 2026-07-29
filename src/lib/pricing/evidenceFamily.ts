@@ -19,6 +19,7 @@ import type { BenchmarkProvenance } from "./provenance";
  */
 export type EvidenceFamily =
   | "first_party"
+  | "gulf_recruiter"
   | "freelance_rate"
   | "salary_bridged"
   | "open_data"
@@ -30,6 +31,9 @@ export type EvidenceFamily =
  * refresh skill keeps these strings current.
  */
 const SALARY_BRIDGED = ["Stack Overflow", "Robert Half"];
+
+/** Gulf salary guides: already in SAR for Saudi-advertised roles, so no PPP conversion. */
+const GULF_RECRUITER = ["Robert Walters Middle East"];
 
 /** The unverifiable seed: editorial judgement wearing a published-reference label. */
 const EDITORIAL_REFS = ["Saudi-adjusted global freelance reference", "Rizq founder editorial seed"];
@@ -51,6 +55,14 @@ export function evidenceFamily(
   if (EDITORIAL_REFS.some((r) => ref.startsWith(r))) return "editorial";
 
   if (provenance === "ingested") return "open_data";
+
+  // Gulf salary guides are their own family and the most independent evidence here short of a
+  // real transaction: the figures are already in riyals for roles advertised in Saudi Arabia,
+  // so they never touch the PPP conversion that every other published family passes through.
+  // When they disagree with the PPP-converted sources, that disagreement is informative rather
+  // than noise — it is the bridge being tested against locally-priced work.
+  if (GULF_RECRUITER.some((r) => ref.startsWith(r))) return "gulf_recruiter";
+
   if (SALARY_BRIDGED.some((r) => ref.startsWith(r))) return "salary_bridged";
 
   // Published freelance/contractor rates: quoted rates rather than salaries, so they skip the
