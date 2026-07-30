@@ -297,7 +297,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
       {/* Client picker */}
       <div>
         <label className={labelClass}>
-          {t("clientLabel")} <span className={`ms-1 text-rizq-ink-soft/60 font-normal`}>({t("optional")})</span>
+          {t("clientLabel")} <span className={`ms-1 text-[var(--content-muted)] font-normal`}>({t("optional")})</span>
         </label>
         <ClientPicker
           value={clientId}
@@ -344,7 +344,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
       {/* Category */}
       <div>
         <label className={labelClass}>
-          {t("categoryLabel")} <span className={`ms-1 text-rizq-ink-soft/60 font-normal`}>({t("optional")})</span>
+          {t("categoryLabel")} <span className={`ms-1 text-[var(--content-muted)] font-normal`}>({t("optional")})</span>
         </label>
         <div className="space-y-2">
           <div className="relative">
@@ -416,7 +416,7 @@ export function GigForm({ locale, mode, initialData, clients = [], onSuccess }: 
       {mode === "edit" && (
         <div>
           <label className={labelClass}>
-            {t("notesLabel")} <span className={`ms-1 text-rizq-ink-soft/60 font-normal`}>({t("optional")})</span>
+            {t("notesLabel")} <span className={`ms-1 text-[var(--content-muted)] font-normal`}>({t("optional")})</span>
           </label>
           <textarea
             value={notes}

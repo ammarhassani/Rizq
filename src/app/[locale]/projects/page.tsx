@@ -117,7 +117,7 @@ export default async function ProjectsIndexPage({ params }: { params: Promise<Pa
                         <p className="tabular font-sans text-base font-bold text-rizq-green leading-none">
                           {fmtPrice(p.amountSar, locale as "ar" | "en")}
                         </p>
-                        <p className={`text-xs text-rizq-ink-soft/60 ${font}`}>{t("sar")}</p>
+                        <p className={`text-xs text-[var(--content-muted)] ${font}`}>{t("sar")}</p>
                       </div>
                     </div>
 

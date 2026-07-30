@@ -234,7 +234,8 @@ export function Combobox({
         <span
           className={cn(
             "min-w-0 flex-1 truncate",
-            selected ? "text-rizq-ink" : "text-rizq-ink-soft/50"
+            // Placeholder text still has to be readable: ink-soft/50 reads 2.5:1.
+            selected ? "text-rizq-ink" : "text-[var(--content-muted)]"
           )}
         >
           {selected ? selected.label : (placeholder ?? "")}
