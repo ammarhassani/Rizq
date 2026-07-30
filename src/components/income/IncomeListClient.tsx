@@ -377,7 +377,13 @@ export function IncomeListClient({ gigs, locale }: Props) {
           <button
             type="button"
             onClick={handleGenerateForecast}
-            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 bg-rizq-green/8 px-4 py-2 text-sm font-medium text-rizq-green hover:bg-rizq-green/15 transition-colors ${font}`}
+            /*
+             * The tint is mixed against --raised rather than left translucent. At 8% alpha the
+             * chip's real background is whatever sits behind it: --raised on desktop (4.97:1
+             * with --acc) but --bg on mobile, where it drops to 4.32:1 and fails AA. Pinning it
+             * keeps the desktop look and stops the contrast changing with the layout.
+             */
+            className={`inline-flex items-center gap-2 rounded-full border border-rizq-green/40 bg-[color-mix(in_srgb,var(--acc)_8%,var(--raised))] px-4 py-2 text-sm font-medium text-rizq-green hover:bg-[color-mix(in_srgb,var(--acc)_15%,var(--raised))] transition-colors ${font}`}
           >
             {forecast.status === "error"
               ? (t("tryAgain"))

@@ -6,15 +6,9 @@ The loop files findings here and never fixes them. Remediation is a separate, re
 decision — mixing discovery with change is how pass 3's fixes shipped five new defects.
 
 **2 open** — P1 0 · P2 0 · P3 2
-**13 closed** of 15 real · **9 withdrawn** (never defects)
+**14 closed** of 16 real · **9 withdrawn** (never defects)
 
 ## P3
-
-### RZQ-0019 — /ar/income — serious: color-contrast — Elements must meet minimum color contrast ratio thr
-
-/ar/income — serious: color-contrast — Elements must meet minimum color contrast ratio thresholds (2 node(s))
-
-_route `/ar/income` · run `rusher/invoice-and-vat/state-machine/print-pdf/degraded-profile/free/in-app-navigation/light` · session `S-0006` · seen again ×53 · filed 2026-07-28_
 
 ### RZQ-0024 — The remaining 43 forms still have no guard on a failed action
 
@@ -26,6 +20,18 @@ _route `/ar/onboarding` · session `ammar-fix` · filed 2026-07-29_
 55 components call a server action inside startTransition; 12 are now guarded
 remaining by area: onboarding 10, auth 9, projects 7, proposals 5, settings 3, others 1 each
 lib/actions/attempt.ts is the wrapper to apply
+```
+
+### RZQ-0025 — The same mobile contrast idiom fails on /ar/projects and /ar/income/new
+
+Fixing RZQ-0019 and then sweeping ten routes at 390x844 found the identical text-rizq-ink-soft/NN idiom failing where nobody had looked: /ar/projects has 23 nodes, all the ريال currency label on each project card, and /ar/income/new has 3 — the (اختياري) optional markers and the بدون عميل placeholder. They were never reported because the sweep only ran axe against /ar/dashboard and /ar/income. Same one-line remedy as RZQ-0019 and RZQ-0013: the design system already has --content-muted and --content-faint, darkened to clear AA, and the opacity modifier bypasses them. Desktop is clean on both routes; this is mobile-only, on a product where mobile is most of the traffic.
+
+_route `/ar/projects` · session `ammar-fix` · filed 2026-07-30_
+
+```
+390x844: /ar/projects 23 color-contrast nodes, /ar/income/new 3; both 0 at desktop width
+<p class="text-xs text-rizq-ink-soft/60 font-arabic">ريال</p> x23 on /ar/projects
+<span class="ms-1 text-rizq-ink-soft/60 font-normal">(اختياري)</span> on /ar/income/new
 ```
 
 ## Closed
@@ -41,6 +47,7 @@ lib/actions/attempt.ts is the wrapper to apply
 - RZQ-0013 (fixed) — Opacity-modified text tokens fail AA on income, calendar and settings
 - RZQ-0014 (fixed) — Money still rounded to whole SAR on the proposal and project surfaces
 - RZQ-0015 (fixed) — Logging income neither saves nor explains why
+- RZQ-0019 (fixed) — /ar/income — serious: color-contrast — Elements must meet minimum color contrast ratio thr
 - RZQ-0020 (accepted) — /ar/income — 31 tap target(s) under 44px: 36×36px "فتح قائمة التطبيقات" | 36×36px "التبديل
 - RZQ-0023 (fixed) — A server action that throws leaves 47 forms silent
 

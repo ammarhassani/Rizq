@@ -178,7 +178,8 @@ export default async function IncomePage({ params }: { params: Promise<Params> }
         <div className={`card-wahaj p-6 sm:p-8 mb-8 ${font}`}>
           <div dir={dir} className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs text-rizq-ink-soft/60 uppercase tracking-wide mb-1">{currentMonthLabel}</p>
+              {/* --content-muted, not ink-soft/60: the opacity blend reads 3.19:1 here. */}
+              <p className="text-xs text-[var(--content-muted)] uppercase tracking-wide mb-1">{currentMonthLabel}</p>
               <p className="tabular font-sans text-3xl font-bold text-rizq-green leading-none">
                 <AnimatedNumber value={totalSar} locale={locale as "ar" | "en"} duration={0.9} />
               </p>
