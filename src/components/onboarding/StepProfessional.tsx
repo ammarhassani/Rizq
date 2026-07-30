@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { saveOnboardingStepSafely as saveOnboardingStep } from "@/lib/onboarding/saveStep";
 import { SPECIALTIES } from "@/lib/refData";
 import { Combobox } from "@/components/ui/Combobox";
 import { NumberStepper } from "./NumberStepper";

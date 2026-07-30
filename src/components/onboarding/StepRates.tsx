@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { saveOnboardingStepSafely as saveOnboardingStep } from "@/lib/onboarding/saveStep";
 import { OnboardingPricePreview } from "./OnboardingPricePreview";
 import { NumberStepper } from "./NumberStepper";
 import { MonthlyGoalWheel } from "./MonthlyGoalWheel";

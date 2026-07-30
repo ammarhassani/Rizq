@@ -11,6 +11,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, Plus, Trash2, Check } from "lucide-react";
+import { attempt } from "@/lib/actions/attempt";
 import {
   saveTestimonials,
   type TestimonialRow,
@@ -83,8 +84,11 @@ export function TestimonialsEditor({ locale, initial }: Props) {
     }));
 
     startTransition(async () => {
-      const result = await saveTestimonials(payload);
-      if (!result.ok) {
+      // A dead request took the whole profile page to the error boundary from here — see
+      // lib/actions/attempt. Re-saving testimonials replaces the same rows, so the existing
+      // save-error message is the honest one.
+      const result = await attempt(() => saveTestimonials(payload));
+      if (!result || !result.ok) {
         setError(t("errorSave"));
         return;
       }

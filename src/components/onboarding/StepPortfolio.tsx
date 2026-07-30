@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { saveOnboardingStep } from "@/app/actions/onboarding/saveOnboardingStep";
+import { saveOnboardingStepSafely as saveOnboardingStep } from "@/lib/onboarding/saveStep";
 import { ChipInput } from "@/components/ui/ChipInput";
 import { normalizeNotableClients } from "@/lib/profile/notableClients";
 import { NumberStepper } from "./NumberStepper";
