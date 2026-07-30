@@ -35,6 +35,15 @@ export const PROJECT_HOURS: Record<ProjectSize, number> = {
 /** Minimum distinct contributors before `submitted` rows may surface in a band. */
 export const SUBMITTED_K_ANON = 3;
 
+/**
+ * Confidence recorded for a benchmark contributed from a finalized proposal.
+ *
+ * An ask, not a clearing price — below the paid-invoice path's 0.70 on purpose. Lives here
+ * rather than beside the server action because a `"use server"` module may only export async
+ * functions; exporting a const from one breaks every route that transitively imports it.
+ */
+export const PROPOSAL_CONTRIBUTION_CONFIDENCE = 0.4;
+
 export type KAnonRow = { provenance: string; source_user_id?: string | null };
 
 /**

@@ -19,10 +19,10 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
-import { projectSizeFromDeliverables } from "@/lib/pricing/contribution";
-
-/** An ask, not a clearing price. Below the paid-invoice path's 0.70 on purpose. */
-export const PROPOSAL_CONTRIBUTION_CONFIDENCE = 0.4;
+import {
+  PROPOSAL_CONTRIBUTION_CONFIDENCE,
+  projectSizeFromDeliverables,
+} from "@/lib/pricing/contribution";
 
 export async function contributeBenchmarkFromProposal(
   proposalId: string
