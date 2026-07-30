@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { CITIES, SPECIALTIES } from "@/lib/refData";
 import { Combobox } from "@/components/ui/Combobox";
 import { saveOnboarding, skipOnboarding } from "@/app/actions/profile/saveOnboarding";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 
@@ -29,11 +30,18 @@ export function OnboardingForm({ locale }: Props) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await saveOnboarding({
-        preferred_language: language,
-        city: city || null,
-        specialty: specialty || null,
-      });
+      // See lib/actions/attempt.
+      const result = await attempt(() =>
+        saveOnboarding({
+          preferred_language: language,
+          city: city || null,
+          specialty: specialty || null,
+        }),
+      );
+      if (!result) {
+        setError(tShared("genericError"));
+        return;
+      }
 
       if (result.ok) {
         router.push("/dashboard");

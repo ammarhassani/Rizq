@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/navigation";
 import { Check, Loader2, Eye, EyeOff } from "lucide-react";
 import { setNewPassword } from "@/app/actions/auth/resetPassword";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { password: string; confirm: string };
@@ -44,7 +45,12 @@ export function ResetPasswordForm({ locale }: Props) {
 
   const onSubmit = (values: FormValues) => {
     startTransition(async () => {
-      const result = await setNewPassword({ password: values.password });
+      // See lib/actions/attempt. Losing this form means losing the reset link's one use.
+      const result = await attempt(() => setNewPassword({ password: values.password }));
+      if (!result) {
+        setError("password", { type: "server", message: tShared("genericError") });
+        return;
+      }
       if (result.ok) {
         setSuccess(true);
         return;

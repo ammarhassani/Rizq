@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { startOAuth, type OAuthProvider } from "@/app/actions/auth/oauthRedirect";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 
@@ -25,7 +26,13 @@ export function OAuthButtons({ locale }: Props) {
     setError(null);
     setPendingProvider(provider);
     startTransition(async () => {
-      const result = await startOAuth(provider, locale);
+      // See lib/actions/attempt.
+      const result = await attempt(() => startOAuth(provider, locale));
+      if (!result) {
+        setPendingProvider(null);
+        setError(t("genericError"));
+        return;
+      }
       if (result.ok) {
         window.location.href = result.url;
         return;

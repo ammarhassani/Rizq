@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, MailCheck } from "lucide-react";
 import { resendVerificationEmail } from "@/app/actions/auth/resendVerification";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = {
   locale: "ar" | "en";
@@ -19,8 +20,11 @@ export function VerifyEmailScreen({ locale, email }: Props) {
 
   const handleResend = () => {
     startTransition(async () => {
-      await resendVerificationEmail({ email, locale });
-      setResent(true);
+      // Only claim it was sent if the request actually completed — see
+      // lib/actions/attempt. Telling someone to check an inbox for an email nobody
+      // sent leaves them waiting on a link that is not coming.
+      const sent = await attempt(() => resendVerificationEmail({ email, locale }));
+      if (sent) setResent(true);
     });
   };
 

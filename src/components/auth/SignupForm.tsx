@@ -9,6 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { signUp } from "@/app/actions/auth/signup";
 import { track } from "@/lib/analytics/track";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { email: string; password: string };
@@ -46,11 +47,18 @@ export function SignupForm({ locale }: Props) {
 
   const onSubmit = (values: FormValues) => {
     startTransition(async () => {
-      const result = await signUp({
-        email: values.email,
-        password: values.password,
-        language_preference: locale,
-      });
+      // See lib/actions/attempt: without this a dead request loses the whole signup form.
+      const result = await attempt(() =>
+        signUp({
+          email: values.email,
+          password: values.password,
+          language_preference: locale,
+        }),
+      );
+      if (!result) {
+        setError("email", { type: "server", message: tShared("genericError") });
+        return;
+      }
 
       if (result.ok) {
         track("signup_completed", {

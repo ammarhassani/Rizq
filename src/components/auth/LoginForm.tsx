@@ -11,6 +11,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { logIn } from "@/app/actions/auth/login";
 import { track } from "@/lib/analytics/track";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { email: string; password: string };
@@ -42,10 +43,18 @@ export function LoginForm({ locale }: Props) {
 
   const onSubmit = (values: FormValues) => {
     startTransition(async () => {
-      const result = await logIn({
-        email: values.email,
-        password: values.password,
-      });
+      // A dead request used to throw the sign-in page to the error boundary — the worst
+      // possible moment to lose the form. See lib/actions/attempt.
+      const result = await attempt(() =>
+        logIn({
+          email: values.email,
+          password: values.password,
+        }),
+      );
+      if (!result) {
+        setError("email", { type: "server", message: tShared("genericError") });
+        return;
+      }
 
       if (result.ok) {
         track("login_completed", { locale, method: "email" });

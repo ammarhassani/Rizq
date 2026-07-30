@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Loader2, AlertCircle } from "lucide-react";
 import { resendVerificationEmail } from "@/app/actions/auth/resendVerification";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en"; email: string };
 
@@ -16,8 +17,11 @@ export function VerifyBanner({ locale, email }: Props) {
 
   const onResend = () => {
     startTransition(async () => {
-      await resendVerificationEmail({ email, locale });
-      setSent(true);
+      // Only claim it was sent if the request actually completed — see
+      // lib/actions/attempt. Telling someone to check an inbox for an email nobody
+      // sent leaves them waiting on a link that is not coming.
+      const sent = await attempt(() => resendVerificationEmail({ email, locale }));
+      if (sent) setSent(true);
     });
   };
 

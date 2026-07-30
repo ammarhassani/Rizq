@@ -7,6 +7,7 @@ import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { Check, Loader2 } from "lucide-react";
 import { requestPasswordReset } from "@/app/actions/auth/forgotPassword";
+import { attempt } from "@/lib/actions/attempt";
 
 type Props = { locale: "ar" | "en" };
 type FormValues = { email: string };
@@ -23,6 +24,7 @@ export function ForgotPasswordForm({ locale }: Props) {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -35,8 +37,15 @@ export function ForgotPasswordForm({ locale }: Props) {
   const onSubmit = (values: FormValues) => {
     startTransition(async () => {
       // Server action returns ok=true even when the email isn't registered,
-      // to prevent account enumeration. UX shows success regardless.
-      await requestPasswordReset({ email: values.email, locale });
+      // to prevent account enumeration. UX shows success regardless — but ONLY when the
+      // request actually completed. `attempt` returns null when it never came back, and
+      // announcing "check your inbox" for an email nobody sent leaves someone locked out
+      // waiting for a link that is not coming. See lib/actions/attempt.
+      const sent = await attempt(() => requestPasswordReset({ email: values.email, locale }));
+      if (!sent) {
+        setError("email", { type: "server", message: tShared("genericError") });
+        return;
+      }
       setSubmitted(true);
     });
   };
@@ -82,6 +91,12 @@ export function ForgotPasswordForm({ locale }: Props) {
             errors.email ? "border-[var(--over-line)]" : "border-rizq-gold/30"
           } ${font}`}
         />
+        {/* The field could go red with nothing to read: the message was never rendered. */}
+        {errors.email && (
+          <p role="alert" className={`mt-2 text-sm text-[var(--over)] ${font}`}>
+            {errors.email.message}
+          </p>
+        )}
       </div>
 
       <button
