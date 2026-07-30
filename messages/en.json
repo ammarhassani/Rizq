@@ -759,7 +759,8 @@
         "salary_bridged": "From published foreign salaries, converted and adjusted",
         "freelance_rate": "From global freelance rates, adjusted for Saudi Arabia",
         "open_data": "From open government data",
-        "editorial": "Editorial estimate"
+        "editorial": "Editorial estimate",
+        "saudi_market": "From published Saudi prices for this deliverable"
       }
     },
     "insufficient": {

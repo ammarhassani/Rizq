@@ -19,6 +19,7 @@ import type { BenchmarkProvenance } from "./provenance";
  */
 export type EvidenceFamily =
   | "first_party"
+  | "saudi_market"
   | "gulf_recruiter"
   | "freelance_rate"
   | "salary_bridged"
@@ -34,6 +35,19 @@ const SALARY_BRIDGED = ["Stack Overflow", "Robert Half"];
 
 /** Gulf salary guides: already in SAR for Saudi-advertised roles, so no PPP conversion. */
 const GULF_RECRUITER = ["Robert Walters Middle East"];
+
+/**
+ * Saudi businesses publishing what they charge Saudi clients, in riyals, for named deliverables.
+ *
+ * The only published evidence that crosses NO bridge at all: not the currency bridge, not the
+ * employment bridge, not the hours assumption. A Riyadh studio's price list for "logo, 3 concepts,
+ * multiple revisions, files delivered — 1,000 SAR" is the same kind of statement the engine is
+ * trying to make. Everything else in this corpus is a foreign number wearing three transforms.
+ */
+const SAUDI_MARKET = [
+  "Saudi published rate card",
+  "Saudi freelance rate guide",
+];
 
 /** The unverifiable seed: editorial judgement wearing a published-reference label. */
 const EDITORIAL_REFS = ["Saudi-adjusted global freelance reference", "Rizq founder editorial seed"];
@@ -53,6 +67,8 @@ export function evidenceFamily(
   if (provenance === "founder" || provenance === "reasoned") return "editorial";
   const ref = sourceRef ?? "";
   if (EDITORIAL_REFS.some((r) => ref.startsWith(r))) return "editorial";
+
+  if (SAUDI_MARKET.some((r) => ref.startsWith(r))) return "saudi_market";
 
   if (provenance === "ingested") return "open_data";
 

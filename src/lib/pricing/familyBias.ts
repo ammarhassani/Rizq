@@ -74,6 +74,19 @@ export const FAMILY_PRIORS: Record<EvidenceFamily, FamilyPrior> = {
     source_ref: null,
     as_of: "2026-07-29",
   },
+  saudi_market: {
+    mu: 0.1,
+    tau: 0.3,
+    rationale:
+      "Saudi businesses publishing what they charge Saudi clients, in riyals, for named " +
+      "deliverables. Crosses no bridge at all — not currency, not employment, not hours — which " +
+      "makes it the closest published proxy for the quantity this engine estimates. The small " +
+      "positive offset is sell-side skew: a published rate card is a list price and an agency " +
+      "sits above a solo freelancer, roughly 2x on the Saudi sources that state both. Not zero " +
+      "like first_party, because nobody has yet been observed paying these.",
+    source_ref: "Saudi agency rate cards and freelance rate guides, 2025-2026",
+    as_of: "2026-07-31",
+  },
   gulf_recruiter: {
     mu: 0.18,
     tau: 0.35,

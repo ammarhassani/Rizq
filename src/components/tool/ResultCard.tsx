@@ -173,7 +173,10 @@ export function ResultCard({
    * number over a quiet footnote claims "measured" when the honest word is "estimated".
    */
   const saudiBacked = (families ?? []).some(
-    (f) => f.family === "first_party" || f.family === "gulf_recruiter"
+    (f) =>
+      f.family === "first_party" ||
+      f.family === "saudi_market" ||
+      f.family === "gulf_recruiter"
   );
   const derivedOnly = (families?.length ?? 0) > 0 && !saudiBacked;
 
@@ -184,10 +187,22 @@ export function ResultCard({
   const showMedian = derivedOnly ? round500(median) : median;
   const showMax = derivedOnly ? round500(max) : max;
 
-  /** The two readings, named by derivation — never ranked. */
-  const readings = [...(families ?? [])]
-    .sort((a, b) => b.adjusted - a.adjusted)
-    .slice(0, 2);
+  /**
+   * The two readings, named by derivation — never ranked by quality.
+   *
+   * Ordered high to low so the freelancer reads the ceiling first, but a Saudi-priced family is
+   * always kept in the pair when one exists. It is the only reading that never crossed a
+   * currency or employment bridge, so dropping it because it happens to sit third by value
+   * would hide the most directly relevant number on the card.
+   */
+  const byValue = [...(families ?? [])].sort((a, b) => b.adjusted - a.adjusted);
+  const saudiReading = byValue.find(
+    (f) => f.family === "first_party" || f.family === "saudi_market"
+  );
+  const readings =
+    saudiReading && !byValue.slice(0, 2).includes(saudiReading)
+      ? [byValue[0]!, saudiReading]
+      : byValue.slice(0, 2);
 
   // Confidence band: visualises the spread between min/median/max as a bar
   const range = max - min;
